@@ -1,0 +1,47 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+project_bundle.txt
+# --- Virtual env ---
+.venv/
+venv/
+env/
+
+# --- IDE ---
+.idea/
+.vscode/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Data / runs / outputs (important) ---
+runs/
+runs_out/
+data/
+outputs/
+*.npz
+*.npy
+*.csv
+*.h5
+*.pt
+*.pth
+*.ckpt
+*.log
+
+
+
+# --- Large media (keep in assets/, but avoid accidental dumps) ---
+*.mp4
+*.mov
+*.avi
+*.zip
+
+# --- Obsidian (если решишь хранить vault внутри repo) ---
+.obsidian/
+.trash/
