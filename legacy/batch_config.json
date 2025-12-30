@@ -1,0 +1,20 @@
+{
+  "Ns": [10],
+  "runs_per_N": 5,
+  "E_level": 0.4,
+  "seed0": 0,
+
+  "max_steps": 3000,
+  "min_t": 1200,
+  "tail": 2000,
+
+  "diag_fast": 1,
+  "diag_slow": 1,
+
+  "A_thr": 0.05,
+  "A_win": 200,
+  "T_need": 12,
+  "T_rel_eps": 0.05,
+
+  "backend": "torch"
+}
