@@ -157,9 +157,7 @@ def step(state: FieldState, params: DynamicsParameters) -> FieldState:
             delta[idx] -= flux
             delta[n_idx] += flux
 
-    updated_energy = [
-        value + delta_value for value, delta_value in zip(state.energy.values, delta)
-    ]
+    updated_energy = [value + delta_value for value, delta_value in zip(state.energy.values, delta)]
 
     if params.energy_bounds is not None:
         lo, hi = params.energy_bounds
@@ -175,9 +173,7 @@ def step(state: FieldState, params: DynamicsParameters) -> FieldState:
     )
 
 
-def evolve(
-    initial_state: FieldState, params: DynamicsParameters, steps: int
-) -> List[FieldState]:
+def evolve(initial_state: FieldState, params: DynamicsParameters, steps: int) -> List[FieldState]:
     """Run deterministic evolution for ``steps`` ticks and return snapshots."""
 
     history = [initial_state]

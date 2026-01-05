@@ -142,9 +142,7 @@ def radial_profile(
             totals[radius] += float(field.values[idx])
             counts[radius] += 1
 
-    profile = [
-        (totals[r] / counts[r]) if counts[r] > 0 else float("nan") for r in range(r_max + 1)
-    ]
+    profile = [(totals[r] / counts[r]) if counts[r] > 0 else float("nan") for r in range(r_max + 1)]
     radii_vector = [float(r) for r in range(r_max + 1)]
     return profile, radii_vector
 
