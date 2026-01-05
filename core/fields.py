@@ -91,7 +91,8 @@ class ScalarField:
     def __post_init__(self) -> None:
         if len(self.values) != self.lattice.size:
             raise ValueError(
-                f"Field value count {len(self.values)} does not match lattice size {self.lattice.size}"
+                "Field value count "
+                f"{len(self.values)} does not match lattice size {self.lattice.size}"
             )
 
     # ------------------------------------------------------------------

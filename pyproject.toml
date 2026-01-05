@@ -1,0 +1,33 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+extend-exclude = "/(legacy|experiments|examples|visualization|docs|detm_logging|fallback|runtime|tools|bundle_project\\.py)/"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["core", "tests"]
+extend-exclude = [
+  "legacy",
+  "experiments",
+  "examples",
+  "visualization",
+  "docs",
+  "detm_logging",
+  "fallback",
+  "runtime",
+  "tools",
+  "bundle_project.py",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E203"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+files = ["core", "tests"]
