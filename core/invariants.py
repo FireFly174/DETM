@@ -81,6 +81,7 @@ def collect_series(history: Sequence[FieldState]) -> Mapping[str, List[float]]:
     energy_mean: List[float] = []
     energy_min: List[float] = []
     energy_max: List[float] = []
+    energy_var: List[float] = []
     entropy_mean: List[float] = []
     internal_time_mean: List[float] = []
 
@@ -89,6 +90,7 @@ def collect_series(history: Sequence[FieldState]) -> Mapping[str, List[float]]:
         energy_mean.append(snapshot.energy.mean)
         energy_min.append(snapshot.energy.minimum)
         energy_max.append(snapshot.energy.maximum)
+        energy_var.append(snapshot.energy.variance)
         entropy_mean.append(snapshot.entropy.mean)
         internal_time_mean.append(snapshot.internal_time.mean)
 
@@ -96,6 +98,7 @@ def collect_series(history: Sequence[FieldState]) -> Mapping[str, List[float]]:
         "energy_mean": energy_mean,
         "energy_min": energy_min,
         "energy_max": energy_max,
+        "energy_var": energy_var,
         "entropy_mean": entropy_mean,
         "internal_time_mean": internal_time_mean,
     }
