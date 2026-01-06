@@ -47,24 +47,24 @@ DETM — это дискретная динамическая модель на 
 
 В проекте жёстко разделены уровни смысла:
 
-- `docs/10_model`  
+- `docs/rus/10_model` (RU), `docs/eng/10_model` (EN)  
   Формальная спецификация модели.  
   Только правила, без интерпретаций.
 
-- `docs/20_mechanisms`  
+- `docs/rus/20_mechanisms` (RU), `docs/eng/20_mechanisms` (EN)  
   Описание механизмов, возникающих из модели
   (коарсинг, инварианты, внутреннее время, каналы).
 
-- `docs/30_hypotheses`  
+- `docs/rus/30_hypotheses` (RU), `docs/eng/30_hypotheses` (EN)  
   Проверяемые, falsifiable-гипотезы.
 
-- `docs/40_experiments`  
+- `docs/rus/40_experiments` (RU), `docs/eng/40_experiments` (EN)  
   Экспериментальные протоколы и метрики.
 
-- `docs/50_limits`  
+- `docs/rus/50_limits` (RU), `docs/eng/50_limits` (EN)  
   Ограничения и запрещённые интерпретации.
 
-- `docs/90_notes`  
+- `docs/rus/90_notes` (RU), `docs/eng/90_notes` (EN)  
   Архив идей, аналогий и Obsidian-заметок.
   Не является каноном.
 

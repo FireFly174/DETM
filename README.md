@@ -15,7 +15,7 @@ DETM — исследовательская дискретная модель д
 **DAGM (Discrete Asynchronous Graph Model)**: дискретная асинхронная динамика на графе
 с ограниченными потоками, где решётка является частным случаем графа.
 
-- Каноническое описание DAGM: `docs/10_model/dagm_core.md`
+- Каноническое описание DAGM: `docs/rus/10_model/dagm_core.md`
 - Исходные рассуждения/черновики по DAGM и DETM: `Discrete Emergent Medium with Multilevel Coarsening/`
 
 ---
@@ -67,7 +67,11 @@ DETM:
 `final_state.npz`, `summary.json/catalog.json`) и используются как канонический
 формат результатов. Скрипты из `legacy/export_*` и `legacy/bundle_*` поддерживаются
 только для ручного разбора старых прогонов и не конвертируются в новый формат;
-подробности — в `docs/40_experiments/legacy_data_formats.md`.
+подробности — в `docs/rus/40_experiments/legacy_data_formats.md`.
+
+## Документация (RU/EN)
+
+- `docs/README.md`
 
 ---
 
