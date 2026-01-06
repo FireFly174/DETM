@@ -8,15 +8,15 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 
-from core.entropy import DynamicsParameters, compute_entropy, step as entropy_step
-from core.fields import FieldState, Lattice, ScalarField
-from core.invariants import describe_field
+from core.fields import Lattice
+from runtime.backends import Backend, NumpyBackend, TorchBackend
 from runtime.config import DETMConfig
 from runtime.diagnostics.attractors import detect_attractors
 from runtime.influence import DETMInfluence, apply_influence
 from runtime.serialization import deserialize_state, serialize_state
-from runtime.signature import DETMSignature, digest_fields
-from runtime.state import DETMState
+from runtime.schemas import get_schema_versions
+from runtime.signature import DETMSignature, describe_field_from_array, digest_fields
+from runtime.state import DETMFieldState, DETMState
 
 
 @dataclass(frozen=True)
@@ -39,19 +39,88 @@ class Observables:
 # Core API
 # ---------------------------------------------------------------------------
 
+def _to_numpy(array) -> np.ndarray:
+    try:
+        import torch  # type: ignore
+    except ModuleNotFoundError:
+        torch = None
+
+    if torch is not None and isinstance(array, torch.Tensor):
+        return array.detach().to("cpu").numpy()
+    return np.asarray(array)
+
+
+def _is_torch_tensor(array) -> bool:
+    try:
+        import torch  # type: ignore
+    except ModuleNotFoundError:
+        return False
+    return isinstance(array, torch.Tensor)
+
+
+def _backend_from_config(config: DETMConfig, lattice: Lattice) -> Backend:
+    if config.backend == "torch":
+        try:
+            backend = TorchBackend(device=config.device)
+        except RuntimeError:
+            backend = None
+        if backend is not None and backend.supports(lattice):
+            return backend
+    return NumpyBackend()
+
+
 def reset(config: DETMConfig, seed: int) -> DETMState:
     rng = np.random.default_rng(seed)
     lattice = Lattice(config.width, config.height, boundary=config.boundary)
-    energy_values = rng.normal(loc=config.dynamics.equilibrium_energy, scale=config.initial_noise, size=lattice.size)
-    energy_values = np.clip(energy_values, 0.0, 1.0).reshape(-1)
+    energy_init = rng.normal(
+        loc=config.dynamics.equilibrium_energy, scale=config.initial_noise, size=(lattice.height, lattice.width)
+    )
+    energy_init = np.clip(energy_init, 0.0, 1.0).astype(float, copy=False)
 
-    energy = ScalarField(lattice, energy_values.tolist())
-    entropy = compute_entropy(energy, config.dynamics)
-    internal_time = ScalarField.constant(lattice, value=0.0)
-    field_state = FieldState(energy=energy, entropy=entropy, internal_time=internal_time)
+    backend = _backend_from_config(config, lattice)
+    entropy_init = NumpyBackend._compute_entropy(energy_init, config.dynamics, boundary=lattice.boundary)
+
+    if isinstance(backend, TorchBackend):
+        torch = backend._torch
+        device = torch.device(backend.config.device)
+        dtype = torch.float64
+        field_state = DETMFieldState(
+            lattice=lattice,
+            energy=torch.tensor(energy_init, device=device, dtype=dtype),
+            entropy=torch.tensor(entropy_init, device=device, dtype=dtype),
+            internal_time=torch.zeros((lattice.height, lattice.width), device=device, dtype=dtype),
+        )
+    else:
+        field_state = DETMFieldState(
+            lattice=lattice,
+            energy=energy_init,
+            entropy=entropy_init,
+            internal_time=np.zeros((lattice.height, lattice.width), dtype=float),
+        )
+
     state = DETMState(field_state=field_state, step_count=0, config=config.to_dict(), dynamics=config.dynamics)
     state.store_rng(rng)
     return state
+
+
+def _select_backend(state: DETMState) -> Backend:
+    config = DETMConfig.from_dict(state.config) if state.config is not None else DETMConfig()
+    backend_name = str(config.backend)
+    device = str(config.device)
+
+    if backend_name == "torch":
+        try:
+            backend = TorchBackend(device=device)
+        except RuntimeError:
+            backend = None
+        if (
+            backend is not None
+            and backend.supports(state.lattice)
+            and _is_torch_tensor(state.field_state.energy)
+            and _is_torch_tensor(state.field_state.internal_time)
+        ):
+            return backend
+    return NumpyBackend()
 
 
 def _apply_quality_proxies(signature_vec: List[float]) -> Dict[str, float]:
@@ -66,28 +135,33 @@ def _apply_quality_proxies(signature_vec: List[float]) -> Dict[str, float]:
     }
 
 
-def step(state: DETMState, influence: DETMInfluence, n_ticks: int, rng: np.random.Generator | None = None) -> Tuple[DETMState, Observables]:
+def step(
+    state: DETMState,
+    influence: DETMInfluence | None,
+    n_ticks: int,
+    rng: np.random.Generator | None = None,
+) -> Tuple[DETMState, Observables]:
     rng = rng or state.restore_rng()
-    application = apply_influence(state.field_state, influence, rng)
+    application = apply_influence(state.field_state, influence, rng) if influence is not None else None
 
     start = time.perf_counter()
-    for _ in range(max(1, n_ticks)):
-        state.field_state = entropy_step(state.field_state, state.dynamics)
-        state.step_count += 1
+    backend = _select_backend(state)
+    state.field_state = backend.step(state.field_state, state.dynamics, n_ticks)
+    state.step_count += max(0, n_ticks)
     elapsed = time.perf_counter() - start
     state.store_rng(rng)
 
     lattice = state.lattice
-    energy_arr = np.asarray(state.field_state.energy.values).reshape(lattice.height, lattice.width)
-    entropy_arr = np.asarray(state.field_state.entropy.values).reshape(lattice.height, lattice.width)
-    time_arr = np.asarray(state.field_state.internal_time.values).reshape(lattice.height, lattice.width)
+    energy_arr = _to_numpy(state.field_state.energy).reshape(lattice.height, lattice.width)
+    entropy_arr = _to_numpy(state.field_state.entropy).reshape(lattice.height, lattice.width)
+    time_arr = _to_numpy(state.field_state.internal_time).reshape(lattice.height, lattice.width)
 
     signature = digest_fields(energy_arr, entropy_arr, time_arr)
     attractors = detect_attractors(energy_arr)
     summaries = FieldSummaries(
-        energy=_moments_to_dict(describe_field(state.field_state.energy)),
-        entropy=_moments_to_dict(describe_field(state.field_state.entropy)),
-        internal_time=_moments_to_dict(describe_field(state.field_state.internal_time)),
+        energy=describe_field_from_array(energy_arr),
+        entropy=describe_field_from_array(entropy_arr),
+        internal_time=describe_field_from_array(time_arr),
     )
 
     cost = {
@@ -107,7 +181,8 @@ def step(state: DETMState, influence: DETMInfluence, n_ticks: int, rng: np.rando
         }
         for attr in attractors
     ]
-    events.append({"type": "influence", **application.__dict__})
+    if application is not None:
+        events.append({"type": "influence", **application.__dict__})
 
     observables = Observables(
         signature=signature,
@@ -121,9 +196,9 @@ def step(state: DETMState, influence: DETMInfluence, n_ticks: int, rng: np.rando
 
 def digest(state: DETMState) -> DETMSignature:
     lattice = state.lattice
-    energy = np.asarray(state.field_state.energy.values).reshape(lattice.height, lattice.width)
-    entropy = np.asarray(state.field_state.entropy.values).reshape(lattice.height, lattice.width)
-    internal_time = np.asarray(state.field_state.internal_time.values).reshape(lattice.height, lattice.width)
+    energy = _to_numpy(state.field_state.energy).reshape(lattice.height, lattice.width)
+    entropy = _to_numpy(state.field_state.entropy).reshape(lattice.height, lattice.width)
+    internal_time = _to_numpy(state.field_state.internal_time).reshape(lattice.height, lattice.width)
     return digest_fields(energy, entropy, internal_time)
 
 
@@ -135,13 +210,15 @@ def deserialize(blob: bytes) -> DETMState:
     return deserialize_state(blob)
 
 
-def _moments_to_dict(moments) -> Dict[str, float]:
-    return {
-        "minimum": float(moments.minimum),
-        "maximum": float(moments.maximum),
-        "mean": float(moments.mean),
-        "variance": float(moments.variance),
-    }
-
-
-__all__ = ["Observables", "FieldSummaries", "digest", "deserialize", "reset", "serialize", "step"]
+__all__ = [
+    "FieldSummaries",
+    "Observables",
+    "deserialize",
+    "deserialize_state",
+    "digest",
+    "get_schema_versions",
+    "reset",
+    "serialize",
+    "serialize_state",
+    "step",
+]

@@ -3,12 +3,25 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List
+from typing import TYPE_CHECKING, Iterable, List
 
 import numpy as np
 
-from core.invariants import describe_field
 from runtime.signature import digest_fields
+
+if TYPE_CHECKING:
+    from runtime.state import DETMState
+
+
+def _to_numpy(array) -> np.ndarray:
+    try:
+        import torch  # type: ignore
+    except ModuleNotFoundError:
+        torch = None
+
+    if torch is not None and isinstance(array, torch.Tensor):
+        return array.detach().to("cpu").numpy()
+    return np.asarray(array)
 
 
 @dataclass(frozen=True)
@@ -25,8 +38,17 @@ class StabilityReport:
     delta: float
 
 
-def detect_attractors(energy: np.ndarray, threshold: float = 0.8, top_k: int = 4) -> List[Attractor]:
-    """Heuristic attractor detector based on local energy peaks."""
+def detect_attractors(state_or_energy: np.ndarray | "DETMState", threshold: float = 0.8, top_k: int = 4) -> List[Attractor]:
+    """Heuristic attractor detector based on local energy peaks.
+
+    Accepts either a raw energy field (2D array) or a full DETMState.
+    """
+
+    if isinstance(state_or_energy, np.ndarray):
+        energy = state_or_energy
+    else:
+        lattice = state_or_energy.lattice
+        energy = _to_numpy(state_or_energy.field_state.energy).reshape(lattice.height, lattice.width)
 
     if energy.size == 0:
         return []
@@ -69,9 +91,9 @@ def signature_from_state(state) -> np.ndarray:
     import numpy as _np
 
     lattice = state.lattice
-    energy = _np.asarray(state.field_state.energy.values).reshape(lattice.height, lattice.width)
-    entropy = _np.asarray(state.field_state.entropy.values).reshape(lattice.height, lattice.width)
-    internal_time = _np.asarray(state.field_state.internal_time.values).reshape(lattice.height, lattice.width)
+    energy = _to_numpy(state.field_state.energy).reshape(lattice.height, lattice.width)
+    entropy = _to_numpy(state.field_state.entropy).reshape(lattice.height, lattice.width)
+    internal_time = _to_numpy(state.field_state.internal_time).reshape(lattice.height, lattice.width)
     return _np.asarray(digest_fields(energy, entropy, internal_time).vector, dtype=float)
 
 

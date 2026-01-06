@@ -1,41 +1,57 @@
-"""Minimal in-process runtime bridge for DETM sessions."""
+"""Minimal in-process runtime bridge for DETM sessions.
+
+This module intentionally contains **no module-level singleton state** so that
+external runtimes can host multiple independent bridges in-process (or one
+bridge per worker/process) without cross-talk.
+"""
 
 from __future__ import annotations
 
 import itertools
-from typing import Dict
+from dataclasses import dataclass
+from typing import Dict, Tuple
 
 from runtime import api
 from runtime.config import DETMConfig
 from runtime.influence import DETMInfluence
 from runtime.serialization import serialize_state
+from runtime.signature import DETMSignature
 from runtime.state import DETMState
 
-_sessions: Dict[int, DETMState] = {}
-_session_counter = itertools.count(1)
+
+@dataclass(frozen=True)
+class SessionStepResult:
+    signature: DETMSignature
+    observables: api.Observables
+    state_digest: list[float]
 
 
-def create_session(config: DETMConfig, seed: int) -> int:
-    session_id = next(_session_counter)
-    _sessions[session_id] = api.reset(config, seed)
-    return session_id
+class DETMRuntimeBridge:
+    def __init__(self) -> None:
+        self._sessions: Dict[int, DETMState] = {}
+        self._session_counter = itertools.count(1)
+
+    def create_session(self, config: DETMConfig, seed: int) -> int:
+        session_id = next(self._session_counter)
+        self._sessions[session_id] = api.reset(config, seed)
+        return session_id
+
+    def session_step(self, session_id: int, influence: DETMInfluence | None, n_ticks: int) -> SessionStepResult:
+        state = self._sessions[session_id]
+        next_state, obs = api.step(state, influence, n_ticks, None)
+        self._sessions[session_id] = next_state
+        signature = api.digest(next_state)
+        return SessionStepResult(signature=signature, observables=obs, state_digest=list(signature.vector))
+
+    def session_get_state_blob(self, session_id: int) -> bytes:
+        state = self._sessions[session_id]
+        return serialize_state(state)
+
+    def close_session(self, session_id: int) -> None:
+        self._sessions.pop(session_id, None)
+
+    def clear_sessions(self) -> None:
+        self._sessions.clear()
 
 
-def session_step(session_id: int, influence: DETMInfluence, n_ticks: int):
-    state = _sessions[session_id]
-    next_state, obs = api.step(state, influence, n_ticks, None)
-    _sessions[session_id] = next_state
-    signature = api.digest(next_state)
-    return signature, obs, signature.vector
-
-
-def session_get_state_blob(session_id: int) -> bytes:
-    state = _sessions[session_id]
-    return serialize_state(state)
-
-
-def clear_sessions() -> None:
-    _sessions.clear()
-
-
-__all__ = ["clear_sessions", "create_session", "session_get_state_blob", "session_step"]
+__all__ = ["DETMRuntimeBridge", "SessionStepResult"]

@@ -3,13 +3,70 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import numpy as np
 
 from core.entropy import DynamicsParameters
-from core.fields import FieldState, Lattice, ScalarField
+from core.fields import Lattice
 from runtime.schemas import DETM_STATE_V1
+
+if TYPE_CHECKING:  # pragma: no cover
+    import torch
+
+    ArrayLike = np.ndarray | torch.Tensor
+else:  # pragma: no cover
+    ArrayLike = Any
+
+
+def _is_torch_tensor(value: Any) -> bool:
+    try:
+        import torch  # type: ignore
+    except ModuleNotFoundError:
+        return False
+    return isinstance(value, torch.Tensor)
+
+
+def _copy_array(value: ArrayLike) -> ArrayLike:
+    if _is_torch_tensor(value):
+        return value.clone()
+    return np.asarray(value, dtype=float).copy()
+
+
+@dataclass
+class DETMFieldState:
+    """Backend-owned numeric state for a single DETM tick."""
+
+    lattice: Lattice
+    energy: ArrayLike  # shape (H, W)
+    entropy: ArrayLike  # shape (H, W)
+    internal_time: ArrayLike  # shape (H, W)
+
+    def ensure_alignment(self) -> None:
+        h, w = self.lattice.height, self.lattice.width
+        expected = (h, w)
+        for name, array in [
+            ("energy", self.energy),
+            ("entropy", self.entropy),
+            ("internal_time", self.internal_time),
+        ]:
+            shape = tuple(array.shape) if _is_torch_tensor(array) else tuple(np.asarray(array).shape)
+            if shape != expected:
+                raise ValueError(f"{name} shape {shape} does not match lattice {expected}")
+
+    def copy(self) -> "DETMFieldState":
+        return DETMFieldState(
+            lattice=self.lattice,
+            energy=_copy_array(self.energy),
+            entropy=_copy_array(self.entropy),
+            internal_time=_copy_array(self.internal_time),
+        )
+
+
+def _default_field_state() -> DETMFieldState:
+    lattice = Lattice(1, 1, boundary="periodic")
+    zeros = np.zeros((1, 1), dtype=float)
+    return DETMFieldState(lattice=lattice, energy=zeros.copy(), entropy=zeros.copy(), internal_time=zeros.copy())
 
 
 @dataclass
@@ -21,7 +78,7 @@ class DETMState:
     """
 
     state_version: str = DETM_STATE_V1
-    field_state: FieldState = field(default_factory=lambda: FieldState(ScalarField(Lattice(1, 1), [0.0]), ScalarField(Lattice(1, 1), [0.0]), ScalarField(Lattice(1, 1), [0.0])))
+    field_state: DETMFieldState = field(default_factory=_default_field_state)
     step_count: int = 0
     rng_state: Dict[str, Any] = field(default_factory=dict)
     config: Optional[Dict[str, Any]] = None
@@ -42,7 +99,7 @@ class DETMState:
         )
 
     def restore_rng(self) -> np.random.Generator:
-        rng = np.random.default_rng()
+        rng = np.random.Generator(np.random.PCG64(0))
         if self.rng_state:
             rng.bit_generator.state = _from_serializable_rng_state(self.rng_state)
         return rng
@@ -80,4 +137,4 @@ def _from_serializable_rng_state(state: Dict[str, Any]) -> Dict[str, Any]:
     return {key: _restore(val) for key, val in state.items()}
 
 
-__all__ = ["DETMState"]
+__all__ = ["DETMFieldState", "DETMState"]

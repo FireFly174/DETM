@@ -4,11 +4,14 @@
 
 ## Базовый API
 - `reset(config: DETMConfig, seed: int) -> DETMState`
-- `step(state: DETMState, influence: DETMInfluence, n_ticks: int, rng: np.random.Generator | None = None) -> tuple[DETMState, DETMObservables]`
+- `step(state: DETMState, influence: DETMInfluence | None, n_ticks: int, rng: np.random.Generator | None = None) -> tuple[DETMState, DETMObservables]`
 - `digest(state: DETMState) -> DETMSignature`
 - `serialize_state(state: DETMState) -> bytes`
 - `deserialize_state(blob: bytes) -> DETMState`
 - `get_schema_versions() -> dict[str, str]`
+
+Допускаются алиасы `serialize(state)` / `deserialize(blob)` как более короткие имена,
+но их сигнатуры и поведение должны быть идентичны `serialize_state`/`deserialize_state`.
 
 ### Детерминизм и воспроизводимость
 - **Единый RNG**: все стохастические операции принимают `rng` явно (или используют `state.rng_state`). Никаких скрытых `np.random`/`torch.rand`.
@@ -16,11 +19,15 @@
 
 ### Конфигурация (промт 1.2)
 - `DETMConfig` (dataclass/pydantic) содержит `config_version` и параметры решётки/динамики.
+- `DETMConfig.backend`: выбирает численный бэкенд (`"torch"` предпочтителен, `"numpy"` как эталон/фолбэк).
+- `DETMConfig.device`: `"cpu"`/`"cuda"`/`"cuda:0"` и т.п.; при отсутствии CUDA бэкенд должен автоматически деградировать до CPU (или до `numpy`).
 - Любое изменение схемы → bump minor версии.
 - Методы `to_dict()/from_dict()` фиксируют сериализуемый формат.
 
 ## Состояние (промты 2.1–2.3)
 - Всё L0‑состояние собрано в едином `DETMState`: поля `E`, `τ` (если используется), дополнительные карты, внутреннее время, счётчики, `rng_state`.
+- Численные поля (`E/S/τ`) принадлежат **бэкенду**: это могут быть `numpy.ndarray` или `torch.Tensor`. Бэкенд выполняет только переход
+  «текущее состояние → будущее состояние» на `n_ticks` и **не приводит** состояние к единому формату (конверсия/сравнение/трансформации делаются снаружи).
 - Сериализация: `serialize_state(state) -> bytes` (msgpack/npz) и `deserialize_state(blob) -> state` с `state_version` для forward‑compatibility. Смоук‑тест: `serialize→deserialize→digest` совпадает.
 - `digest(state) -> DETMSignature`: компактный вектор (8–32 числа): энергия, энтропия/гладкость, доминирующая мода, центр массы, устойчивость/периодичность при наличии.
 
@@ -38,6 +45,7 @@
 
 ## Step API и время (промты 4.1–4.2)
 - `step()` принимает `n_ticks: int` (tick‑driven). Внутренняя физическая шкала (`dt`) хранится в `config`, но наружный интерфейс оперирует тиками.
+- `influence` может быть `None` (шаг без внешних воздействий).
 - Возврат `observables` включает:
   - `signature` (короткая подпись сразу после шага);
   - `field_summaries` (минимальные статистики по полям);
@@ -64,9 +72,9 @@
 - При bump версии — `migrate_state(blob, from_version, to_version)` (пока stub + документация), чтобы сохранять совместимость.
 
 ## Runtime bridge (промты 10.1–10.2)
-- `integrations/runtime_bridge.py` предоставляет:
+- `integrations/runtime_bridge.py` предоставляет `DETMRuntimeBridge`:
   - `create_session(config, seed) -> session_id`
-  - `session_step(session_id, influence, n_ticks) -> (signature, observables, maybe_state_digest)`
+  - `session_step(session_id, influence, n_ticks) -> SessionStepResult(signature, observables, state_digest)`
   - `session_get_state_blob(session_id)`
 - Без глобальных синглтонов: DETM должна поддерживать несколько одновременных сессий (или явный запрет). Рантайм-бридж организует изоляцию без UI/ComfyUI зависимостей.
 

@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, Optional
+from dataclasses import dataclass
+from typing import Any, Dict
 
 import numpy as np
 
-from core.fields import FieldState, Lattice
+from core.fields import Lattice
+from runtime.state import DETMFieldState
 
 
 @dataclass(frozen=True)
@@ -47,7 +48,15 @@ def _resolve_mask(lattice: Lattice, influence: DETMInfluence) -> np.ndarray:
     return (x - cx) ** 2 + (y - cy) ** 2 <= radius**2
 
 
-def apply_influence(state: FieldState, influence: DETMInfluence, rng: np.random.Generator) -> InfluenceApplication:
+def _is_torch_tensor(value: Any) -> bool:
+    try:
+        import torch  # type: ignore
+    except ModuleNotFoundError:
+        return False
+    return isinstance(value, torch.Tensor)
+
+
+def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.random.Generator) -> InfluenceApplication:
     """Apply influence to energy field in-place.
 
     The implementation is intentionally simple: it perturbs energy in a masked
@@ -57,15 +66,31 @@ def apply_influence(state: FieldState, influence: DETMInfluence, rng: np.random.
 
     lattice = state.lattice
     mask = _resolve_mask(lattice, influence)
-    energy = np.asarray(state.energy.values, dtype=float).reshape(lattice.height, lattice.width)
+    amplitude = float(influence.amplitude)
 
-    amplitude = influence.amplitude
+    influence_rng = rng
     if influence.seed is not None:
-        rng = np.random.default_rng(influence.seed)
-    noise = rng.normal(loc=0.0, scale=0.05, size=energy.shape)
-    energy[mask] = np.clip(energy[mask] + amplitude * (1.0 + noise[mask]), 0.0, 1.0)
+        influence_rng = np.random.Generator(np.random.PCG64(int(influence.seed)))
 
-    state.energy.values = energy.reshape(-1).tolist()
+    if _is_torch_tensor(state.energy):
+        import torch  # type: ignore
+
+        energy_t = state.energy
+        device = energy_t.device
+        dtype = energy_t.dtype
+
+        mask_t = torch.from_numpy(mask).to(device=device)
+        noise_np = influence_rng.normal(loc=0.0, scale=0.05, size=mask.shape).astype(np.float64)
+        noise_t = torch.from_numpy(noise_np).to(device=device, dtype=dtype)
+
+        updated = energy_t + amplitude * (1.0 + noise_t)
+        updated = torch.clamp(updated, min=0.0, max=1.0)
+        state.energy = torch.where(mask_t, updated, energy_t)
+    else:
+        energy = np.asarray(state.energy, dtype=float)
+        noise = influence_rng.normal(loc=0.0, scale=0.05, size=energy.shape)
+        energy[mask] = np.clip(energy[mask] + amplitude * (1.0 + noise[mask]), 0.0, 1.0)
+        state.energy = energy
 
     affected_fraction = float(mask.mean()) if mask.size else 0.0
     external_features = None

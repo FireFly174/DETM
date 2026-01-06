@@ -19,6 +19,8 @@ class DETMConfig:
     """
 
     config_version: str = DETM_CONFIG_V1
+    backend: str = "torch"  # "numpy" | "torch"
+    device: str = "cuda"  # preferred device; may fall back to cpu if unavailable
     width: int = 24
     height: int = 24
     boundary: str = "periodic"
@@ -39,6 +41,8 @@ class DETMConfig:
         dynamics = DynamicsParameters(**dynamics_raw) if isinstance(dynamics_raw, dict) else dynamics_raw
         return cls(
             config_version=version,
+            backend=str(data.get("backend", "torch")),
+            device=str(data.get("device", "cuda")),
             width=int(data.get("width", 24)),
             height=int(data.get("height", 24)),
             boundary=str(data.get("boundary", "periodic")),
