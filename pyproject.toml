@@ -25,6 +25,9 @@ include = [
   "detm*",
 ]
 
+[tool.setuptools.package-data]
+"detm.presets" = ["*.json"]
+
 [tool.black]
 line-length = 100
 target-version = ["py312"]
