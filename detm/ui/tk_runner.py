@@ -16,7 +16,7 @@ from detm.runtime.influence import DETMInfluence
 from detm.runtime.symbols import list_symbols, make_symbol
 from detm.run.bus import EventBus
 from detm.run.session import DetmSession
-from detm.run.subscribers import ArtifactWriter, JsonlTraceWriter, VizStreamer
+from detm.run.subscribers import ArtifactWriter, FieldHistoryRecorder, JsonlTraceWriter, VizStreamer
 from detm.viz.transport import VizTransport, open_viz_transport
 
 
@@ -29,6 +29,7 @@ class UiRunSettings:
     symbol_id: str = "pulse"
     amplitude: float = 1.0
     record_dir: Optional[Path] = None
+    record_fields: bool = False
     viz_enabled: bool = True
     viz_transport: str = "tcp"  # tcp | none
     viz_host: str = "127.0.0.1"
@@ -50,6 +51,7 @@ class DetmTkRunner:
         self._viz_key: tuple | None = None
         self._trace_writer: JsonlTraceWriter | None = None
         self._artifact_writer: ArtifactWriter | None = None
+        self._fields_recorder: FieldHistoryRecorder | None = None
 
         self._configure_recording()
         self._configure_viz()
@@ -146,6 +148,9 @@ class DetmTkRunner:
         if self._artifact_writer is not None:
             self._artifact_writer.detach()
             self._artifact_writer = None
+        if self._fields_recorder is not None:
+            self._fields_recorder.detach()
+            self._fields_recorder = None
 
     def _configure_recording(self) -> None:
         record_dir = self.settings.record_dir
@@ -157,12 +162,23 @@ class DetmTkRunner:
         if self._trace_writer is None:
             self._trace_writer = JsonlTraceWriter.attach(self._session.bus, record_dir / "trace.jsonl")
             self._artifact_writer = ArtifactWriter.attach(self._session.bus, record_dir)
+            if bool(self.settings.record_fields):
+                self._fields_recorder = FieldHistoryRecorder.attach(self._session.bus, record_dir / "fields_hist.npz")
             return
 
         if self._trace_writer.path.resolve() != (record_dir / "trace.jsonl").resolve():
             self._disable_recording()
             self._trace_writer = JsonlTraceWriter.attach(self._session.bus, record_dir / "trace.jsonl")
             self._artifact_writer = ArtifactWriter.attach(self._session.bus, record_dir)
+            if bool(self.settings.record_fields):
+                self._fields_recorder = FieldHistoryRecorder.attach(self._session.bus, record_dir / "fields_hist.npz")
+        else:
+            # Toggle field recorder without changing directory
+            if bool(self.settings.record_fields) and self._fields_recorder is None:
+                self._fields_recorder = FieldHistoryRecorder.attach(self._session.bus, record_dir / "fields_hist.npz")
+            if (not bool(self.settings.record_fields)) and self._fields_recorder is not None:
+                self._fields_recorder.detach()
+                self._fields_recorder = None
 
 
 def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
@@ -227,6 +243,9 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
     ttk.Entry(frm, textvariable=out_var, width=38).grid(row=4, column=1, columnspan=3, sticky="we", padx=(6, 0))
     frm.columnconfigure(3, weight=1)
 
+    fields_var = tk.BooleanVar(value=bool(getattr(settings, "record_fields", False)))
+    ttk.Checkbutton(frm, text="fields_hist.npz", variable=fields_var).grid(row=4, column=3, sticky="e")
+
     viz_enabled_var = tk.BooleanVar(value=settings.viz_enabled)
     ttk.Checkbutton(frm, text="Viz daemon", variable=viz_enabled_var).grid(row=5, column=0, sticky="w")
     viz_transport_var = tk.StringVar(value=settings.viz_transport)
@@ -264,6 +283,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
         settings.ticks_per_step = int(ticks_var.get())
         settings.tick_interval_ms = int(interval_var.get())
         settings.record_dir = Path(out_var.get()) if record_var.get() else None
+        settings.record_fields = bool(fields_var.get())
         settings.viz_enabled = bool(viz_enabled_var.get())
         settings.viz_transport = str(viz_transport_var.get()).strip() or "tcp"
         settings.viz_host = str(viz_host_var.get()).strip() or "127.0.0.1"

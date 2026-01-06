@@ -128,11 +128,49 @@ def run_daemon(host: str, port: int) -> None:  # pragma: no cover (UI)
     status_var = tk.StringVar(value=f"Listening on {ready_host}:{ready_port}")
     ttk.Label(frm, textvariable=status_var).grid(row=0, column=0, sticky="w")
 
+    controls = ttk.Frame(frm)
+    controls.grid(row=1, column=0, sticky="we", pady=(8, 0))
+    controls.columnconfigure(9, weight=1)
+
+    field_var = tk.StringVar(value="energy")
+    ttk.Label(controls, text="Field").grid(row=0, column=0, sticky="w")
+    ttk.Combobox(
+        controls,
+        textvariable=field_var,
+        values=["energy", "entropy", "internal_time"],
+        width=14,
+        state="readonly",
+    ).grid(row=0, column=1, sticky="w", padx=(6, 12))
+
+    cmap_var = tk.StringVar(value="heat")
+    ttk.Label(controls, text="Cmap").grid(row=0, column=2, sticky="w")
+    ttk.Combobox(
+        controls,
+        textvariable=cmap_var,
+        values=["gray", "heat"],
+        width=8,
+        state="readonly",
+    ).grid(row=0, column=3, sticky="w", padx=(6, 12))
+
+    quiver_var = tk.BooleanVar(value=False)
+    ttk.Checkbutton(controls, text="Quiver", variable=quiver_var).grid(row=0, column=4, sticky="w")
+
+    q_step_var = tk.IntVar(value=2)
+    ttk.Label(controls, text="step").grid(row=0, column=5, sticky="w", padx=(8, 2))
+    ttk.Entry(controls, textvariable=q_step_var, width=4).grid(row=0, column=6, sticky="w")
+
+    q_scale_var = tk.DoubleVar(value=0.8)
+    ttk.Label(controls, text="scale").grid(row=0, column=7, sticky="w", padx=(8, 2))
+    ttk.Entry(controls, textvariable=q_scale_var, width=6).grid(row=0, column=8, sticky="w")
+
     canvas = tk.Canvas(frm, width=520, height=520, bg="#111111", highlightthickness=1, highlightbackground="#333333")
-    canvas.grid(row=1, column=0, sticky="nsew", pady=(8, 0))
+    canvas.grid(row=2, column=0, sticky="nsew", pady=(8, 0))
 
     rects: list[list[int]] = []
     current_shape: Tuple[int, int] | None = None
+    arrows: list[int] = []
+    cell_w = 1
+    cell_h = 1
 
     def _ensure_grid(h: int, w: int) -> None:
         nonlocal current_shape
@@ -140,9 +178,11 @@ def run_daemon(host: str, port: int) -> None:  # pragma: no cover (UI)
             return
         current_shape = (h, w)
         rects.clear()
+        arrows.clear()
         canvas.delete("all")
         canvas_w = int(canvas["width"])
         canvas_h = int(canvas["height"])
+        nonlocal cell_w, cell_h
         cell_w = max(1, canvas_w // w)
         cell_h = max(1, canvas_h // h)
         for y in range(h):
@@ -154,6 +194,59 @@ def run_daemon(host: str, port: int) -> None:  # pragma: no cover (UI)
                 row.append(rid)
             rects.append(row)
 
+    def _cmap_color(v: float, mode: str) -> str:
+        # v expected in [0..1]
+        v = max(0.0, min(1.0, float(v)))
+        if mode == "gray":
+            c = int(round(v * 255.0))
+            return f"#{c:02x}{c:02x}{c:02x}"
+        # "heat": black -> red -> yellow -> white
+        r = int(round(min(1.0, v * 1.4) * 255.0))
+        g = int(round(max(0.0, min(1.0, (v - 0.35) * 1.6)) * 255.0))
+        b = int(round(max(0.0, min(1.0, (v - 0.75) * 4.0)) * 255.0))
+        return f"#{r:02x}{g:02x}{b:02x}"
+
+    def _central_grad(arr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        # dx along x (cols), dy along y (rows)
+        dx = 0.5 * (np.roll(arr, -1, axis=1) - np.roll(arr, 1, axis=1))
+        dy = 0.5 * (np.roll(arr, -1, axis=0) - np.roll(arr, 1, axis=0))
+        return dx, dy
+
+    def _draw_quiver(arr: np.ndarray, h: int, w: int) -> None:
+        # Clear existing arrows
+        nonlocal arrows
+        for aid in arrows:
+            try:
+                canvas.delete(aid)
+            except Exception:
+                pass
+        arrows = []
+
+        if not bool(quiver_var.get()):
+            return
+
+        step = max(1, int(q_step_var.get() or 1))
+        scale = float(q_scale_var.get() or 1.0)
+        dx, dy = _central_grad(arr)
+        mag = np.hypot(dx, dy)
+        mmax = float(np.max(mag)) if mag.size else 0.0
+        if not np.isfinite(mmax) or mmax <= 1e-12:
+            return
+
+        # Arrow length in pixels
+        base_len = scale * 0.45 * float(min(cell_w, cell_h))
+
+        for yy in range(0, h, step):
+            for xx in range(0, w, step):
+                vx = float(dx[yy, xx]) / mmax
+                vy = float(dy[yy, xx]) / mmax
+                x0 = (xx + 0.5) * cell_w
+                y0 = (h - 1 - yy + 0.5) * cell_h
+                x1 = x0 + vx * base_len
+                y1 = y0 - vy * base_len
+                aid = canvas.create_line(x0, y0, x1, y1, fill="#00ffcc", arrow=tk.LAST, width=1)
+                arrows.append(aid)
+
     last_ts = 0.0
     last_tick = 0
 
@@ -161,15 +254,24 @@ def run_daemon(host: str, port: int) -> None:  # pragma: no cover (UI)
         nonlocal last_ts, last_tick
         state = deserialize_state(packet.state_blob)
         lattice = state.lattice
-        energy = np.asarray(state.field_state.energy, dtype=float).reshape(lattice.height, lattice.width)
-        img = _to_image_gray(energy)
+        mode = str(field_var.get()).strip().lower() or "energy"
+        if mode == "entropy":
+            field = np.asarray(state.field_state.entropy, dtype=float).reshape(lattice.height, lattice.width)
+        elif mode in {"internal_time", "time", "tau"}:
+            field = np.asarray(state.field_state.internal_time, dtype=float).reshape(lattice.height, lattice.width)
+        else:
+            field = np.asarray(state.field_state.energy, dtype=float).reshape(lattice.height, lattice.width)
+
+        img = _to_image_gray(field)
         _ensure_grid(lattice.height, lattice.width)
 
         for y in range(lattice.height):
             for x in range(lattice.width):
                 c = int(img[y, x])
-                color = f"#{c:02x}{c:02x}{c:02x}"
+                color = _cmap_color(c / 255.0, str(cmap_var.get()).strip().lower() or "heat")
                 canvas.itemconfig(rects[y][x], fill=color)
+
+        _draw_quiver(field, lattice.height, lattice.width)
 
         now = time.perf_counter()
         dt = now - last_ts if last_ts else 0.0
@@ -181,7 +283,9 @@ def run_daemon(host: str, port: int) -> None:  # pragma: no cover (UI)
             sig_preview = f" sig0..3={packet.signature[:4]}"
 
         fps = (1.0 / dt) if dt > 1e-9 else 0.0
-        status_var.set(f"tick={last_tick}  fps~{fps:.1f}  lattice={lattice.width}x{lattice.height}{sig_preview}")
+        status_var.set(
+            f"tick={last_tick}  fps~{fps:.1f}  lattice={lattice.width}x{lattice.height}  field={mode}{sig_preview}"
+        )
 
     def _poll():
         # Drain queue, keep the most recent state only.
@@ -214,4 +318,3 @@ def main() -> None:  # pragma: no cover
 
 if __name__ == "__main__":
     main()
-

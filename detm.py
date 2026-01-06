@@ -22,7 +22,7 @@ from detm.presets import load_preset_config, preset_names
 from detm.runtime.config import DETMConfig
 from detm.runtime.symbols import list_symbols, make_symbol
 from detm.run.session import DetmSession
-from detm.run.subscribers import ArtifactWriter, TraceRecorder, VizStreamer
+from detm.run.subscribers import ArtifactWriter, FieldHistoryRecorder, JsonlTraceWriter, TraceRecorder, VizStreamer
 from detm.viz.transport import open_viz_transport
 
 
@@ -79,14 +79,24 @@ def run_headless(
     viz_transport,
     *,
     viz_every_steps: int = 1,
+    fields_npz: bool = False,
+    fields_every_steps: int = 1,
 ) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     session = DetmSession.create(config, seed)
     TraceRecorder.attach(session.bus, out_dir)
     ArtifactWriter.attach(session.bus, out_dir)
+    JsonlTraceWriter.attach(session.bus, out_dir / "trace.jsonl")
     if viz_transport is not None:
         VizStreamer.attach(session.bus, viz_transport, every_steps=viz_every_steps)
+    if fields_npz:
+        FieldHistoryRecorder.attach(
+            session.bus,
+            out_dir / "fields_hist.npz",
+            every_steps=int(fields_every_steps),
+            dtype="float32",
+        )
 
     for sid in symbol_ids:
         influence = make_symbol(sid)
@@ -138,6 +148,8 @@ def main(argv: list[str] | None = None) -> int:
         help="Do not terminate the locally started viz daemon after the run finishes",
     )
     ap.add_argument("--viz-every-steps", type=int, default=1, help="Send viz updates every N step_count increments")
+    ap.add_argument("--record-fields", action="store_true", help="Write `fields_hist.npz` with E/S/tau (+J approx) history")
+    ap.add_argument("--fields-every-steps", type=int, default=1, help="Record fields every N step_count increments")
 
     ap.add_argument("--list-symbols", action="store_true", help="Print known symbol IDs and exit")
     args = ap.parse_args(argv)
@@ -169,16 +181,16 @@ def main(argv: list[str] | None = None) -> int:
         if args.batch is not None:
             for i in range(int(args.batch)):
                 seed = int(args.seed0) + i
-                runs.append(
-                    run_headless(
-                        config,
-                        seed,
-                        symbol_ids,
-                        int(args.steps),
-                        out_root / f"seed_{seed:04d}",
-                        None,
-                    )
+            runs.append(
+                run_headless(
+                    config,
+                    seed,
+                    symbol_ids,
+                    int(args.steps),
+                    out_root / f"seed_{seed:04d}",
+                    None,
                 )
+            )
         else:
             seed = int(args.seed)
             runs.append(
@@ -190,6 +202,8 @@ def main(argv: list[str] | None = None) -> int:
                     out_root / f"seed_{seed:04d}",
                     viz_transport,
                     viz_every_steps=int(args.viz_every_steps),
+                    fields_npz=bool(args.record_fields),
+                    fields_every_steps=int(args.fields_every_steps),
                 )
             )
     finally:
