@@ -26,7 +26,12 @@ def _to_image_gray(arr: np.ndarray) -> np.ndarray:
     vmin = float(np.min(arr))
     vmax = float(np.max(arr))
     span = max(1e-9, vmax - vmin)
-    norm = (arr - vmin) / span
+    # If the field becomes (nearly) constant, avoid collapsing to all-black.
+    # A constant snapshot still carries meaning and should remain visible.
+    if not np.isfinite(span) or span <= 1e-9:
+        norm = np.full_like(arr, 0.5, dtype=float)
+    else:
+        norm = (arr - vmin) / span
     img = np.clip(np.round(norm * 255.0), 0, 255).astype(np.uint8)
     return img
 

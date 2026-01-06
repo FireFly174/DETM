@@ -2,24 +2,27 @@
 
 This module provides a *frequency-based* "invariant tick" mechanism that is not
 hardcoded to discrete levels (L1/L2/...). Instead, each stream is defined by a
-dt ratio relative to the L0 microtick (the `DetmSession` step_count).
+dt ratio relative to the L0 tick (the `DetmSession` step_count).
 
 Example streams:
 - dt = 1/10   -> "L1" style update cadence (0.1 per L0 tick)
 - dt = 4/25   -> 0.16 per L0 tick
 
-Streams update incrementally on every L0 step (no "lump sum" at boundaries).
-An `invariant_tick` event is emitted whenever the stream crosses an integer
-boundary in its own time coordinate.
+Streams update incrementally on every L0 step (no signature accumulation in the
+coarsener). The coarsener emits an `invariant_tick` event on every session step
+and includes:
+- the current stream time coordinate (as a rational number)
+- the integer `invariant_index` and `phase_num` (position within the unit interval)
+- a `boundary_crossed` flag when the integer index changes during this step
+
+Persistence / JSON logging is intentionally implemented in separate subscribers.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from fractions import Fraction
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
-
-import numpy as np
+from typing import Any, Callable, Iterable, List
 
 from detm.run.bus import EventBus
 
@@ -45,16 +48,17 @@ class InvariantStreamSpec:
 @dataclass
 class InvariantTick:
     stream_id: str
-    invariant_tick: int
     l0_tick: int
     dt_num: int
     dt_den: int
-    signature_mean: List[float]
-    samples: int
+    time_num: int
+    invariant_index: int
+    phase_num: int
+    boundary_crossed: bool
 
 
 class InvariantStream:
-    """Incremental accumulator for one invariant stream."""
+    """Pure timekeeper for one invariant stream (no accumulation)."""
 
     def __init__(self, spec: InvariantStreamSpec) -> None:
         fr = spec.fraction()
@@ -65,64 +69,29 @@ class InvariantStream:
         self.dt_num = int(fr.numerator)
         self.dt_den = int(fr.denominator)
 
-        self._phase = 0  # integer in [0..dt_den)
-        self._tick = 0
+    def compute_tick(self, *, l0_tick: int, delta_l0_ticks: int) -> InvariantTick:
+        l0_tick = int(l0_tick)
+        delta_l0_ticks = max(0, int(delta_l0_ticks))
+        start_tick = l0_tick - delta_l0_ticks
+        if start_tick < 0:
+            start_tick = 0
 
-        self._sum: np.ndarray | None = None  # weighted sum
-        self._weight = 0  # in dt_den units
-        self._samples = 0
+        time_num_end = l0_tick * self.dt_num
+        time_num_start = start_tick * self.dt_num
+        idx_end, phase_end = divmod(time_num_end, self.dt_den)
+        idx_start, _phase_start = divmod(time_num_start, self.dt_den)
+        boundary_crossed = bool(idx_end != idx_start)
 
-    def reset(self) -> None:
-        self._phase = 0
-        self._tick = 0
-        self._sum = None
-        self._weight = 0
-        self._samples = 0
-
-    def update(self, *, l0_tick: int, signature: Sequence[float]) -> List[InvariantTick]:
-        sig = np.asarray(signature, dtype=float)
-        if sig.ndim != 1:
-            sig = sig.reshape(-1)
-
-        if self._sum is None:
-            self._sum = np.zeros_like(sig, dtype=float)
-
-        emitted: List[InvariantTick] = []
-
-        # Split this update into one or more segments if it crosses boundaries.
-        remaining = self.dt_num
-        while remaining > 0:
-            to_boundary = self.dt_den - self._phase
-            take = remaining if remaining < to_boundary else to_boundary
-
-            self._sum += sig * float(take)
-            self._weight += int(take)
-            self._samples += 1
-            self._phase += int(take)
-            remaining -= int(take)
-
-            if self._phase >= self.dt_den:
-                # Emit invariant tick snapshot for the completed unit interval.
-                mean = (self._sum / float(max(1, self._weight))).tolist()
-                emitted.append(
-                    InvariantTick(
-                        stream_id=self.stream_id,
-                        invariant_tick=int(self._tick),
-                        l0_tick=int(l0_tick),
-                        dt_num=int(self.dt_num),
-                        dt_den=int(self.dt_den),
-                        signature_mean=[float(x) for x in mean],
-                        samples=int(self._samples),
-                    )
-                )
-                self._tick += 1
-                self._phase -= self.dt_den
-                # Carry remainder of the last step into the next interval: reset accumulators.
-                self._sum = np.zeros_like(sig, dtype=float)
-                self._weight = 0
-                self._samples = 0
-
-        return emitted
+        return InvariantTick(
+            stream_id=self.stream_id,
+            l0_tick=l0_tick,
+            dt_num=self.dt_num,
+            dt_den=self.dt_den,
+            time_num=int(time_num_end),
+            invariant_index=int(idx_end),
+            phase_num=int(phase_end),
+            boundary_crossed=boundary_crossed,
+        )
 
 
 class InvariantCoarsener:
@@ -150,25 +119,30 @@ class InvariantCoarsener:
             self._unsub_step = None
 
     def on_reset(self, **_payload: Any) -> None:
-        for stream in self._streams:
-            stream.reset()
+        return None
 
-    def on_step(self, *, state, observables, **_payload: Any) -> None:
+    def on_step(self, *, state, observables, n_ticks: int = 1, get_state_blob: Any | None = None, **_payload: Any) -> None:
         l0_tick = int(state.step_count)
-        signature = observables.signature.vector
+        delta_l0_ticks = max(0, int(n_ticks))
         for stream in self._streams:
-            ticks = stream.update(l0_tick=l0_tick, signature=signature)
-            for inv in ticks:
-                self.bus.publish(
-                    "invariant_tick",
-                    stream_id=inv.stream_id,
-                    invariant_tick=inv.invariant_tick,
-                    l0_tick=inv.l0_tick,
-                    dt_num=inv.dt_num,
-                    dt_den=inv.dt_den,
-                    signature_mean=inv.signature_mean,
-                    samples=inv.samples,
-                )
+            inv = stream.compute_tick(l0_tick=l0_tick, delta_l0_ticks=delta_l0_ticks)
+            # Pass through `state/observables/get_state_blob` so listeners that only
+            # subscribe to `invariant_tick` can still access the latest L0 snapshot.
+            self.bus.publish(
+                "invariant_tick",
+                stream_id=inv.stream_id,
+                l0_tick=inv.l0_tick,
+                dt_num=inv.dt_num,
+                dt_den=inv.dt_den,
+                time_num=inv.time_num,
+                invariant_index=inv.invariant_index,
+                phase_num=inv.phase_num,
+                boundary_crossed=inv.boundary_crossed,
+                state=state,
+                observables=observables,
+                get_state_blob=get_state_blob,
+                delta_l0_ticks=delta_l0_ticks,
+            )
 
 
 def parse_invariant_streams(spec: str | Iterable[str]) -> List[InvariantStreamSpec]:
