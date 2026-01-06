@@ -19,10 +19,11 @@ import sys
 from datetime import datetime
 
 from detm.presets import load_preset_config, preset_names
-from detm.runtime import api
 from detm.runtime.config import DETMConfig
 from detm.runtime.symbols import list_symbols, make_symbol
-from detm.viz.client import VizClient, start_local_daemon
+from detm.run.session import DetmSession
+from detm.run.subscribers import ArtifactWriter, TraceRecorder, VizStreamer
+from detm.viz.transport import open_viz_transport
 
 
 def _load_config(args) -> DETMConfig:
@@ -75,35 +76,25 @@ def run_headless(
     symbol_ids: list[str],
     steps: int,
     out_dir: Path,
-    viz: VizClient | None,
+    viz_transport,
+    *,
+    viz_every_steps: int = 1,
 ) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
-    state = api.reset(config, seed)
-    history = []
-    if viz is not None:
-        viz.send_state(state_blob=api.serialize(state), tick=state.step_count, signature=api.digest(state).vector)
+
+    session = DetmSession.create(config, seed)
+    TraceRecorder.attach(session.bus, out_dir)
+    ArtifactWriter.attach(session.bus, out_dir)
+    if viz_transport is not None:
+        VizStreamer.attach(session.bus, viz_transport, every_steps=viz_every_steps)
+
     for sid in symbol_ids:
         influence = make_symbol(sid)
-        state, obs = api.step(state, influence, steps, None)
-        history.append(
-            {
-                "signature": obs.signature.as_dict(),
-                "events": obs.events,
-                "cost": obs.cost,
-                "quality": obs.quality,
-            }
-        )
-        if viz is not None:
-            viz.send_state(state_blob=api.serialize(state), tick=state.step_count, signature=obs.signature.vector)
+        session.step(influence, steps)
 
-    blob = api.serialize(state)
-    digest = api.digest(state)
-
-    (out_dir / "history.jsonl").write_text("\n".join(json.dumps(e) for e in history), encoding="utf-8")
-    (out_dir / "state.msgpack").write_bytes(blob)
-    (out_dir / "digest.json").write_text(json.dumps(digest.as_dict(), indent=2), encoding="utf-8")
-    (out_dir / "config.json").write_text(json.dumps(config.to_dict(), indent=2), encoding="utf-8")
-    return {"seed": seed, "digest": digest.as_dict(), "dir": str(out_dir)}
+    digest = session.digest()
+    session.close()
+    return {"seed": int(seed), "digest": digest.as_dict(), "dir": str(out_dir)}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -129,6 +120,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Start a local viz daemon and stream state updates (headless runner still writes artifacts)",
     )
     ap.add_argument(
+        "--viz-transport",
+        default="tcp",
+        choices=["tcp", "none"],
+        help="Visualization transport (default: tcp)",
+    )
+    ap.add_argument(
         "--viz-connect",
         action="store_true",
         help="Connect to an existing viz daemon instead of starting a new one (requires --viz-host/--viz-port)",
@@ -140,6 +137,7 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Do not terminate the locally started viz daemon after the run finishes",
     )
+    ap.add_argument("--viz-every-steps", type=int, default=1, help="Send viz updates every N step_count increments")
 
     ap.add_argument("--list-symbols", action="store_true", help="Print known symbol IDs and exit")
     args = ap.parse_args(argv)
@@ -154,16 +152,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.viz and args.batch is not None:
         raise SystemExit("--viz is supported only for a single run (omit --batch)")
 
-    viz_daemon = None
-    viz_client = None
-    if args.viz:
-        if args.viz_connect:
-            if int(args.viz_port) <= 0:
-                raise SystemExit("--viz-connect requires --viz-port to be set")
-            viz_client = VizClient(str(args.viz_host), int(args.viz_port))
-        else:
-            viz_daemon = start_local_daemon(host=str(args.viz_host), port=int(args.viz_port))
-            viz_client = viz_daemon.connect()
+    viz_transport = None
+    if args.viz and str(args.viz_transport).lower() != "none":
+        viz_transport = open_viz_transport(
+            enabled=True,
+            transport=str(args.viz_transport),
+            host=str(args.viz_host),
+            port=int(args.viz_port),
+            connect=bool(args.viz_connect),
+            keep_open=bool(args.viz_keep_open),
+        )
 
     out_root = _default_out_dir(args.out)
     runs = []
@@ -190,16 +188,17 @@ def main(argv: list[str] | None = None) -> int:
                     symbol_ids,
                     int(args.steps),
                     out_root / f"seed_{seed:04d}",
-                    viz_client,
+                    viz_transport,
+                    viz_every_steps=int(args.viz_every_steps),
                 )
             )
     finally:
-        if viz_client is not None:
-            viz_client.close()
-        if viz_daemon is not None and not bool(args.viz_keep_open):
-            viz_daemon.terminate()
+        if viz_transport is not None:
+            viz_transport.close()
 
-    catalog = {"schema_versions": api.get_schema_versions(), "runs": runs}
+    from detm.runtime.schemas import get_schema_versions
+
+    catalog = {"schema_versions": get_schema_versions(), "runs": runs}
     (out_root / "catalog.json").write_text(json.dumps(catalog, indent=2), encoding="utf-8")
     print(f"[OK] {len(runs)} run(s) complete. Catalog: {out_root / 'catalog.json'}")
     return 0
