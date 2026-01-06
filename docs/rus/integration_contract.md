@@ -1,8 +1,6 @@
 # DETM: контракт интеграции
 
-Синхронизированные версии:
-- Русская (копия): `docs/rus/integration_contract.md`
-- English (translation): `docs/eng/integration_contract.md`
+English version: `docs/eng/integration_contract.md`
 
 Этот документ фиксирует минимальный API и требования воспроизводимости, необходимые для подключения DETM к внешним рантаймам (ACGS Scheduler, ComfyUI и др.). DETM остаётся чистой L0‑динамикой и не знает про UI/оркестраторы: извне она видит только конфигурацию, сиды, влияния и отдаёт наблюдаемые величины.
 
@@ -16,6 +14,19 @@
 
 Допускаются алиасы `serialize(state)` / `deserialize(blob)` как более короткие имена,
 но их сигнатуры и поведение должны быть идентичны `serialize_state`/`deserialize_state`.
+
+### UML‑эскиз
+
+```mermaid
+classDiagram
+  class DETMConfig
+  class DETMState
+  class DETMInfluence
+  class DETMObservables
+  DETMConfig --> DETMState : reset()
+  DETMState --> DETMObservables : step()
+  DETMState --> DETMSignature : digest()
+```
 
 ### Детерминизм и воспроизводимость
 - **Единый RNG**: все стохастические операции принимают `rng` явно (или используют `state.rng_state`). Никаких скрытых `np.random`/`torch.rand`.
