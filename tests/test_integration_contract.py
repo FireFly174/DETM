@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numpy as np
-
 from runtime.api import digest, reset, step
 from runtime.config import DETMConfig
 from runtime.influence import DETMInfluence
