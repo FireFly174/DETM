@@ -32,3 +32,20 @@ A metric is considered valid if it is:
 
 All metrics should be computed without external semantic assumptions.
 
+---
+
+## Phase metric and PLV (for frequency hypotheses)
+
+If you can define a phase `φ(t)` for a structure/domain, phase locking can be quantified via PLV:
+
+`PLV(Ω1,Ω2) = | mean_t exp(i (φ1(t) - φ2(t))) |`
+
+Practical “locking” criterion: `PLV > θ` over a window `W`.
+
+## Spectral density and dominant period
+
+Log a compact time series (e.g. `E_mean(t)` over a region) and compute rFFT peaks to estimate dominant periods and their ratios.
+
+## Flow proxies for “merging”
+
+Track flux intensity in the interaction zone and time-to-stabilize after contact.

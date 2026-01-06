@@ -42,6 +42,8 @@ Key docs:
   - Coarsening: RU `docs/rus/20_mechanisms/coarsening.md`, EN `docs/eng/20_mechanisms/coarsening.md`
   - Internal time: RU `docs/rus/20_mechanisms/internal_time.md`, EN `docs/eng/20_mechanisms/internal_time.md`
   - Invariants: RU `docs/rus/20_mechanisms/invariants.md`, EN `docs/eng/20_mechanisms/invariants.md`
+  - Parameter fields: RU `docs/rus/20_mechanisms/parameter_fields.md`, EN `docs/eng/20_mechanisms/parameter_fields.md`
+  - Level scale axis: RU `docs/rus/20_mechanisms/scale_axis.md`, EN `docs/eng/20_mechanisms/scale_axis.md`
 - Hypotheses
   - RU: `docs/rus/30_hypotheses/hypotheses.md`
   - EN: `docs/eng/30_hypotheses/hypotheses.md`
@@ -59,3 +61,8 @@ Key docs:
 - Notes
   - Archive: RU `docs/rus/90_notes/archive.md`, EN `docs/eng/90_notes/archive.md`
   - Rewrite checklist: RU `docs/rus/90_notes/rewrite_checklist.md`, EN `docs/eng/90_notes/rewrite_checklist.md`
+  - Source materials mapping: RU `docs/rus/90_notes/source_materials.md`, EN `docs/eng/90_notes/source_materials.md`
+  - Fallback/subworld: RU `docs/rus/90_notes/fallback_subworld.md`, EN `docs/eng/90_notes/fallback_subworld.md`
+  - Storage formats: RU `docs/rus/90_notes/storage_neurons_subworld.md`, EN `docs/eng/90_notes/storage_neurons_subworld.md`
+  - Meaning/alphabet/LLM-mode: RU `docs/rus/90_notes/meaning_alphabet_llm_mode.md`, EN `docs/eng/90_notes/meaning_alphabet_llm_mode.md`
+  - System architecture sketch: RU `docs/rus/90_notes/system_architecture_sketch.md`, EN `docs/eng/90_notes/system_architecture_sketch.md`

@@ -9,3 +9,6 @@ This section fixes the boundaries of interpretation:
 
 Interpretations beyond the formal dynamics are treated as external analogies and must not leak into the model code or the canonical documentation.
 
+Additional scope constraints captured from the original notes:
+- the model is discrete and does not assume `Δt → 0`
+- stochasticity/noise is not part of the base spec (it is an extension)
