@@ -21,6 +21,7 @@ from datetime import datetime
 from detm.presets import load_preset_config, preset_names
 from detm.runtime.config import DETMConfig
 from detm.runtime.symbols import list_symbols, make_symbol
+from detm.run.coarsening import InvariantCoarsener, parse_invariant_streams
 from detm.run.session import DetmSession
 from detm.run.subscribers import ArtifactWriter, FieldHistoryRecorder, JsonlTraceWriter, TraceRecorder, VizStreamer
 from detm.viz.transport import open_viz_transport
@@ -81,10 +82,13 @@ def run_headless(
     viz_every_steps: int = 1,
     fields_npz: bool = False,
     fields_every_steps: int = 1,
+    invariant_streams: list[str] | None = None,
 ) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     session = DetmSession.create(config, seed)
+    if invariant_streams:
+        InvariantCoarsener.attach(session.bus, parse_invariant_streams(invariant_streams))
     TraceRecorder.attach(session.bus, out_dir)
     ArtifactWriter.attach(session.bus, out_dir)
     JsonlTraceWriter.attach(session.bus, out_dir / "trace.jsonl")
@@ -150,6 +154,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--viz-every-steps", type=int, default=1, help="Send viz updates every N step_count increments")
     ap.add_argument("--record-fields", action="store_true", help="Write `fields_hist.npz` with E/S/tau (+J approx) history")
     ap.add_argument("--fields-every-steps", type=int, default=1, help="Record fields every N step_count increments")
+    ap.add_argument(
+        "--invariant-stream",
+        action="append",
+        default=[],
+        help="Add invariant stream spec (e.g. inv0=1/10). Repeatable; comma-separated also accepted.",
+    )
 
     ap.add_argument("--list-symbols", action="store_true", help="Print known symbol IDs and exit")
     args = ap.parse_args(argv)
@@ -204,6 +214,7 @@ def main(argv: list[str] | None = None) -> int:
                     viz_every_steps=int(args.viz_every_steps),
                     fields_npz=bool(args.record_fields),
                     fields_every_steps=int(args.fields_every_steps),
+                    invariant_streams=list(args.invariant_stream or []),
                 )
             )
     finally:

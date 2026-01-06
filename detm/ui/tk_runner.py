@@ -15,6 +15,7 @@ from detm.runtime.config import DETMConfig
 from detm.runtime.influence import DETMInfluence
 from detm.runtime.symbols import list_symbols, make_symbol
 from detm.run.bus import EventBus
+from detm.run.coarsening import InvariantCoarsener, parse_invariant_streams
 from detm.run.session import DetmSession
 from detm.run.subscribers import ArtifactWriter, FieldHistoryRecorder, JsonlTraceWriter, VizStreamer
 from detm.viz.transport import VizTransport, open_viz_transport
@@ -30,6 +31,7 @@ class UiRunSettings:
     amplitude: float = 1.0
     record_dir: Optional[Path] = None
     record_fields: bool = False
+    invariant_streams: str = ""  # e.g. "inv0=1/10,inv1=4/25"
     viz_enabled: bool = True
     viz_transport: str = "tcp"  # tcp | none
     viz_host: str = "127.0.0.1"
@@ -52,9 +54,12 @@ class DetmTkRunner:
         self._trace_writer: JsonlTraceWriter | None = None
         self._artifact_writer: ArtifactWriter | None = None
         self._fields_recorder: FieldHistoryRecorder | None = None
+        self._coarsener: InvariantCoarsener | None = None
+        self._invariant_key: str | None = None
 
         self._configure_recording()
         self._configure_viz()
+        self._configure_invariants()
 
     @property
     def state(self):
@@ -69,6 +74,7 @@ class DetmTkRunner:
         self._session.close()
         self._disable_viz()
         self._disable_recording()
+        self._disable_invariants()
 
     def reset(self) -> None:
         self._session.config = self.settings.config
@@ -151,6 +157,23 @@ class DetmTkRunner:
         if self._fields_recorder is not None:
             self._fields_recorder.detach()
             self._fields_recorder = None
+
+    def _disable_invariants(self) -> None:
+        if self._coarsener is not None:
+            self._coarsener.detach()
+            self._coarsener = None
+        self._invariant_key = None
+
+    def _configure_invariants(self) -> None:
+        key = (self.settings.invariant_streams or "").strip()
+        if not key:
+            self._disable_invariants()
+            return
+        if self._invariant_key == key and self._coarsener is not None:
+            return
+        self._disable_invariants()
+        self._coarsener = InvariantCoarsener.attach(self._session.bus, parse_invariant_streams(key))
+        self._invariant_key = key
 
     def _configure_recording(self) -> None:
         record_dir = self.settings.record_dir
@@ -246,25 +269,29 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
     fields_var = tk.BooleanVar(value=bool(getattr(settings, "record_fields", False)))
     ttk.Checkbutton(frm, text="fields_hist.npz", variable=fields_var).grid(row=4, column=3, sticky="e")
 
+    inv_var = tk.StringVar(value=getattr(settings, "invariant_streams", ""))
+    ttk.Label(frm, text="Invariant streams").grid(row=5, column=0, sticky="w")
+    ttk.Entry(frm, textvariable=inv_var, width=52).grid(row=5, column=1, columnspan=3, sticky="we", padx=(6, 0))
+
     viz_enabled_var = tk.BooleanVar(value=settings.viz_enabled)
-    ttk.Checkbutton(frm, text="Viz daemon", variable=viz_enabled_var).grid(row=5, column=0, sticky="w")
+    ttk.Checkbutton(frm, text="Viz daemon", variable=viz_enabled_var).grid(row=6, column=0, sticky="w")
     viz_transport_var = tk.StringVar(value=settings.viz_transport)
     ttk.Combobox(frm, textvariable=viz_transport_var, values=["tcp", "none"], width=6).grid(
-        row=5, column=1, sticky="w", padx=(6, 6)
+        row=6, column=1, sticky="w", padx=(6, 6)
     )
     viz_host_var = tk.StringVar(value=settings.viz_host)
-    ttk.Entry(frm, textvariable=viz_host_var, width=14).grid(row=5, column=2, sticky="w", padx=(6, 6))
+    ttk.Entry(frm, textvariable=viz_host_var, width=14).grid(row=6, column=2, sticky="w", padx=(6, 6))
     viz_port_var = tk.IntVar(value=settings.viz_port)
-    ttk.Entry(frm, textvariable=viz_port_var, width=8).grid(row=5, column=3, sticky="w")
+    ttk.Entry(frm, textvariable=viz_port_var, width=8).grid(row=6, column=3, sticky="w")
 
     viz_connect_var = tk.BooleanVar(value=settings.viz_connect)
-    ttk.Checkbutton(frm, text="connect", variable=viz_connect_var).grid(row=6, column=0, sticky="w")
+    ttk.Checkbutton(frm, text="connect", variable=viz_connect_var).grid(row=7, column=0, sticky="w")
     viz_every_var = tk.IntVar(value=settings.viz_every_steps)
-    ttk.Entry(frm, textvariable=viz_every_var, width=6).grid(row=6, column=1, sticky="w", padx=(6, 6))
-    ttk.Label(frm, text="every_steps").grid(row=6, column=2, sticky="w")
+    ttk.Entry(frm, textvariable=viz_every_var, width=6).grid(row=7, column=1, sticky="w", padx=(6, 6))
+    ttk.Label(frm, text="every_steps").grid(row=7, column=2, sticky="w")
 
     status = tk.StringVar(value="Ready")
-    ttk.Label(frm, textvariable=status).grid(row=7, column=0, columnspan=4, sticky="w")
+    ttk.Label(frm, textvariable=status).grid(row=8, column=0, columnspan=4, sticky="w")
 
     def _apply_settings_to_runner(reset: bool) -> None:
         cfg = DETMConfig.from_dict(
@@ -284,6 +311,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
         settings.tick_interval_ms = int(interval_var.get())
         settings.record_dir = Path(out_var.get()) if record_var.get() else None
         settings.record_fields = bool(fields_var.get())
+        settings.invariant_streams = str(inv_var.get()).strip()
         settings.viz_enabled = bool(viz_enabled_var.get())
         settings.viz_transport = str(viz_transport_var.get()).strip() or "tcp"
         settings.viz_host = str(viz_host_var.get()).strip() or "127.0.0.1"
@@ -294,6 +322,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
         if reset:
             runner.reset()
         runner._configure_recording()
+        runner._configure_invariants()
         runner._configure_viz()
 
     def _update_status():
@@ -325,7 +354,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
             _tick()
 
     btns = ttk.Frame(frm)
-    btns.grid(row=8, column=0, columnspan=4, sticky="w", pady=(6, 0))
+    btns.grid(row=9, column=0, columnspan=4, sticky="w", pady=(6, 0))
     ttk.Button(btns, text="Reset", command=on_reset).grid(row=0, column=0, padx=(0, 6))
     ttk.Button(btns, text="Step", command=on_step).grid(row=0, column=1, padx=(0, 6))
     ttk.Button(btns, text="Run/Stop", command=on_run_toggle).grid(row=0, column=2, padx=(0, 6))
@@ -337,6 +366,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
     root.protocol("WM_DELETE_WINDOW", _on_close)
 
     runner._configure_recording()
+    runner._configure_invariants()
     runner._configure_viz()
     _update_status()
     root.mainloop()

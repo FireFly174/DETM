@@ -212,6 +212,7 @@ class JsonlTraceWriter:
     metric_plugins: Sequence[MetricPlugin]
     _fh: Any | None = None
     _unsub_step: Callable[[], None] | None = None
+    _unsub_invariant: Callable[[], None] | None = None
     _unsub_close: Callable[[], None] | None = None
 
     @classmethod
@@ -224,6 +225,7 @@ class JsonlTraceWriter:
     ) -> "JsonlTraceWriter":
         writer = cls(path=path, metric_plugins=list(metric_plugins or default_metric_plugins()))
         writer._unsub_step = bus.add_event_listener_unsub("step", writer.on_step)
+        writer._unsub_invariant = bus.add_event_listener_unsub("invariant_tick", writer.on_invariant_tick)
         writer._unsub_close = bus.add_event_listener_unsub("close", writer.on_close)
         return writer
 
@@ -259,6 +261,7 @@ class JsonlTraceWriter:
                 metrics[str(getattr(plugin, "name", plugin.__class__.__name__))] = {"error": str(exc)}
 
         entry = {
+            "type": "step",
             "tick": int(state.step_count),
             "n_ticks": int(n_ticks),
             "influence": influence.__dict__ if influence is not None else None,
@@ -277,6 +280,13 @@ class JsonlTraceWriter:
         self._fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
         self._fh.flush()
 
+    def on_invariant_tick(self, **payload: Any) -> None:
+        self._ensure()
+        entry = {"type": "invariant_tick", **payload}
+        assert self._fh is not None
+        self._fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        self._fh.flush()
+
     def on_close(self, **_rest: Any) -> None:
         if self._fh is not None:
             self._fh.close()
@@ -287,6 +297,9 @@ class JsonlTraceWriter:
         if self._unsub_step is not None:
             self._unsub_step()
             self._unsub_step = None
+        if self._unsub_invariant is not None:
+            self._unsub_invariant()
+            self._unsub_invariant = None
         if self._unsub_close is not None:
             self._unsub_close()
             self._unsub_close = None
