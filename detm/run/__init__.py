@@ -9,7 +9,7 @@ This layer is intentionally thin:
 from __future__ import annotations
 
 from detm.run.bus import EventBus
+from detm.run.scheduler import TickRunner, TickScheduler
 from detm.run.session import DetmSession
 
-__all__ = ["DetmSession", "EventBus"]
-
+__all__ = ["DetmSession", "EventBus", "TickRunner", "TickScheduler"]
