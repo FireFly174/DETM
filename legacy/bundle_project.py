@@ -5,7 +5,7 @@
 Bundle a Python project into a single text file for sharing/review.
 
 Usage:
-  python bundle_project.py --root . --out project_bundle.txt
+  python bundle_project.py --root . --out DETM_bundle.txt
 
 By default includes: *.py, *.json, *.yml, *.yaml, *.toml, *.ini, *.md
 Excludes: venv, .venv, __pycache__, .git, dist, build, .mypy_cache, .pytest_cache, node_modules
@@ -114,7 +114,7 @@ def collect_files(root: Path, include: list[str], exclude_dirs: set[str]) -> lis
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="Project root directory")
-    ap.add_argument("--out", default="project_bundle.txt", help="Output bundle file")
+    ap.add_argument("--out", default="DETM_bundle.txt", help="Output bundle file")
     ap.add_argument(
         "--include",
         nargs="*",
