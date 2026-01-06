@@ -5,9 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from core.entropy import DynamicsParameters
-from core.fields import Lattice
-from runtime.state import DETMFieldState
+from detm.core.entropy import DynamicsParameters
+from detm.core.fields import Lattice
+from detm.runtime.state import DETMFieldState
 
 
 @dataclass(frozen=True)

@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any, Dict
 
-from core.entropy import DynamicsParameters
-from runtime.schemas import DETM_CONFIG_V1
+from detm.core.entropy import DynamicsParameters
+from detm.runtime.schemas import DETM_CONFIG_V1
 
 
 @dataclass(frozen=True)

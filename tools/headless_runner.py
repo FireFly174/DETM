@@ -15,11 +15,11 @@ from typing import Iterable, List
 
 import numpy as np
 
-from runtime import api
-from runtime.config import DETMConfig
-from runtime.influence import DETMInfluence
-from runtime.schemas import get_schema_versions
-from runtime.symbols import alphabet, make_symbol
+from detm.runtime import api
+from detm.runtime.config import DETMConfig
+from detm.runtime.influence import DETMInfluence
+from detm.runtime.schemas import get_schema_versions
+from detm.runtime.symbols import alphabet, make_symbol
 
 
 def _load_config(path: Path | None) -> DETMConfig:

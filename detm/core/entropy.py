@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterator, List, Tuple
 
-from .fields import FieldState, Lattice, ScalarField
+from detm.core.fields import FieldState, Lattice, ScalarField
 
 
 @dataclass(frozen=True)

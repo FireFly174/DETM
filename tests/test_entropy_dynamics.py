@@ -1,8 +1,8 @@
 import math
 from dataclasses import replace
 
-from core.entropy import DynamicsParameters, compute_entropy, evolve, step
-from core.fields import FieldState, Lattice, ScalarField
+from detm.core.entropy import DynamicsParameters, compute_entropy, evolve, step
+from detm.core.fields import FieldState, Lattice, ScalarField
 
 
 def test_energy_conserved_without_clamp():

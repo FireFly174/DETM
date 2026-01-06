@@ -1,4 +1,4 @@
-"""Schema registry and version helpers for DETM integration."""
+"""Schema registry and version helpers for DETM integration (`detm.runtime`)."""
 
 from __future__ import annotations
 

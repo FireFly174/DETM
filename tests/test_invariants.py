@@ -1,5 +1,5 @@
-from core.fields import FieldState, Lattice, ScalarField
-from core.invariants import collect_series, describe_field, radial_profile
+from detm.core.fields import FieldState, Lattice, ScalarField
+from detm.core.invariants import collect_series, describe_field, radial_profile
 
 
 def test_describe_field_reports_moments():

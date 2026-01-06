@@ -8,15 +8,15 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 
-from core.fields import Lattice
-from runtime.backends import Backend, NumpyBackend, TorchBackend
-from runtime.config import DETMConfig
-from runtime.diagnostics.attractors import detect_attractors
-from runtime.influence import DETMInfluence, apply_influence
-from runtime.serialization import deserialize_state, serialize_state
-from runtime.schemas import get_schema_versions
-from runtime.signature import DETMSignature, describe_field_from_array, digest_fields
-from runtime.state import DETMFieldState, DETMState
+from detm.core.fields import Lattice
+from detm.runtime.backends import Backend, NumpyBackend, TorchBackend
+from detm.runtime.config import DETMConfig
+from detm.runtime.diagnostics.attractors import detect_attractors
+from detm.runtime.influence import DETMInfluence, apply_influence
+from detm.runtime.serialization import deserialize_state, serialize_state
+from detm.runtime.schemas import get_schema_versions
+from detm.runtime.signature import DETMSignature, describe_field_from_array, digest_fields
+from detm.runtime.state import DETMFieldState, DETMState
 
 
 @dataclass(frozen=True)

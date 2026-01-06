@@ -9,10 +9,10 @@ Notes:
 
 from __future__ import annotations
 
-from core.entropy import DynamicsParameters
-from core.fields import Lattice
-from runtime.backends.base import BackendConfig
-from runtime.state import DETMFieldState
+from detm.core.entropy import DynamicsParameters
+from detm.core.fields import Lattice
+from detm.runtime.backends.base import BackendConfig
+from detm.runtime.state import DETMFieldState
 
 
 def _require_torch():

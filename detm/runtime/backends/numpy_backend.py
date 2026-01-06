@@ -8,10 +8,10 @@ from __future__ import annotations
 
 import numpy as np
 
-from core.entropy import DynamicsParameters
-from core.fields import Lattice
-from runtime.backends.base import BackendConfig
-from runtime.state import DETMFieldState
+from detm.core.entropy import DynamicsParameters
+from detm.core.fields import Lattice
+from detm.runtime.backends.base import BackendConfig
+from detm.runtime.state import DETMFieldState
 
 
 class NumpyBackend:
@@ -103,4 +103,3 @@ class NumpyBackend:
 
         entropy = self._compute_entropy(energy, params, boundary=boundary)
         return DETMFieldState(lattice=lattice, energy=energy, entropy=entropy, internal_time=tau)
-

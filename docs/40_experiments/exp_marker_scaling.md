@@ -1,7 +1,7 @@
 # Протоколы `marker_protocol` и `scaling_protocol`
 
 Новые сценарии в каталоге `experiments/` переносят логику из legacy-скриптов
-`analyze_grid_timeseries.py` и `bundle_timeseries.py` на API `core.entropy`.
+`analyze_grid_timeseries.py` и `bundle_timeseries.py` на API `detm.core.entropy`.
 Сохраняется акцент на компактных метриках и воспроизводимости запуска.
 
 ## Общие метрики

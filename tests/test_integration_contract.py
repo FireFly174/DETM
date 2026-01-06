@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import numpy as np
-from runtime.api import digest, reset, step
-from runtime.config import DETMConfig
-from runtime.influence import DETMInfluence
-from runtime.serialization import deserialize_state, serialize_state
-from runtime.symbols import make_symbol
+from detm.runtime.api import digest, reset, step
+from detm.runtime.config import DETMConfig
+from detm.runtime.influence import DETMInfluence
+from detm.runtime.serialization import deserialize_state, serialize_state
+from detm.runtime.symbols import make_symbol
 
 
 def test_seed_determinism_matches_signature():

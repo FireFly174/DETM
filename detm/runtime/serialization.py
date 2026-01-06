@@ -8,11 +8,11 @@ from typing import Any, Dict
 import msgpack
 import numpy as np
 
-from core.entropy import DynamicsParameters
-from core.fields import Lattice
-from runtime.schemas import DETM_STATE_V1
-from runtime.signature import digest_fields
-from runtime.state import DETMFieldState, DETMState
+from detm.core.entropy import DynamicsParameters
+from detm.core.fields import Lattice
+from detm.runtime.schemas import DETM_STATE_V1
+from detm.runtime.signature import digest_fields
+from detm.runtime.state import DETMFieldState, DETMState
 
 
 def _to_numpy(array: Any) -> np.ndarray:

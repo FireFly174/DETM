@@ -53,7 +53,7 @@
   - `cost` (оценка стоимости шага: время, операции, память).
 
 ## Диагностика (промты 5.1–5.2)
-- `diagnostics/attractors.py`: `detect_attractors(state) -> list[Attractor]` с полями `position/region`, `strength`, `stability_score`, `period_estimate`.
+- `detm/runtime/diagnostics/attractors.py`: `detect_attractors(state) -> list[Attractor]` с полями `position/region`, `strength`, `stability_score`, `period_estimate`.
 - `stability_metrics(state, history_window)` возвращает статус «прогресс падает/плато/колебания» по динамике `signature`.
 
 ## Профили исполнения (промты 6.1–6.2)

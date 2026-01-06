@@ -17,9 +17,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from core.entropy import DynamicsParameters, compute_entropy, evolve
-from core.fields import FieldState, Lattice, ScalarField
-from core.invariants import collect_series
+from detm.core.entropy import DynamicsParameters, compute_entropy, evolve
+from detm.core.fields import FieldState, Lattice, ScalarField
+from detm.core.invariants import collect_series
 from visualization import plot_field_state, plot_invariants, plot_radial, plotly_scalar_field
 
 

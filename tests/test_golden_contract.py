@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from runtime.api import digest, reset, step
-from runtime.config import DETMConfig
-from runtime.symbols import make_symbol
+from detm.runtime.api import digest, reset, step
+from detm.runtime.config import DETMConfig
+from detm.runtime.symbols import make_symbol
 
 
 def test_golden_digest_fixed_sequence():

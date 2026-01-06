@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING, Iterable, List
 
 import numpy as np
 
-from runtime.signature import digest_fields
+from detm.runtime.signature import digest_fields
 
 if TYPE_CHECKING:
-    from runtime.state import DETMState
+    from detm.runtime.state import DETMState
 
 
 def _to_numpy(array) -> np.ndarray:

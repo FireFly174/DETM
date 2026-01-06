@@ -11,12 +11,12 @@ import itertools
 from dataclasses import dataclass
 from typing import Dict, Tuple
 
-from runtime import api
-from runtime.config import DETMConfig
-from runtime.influence import DETMInfluence
-from runtime.serialization import serialize_state
-from runtime.signature import DETMSignature
-from runtime.state import DETMState
+from detm.runtime import api
+from detm.runtime.config import DETMConfig
+from detm.runtime.influence import DETMInfluence
+from detm.runtime.serialization import serialize_state
+from detm.runtime.signature import DETMSignature
+from detm.runtime.state import DETMState
 
 
 @dataclass(frozen=True)
