@@ -7,17 +7,17 @@ serialized DETM state blobs to it.
 
 from __future__ import annotations
 
-import json
-import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from detm.runtime import api
 from detm.runtime.config import DETMConfig
 from detm.runtime.influence import DETMInfluence
 from detm.runtime.symbols import list_symbols, make_symbol
-from detm.viz.client import VizClient, VizDaemon, start_local_daemon
+from detm.run.bus import EventBus
+from detm.run.session import DetmSession
+from detm.run.subscribers import ArtifactWriter, JsonlTraceWriter, VizStreamer
+from detm.viz.transport import VizTransport, open_viz_transport
 
 
 @dataclass
@@ -30,71 +30,51 @@ class UiRunSettings:
     amplitude: float = 1.0
     record_dir: Optional[Path] = None
     viz_enabled: bool = True
+    viz_transport: str = "tcp"  # tcp | none
     viz_host: str = "127.0.0.1"
     viz_port: int = 0
+    viz_connect: bool = False
+    viz_keep_open: bool = False
+    viz_every_steps: int = 1
 
 
 class DetmTkRunner:
     def __init__(self, settings: UiRunSettings):
         self.settings = settings
-        self._state = api.reset(settings.config, settings.seed)
-        self._last_obs = api.step(self._state, None, 0)[1]
+        self._bus = EventBus()
+        self._session = DetmSession.create(settings.config, settings.seed, bus=self._bus)
+        self._last_signature = self._session.digest().vector
         self._running = False
-        self._trace_fh = None
-        self._viz_daemon: VizDaemon | None = None
-        self._viz_client: VizClient | None = None
+        self._viz_transport: VizTransport | None = None
+        self._viz_streamer: VizStreamer | None = None
+        self._trace_writer: JsonlTraceWriter | None = None
+        self._artifact_writer: ArtifactWriter | None = None
+
+        self._configure_recording()
+        self._configure_viz()
 
     @property
     def state(self):
-        return self._state
+        return self._session.state
 
     @property
     def last_observables(self):
-        return self._last_obs
+        return self._last_signature
 
     def close(self) -> None:
         self._running = False
-        if self._trace_fh is not None:
-            self._trace_fh.close()
-            self._trace_fh = None
-        if self._viz_client is not None:
-            self._viz_client.close()
-            self._viz_client = None
-        if self._viz_daemon is not None:
-            self._viz_daemon.terminate()
-            self._viz_daemon = None
+        self._session.close()
+        self._disable_viz()
+        self._disable_recording()
 
     def reset(self) -> None:
-        self._state = api.reset(self.settings.config, self.settings.seed)
-        self._last_obs = api.step(self._state, None, 0)[1]
-        self._send_viz()
+        self._session.config = self.settings.config
+        self._session.reset(seed=self.settings.seed)
+        self._last_signature = self._session.digest().vector
 
     def set_viz_enabled(self, enabled: bool) -> None:
-        enabled = bool(enabled)
-        if not enabled:
-            if self._viz_client is not None:
-                self._viz_client.close()
-                self._viz_client = None
-            if self._viz_daemon is not None:
-                self._viz_daemon.terminate()
-                self._viz_daemon = None
-            return
-        self.ensure_viz()
-
-    def ensure_viz(self) -> None:
-        if not self.settings.viz_enabled:
-            return
-        if self._viz_client is not None:
-            return
-        self._viz_daemon = start_local_daemon(host=self.settings.viz_host, port=self.settings.viz_port)
-        self._viz_client = self._viz_daemon.connect()
-        self._send_viz()
-
-    def _send_viz(self) -> None:
-        if self._viz_client is None:
-            return
-        sig = api.digest(self._state).vector
-        self._viz_client.send_state(state_blob=api.serialize(self._state), tick=int(self._state.step_count), signature=sig)
+        self.settings.viz_enabled = bool(enabled)
+        self._configure_viz()
 
     def _make_influence(self) -> Optional[DETMInfluence]:
         symbol_id = (self.settings.symbol_id or "").strip()
@@ -104,28 +84,8 @@ class DetmTkRunner:
 
     def step_once(self) -> None:
         influence = self._make_influence()
-        start = time.perf_counter()
-        self._state, self._last_obs = api.step(self._state, influence, int(self.settings.ticks_per_step))
-        elapsed = (time.perf_counter() - start) * 1000.0
-        self._send_viz()
-
-        if self.settings.record_dir is not None:
-            self._ensure_trace()
-            entry = {
-                "tick": int(self._state.step_count),
-                "signature": self._last_obs.signature.as_dict(),
-                "field_summaries": {
-                    "energy": self._last_obs.field_summaries.energy,
-                    "entropy": self._last_obs.field_summaries.entropy,
-                    "internal_time": self._last_obs.field_summaries.internal_time,
-                },
-                "cost": dict(self._last_obs.cost),
-                "quality": dict(self._last_obs.quality),
-                "events": list(self._last_obs.events),
-                "ui": {"elapsed_ms": elapsed},
-            }
-            self._trace_fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
-            self._trace_fh.flush()
+        obs = self._session.step(influence, int(self.settings.ticks_per_step))
+        self._last_signature = obs.signature.vector
 
     def start(self) -> None:
         self._running = True
@@ -136,14 +96,60 @@ class DetmTkRunner:
     def is_running(self) -> bool:
         return self._running
 
-    def _ensure_trace(self) -> None:
-        if self._trace_fh is not None:
+    def _disable_viz(self) -> None:
+        if self._viz_streamer is not None:
+            self._viz_streamer.detach()
+            self._viz_streamer = None
+        if self._viz_transport is not None:
+            self._viz_transport.close()
+            self._viz_transport = None
+
+    def _configure_viz(self) -> None:
+        if not bool(self.settings.viz_enabled) or str(self.settings.viz_transport).lower() == "none":
+            self._disable_viz()
             return
+
+        if self._viz_transport is None:
+            self._viz_transport = open_viz_transport(
+                enabled=True,
+                transport=str(self.settings.viz_transport),
+                host=str(self.settings.viz_host),
+                port=int(self.settings.viz_port),
+                connect=bool(self.settings.viz_connect),
+                keep_open=bool(self.settings.viz_keep_open),
+            )
+            self._viz_streamer = VizStreamer.attach(
+                self._session.bus,
+                self._viz_transport,
+                every_steps=int(self.settings.viz_every_steps),
+            )
+            # Send current state immediately.
+            self._viz_streamer.on_reset(state=self._session.state)
+
+    def _disable_recording(self) -> None:
+        if self._trace_writer is not None:
+            self._trace_writer.on_close()
+            self._trace_writer = None
+        if self._artifact_writer is not None:
+            self._artifact_writer.detach()
+            self._artifact_writer = None
+
+    def _configure_recording(self) -> None:
         record_dir = self.settings.record_dir
         if record_dir is None:
+            self._disable_recording()
             return
-        record_dir.mkdir(parents=True, exist_ok=True)
-        self._trace_fh = (record_dir / "trace.jsonl").open("a", encoding="utf-8")
+
+        record_dir = Path(record_dir)
+        if self._trace_writer is None:
+            self._trace_writer = JsonlTraceWriter.attach(self._session.bus, record_dir / "trace.jsonl")
+            self._artifact_writer = ArtifactWriter.attach(self._session.bus, record_dir)
+            return
+
+        if self._trace_writer.path.resolve() != (record_dir / "trace.jsonl").resolve():
+            self._disable_recording()
+            self._trace_writer = JsonlTraceWriter.attach(self._session.bus, record_dir / "trace.jsonl")
+            self._artifact_writer = ArtifactWriter.attach(self._session.bus, record_dir)
 
 
 def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
@@ -210,14 +216,23 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
 
     viz_enabled_var = tk.BooleanVar(value=settings.viz_enabled)
     ttk.Checkbutton(frm, text="Viz daemon", variable=viz_enabled_var).grid(row=5, column=0, sticky="w")
+    viz_transport_var = tk.StringVar(value=settings.viz_transport)
+    ttk.Combobox(frm, textvariable=viz_transport_var, values=["tcp", "none"], width=6).grid(
+        row=5, column=1, sticky="w", padx=(6, 6)
+    )
     viz_host_var = tk.StringVar(value=settings.viz_host)
-    ttk.Entry(frm, textvariable=viz_host_var, width=14).grid(row=5, column=1, sticky="w", padx=(6, 6))
+    ttk.Entry(frm, textvariable=viz_host_var, width=14).grid(row=5, column=2, sticky="w", padx=(6, 6))
     viz_port_var = tk.IntVar(value=settings.viz_port)
-    ttk.Entry(frm, textvariable=viz_port_var, width=8).grid(row=5, column=2, sticky="w")
-    ttk.Label(frm, text="host/port").grid(row=5, column=3, sticky="w")
+    ttk.Entry(frm, textvariable=viz_port_var, width=8).grid(row=5, column=3, sticky="w")
+
+    viz_connect_var = tk.BooleanVar(value=settings.viz_connect)
+    ttk.Checkbutton(frm, text="connect", variable=viz_connect_var).grid(row=6, column=0, sticky="w")
+    viz_every_var = tk.IntVar(value=settings.viz_every_steps)
+    ttk.Entry(frm, textvariable=viz_every_var, width=6).grid(row=6, column=1, sticky="w", padx=(6, 6))
+    ttk.Label(frm, text="every_steps").grid(row=6, column=2, sticky="w")
 
     status = tk.StringVar(value="Ready")
-    ttk.Label(frm, textvariable=status).grid(row=6, column=0, columnspan=4, sticky="w")
+    ttk.Label(frm, textvariable=status).grid(row=7, column=0, columnspan=4, sticky="w")
 
     def _apply_settings_to_runner(reset: bool) -> None:
         cfg = DETMConfig.from_dict(
@@ -237,16 +252,20 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
         settings.tick_interval_ms = int(interval_var.get())
         settings.record_dir = Path(out_var.get()) if record_var.get() else None
         settings.viz_enabled = bool(viz_enabled_var.get())
+        settings.viz_transport = str(viz_transport_var.get()).strip() or "tcp"
         settings.viz_host = str(viz_host_var.get()).strip() or "127.0.0.1"
         settings.viz_port = int(viz_port_var.get())
+        settings.viz_connect = bool(viz_connect_var.get())
+        settings.viz_every_steps = int(viz_every_var.get())
         runner.settings = settings
         if reset:
             runner.reset()
-        runner.set_viz_enabled(settings.viz_enabled)
+        runner._configure_recording()
+        runner._configure_viz()
 
     def _update_status():
         st = runner.state
-        sig = runner.last_observables.signature.vector
+        sig = runner.last_observables
         status.set(f"tick={st.step_count}  sig0..3={sig[:4]}  backend={settings.config.backend}/{settings.config.device}")
 
     def _tick():
@@ -273,7 +292,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
             _tick()
 
     btns = ttk.Frame(frm)
-    btns.grid(row=7, column=0, columnspan=4, sticky="w", pady=(6, 0))
+    btns.grid(row=8, column=0, columnspan=4, sticky="w", pady=(6, 0))
     ttk.Button(btns, text="Reset", command=on_reset).grid(row=0, column=0, padx=(0, 6))
     ttk.Button(btns, text="Step", command=on_step).grid(row=0, column=1, padx=(0, 6))
     ttk.Button(btns, text="Run/Stop", command=on_run_toggle).grid(row=0, column=2, padx=(0, 6))
@@ -284,7 +303,8 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
 
     root.protocol("WM_DELETE_WINDOW", _on_close)
 
-    runner.set_viz_enabled(bool(settings.viz_enabled))
+    runner._configure_recording()
+    runner._configure_viz()
     _update_status()
     root.mainloop()
 
