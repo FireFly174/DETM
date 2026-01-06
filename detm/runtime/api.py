@@ -163,8 +163,21 @@ def step(
     rng: np.random.Generator | None = None,
 ) -> Tuple[DETMState, Observables]:
     rng = rng or state.restore_rng()
-    application = apply_influence(state.field_state, influence, rng) if influence is not None else None
     dynamics = _apply_dynamics_overrides(state.dynamics, influence.dynamics_overrides if influence is not None else None)
+    application = None
+    if influence is not None:
+        is_override_only = (
+            abs(float(influence.amplitude)) < 1e-12
+            and influence.mask is None
+            and influence.region is None
+            and influence.external_features is None
+            and influence.seed is None
+            and influence.phase is None
+            and influence.duration is None
+            and bool(influence.dynamics_overrides)
+        )
+        if not is_override_only:
+            application = apply_influence(state.field_state, influence, rng)
 
     start = time.perf_counter()
     backend = _select_backend(state)
