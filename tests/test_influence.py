@@ -50,3 +50,16 @@ def test_source_sink_forces_points() -> None:
     assert float(state.energy[0, 0]) == 1.0
     assert float(state.energy[5, 5]) == 0.0
 
+
+def test_stripe_mask_broadcasts_to_full_lattice() -> None:
+    rng = np.random.default_rng(0)
+    state = _field_state(24, 24)
+
+    vertical = DETMInfluence(symbol_id="stripe", amplitude=0.1, phase=0.0, region=(12, 12, 4))
+    app_v = apply_influence(state, vertical, rng)
+    assert app_v.affected_fraction > 0.0
+
+    state2 = _field_state(24, 24)
+    horizontal = DETMInfluence(symbol_id="stripe", amplitude=0.1, phase=1.0, region=(12, 12, 4))
+    app_h = apply_influence(state2, horizontal, rng)
+    assert app_h.affected_fraction > 0.0

@@ -38,6 +38,10 @@ class TcpVizTransport:
         self._client = client
         self._daemon = daemon
         self._keep_open = bool(keep_open)
+        self.sent_frames: int = 0
+        self._sent_window_start: float = 0.0
+        self._sent_window_count: int = 0
+        self.sent_fps_ema: float = 0.0
 
     @classmethod
     def connect(cls, host: str, port: int, *, timeout_s: float = 2.0) -> "TcpVizTransport":
@@ -57,6 +61,22 @@ class TcpVizTransport:
 
     def send_state(self, *, state_blob: bytes, tick: int, signature: list[float] | None = None) -> None:
         self._client.send_state(state_blob=state_blob, tick=int(tick), signature=signature)
+        self.sent_frames += 1
+        now = __import__("time").perf_counter()
+        if self._sent_window_start <= 0.0:
+            self._sent_window_start = now
+            self._sent_window_count = 0
+        self._sent_window_count += 1
+        dt = now - self._sent_window_start
+        if dt >= 0.5:
+            fps = float(self._sent_window_count) / max(1e-9, dt)
+            self.sent_fps_ema = 0.85 * float(self.sent_fps_ema) + 0.15 * fps
+            self._sent_window_start = now
+            self._sent_window_count = 0
+
+    @property
+    def address(self) -> tuple[str, int]:
+        return str(self._client.host), int(self._client.port)
 
     def close(self) -> None:
         try:
@@ -90,4 +110,3 @@ def open_viz_transport(
 
 
 __all__ = ["NullVizTransport", "TcpVizTransport", "VizTransport", "open_viz_transport"]
-

@@ -73,8 +73,10 @@ def _resolve_mask(lattice: Lattice, influence: DETMInfluence) -> np.ndarray:
                 orientation = "vertical"
         stripe_half = max(1, int(round(radius if influence.region is not None else max(1, w // 10))))
         if orientation == "horizontal":
-            return np.abs(y - cy) <= stripe_half
-        return np.abs(x - cx) <= stripe_half
+            mask = np.abs(y - cy) <= stripe_half
+            return np.broadcast_to(mask, (h, w))
+        mask = np.abs(x - cx) <= stripe_half
+        return np.broadcast_to(mask, (h, w))
 
     if sid == "focus":
         # Smaller, tighter spot than a default pulse.

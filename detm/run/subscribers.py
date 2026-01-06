@@ -387,7 +387,12 @@ class VizStreamer:
             return
         self._last_sent_step = step_count
         blob = get_state_blob() if callable(get_state_blob) else api.serialize(state)
-        self.transport.send_state(state_blob=blob, tick=step_count, signature=signature.vector)
+        try:
+            self.transport.send_state(state_blob=blob, tick=step_count, signature=signature.vector)
+        except Exception:
+            # Viz is best-effort: if a transport drops (daemon closed, socket error),
+            # keep the simulation running and stop streaming further.
+            self.detach()
 
     def on_reset(self, *, state: DETMState, get_state_blob: Any | None = None, **_rest: Any) -> None:
         self._last_sent_step = -1

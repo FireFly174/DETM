@@ -42,7 +42,7 @@
     "record_fields": false,
     "invariant_streams": "",
     "viz_enabled": true,
-    "viz_transport": "tcp",
+    "viz_transport": "embedded",
     "viz_host": "127.0.0.1",
     "viz_port": 0,
     "viz_connect": false,
