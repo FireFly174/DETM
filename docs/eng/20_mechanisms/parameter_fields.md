@@ -17,4 +17,21 @@ Related docs:
 - channels: `docs/eng/20_mechanisms/channels.md`
 - parameter gradients experiment: `docs/eng/40_experiments/exp_gradient.md`
 - influence port (integration contract): `docs/eng/integration_contract.md`
+ - regime phase maps: `docs/eng/40_experiments/exp_phase_map.md`
 
+In the UI/trace you may also see short aliases:
+`a,b,g,k,t` = `alpha,beta,gamma,kappa,lambda_t`.
+
+## Qualitative meaning of the main parameters
+
+These interpretations are used for experiment design and regime diagnostics:
+
+| Parameter | Role (qualitative) |
+|---|---|
+| `kappa` | “conductivity”: transport speed / smoothing |
+| `alpha` | gradient sensitivity: flow sharpness / structure |
+| `beta` | “spring”: pull towards the baseline `E_level` |
+| `gamma` | collectivity: neighbor contribution to suppression / “viscosity” |
+| `lambda_t` | asynchrony strength: how suppression shapes `τ` |
+
+The goal is not “physical realism”, but controllable, distinguishable regimes and observable transitions.

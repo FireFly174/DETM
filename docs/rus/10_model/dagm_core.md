@@ -11,7 +11,7 @@
 См. также:
 - `docs/rus/10_model/model_core.md` — спецификация DETM (решёточный профиль);
 - `docs/rus/20_mechanisms/coarsening.md` — коарсинг и уровни (наблюдаемое);
-- `Discrete Emergent Medium with Multilevel Coarsening/Discrete Asynchronous Graph Model (DAGM).md` — исходный текст рассуждений.
+- `docs/rus/90_notes/source_materials.md` — карта источников и переносов (исходные заметки вне git).
 
 ---
 

@@ -47,8 +47,17 @@ Key docs:
 - Hypotheses
   - RU: `docs/rus/30_hypotheses/hypotheses.md`
   - EN: `docs/eng/30_hypotheses/hypotheses.md`
+  - Cards:
+    - Attractors as objects: RU `docs/rus/30_hypotheses/attractors_as_objects.md`, EN `docs/eng/30_hypotheses/attractors_as_objects.md`
+    - Boundary interface + holography: RU `docs/rus/30_hypotheses/boundary_interface_holography.md`, EN `docs/eng/30_hypotheses/boundary_interface_holography.md`
+    - Inertia/mass from locality: RU `docs/rus/30_hypotheses/inertia_mass_locality.md`, EN `docs/eng/30_hypotheses/inertia_mass_locality.md`
+    - Vortices as quasiparticles: RU `docs/rus/30_hypotheses/vortices_quasiparticles.md`, EN `docs/eng/30_hypotheses/vortices_quasiparticles.md`
+    - Level capacity/phase transitions: RU `docs/rus/30_hypotheses/level_capacity_phase_transitions.md`, EN `docs/eng/30_hypotheses/level_capacity_phase_transitions.md`
 - Experiments
   - Metrics: RU `docs/rus/40_experiments/metrics.md`, EN `docs/eng/40_experiments/metrics.md`
+  - Phase map: RU `docs/rus/40_experiments/exp_phase_map.md`, EN `docs/eng/40_experiments/exp_phase_map.md`
+  - Object masks: RU `docs/rus/40_experiments/exp_object_masks.md`, EN `docs/eng/40_experiments/exp_object_masks.md`
+  - Transfer speed: RU `docs/rus/40_experiments/exp_transfer_speed.md`, EN `docs/eng/40_experiments/exp_transfer_speed.md`
   - Channels: RU `docs/rus/40_experiments/exp_channels.md`, EN `docs/eng/40_experiments/exp_channels.md`
   - Density: RU `docs/rus/40_experiments/exp_density.md`, EN `docs/eng/40_experiments/exp_density.md`
   - Gradient: RU `docs/rus/40_experiments/exp_gradient.md`, EN `docs/eng/40_experiments/exp_gradient.md`
@@ -65,4 +74,4 @@ Key docs:
   - Fallback/subworld: RU `docs/rus/90_notes/fallback_subworld.md`, EN `docs/eng/90_notes/fallback_subworld.md`
   - Storage formats: RU `docs/rus/90_notes/storage_neurons_subworld.md`, EN `docs/eng/90_notes/storage_neurons_subworld.md`
   - Meaning/alphabet/LLM-mode: RU `docs/rus/90_notes/meaning_alphabet_llm_mode.md`, EN `docs/eng/90_notes/meaning_alphabet_llm_mode.md`
-  - System architecture sketch: RU `docs/rus/90_notes/system_architecture_sketch.md`, EN `docs/eng/90_notes/system_architecture_sketch.md`
+- System architecture sketch: RU `docs/rus/90_notes/system_architecture_sketch.md`, EN `docs/eng/90_notes/system_architecture_sketch.md`

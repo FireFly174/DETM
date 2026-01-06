@@ -126,3 +126,14 @@ H15. Слияние инвариантов = резонанс + замыкани
 Ни одна гипотеза не считается подтверждённой априори.
 
 См. рекомендуемые метрики (PLV/спектр/потоки): `docs/rus/40_experiments/metrics.md`.
+
+---
+
+## Карточки‑расширения (из исходных заметок)
+
+Эти страницы дополняют список гипотез операциональными определениями и набросками экспериментов:
+- аттракторы как «объекты»: `docs/rus/30_hypotheses/attractors_as_objects.md`
+- граница как интерфейс и «голографичность»: `docs/rus/30_hypotheses/boundary_interface_holography.md`
+- инерция/«масса» из локальности: `docs/rus/30_hypotheses/inertia_mass_locality.md`
+- вихри как квазичастицы: `docs/rus/30_hypotheses/vortices_quasiparticles.md`
+- ёмкость уровня и фазовые переходы: `docs/rus/30_hypotheses/level_capacity_phase_transitions.md`

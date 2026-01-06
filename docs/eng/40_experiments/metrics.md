@@ -23,6 +23,46 @@ A metric is considered valid if it is:
 
 ---
 
+## Regimes (phases) and phase maps
+
+For coarse regime classification (freeze / vortex cycle / “turbulence”), use tail metrics:
+
+- `t_stable`: time to stabilize (e.g. when `mean(|J|) < ε` for a window `W`)
+- `J_tail`: tail activity `mean(|J|)` after burn-in
+- `curl_rms`: RMS vorticity proxy (or any stable curl-like feature of `J`)
+- spectral features: dominant rFFT peak of a compact time series (`E_mean(t)`, `signature(t)`)
+
+Protocol: `docs/eng/40_experiments/exp_phase_map.md`.
+
+---
+
+## Objectness and masks
+
+The model has no explicit “object” entity; objects are extracted diagnostically as regions where:
+- `E` (and/or its derivatives) forms a stable structure
+- the shape is preserved over time
+
+Minimal mask metrics:
+- object area / effective radius (`area`, `r_eff`)
+- number and size of connected components (`n_components`)
+- shape stability: `corr(E(t), E(t+Δt))` inside the mask
+- boundary metrics: `J_boundary`, `E_flux_in/out`, circulation `∮ J·dl`
+
+Protocol: `docs/eng/40_experiments/exp_object_masks.md`.
+
+---
+
+## Transfer speed, lags, and “signal speed”
+
+Ways to estimate propagation speed:
+- lag correlations: `corr(E(x0,t), E(x1,t+τ))` → `τ_max` as transfer delay estimate
+- speed proxy: `v_eff = ⟨ |J| / (E + ε) ⟩` (inside the mask / on the boundary)
+- orbit/period features: `T_orbit` via ring means or circulation measures
+
+Protocol: `docs/eng/40_experiments/exp_transfer_speed.md`.
+
+---
+
 ## Auxiliary metrics (examples)
 
 - energy variance
@@ -44,8 +84,18 @@ Practical “locking” criterion: `PLV > θ` over a window `W`.
 
 ## Spectral density and dominant period
 
-Log a compact time series (e.g. `E_mean(t)` over a region) and compute rFFT peaks to estimate dominant periods and their ratios.
+Log a compact time series (e.g. `E_mean(t)` over a region, or compact scalars from `digest`/`signature`) and compute rFFT peaks to estimate dominant periods and their ratios.
 
 ## Flow proxies for “merging”
 
 Track flux intensity in the interaction zone and time-to-stabilize after contact.
+
+---
+
+## Boundary “holography” (optional, hypothesis)
+
+If you have a mask, you can test how predictive the boundary is for the interior:
+- `MI(E_boundary, E_in)` or correlations between boundary and interior features
+- reconstruction of `E_in` from `E_boundary` via a simple model (linear/ML, as an external analysis step)
+
+This lives in the interpretation layer, but provides useful diagnostics for regimes and interactions.
