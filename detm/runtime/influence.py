@@ -23,6 +23,7 @@ class DETMInfluence:
     mask: np.ndarray | None = None
     duration: int | None = None
     external_features: np.ndarray | Dict[str, float] | None = None
+    dynamics_overrides: Dict[str, float] | None = None
 
 
 @dataclass(frozen=True)

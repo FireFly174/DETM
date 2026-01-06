@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Dict, List, Tuple
 
 import numpy as np
 
 from detm.core.fields import Lattice
+from detm.core.entropy import DynamicsParameters
 from detm.runtime.backends import Backend, NumpyBackend, TorchBackend
 from detm.runtime.config import DETMConfig
 from detm.runtime.diagnostics.attractors import detect_attractors
@@ -38,6 +39,26 @@ class Observables:
 # ---------------------------------------------------------------------------
 # Core API
 # ---------------------------------------------------------------------------
+
+def _apply_dynamics_overrides(base: DynamicsParameters, overrides: Dict[str, float] | None) -> DynamicsParameters:
+    if not overrides:
+        return base
+    allowed = {
+        "equilibrium_energy",
+        "beta",
+        "gamma",
+        "kappa",
+        "alpha",
+        "lambda_t",
+        "activation_threshold",
+    }
+    clean: Dict[str, float] = {}
+    for key, value in overrides.items():
+        if key not in allowed:
+            raise ValueError(f"Unsupported dynamics override: {key}")
+        clean[key] = float(value)
+    return replace(base, **clean)
+
 
 def _to_numpy(array) -> np.ndarray:
     try:
@@ -143,10 +164,11 @@ def step(
 ) -> Tuple[DETMState, Observables]:
     rng = rng or state.restore_rng()
     application = apply_influence(state.field_state, influence, rng) if influence is not None else None
+    dynamics = _apply_dynamics_overrides(state.dynamics, influence.dynamics_overrides if influence is not None else None)
 
     start = time.perf_counter()
     backend = _select_backend(state)
-    state.field_state = backend.step(state.field_state, state.dynamics, n_ticks)
+    state.field_state = backend.step(state.field_state, dynamics, n_ticks)
     state.step_count += max(0, n_ticks)
     elapsed = time.perf_counter() - start
     state.store_rng(rng)
