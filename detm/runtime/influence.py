@@ -7,8 +7,8 @@ from typing import Any, Dict
 
 import numpy as np
 
-from core.fields import Lattice
-from runtime.state import DETMFieldState
+from detm.core.fields import Lattice
+from detm.runtime.state import DETMFieldState
 
 
 @dataclass(frozen=True)

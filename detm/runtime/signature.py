@@ -7,8 +7,7 @@ from typing import Dict, List
 
 import numpy as np
 
-from core.invariants import describe_field
-from runtime.schemas import DETM_SIGNATURE_V1
+from detm.runtime.schemas import DETM_SIGNATURE_V1
 
 
 @dataclass(frozen=True)

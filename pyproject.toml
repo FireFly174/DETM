@@ -21,12 +21,8 @@ package-dir = {"" = "."}
 [tool.setuptools.packages.find]
 where = ["."]
 include = [
-  "core*",
-  "runtime*",
-  "levels*",
-  "visualization*",
   "detm_logging*",
-  "integrations*",
+  "detm*",
 ]
 
 [tool.black]
@@ -37,7 +33,7 @@ extend-exclude = "/(legacy|experiments|examples|visualization|docs|detm_logging|
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-src = ["core", "tests"]
+src = ["detm", "tests"]
 extend-exclude = [
   "legacy",
   "experiments",
@@ -46,7 +42,6 @@ extend-exclude = [
   "docs",
   "detm_logging",
   "fallback",
-  "runtime",
   "tools",
   "bundle_project.py",
 ]
@@ -61,4 +56,4 @@ strict = false
 ignore_missing_imports = true
 check_untyped_defs = true
 warn_unused_ignores = true
-files = ["core", "tests"]
+files = ["detm", "tests"]

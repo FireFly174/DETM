@@ -23,9 +23,9 @@ from typing import Iterable, Mapping, Sequence
 
 import numpy as np
 
-from core.entropy import DynamicsParameters, compute_entropy, evolve
-from core.fields import FieldState, Lattice, ScalarField
-from core.invariants import collect_series, describe_state
+from detm.core.entropy import DynamicsParameters, compute_entropy, evolve
+from detm.core.fields import FieldState, Lattice, ScalarField
+from detm.core.invariants import collect_series, describe_state
 from experiments.configuration import load_structured_config, pick
 
 

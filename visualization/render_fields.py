@@ -8,8 +8,8 @@ from typing import Mapping, Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 
-from core.fields import FieldState, ScalarField
-from core.invariants import collect_series, radial_profile
+from detm.core.fields import FieldState, ScalarField
+from detm.core.invariants import collect_series, radial_profile
 
 
 def _to_array(field: ScalarField) -> np.ndarray:

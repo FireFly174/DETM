@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import numpy as np
 
-from core.entropy import DynamicsParameters
-from core.fields import Lattice
-from runtime.schemas import DETM_STATE_V1
+from detm.core.entropy import DynamicsParameters
+from detm.core.fields import Lattice
+from detm.runtime.schemas import DETM_STATE_V1
 
 if TYPE_CHECKING:  # pragma: no cover
     import torch

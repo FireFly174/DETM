@@ -1,4 +1,4 @@
-"""Helpers for computing coarse invariants from :mod:`core.fields` data.
+"""Helpers for computing coarse invariants from :mod:`detm.core.fields` data.
 
 The legacy visualiser (`legacy/viz/visualizer.py`) rendered both raw fields
 (`E`, gradients, histograms) and aggregated invariants such as global extrema
@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from math import sqrt
 from typing import List, Mapping, Sequence, Tuple
 
-from .fields import Coordinate, FieldState, ScalarField
+from detm.core.fields import Coordinate, FieldState, ScalarField
 
 
 @dataclass(frozen=True)

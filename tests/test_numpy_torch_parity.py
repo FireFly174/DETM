@@ -3,10 +3,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from core.entropy import DynamicsParameters
-from core.fields import Lattice
-from runtime.backends import NumpyBackend, TorchBackend
-from runtime.state import DETMFieldState
+from detm.core.entropy import DynamicsParameters
+from detm.core.fields import Lattice
+from detm.runtime.backends import NumpyBackend, TorchBackend
+from detm.runtime.state import DETMFieldState
 
 
 def test_torch_backend_matches_numpy_periodic():

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Dict, Iterable, List
 
-from runtime.influence import DETMInfluence
+from detm.runtime.influence import DETMInfluence
 
 
 _SYMBOL_TEMPLATES: Dict[str, dict] = {

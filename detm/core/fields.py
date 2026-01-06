@@ -1,4 +1,4 @@
-"""Core lattice and scalar field primitives for DETM.
+"""Core lattice and scalar field primitives for DETM (`detm.core`).
 
 The module defines a minimal, deterministic toolkit for representing
 regular lattices and scalar fields that live on top of them.  The classes are

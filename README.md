@@ -55,7 +55,9 @@ DETM:
   - `50_limits` — ограничения и границы интерпретаций  
   - `90_notes` — архив идей и черновиков  
 
-- `core/`, `runtime/`, `levels/` и др. — реализация модели  
+- `detm/` — реализация L0 (ядро + runtime-контракт)  
+  - `detm/runtime/` — типизированный L0 API (`reset/step/digest/serialize`)
+  - `detm/integrations/` — адаптеры для оркестраторов (ACGS/ComfyUI): `DETMRuntimeBridge`, `ACGSDetmBackend`
 - `experiments/` — экспериментальные сценарии  
 - `runs/`, `data/` — результаты запусков (обычно игнорируются git)
 
