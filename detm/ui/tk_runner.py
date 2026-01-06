@@ -47,6 +47,7 @@ class DetmTkRunner:
         self._running = False
         self._viz_transport: VizTransport | None = None
         self._viz_streamer: VizStreamer | None = None
+        self._viz_key: tuple | None = None
         self._trace_writer: JsonlTraceWriter | None = None
         self._artifact_writer: ArtifactWriter | None = None
 
@@ -103,11 +104,23 @@ class DetmTkRunner:
         if self._viz_transport is not None:
             self._viz_transport.close()
             self._viz_transport = None
+        self._viz_key = None
 
     def _configure_viz(self) -> None:
         if not bool(self.settings.viz_enabled) or str(self.settings.viz_transport).lower() == "none":
             self._disable_viz()
             return
+
+        desired_key = (
+            str(self.settings.viz_transport),
+            str(self.settings.viz_host),
+            int(self.settings.viz_port),
+            bool(self.settings.viz_connect),
+            bool(self.settings.viz_keep_open),
+            int(self.settings.viz_every_steps),
+        )
+        if self._viz_key is not None and self._viz_key != desired_key:
+            self._disable_viz()
 
         if self._viz_transport is None:
             self._viz_transport = open_viz_transport(
@@ -123,7 +136,7 @@ class DetmTkRunner:
                 self._viz_transport,
                 every_steps=int(self.settings.viz_every_steps),
             )
-            # Send current state immediately.
+            self._viz_key = desired_key
             self._viz_streamer.on_reset(state=self._session.state)
 
     def _disable_recording(self) -> None:
@@ -255,7 +268,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
         settings.viz_transport = str(viz_transport_var.get()).strip() or "tcp"
         settings.viz_host = str(viz_host_var.get()).strip() or "127.0.0.1"
         settings.viz_port = int(viz_port_var.get())
-        settings.viz_connect = bool(viz_connect_var.get())
+        settings.viz_connect = bool(viz_connect_var.get()) and settings.viz_port > 0
         settings.viz_every_steps = int(viz_every_var.get())
         runner.settings = settings
         if reset:
