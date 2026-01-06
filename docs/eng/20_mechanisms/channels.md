@@ -11,3 +11,4 @@ Typical questions:
 
 This document collects hypotheses and experiment hooks related to “channels”.
 
+See also: `docs/eng/20_mechanisms/parameter_fields.md`.

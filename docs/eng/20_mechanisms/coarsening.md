@@ -11,3 +11,4 @@ In code, a minimal frequency-based timekeeper is implemented via “invariant ti
 
 Persistence/analysis of coarsening streams must be implemented as separate EventBus subscribers (plugins), not inside the coarsener itself.
 
+Canonical scaling/normalization constraints: `docs/eng/20_mechanisms/scale_axis.md`.

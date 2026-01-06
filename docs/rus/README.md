@@ -8,3 +8,4 @@
 Справочно:
 - Контракт интеграции: `docs/rus/integration_contract.md`
 - Архитектура runtime/UI/viz: `docs/rus/architecture.md`
+- Карта исходников → канон: `docs/rus/90_notes/source_materials.md`
