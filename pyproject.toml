@@ -1,3 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "detm"
+version = "0.0.0"
+description = "Discrete Entropy-Time Model runtime"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "msgpack>=1.0",
+]
+
+[tool.setuptools]
+packages = []
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]
