@@ -104,6 +104,8 @@ class TickRunner:
 
     def __init__(self, session: DetmSession, scheduler: TickScheduler) -> None:
         self.session = session
+        # Unify the clock and event stream: Scheduler is the "time spine" for the same bus.
+        scheduler.bus = session.bus
         self.scheduler = scheduler
 
     @property
@@ -118,11 +120,14 @@ class TickRunner:
         due = self.scheduler.pop_due(tick)
         self.bus.publish("tick", tick=tick)
 
+        merged_overrides: Dict[str, float] = {}
         for item in due:
             if item.kind != "influence":
                 continue
             influence: DETMInfluence = item.payload["influence"]
             application: InfluenceApplication = apply_influence(self.session.state.field_state, influence, rng)
+            if influence.dynamics_overrides:
+                merged_overrides.update({k: float(v) for k, v in influence.dynamics_overrides.items()})
             self.bus.publish(
                 "signal",
                 tick=tick,
@@ -132,7 +137,14 @@ class TickRunner:
             )
 
         # Advance L0 by one global tick after all signals are applied.
-        self.session.step(None, 1, rng=rng)
+        override_influence = None
+        if merged_overrides:
+            override_influence = DETMInfluence(
+                symbol_id="scheduled_overrides",
+                amplitude=0.0,
+                dynamics_overrides=merged_overrides,
+            )
+        self.session.step(override_influence, 1, rng=rng)
 
     def run(self, n_ticks: int) -> None:
         for _ in range(max(0, int(n_ticks))):
