@@ -16,3 +16,12 @@ Additional hypotheses captured from the original notes (frequency/phase structur
 - merging as resonance + flow/circulation closure
 
 See metrics: `docs/eng/40_experiments/metrics.md`.
+
+## Supplemental cards (from the original notes)
+
+These pages add operational definitions and experiment sketches:
+- attractors as “objects”: `docs/eng/30_hypotheses/attractors_as_objects.md`
+- boundary as interface + “holography”: `docs/eng/30_hypotheses/boundary_interface_holography.md`
+- inertia/“mass” from locality: `docs/eng/30_hypotheses/inertia_mass_locality.md`
+- vortices as quasiparticles: `docs/eng/30_hypotheses/vortices_quasiparticles.md`
+- level capacity and phase transitions: `docs/eng/30_hypotheses/level_capacity_phase_transitions.md`

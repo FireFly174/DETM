@@ -1,53 +1,59 @@
 # Исходные материалы и покрытие документацией
 
-Папка `Discrete Emergent Medium with Multilevel Coarsening/` содержит исходные рассуждения («поток сознания»), из которых собирался канон проекта.
-Цель этого файла — зафиксировать, **что уже перенесено в `docs/rus/`**, а что ещё требует оформления.
+Изначально большая часть идей и формулировок велась как «поток заметок» (Markdown + Obsidian `.canvas`).
+Эти исходники рассматриваются как **локальное сырьё** и **не трекаются git** (их можно хранить рядом с репозиторием или в локальной папке `docs/source/`, которая игнорируется).
+
+Цель этого файла — зафиксировать, где находится канон, и какие темы из исходников уже перенесены в структуру `docs/rus/` (и переведены в `docs/eng/`).
+
+---
 
 ## 1) Принцип
 
-- `docs/rus/` — каноническая документация (то, на что опирается код и эксперименты).
-- исходная папка — источник контекста, идей и формулировок; она может содержать устаревшие/сырые фрагменты.
+- `docs/rus/` — каноническая документация (на неё опираются код и эксперименты).
+- `docs/eng/` — перевод (может быть неполным/упрощённым).
+- исходные заметки и выгрузки из `.canvas` — вспомогательный материал и не являются частью канона.
 
-## 2) Карта соответствия (high level)
+Если нужно локально «распаковать» текстовые узлы `.canvas` в карточки, используйте `tools/extract_canvas_cards.py` (выходные файлы считаются локальными и не коммитятся).
 
-### Графовая формулировка (DAGM)
-- Источник: `Discrete Emergent Medium with Multilevel Coarsening/Discrete Asynchronous Graph Model (DAGM).md`
-- Канон: `docs/rus/10_model/dagm_core.md`
+---
 
-### Решёточная спецификация (DETM)
-- Источники: `.../README.md`, `.../Дискретная энтропийно-временная модель (DETM).md`
-- Канон: `docs/rus/10_model/model_core.md`
+## 2) Покрытие каноном (где что лежит)
 
-### Гипотезы
-- Источник: `.../HYPOTHESES.md.md` (в т.ч. PLV/спектр/рациональные отношения частот)
-- Канон: `docs/rus/30_hypotheses/hypotheses.md`
-- Метрики для проверки: `docs/rus/40_experiments/metrics.md`
+- DAGM (графовая формулировка): `docs/rus/10_model/dagm_core.md`
+- DETM (решёточная спецификация): `docs/rus/10_model/model_core.md`
+- Механизмы: `docs/rus/20_mechanisms/*`
+  - внутреннее время/асинхронность: `docs/rus/20_mechanisms/internal_time.md`
+  - параметры среды как поля: `docs/rus/20_mechanisms/parameter_fields.md`
+  - коарсинг/шкалы: `docs/rus/20_mechanisms/coarsening.md`, `docs/rus/20_mechanisms/scale_axis.md`
+- Гипотезы (список): `docs/rus/30_hypotheses/hypotheses.md`
+- Эксперименты и метрики: `docs/rus/40_experiments/*`
+  - метрики: `docs/rus/40_experiments/metrics.md`
+  - фазовые карты режимов: `docs/rus/40_experiments/exp_phase_map.md`
+  - маски/границы объектов: `docs/rus/40_experiments/exp_object_masks.md`
+  - скорость переноса/лаги: `docs/rus/40_experiments/exp_transfer_speed.md`
+- Ограничения (limits): `docs/rus/50_limits/limits.md`
 
-### Ограничения (limits)
-- Источник: `.../LIMITS.md.md`
-- Канон: `docs/rus/50_limits/limits.md`
+---
 
-### Коарсинг, уровни, шкала и нормировки
-- Источники: `.../PROMT.md.md`, `.../Main holst.canvas`, `.../Экспериментальные данные.canvas`
-- Канон: `docs/rus/20_mechanisms/coarsening.md`
-- Дополнение (нормировка/шкала): `docs/rus/20_mechanisms/scale_axis.md`
+## 3) Карточки‑расширения (выжимка из canvas)
 
-### Параметры среды как поля (каналы/градиенты/«врезка»)
-- Источники: `.../PROMT.md.md`, `.../Main holst.canvas`
-- Канон: `docs/rus/20_mechanisms/channels.md`
-- Дополнение: `docs/rus/20_mechanisms/parameter_fields.md`
+Следующие темы из исходных `.canvas` перенесены как отдельные карточки/протоколы:
 
-### Метадокумент про риски/границы «модель vs интерпретация»
-- Источник: `.../Анализ модели DETM и эмерджентной иерархии.md`
-- Статус: полезно как справочная рамка; при необходимости перенести в `docs/rus/90_notes/` отдельной страницей.
+- аттракторы как «объекты»: `docs/rus/30_hypotheses/attractors_as_objects.md`
+- граница как интерфейс и «голографичность»: `docs/rus/30_hypotheses/boundary_interface_holography.md`
+- инерция/«масса» из локальности: `docs/rus/30_hypotheses/inertia_mass_locality.md`
+- вихри как квазичастицы: `docs/rus/30_hypotheses/vortices_quasiparticles.md`
+- ёмкость уровня и фазовые переходы: `docs/rus/30_hypotheses/level_capacity_phase_transitions.md`
 
-## 3) Что явно вне канона DETM (но важно не потерять)
+---
 
-В исходниках есть блоки про уровни выше L0 и оркестрацию. Они вынесены в отдельные карточки `90_notes`:
+## 4) Что явно вне канона L0 (но важно не потерять)
 
-- Fallback/subworld/pipeline swap: `docs/rus/90_notes/fallback_subworld.md`
-- Форматы хранения нейронов/subworld и ресурсные критерии: `docs/rus/90_notes/storage_neurons_subworld.md`
-- «Смысл», алфавиты уровней и LLM-mode: `docs/rus/90_notes/meaning_alphabet_llm_mode.md`
-- Набросок системной архитектуры (термины): `docs/rus/90_notes/system_architecture_sketch.md`
+Темы про уровни выше L0 и/или оркестрацию (ACGS) хранятся в `90_notes`:
 
-Эти темы относятся к **уровням выше L0** и/или к оркестрации (ACGS), поэтому они не являются каноном L0 и не должны требоваться для работы `detm/runtime/api.py`.
+- fallback/subworld: `docs/rus/90_notes/fallback_subworld.md`
+- форматы хранения нейронов/subworld и ресурсные критерии: `docs/rus/90_notes/storage_neurons_subworld.md`
+- «смысл», алфавиты уровней и LLM-mode: `docs/rus/90_notes/meaning_alphabet_llm_mode.md`
+- набросок системной архитектуры (термины): `docs/rus/90_notes/system_architecture_sketch.md`
+
+Эти темы не должны требоваться для работы канонического L0 API (`detm/runtime/api.py`).
