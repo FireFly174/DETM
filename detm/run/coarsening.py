@@ -171,5 +171,41 @@ class InvariantCoarsener:
                 )
 
 
-__all__ = ["InvariantCoarsener", "InvariantStreamSpec"]
+def parse_invariant_streams(spec: str | Iterable[str]) -> List[InvariantStreamSpec]:
+    """Parse stream specs from CLI/UI.
 
+    Accepted formats:
+    - "id=1/10"
+    - "id=0.1"
+    - "id:1/10"
+    - "id:0.1"
+    - multiple: "a=1/10,b=4/25"
+    - list input: ["a=1/10", "b=4/25"]
+    """
+
+    if isinstance(spec, str):
+        chunks = [c.strip() for c in spec.split(",") if c.strip()]
+    else:
+        chunks = [str(c).strip() for c in spec if str(c).strip()]
+
+    out: List[InvariantStreamSpec] = []
+    for chunk in chunks:
+        if "=" in chunk:
+            sid, dt = chunk.split("=", 1)
+        elif ":" in chunk:
+            sid, dt = chunk.split(":", 1)
+        else:
+            # If only dt is provided, generate a stable id.
+            sid = f"inv_{len(out)}"
+            dt = chunk
+        sid = sid.strip()
+        dt = dt.strip()
+        if not sid:
+            sid = f"inv_{len(out)}"
+        if not dt:
+            raise ValueError(f"Invalid invariant stream spec (missing dt): {chunk}")
+        out.append(InvariantStreamSpec(stream_id=sid, dt=dt))
+    return out
+
+
+__all__ = ["InvariantCoarsener", "InvariantStreamSpec", "parse_invariant_streams"]
