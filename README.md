@@ -71,6 +71,21 @@ DETM:
 
 ---
 
+## Конфигурация запуска (1 файл)
+
+По умолчанию `python main.py` использует локальный файл `config.example.py` в корне репозитория:
+- если файла нет, он автоматически копируется из `detm/presets/config.default.py`
+- локальный `config.example.py` **не должен** трекаться git (он уже добавлен в `.gitignore`)
+
+Файл `config.example.py` — это Python-словарь `CONFIG` с секциями:
+- runtime (поля `DETMConfig`): `backend/device/width/height/boundary/initial_noise/dynamics(a,b,g,k,t=alpha,beta,gamma,kappa,lambda_t)`
+- `ui`: дефолты для UI (`UiRunSettings`)
+- `runner`: дефолты для headless CLI (`detm.cli`)
+
+Также можно передать свой конфиг:
+- UI: `python main.py ui --config config.local.py`
+- Headless/batch: `python main.py --config config.local.py --batch 10`
+
 ## Статус
 
 Проект находится в активной исследовательской стадии.

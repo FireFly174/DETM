@@ -9,8 +9,8 @@ from detm.runtime.influence import DETMInfluence
 
 _SYMBOL_TEMPLATES: Dict[str, dict] = {
     "pulse": {"amplitude": 0.15, "region": None},
-    "ring": {"amplitude": 0.1, "region": (0, 0, 0)},
-    "stripe": {"amplitude": 0.08},
+    "ring": {"amplitude": 0.1, "region": None},
+    "stripe": {"amplitude": 0.08, "phase": 0.0},  # phase controls orientation (see apply_influence)
     "noise_burst": {"amplitude": 0.2},
     "cooldown": {"amplitude": -0.1},
     "focus": {"amplitude": 0.05},

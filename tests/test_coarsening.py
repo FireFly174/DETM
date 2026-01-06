@@ -18,8 +18,12 @@ def test_invariant_stream_emits_expected_ticks():
     for _ in range(20):
         sess.step(None, 1, rng=sess.state.restore_rng())
 
-    assert len(emitted) == 2
-    assert [e["invariant_tick"] for e in emitted] == [0, 1]
+    assert len(emitted) == 20
+    assert [e["l0_tick"] for e in emitted] == list(range(1, 21))
+    assert [e["l0_tick"] for e in emitted if e["boundary_crossed"]] == [10, 20]
+    assert emitted[8]["invariant_index"] == 0  # l0_tick=9
+    assert emitted[9]["invariant_index"] == 1  # l0_tick=10
+    assert emitted[9]["phase_num"] == 0  # exact boundary (10/10)
 
 
 def test_invariant_fractional_dt_emits_multiple_per_window():
@@ -34,6 +38,8 @@ def test_invariant_fractional_dt_emits_multiple_per_window():
     for _ in range(25):
         sess.step(None, 1, rng=sess.state.restore_rng())
 
-    assert len(emitted) == 4
-    assert [e["invariant_tick"] for e in emitted] == [0, 1, 2, 3]
-
+    assert len(emitted) == 25
+    assert [e["l0_tick"] for e in emitted if e["boundary_crossed"]] == [7, 13, 19, 25]
+    assert emitted[-1]["invariant_index"] == 4
+    assert emitted[-1]["phase_num"] == 0
+    assert emitted[-1]["time_num"] == 25 * 4

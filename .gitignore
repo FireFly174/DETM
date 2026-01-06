@@ -38,6 +38,11 @@ bundle_project.py
 *_bundle.txt
 Prev_proj.txt
 
+# --- Local single-file configs (generated/edited locally) ---
+config.py
+config.local.py
+config.example.py
+
 
 # --- Research notes / drafts (not tracked) ---
 Discrete Emergent Medium with Multilevel Coarsening/
