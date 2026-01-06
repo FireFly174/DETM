@@ -9,7 +9,7 @@ from runtime.symbols import make_symbol
 
 
 def test_seed_determinism_matches_signature():
-    config = DETMConfig(width=8, height=8, initial_noise=0.01)
+    config = DETMConfig(width=8, height=8, initial_noise=0.01, backend="numpy", device="cpu")
     influence = make_symbol("pulse", amplitude=0.1, region=(4, 4, 2))
 
     state_a = reset(config, seed=123)
@@ -23,11 +23,11 @@ def test_seed_determinism_matches_signature():
 
 
 def test_serialize_roundtrip_preserves_digest():
-    config = DETMConfig(width=6, height=6, initial_noise=0.02)
+    config = DETMConfig(width=6, height=6, initial_noise=0.02, backend="numpy", device="cpu")
     influence = DETMInfluence(symbol_id="test", amplitude=0.05, region=(3, 3, 1))
 
     state = reset(config, seed=7)
-    state, _ = step(state, influence, n_ticks=2, rng=np.random.default_rng(7))
+    state, _ = step(state, influence, n_ticks=2, rng=state.restore_rng())
 
     blob = serialize_state(state)
     restored = deserialize_state(blob)

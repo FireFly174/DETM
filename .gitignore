@@ -1,5 +1,6 @@
 # --- Python ---
 __pycache__/
+.pytest_cache/
 *.py[cod]
 *.pyd
 *.so
@@ -35,6 +36,10 @@ outputs/
 PROMT_SHORT.md
 bundle_project.py
 DETM_bundle.txt
+
+
+# --- Research notes / drafts (not tracked) ---
+Discrete Emergent Medium with Multilevel Coarsening/
 
 
 

@@ -6,22 +6,36 @@ build-backend = "setuptools.build_meta"
 name = "detm"
 version = "0.0.0"
 description = "Discrete Entropy-Time Model runtime"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
   "numpy>=1.26",
   "msgpack>=1.0",
 ]
 
+[project.optional-dependencies]
+torch = ["torch"]
+
 [tool.setuptools]
-packages = []
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+  "core*",
+  "runtime*",
+  "levels*",
+  "visualization*",
+  "detm_logging*",
+  "integrations*",
+]
 
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py312"]
 extend-exclude = "/(legacy|experiments|examples|visualization|docs|detm_logging|fallback|runtime|tools|bundle_project\\.py)/"
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 line-length = 100
 src = ["core", "tests"]
 extend-exclude = [
@@ -42,7 +56,7 @@ select = ["E", "F", "I"]
 ignore = ["E203"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 strict = false
 ignore_missing_imports = true
 check_untyped_defs = true

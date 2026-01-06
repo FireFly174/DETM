@@ -8,11 +8,22 @@ from typing import Any, Dict
 import msgpack
 import numpy as np
 
-from core.entropy import DynamicsParameters, compute_entropy
-from core.fields import FieldState, Lattice, ScalarField
+from core.entropy import DynamicsParameters
+from core.fields import Lattice
 from runtime.schemas import DETM_STATE_V1
 from runtime.signature import digest_fields
-from runtime.state import DETMState
+from runtime.state import DETMFieldState, DETMState
+
+
+def _to_numpy(array: Any) -> np.ndarray:
+    try:
+        import torch  # type: ignore
+    except ModuleNotFoundError:
+        torch = None
+
+    if torch is not None and isinstance(array, torch.Tensor):
+        return array.detach().to("cpu").numpy()
+    return np.asarray(array)
 
 
 def serialize_state(state: DETMState) -> bytes:
@@ -22,9 +33,9 @@ def serialize_state(state: DETMState) -> bytes:
     """
 
     lattice = state.lattice
-    energy = np.asarray(state.field_state.energy.values, dtype=float).reshape(lattice.height, lattice.width)
-    entropy = np.asarray(state.field_state.entropy.values, dtype=float).reshape(lattice.height, lattice.width)
-    internal_time = np.asarray(state.field_state.internal_time.values, dtype=float).reshape(lattice.height, lattice.width)
+    energy = _to_numpy(state.field_state.energy).astype(float, copy=False).reshape(lattice.height, lattice.width)
+    entropy = _to_numpy(state.field_state.entropy).astype(float, copy=False).reshape(lattice.height, lattice.width)
+    internal_time = _to_numpy(state.field_state.internal_time).astype(float, copy=False).reshape(lattice.height, lattice.width)
 
     buffer = io.BytesIO()
     np.savez_compressed(buffer, energy=energy, entropy=entropy, internal_time=internal_time)
@@ -48,11 +59,12 @@ def deserialize_state(blob: bytes) -> DETMState:
     lattice_info = data["lattice"]
     lattice = Lattice(width=int(lattice_info["width"]), height=int(lattice_info["height"]), boundary=str(lattice_info["boundary"]))
 
-    energy = ScalarField(lattice, arrays["energy"].reshape(-1).astype(float).tolist())
-    entropy = ScalarField(lattice, arrays["entropy"].reshape(-1).astype(float).tolist())
-    internal_time = ScalarField(lattice, arrays["internal_time"].reshape(-1).astype(float).tolist())
-
-    field_state = FieldState(energy=energy, entropy=entropy, internal_time=internal_time)
+    field_state = DETMFieldState(
+        lattice=lattice,
+        energy=arrays["energy"].astype(float, copy=False),
+        entropy=arrays["entropy"].astype(float, copy=False),
+        internal_time=arrays["internal_time"].astype(float, copy=False),
+    )
     state = DETMState(
         state_version=str(data.get("state_version", DETM_STATE_V1)),
         field_state=field_state,
@@ -67,9 +79,9 @@ def deserialize_state(blob: bytes) -> DETMState:
 def digest_blob(blob: bytes) -> bytes:
     state = deserialize_state(blob)
     sig = digest_fields(
-        np.asarray(state.field_state.energy.values).reshape(state.lattice.height, state.lattice.width),
-        np.asarray(state.field_state.entropy.values).reshape(state.lattice.height, state.lattice.width),
-        np.asarray(state.field_state.internal_time.values).reshape(state.lattice.height, state.lattice.width),
+        _to_numpy(state.field_state.energy).reshape(state.lattice.height, state.lattice.width),
+        _to_numpy(state.field_state.entropy).reshape(state.lattice.height, state.lattice.width),
+        _to_numpy(state.field_state.internal_time).reshape(state.lattice.height, state.lattice.width),
     )
     return msgpack.dumps(sig.as_dict(), use_bin_type=True)
 
