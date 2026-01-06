@@ -48,7 +48,7 @@ CONFIG = {
         "record_fields": False,  # False | True  /// запись fields_hist.npz
         "invariant_streams": "",  # "" | "inv0=1/10,..."  /// инвариантные тики
         "viz_enabled": True,  # False | True  /// включить viz-демон
-        "viz_transport": "tcp",  # tcp | none  /// транспорт визуализации
+        "viz_transport": "embedded",  # embedded | tcp | none  /// транспорт визуализации
         "viz_host": "127.0.0.1",  # host  /// адрес viz-демона
         "viz_port": 0,  # 0 | int > 0  /// порт viz-демона
         "viz_connect": False,  # False | True  /// connect к внешнему daemon
