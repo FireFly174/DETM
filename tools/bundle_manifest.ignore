@@ -1,0 +1,74 @@
+###############################################################################
+# Bundle manifest (source of truth for bundling)
+#
+# Rules:
+#   - lines starting with '#' are comments (ignored by bundler)
+#   - uncommented lines are INCLUDED in the bundle
+#
+# How to exclude:
+#   - put '#' in front of any file line
+#   - for a whole folder, multi-select and comment the block
+#
+# Generated at: 2026-01-09T13:28:56
+###############################################################################
+
+# comfyui_nodes/
+#   DETM/
+comfyui_nodes/DETM/README.md
+docs/integration_contract.md
+docs/README.md
+#   rus/
+#     00_overview/
+docs/rus/00_overview/architecture.md
+docs/rus/00_overview/README.md
+#     10_model/
+docs/rus/10_model/dagm_core.md
+docs/rus/10_model/model_core.md
+#     20_mechanisms/
+docs/rus/20_mechanisms/channels.md
+docs/rus/20_mechanisms/coarsener_and_global_time.md
+docs/rus/20_mechanisms/coarsening.md
+docs/rus/20_mechanisms/internal_time.md
+docs/rus/20_mechanisms/invariants.md
+docs/rus/20_mechanisms/invariants_as_spectral_operators.md
+docs/rus/20_mechanisms/level_scaling_refinement.md
+docs/rus/20_mechanisms/parameter_fields.md
+docs/rus/20_mechanisms/scale_axis.md
+docs/rus/20_mechanisms/snapshots_and_state_visibility.md
+docs/rus/20_mechanisms/temporary_links_and_external_channels.md
+docs/rus/20_mechanisms/time_model_and_internal_spectra.md
+#     30_architecture/
+docs/rus/30_architecture/runtime_api.md
+#     40_hypotheses/
+docs/rus/40_hypotheses/attractors_as_objects.md
+docs/rus/40_hypotheses/boundary_interface_holography.md
+docs/rus/40_hypotheses/hypotheses.md
+docs/rus/40_hypotheses/inertia_mass_locality.md
+docs/rus/40_hypotheses/level_capacity_phase_transitions.md
+docs/rus/40_hypotheses/vortices_quasiparticles.md
+#     50_experiments/
+docs/rus/50_experiments/exp_channels.md
+docs/rus/50_experiments/exp_density.md
+docs/rus/50_experiments/exp_gradient.md
+docs/rus/50_experiments/exp_marker_scaling.md
+docs/rus/50_experiments/exp_object_masks.md
+docs/rus/50_experiments/exp_phase_map.md
+docs/rus/50_experiments/exp_torus.md
+docs/rus/50_experiments/exp_transfer_speed.md
+docs/rus/50_experiments/legacy_data_formats.md
+docs/rus/50_experiments/metrics.md
+#     60_limits/
+docs/rus/60_limits/limits.md
+#     90_notes/
+docs/rus/90_notes/archive.md
+docs/rus/90_notes/fallback_subworld.md
+docs/rus/90_notes/meaning_alphabet_llm_mode.md
+docs/rus/90_notes/rewrite_checklist.md
+docs/rus/90_notes/source_materials.md
+docs/rus/90_notes/storage_neurons_subworld.md
+docs/rus/90_notes/system_architecture_sketch.md
+docs/rus/architecture.md
+docs/rus/integration_contract.md
+docs/rus/README.md
+PROMT.md
+README.md

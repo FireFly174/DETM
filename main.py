@@ -85,9 +85,10 @@ def main() -> int:
             return _ui_main(["--config", str(local_cfg)])
         return _ui_main(argv[1:] if argv and argv[0] == "ui" else argv)
 
-    from detm.cli import main as cli_main
+    from detm.cli import main as cli_mainou
 
-    return int(cli_main(argv))
+
+    return int(cli_mainou(argv))
 
 
 if __name__ == "__main__":
