@@ -12,3 +12,15 @@ In code, a minimal frequency-based timekeeper is implemented via “invariant ti
 Persistence/analysis of coarsening streams must be implemented as separate EventBus subscribers (plugins), not inside the coarsener itself.
 
 Canonical scaling/normalization constraints: `docs/eng/20_mechanisms/scale_axis.md`.
+
+### Coarsening and Mandatory Refinement
+
+Coarsening in DETM is not optional optimization.
+It is paired with a mandatory refinement mechanism that is activated
+when the representability invariant (E ≤ 1) is violated.
+
+Refinement is local, deterministic, and reversible with respect
+to preserved invariants.
+
+See: `level_scaling_refinement.md`
+

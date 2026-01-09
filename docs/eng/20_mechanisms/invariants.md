@@ -39,3 +39,16 @@ Invariants exist only within certain parameter ranges. Outside those ranges they
 
 This makes it possible to explore “stability regions” experimentally.
 
+---
+
+## Energy Representation Invariant
+
+The DETM model enforces a strict representability invariant:
+
+E ∈ [0;1]
+
+This is not a physical threshold, but a limit of the representation level.
+Violation of this invariant triggers mandatory local refinement.
+
+See: `level_scaling_refinement.md`
+

@@ -28,6 +28,8 @@ Key docs:
 - Integration contract (L0 API)
   - RU: `docs/rus/integration_contract.md`
   - EN: `docs/eng/integration_contract.md`
+- Runtime API (canonical execution layer)
+  - RU: `docs/rus/30_architecture/runtime_api.md`
 - Runtime/UI/viz architecture (current implementation)
   - RU: `docs/rus/architecture.md`
   - EN: `docs/eng/architecture.md`
@@ -44,6 +46,8 @@ Key docs:
   - Invariants: RU `docs/rus/20_mechanisms/invariants.md`, EN `docs/eng/20_mechanisms/invariants.md`
   - Parameter fields: RU `docs/rus/20_mechanisms/parameter_fields.md`, EN `docs/eng/20_mechanisms/parameter_fields.md`
   - Level scale axis: RU `docs/rus/20_mechanisms/scale_axis.md`, EN `docs/eng/20_mechanisms/scale_axis.md`
+  - Level scaling + refinement: RU `docs/rus/20_mechanisms/level_scaling_refinement.md`, EN `docs/eng/20_mechanisms/level_scaling_refinement.md`
+
 - Hypotheses
   - RU: `docs/rus/30_hypotheses/hypotheses.md`
   - EN: `docs/eng/30_hypotheses/hypotheses.md`

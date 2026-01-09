@@ -4,6 +4,18 @@ Note: first-pass translation of `docs/rus/20_mechanisms/scale_axis.md`.
 
 This page fixes canonical constraints for multi-level scaling/coarsening. The current repo focuses on L0, but these rules matter for future compatibility and diagnostics.
 
+
+### Linear Scaling of Space and Time
+
+In DETM, spatial and temporal scaling are strictly coupled.
+Scaling space by factor k implies scaling time resolution by factor k.
+
+This coupling is enforced through level transitions and energy normalization.
+Levels differ only by representational scale, not by physical laws.
+
+See: `level_scaling_refinement.md`
+
+
 ## 1) Normalization invariant
 
 At any level and any location:
@@ -29,4 +41,6 @@ Examples:
 
 Related docs:
 - coarsening overview: `docs/eng/20_mechanisms/coarsening.md`
+
+
 
