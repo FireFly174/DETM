@@ -79,3 +79,10 @@ Key docs:
   - Storage formats: RU `docs/rus/90_notes/storage_neurons_subworld.md`, EN `docs/eng/90_notes/storage_neurons_subworld.md`
   - Meaning/alphabet/LLM-mode: RU `docs/rus/90_notes/meaning_alphabet_llm_mode.md`, EN `docs/eng/90_notes/meaning_alphabet_llm_mode.md`
 - System architecture sketch: RU `docs/rus/90_notes/system_architecture_sketch.md`, EN `docs/eng/90_notes/system_architecture_sketch.md`
+
+
+
+Вылито в "граните":
+Если алгоритм не сообщает границы применимости,
+то все его успехи — случайность,
+а все провалы — вина пользователя.
