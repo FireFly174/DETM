@@ -12,6 +12,7 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
+
 from detm.runtime.serialization import deserialize_state
 
 
@@ -68,6 +69,7 @@ class DetmVizPanel:
         import tkinter as tk
         from tkinter import ttk
 
+        from tkinter import font as tkfont
         self._tk = tk
         self._ttk = ttk
         self._parent = parent
@@ -81,9 +83,25 @@ class DetmVizPanel:
         self._canvas_w = 0
         self._canvas_h = 0
         self._last_field: np.ndarray | None = None
+        self._off_x = 0.0
+        self._off_y = 0.0
 
-        self.status_var = tk.StringVar(value="Viz: waiting for data")
-        ttk.Label(parent, textvariable=self.status_var, width=96, anchor="w").grid(row=0, column=0, sticky="we")
+        status = ttk.Frame(parent)
+        status.grid(row=0, column=0, sticky="we")
+        status.columnconfigure(0, weight=1)
+        
+        self.status_var = tk.StringVar(value="")  # alias, will be kept in sync 
+
+
+        fixed = tkfont.nametofont("TkFixedFont")
+
+        self.status_left = tk.StringVar(value="tick=0")
+        self.status_mid = tk.StringVar(value="lattice=?x?")
+        self.status_right = tk.StringVar(value="field=energy")
+
+        ttk.Label(status, textvariable=self.status_left, font=fixed).grid(row=0, column=0, sticky="w")
+        ttk.Label(status, textvariable=self.status_mid,  font=fixed).grid(row=0, column=1, sticky="w", padx=(12, 0))
+        ttk.Label(status, textvariable=self.status_right, font=fixed).grid(row=0, column=2, sticky="w", padx=(12, 0))
 
         controls = ttk.Frame(parent)
         controls.grid(row=1, column=0, sticky="we", pady=(6, 0))
@@ -109,7 +127,7 @@ class DetmVizPanel:
             state="readonly",
         ).grid(row=0, column=3, sticky="w", padx=(6, 12))
 
-        self.quiver_var = tk.BooleanVar(value=False)
+        self.quiver_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(controls, text="Quiver", variable=self.quiver_var).grid(row=0, column=4, sticky="w")
 
         self.q_step_var = tk.IntVar(value=2)
@@ -120,8 +138,29 @@ class DetmVizPanel:
         ttk.Label(controls, text="scale").grid(row=0, column=7, sticky="w", padx=(0, 2))
         ttk.Entry(controls, textvariable=self.q_scale_var, width=6).grid(row=0, column=8, sticky="w", padx=(2, 0))
 
-        self.canvas = tk.Canvas(parent, width=520, height=520, bg="#000000", highlightthickness=1)
-        self.canvas.grid(row=2, column=0, sticky="nsew", pady=(8, 0))
+        # self.canvas = tk.Canvas(parent, width=520, height=520, bg="#000000", highlightthickness=1)
+        # self.canvas.grid(row=2, column=0, sticky="nsew", pady=(8, 0))
+        self.nb = ttk.Notebook(parent)
+        self.nb.grid(row=2, column=0, sticky="nsew", pady=(8, 0))
+        parent.rowconfigure(2, weight=1)
+        parent.columnconfigure(0, weight=1)
+
+        tab_field = ttk.Frame(self.nb)
+        tab_plot = ttk.Frame(self.nb)
+        self.nb.add(tab_field, text="Field")
+        self.nb.add(tab_plot, text="Graph")
+
+        # --- Field tab ---
+        tab_field.rowconfigure(0, weight=1)
+        tab_field.columnconfigure(0, weight=1)
+        self.canvas = tk.Canvas(tab_field, bg="#000000", highlightthickness=1)
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+
+        # --- Graph tab (пока просто заглушка, но место готово) ---
+        ttk.Label(tab_plot, text="(Graph view: TODO) ").grid(row=0, column=0, sticky="nw", padx=8, pady=8)
+
+        self.canvas.bind("<Configure>", self._on_canvas_configure, add=True)
+
         parent.rowconfigure(2, weight=1)
         parent.columnconfigure(0, weight=1)
 
@@ -142,6 +181,14 @@ class DetmVizPanel:
             self._rects.append(row)
         self._layout_grid()
 
+    def _sync_status_var(self) -> None:
+        try:
+            self.status_var.set(
+                f"{self.status_left.get()}  {self.status_mid.get()}  {self.status_right.get()}"
+            )
+        except Exception:
+            pass
+
     def _on_canvas_configure(self, event) -> None:
         w = int(getattr(event, "width", 0) or 0)
         h = int(getattr(event, "height", 0) or 0)
@@ -155,17 +202,36 @@ class DetmVizPanel:
     def _layout_grid(self) -> None:
         if self._h <= 0 or self._w <= 0 or not self._rects:
             return
+
         canvas_w = int(self._canvas_w or self.canvas.winfo_width() or int(self.canvas["width"]))
         canvas_h = int(self._canvas_h or self.canvas.winfo_height() or int(self.canvas["height"]))
-        self._cell_w = max(1, canvas_w // self._w)
-        self._cell_h = max(1, canvas_h // self._h)
+        if canvas_w <= 1 or canvas_h <= 1:
+            return
+
+        # квадратная клетка, как “CSS grid: auto-fit”
+        cell = max(1.0, min(canvas_w / float(self._w), canvas_h / float(self._h)))
+        self._cell_w = cell
+        self._cell_h = cell
+
+        grid_w = cell * self._w
+        grid_h = cell * self._h
+
+        # центрируем
+        ox = (canvas_w - grid_w) * 0.5
+        oy = (canvas_h - grid_h) * 0.5
+        self._off_x = ox
+        self._off_y = oy
         for y in range(self._h):
             for x in range(self._w):
-                x0, y0 = x * self._cell_w, (self._h - 1 - y) * self._cell_h
-                x1, y1 = x0 + self._cell_w, y0 + self._cell_h
+                x0 = ox + x * cell
+                y0 = oy + (self._h - 1 - y) * cell
+                x1 = x0 + cell
+                y1 = y0 + cell
                 self.canvas.coords(self._rects[y][x], x0, y0, x1, y1)
+
         if self._last_field is not None:
             self._draw_quiver(self._last_field)
+
 
     def _draw_quiver(self, arr: np.ndarray) -> None:
         for aid in self._arrows:
@@ -192,8 +258,8 @@ class DetmVizPanel:
             for xx in range(0, self._w, step):
                 vx = float(dx[yy, xx]) / mmax
                 vy = float(dy[yy, xx]) / mmax
-                x0 = (xx + 0.5) * self._cell_w
-                y0 = (self._h - 1 - yy + 0.5) * self._cell_h
+                x0 = self._off_x + (xx + 0.5) * self._cell_w
+                y0 = self._off_y + (self._h - 1 - yy + 0.5) * self._cell_h
                 x1 = x0 + vx * base_len
                 y1 = y0 - vy * base_len
                 aid = self.canvas.create_line(x0, y0, x1, y1, fill="#00ffcc", arrow=self._tk.LAST, width=1)
@@ -225,9 +291,11 @@ class DetmVizPanel:
 
         self._draw_quiver(field)
         sig_preview = f" sig0..3={signature[:4]}" if signature else ""
-        self.status_var.set(
-            f"tick={int(tick)}  lattice={lattice.width}x{lattice.height}  field={mode}{sig_preview}"
-        )
+        self.status_left.set(f"tick={int(tick)}")
+        self.status_mid.set(f"lattice={lattice.width}x{lattice.height}")
+        self.status_right.set(f"field={mode}{sig_preview}")
+        self._sync_status_var()
+
 
     def update_from_state(self, *, state: Any, tick: int, signature: Optional[list[float]] = None) -> None:
         lattice = getattr(state, "lattice")

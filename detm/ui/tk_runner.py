@@ -368,6 +368,25 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
     root = tk.Tk()
     root.title("DETM Runner")
     _install_clipboard_shortcuts(root)
+    is_full = {"v": False}
+    prev_geom = {"v": None}
+
+    def _toggle_fullscreen(_e=None):
+        is_full["v"] = not is_full["v"]
+        if is_full["v"]:
+            prev_geom["v"] = root.geometry()
+            root.attributes("-fullscreen", True)
+        else:
+            root.attributes("-fullscreen", False)
+            if prev_geom["v"]:
+                root.geometry(prev_geom["v"])
+
+    def _exit_fullscreen(_e=None):
+        if is_full["v"]:
+            _toggle_fullscreen()
+
+    root.bind("<F11>", _toggle_fullscreen, add=True)
+    root.bind("<Escape>", _exit_fullscreen, add=True)
 
     root.columnconfigure(0, weight=0)
     root.columnconfigure(1, weight=1)
@@ -380,10 +399,11 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
 
     symbols = ["(none)"] + list_symbols()
 
-    frm = ttk.Frame(root, padding=10)
+    frm = ttk.Frame(root, padding=(10, 10, 6, 10))
     frm.grid(row=0, column=0, sticky="nsw")
 
-    viz_frame = ttk.Frame(root, padding=10)
+
+    viz_frame = ttk.Frame(root, padding=(6, 10, 10, 10))
     viz_frame.grid(row=0, column=1, sticky="nsew")
     viz_frame.columnconfigure(0, weight=1)
     viz_frame.rowconfigure(0, weight=1)
@@ -398,7 +418,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
     viz_panel_frame.rowconfigure(0, weight=1)
 
     viz_panel = DetmVizPanel(viz_panel_frame)
-    viz_panel.status_var.set("Viz: embedded")
+    viz_panel.status_mid.set("Viz: embedded")
 
     log_frame = ttk.Frame(viz_stack)
     log_frame.grid(row=0, column=0, sticky="nsew")
