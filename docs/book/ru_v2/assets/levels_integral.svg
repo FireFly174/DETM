@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .box { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 18; }
+      .title { font: 700 28px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .h { font: 700 22px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .t { font: 500 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .muted { font: 500 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #334155; }
+      .arrow { stroke: #0f172a; stroke-width: 3; fill: none; marker-end: url(#m); }
+      .arrow2 { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#m2); }
+      .pill { fill: #e2e8f0; stroke: #475569; stroke-width: 1.5; rx: 999; }
+      .pilltext { font: 600 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+    </style>
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a"/>
+    </marker>
+    <marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="820"/>
+
+  <text class="title" x="60" y="70">Интегральная интуиция уровней: Ln как интеграл Ln−1</text>
+  <text class="muted" x="60" y="105">Смысл: повторяемые локальные шаги и их цена, накопленные во времени, кристаллизуются в более «долгоживущую» структуру следующего уровня.</text>
+
+  <!-- Boxes -->
+  <rect class="box" x="90" y="160" width="520" height="110"/>
+  <rect class="box" x="90" y="290" width="520" height="110"/>
+  <rect class="box" x="90" y="420" width="520" height="110"/>
+  <rect class="box" x="90" y="550" width="520" height="110"/>
+  <rect class="box" x="90" y="680" width="520" height="110"/>
+
+  <text class="h" x="120" y="205">L1</text>
+  <text class="t" x="170" y="205">Шаги и readout</text>
+  <text class="muted" x="120" y="238">минимальная операция • короткий цикл • проверяемый эффект</text>
+
+  <text class="h" x="120" y="335">L2</text>
+  <text class="t" x="170" y="335">Истории и роли</text>
+  <text class="muted" x="120" y="368">легитимация • фреймы • «кто мы / во что играем»</text>
+
+  <text class="h" x="120" y="465">L3</text>
+  <text class="t" x="170" y="465">Оси, метрики, контракты</text>
+  <text class="muted" x="120" y="498">правила как архитектура цены • датчики • санкции</text>
+
+  <text class="h" x="120" y="595">L4</text>
+  <text class="t" x="170" y="595">Институты и власть</text>
+  <text class="muted" x="120" y="628">права • легитимность • кто может менять правила</text>
+
+  <text class="h" x="120" y="725">L5</text>
+  <text class="t" x="170" y="725">Границы и переходы</text>
+  <text class="muted" x="120" y="758">поверхность наблюдения • режимы • «где ломается»</text>
+
+  <!-- Vertical arrows + labels -->
+  <path class="arrow" d="M 350 270 L 350 290"/>
+  <path class="arrow" d="M 350 400 L 350 420"/>
+  <path class="arrow" d="M 350 530 L 350 550"/>
+  <path class="arrow" d="M 350 660 L 350 680"/>
+
+  <rect class="pill" x="645" y="208" width="640" height="52"/>
+  <text class="pilltext" x="670" y="242">Интеграл по времени: «повторение + цена» → «норма/структура следующего уровня»</text>
+
+  <path class="arrow2" d="M 610 234 L 642 234"/>
+
+  <!-- Right-side notes -->
+  <text class="h" x="690" y="320">Как читать стрелку</text>
+  <text class="muted" x="690" y="352">Если на Ln «вдруг появилось»:</text>
+  <text class="muted" x="705" y="382">1) ищи на Ln−1 повторяемые шаги</text>
+  <text class="muted" x="705" y="408">2) проверь, какая цена делала их «дешёвыми»</text>
+  <text class="muted" x="705" y="434">3) это и есть материал, из которого выросла структура Ln</text>
+
+  <text class="h" x="690" y="500">Пример (грубо)</text>
+  <text class="muted" x="690" y="532">L2 = ∫L1: повторяемые шаги + их цена → роль/история</text>
+  <text class="muted" x="690" y="558">L3 = ∫L2: истории кристаллизуются → оси/метрики/контракты</text>
+  <text class="muted" x="690" y="584">L4 = ∫L3: правила живут дольше людей → институты</text>
+  <text class="muted" x="690" y="610">L5 = ∫(всего): видно границы режима и переходы</text>
+
+  <text class="muted" x="60" y="805">DETM / «Уровни L0–L5» (v2): схема для чтения, не «математическое доказательство».</text>
+</svg>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="940" viewBox="0 0 1400 940">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .box { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 18; }
+      .title { font: 700 30px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .muted { font: 500 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #334155; }
+      .h { font: 700 22px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .t { font: 600 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .arrow { stroke: #0f172a; stroke-width: 3; fill: none; marker-end: url(#m); }
+      .pill { fill: #e2e8f0; stroke: #475569; stroke-width: 1.5; rx: 999; }
+      .pilltext { font: 600 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+    </style>
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="940"/>
+
+  <text class="title" x="60" y="70">Карта уровней L0–L5 (в одной странице)</text>
+  <text class="muted" x="60" y="105">Один уровень = один тип задачи. Конфликты чаще всего возникают, когда говорят про разные уровни.</text>
+
+  <!-- Boxes -->
+  <rect class="box" x="90" y="150" width="560" height="105"/>
+  <rect class="box" x="90" y="270" width="560" height="105"/>
+  <rect class="box" x="90" y="390" width="560" height="105"/>
+  <rect class="box" x="90" y="510" width="560" height="105"/>
+  <rect class="box" x="90" y="630" width="560" height="105"/>
+  <rect class="box" x="90" y="750" width="560" height="105"/>
+
+  <!-- Box text -->
+  <text class="h" x="120" y="192">L0</text>
+  <text class="t" x="170" y="192">Базис (ресурс, безопасность, право на правду/выход)</text>
+  <text class="muted" x="120" y="222">Если базис не держится — верхние уровни начинают обслуживать перекос и выращивают имитацию.</text>
+
+  <text class="h" x="120" y="312">L1</text>
+  <text class="t" x="170" y="312">Шаг → эффект (минимальная операция и проверка)</text>
+  <text class="muted" x="120" y="342">Если нет readout — система становится шумом: “делаем”, но причинность не наблюдается.</text>
+
+  <text class="h" x="120" y="432">L2</text>
+  <text class="t" x="170" y="432">Истории и роли (что “можно/нельзя”, кто “мы”)</text>
+  <text class="muted" x="120" y="462">Легитимация действий и табу на наблюдение. Может усиливать истину или защищать легенду.</text>
+
+  <text class="h" x="120" y="552">L3</text>
+  <text class="t" x="170" y="552">Правила и метрики (оси, стимулы, цена, контракты)</text>
+  <text class="muted" x="120" y="582">Правила проектируют цену: что становится дешёвым/дорогим и кто платит счёт.</text>
+
+  <text class="h" x="120" y="672">L4</text>
+  <text class="t" x="170" y="672">Институты и власть (кто может менять правила)</text>
+  <text class="muted" x="120" y="702">Легитимность и право вмешательства. Захват = институты начинают служить частному интересу.</text>
+
+  <text class="h" x="120" y="792">L5</text>
+  <text class="t" x="170" y="792">Границы режима (где “по-старому” не сходится)</text>
+  <text class="muted" x="120" y="822">Поверхностные симптомы. Если граница близко — нужны переходы, а не “ещё сильнее оптимизировать”.</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M 370 255 L 370 270"/>
+  <path class="arrow" d="M 370 375 L 370 390"/>
+  <path class="arrow" d="M 370 495 L 370 510"/>
+  <path class="arrow" d="M 370 615 L 370 630"/>
+  <path class="arrow" d="M 370 735 L 370 750"/>
+
+  <!-- Right hints -->
+  <rect class="pill" x="705" y="165" width="630" height="56"/>
+  <text class="pilltext" x="730" y="200">Правило переключения: если readout не держится → иди вглубь (L1→L0). Если держится → ищи вширь (L2–L3).</text>
+
+  <rect class="box" x="705" y="255" width="630" height="310"/>
+  <text class="h" x="735" y="295">Как пользоваться (быстро)</text>
+  <text class="muted" x="735" y="330">1) Зафиксируй наблюдаемые входы (что реально видно).</text>
+  <text class="muted" x="735" y="356">2) Определи уровень: базис / шаг→эффект / роли / метрики / институты / граница.</text>
+  <text class="muted" x="735" y="382">3) Выбери минимальный оператор (Lx-Cy) и заранее посмотри “цену/перенос цены”.</text>
+  <text class="muted" x="735" y="408">4) Проверь readout: изменилась ли система после шага?</text>
+  <text class="muted" x="735" y="434">5) Если нет — не спорь об объяснениях, спускайся глубже.</text>
+  <text class="muted" x="735" y="470">Подсказка: “всё срочно/героизм/отказы/войны метрик” — это обычно симптомы L5,</text>
+  <text class="muted" x="735" y="496">а чинится выбором уровня и возвращением причинности на L0–L3.</text>
+
+  <text class="muted" x="60" y="915">DETM / RU v2 — карта для чтения и диагностики (не “доказательство”, а навигация).</text>
+</svg>
+

@@ -1,0 +1,16 @@
+# Order of chapters for compilation (RU book v2 quick guide)
+# Paths are relative to this file.
+00_frontmatter/00_hook.md
+00_frontmatter/01_levels_map.md
+00_frontmatter/00_quickstart.md
+00_frontmatter/05_first_aid.md
+00_frontmatter/02_reader_map.md
+00_frontmatter/03_how_to_read.md
+00_frontmatter/04_level_summaries.md
+
+# Appendix (optional, but practical)
+90_appendix/03_navigation.md
+90_appendix/05_invariants_and_tests.md
+90_appendix/01_terms.md
+90_appendix/04_index.md
+90_appendix/02_case_registry.md
