@@ -42,8 +42,12 @@ Prev_proj.txt
 config.py
 config.local.py
 config.example.py
+media*
+TO_DO*.md
+_tmp/
 
-
+# --- Book build temp (pandoc/chrome profiles, logs, etc.) ---
+docs/book/**/_tmp/
 # --- Research notes / drafts (not tracked) ---
 /Discrete Emergent Medium with Multilevel Coarsening/
 docs/source/
