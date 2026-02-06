@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List
 
 from detm.metrics.base import MetricContext, MetricPlugin
+from detm.metrics.boundary_flux import BoundaryFluxMetrics
 
 
 @dataclass(frozen=True)
@@ -34,8 +35,7 @@ class BuiltinMetrics:
 
 
 def default_metric_plugins() -> List[MetricPlugin]:
-    return [BuiltinMetrics()]
+    return [BuiltinMetrics(), BoundaryFluxMetrics()]
 
 
 __all__ = ["BuiltinMetrics", "default_metric_plugins"]
-

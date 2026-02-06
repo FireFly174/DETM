@@ -1,11 +1,12 @@
 {
-  "config_version": "1.1.0",
+  "config_version": "1.2.0",
   "backend": "torch",
   "device": "cuda",
   "width": 24,
   "height": 24,
   "boundary": "periodic",
   "initial_noise": 0.08,
+  "trace_boundary_flux": false,
   "dynamics": {
     "equilibrium_energy": 0.5,
     "alpha": 0.3,

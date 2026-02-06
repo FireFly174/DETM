@@ -21,7 +21,7 @@
 - `|∇E|` по границе как маркеры взаимодействий/фронтов;
 - циркуляция `∮ J·dl` (замкнутость переносов).
 
-Про выделение маски: `docs/rus/40_experiments/exp_object_masks.md`.
+Про выделение маски: `docs/rus/50_experiments/exp_object_masks.md`.
 
 ---
 
@@ -48,7 +48,6 @@
 
 ## Связанные эксперименты и метрики
 
-- маски и границы: `docs/rus/40_experiments/exp_object_masks.md`
-- скорость переноса/лаги: `docs/rus/40_experiments/exp_transfer_speed.md`
-- сводка метрик: `docs/rus/40_experiments/metrics.md`
-
+- маски и границы: `docs/rus/50_experiments/exp_object_masks.md`
+- скорость переноса/лаги: `docs/rus/50_experiments/exp_transfer_speed.md`
+- сводка метрик: `docs/rus/50_experiments/metrics.md`

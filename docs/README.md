@@ -75,6 +75,7 @@ Key docs:
   - Archive: RU `docs/rus/90_notes/archive.md`, EN `docs/eng/90_notes/archive.md`
   - Rewrite checklist: RU `docs/rus/90_notes/rewrite_checklist.md`, EN `docs/eng/90_notes/rewrite_checklist.md`
   - Source materials mapping: RU `docs/rus/90_notes/source_materials.md`, EN `docs/eng/90_notes/source_materials.md`
+  - Book / external framing (RU only, non-canon): `docs/book/ru/README.md`
   - Fallback/subworld: RU `docs/rus/90_notes/fallback_subworld.md`, EN `docs/eng/90_notes/fallback_subworld.md`
   - Storage formats: RU `docs/rus/90_notes/storage_neurons_subworld.md`, EN `docs/eng/90_notes/storage_neurons_subworld.md`
   - Meaning/alphabet/LLM-mode: RU `docs/rus/90_notes/meaning_alphabet_llm_mode.md`, EN `docs/eng/90_notes/meaning_alphabet_llm_mode.md`

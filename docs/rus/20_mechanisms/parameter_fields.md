@@ -36,6 +36,6 @@
 
 Связанные материалы:
 - каналы: `docs/rus/20_mechanisms/channels.md`
-- градиенты параметров: `docs/rus/40_experiments/exp_gradient.md`
+- градиенты параметров: `docs/rus/50_experiments/exp_gradient.md`
 - интеграционный порт «влияний»: `docs/rus/integration_contract.md`
- - фазовые карты режимов: `docs/rus/40_experiments/exp_phase_map.md`
+ - фазовые карты режимов: `docs/rus/50_experiments/exp_phase_map.md`

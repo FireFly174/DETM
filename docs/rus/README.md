@@ -8,6 +8,8 @@
 Справочно:
 - Контракт интеграции: `docs/rus/integration_contract.md`
 - Архитектура runtime/UI/viz: `docs/rus/architecture.md`
+- OuterFields и подписки: `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
+- Контракты как инварианты переноса: `docs/rus/20_mechanisms/contracts_as_flow_invariants.md`
 - Карта исходников → канон: `docs/rus/90_notes/source_materials.md`
 
 

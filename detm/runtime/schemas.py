@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-DETM_CONFIG_V1 = "1.1.0"
+DETM_CONFIG_V1 = "1.2.0"
 DETM_STATE_V1 = "1.0.0"
 DETM_SIGNATURE_V1 = "1.0.0"
 

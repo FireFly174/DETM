@@ -1,0 +1,31 @@
+# Order of chapters for compilation (RU book draft)
+# Paths are relative to this file.
+08_prologue_how_not_to.md
+02_l0_exists.md
+03_l1_minimal_operation.md
+04_levels_as_time_windows.md
+05_boundary_as_operator.md
+06_contracts_as_flow_invariants.md
+07_architecturally_unfair_and_antigoodhart.md
+10_maslow_3d.md
+12_kpi_by_maslow_and_levels.md
+13_life_compatible_goals.md
+09_brain_as_local_search.md
+10_collective_as_greedy_search.md
+11_neural_nets_and_missing_l0.md
+20_career_levels_system.md
+21_interface_engineer_translation.md
+25_anti_capture.md
+26_pensionat_and_honest_feedback.md
+27_forum_of_ideas_and_ai_interface.md
+28_real_mrot_and_payback.md
+29_valve_as_prototype.md
+30_intercompany_task_market.md
+31_dynamic_task_pricing.md
+32_capacity_matching_and_dispatch.md
+33_self_interpreting_task_spec.md
+35_finite_resources_and_fake_infinity.md
+40_global_needs_protocol.md
+
+# Appendix (optional)
+01_terms.md

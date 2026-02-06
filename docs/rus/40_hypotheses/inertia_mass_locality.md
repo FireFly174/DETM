@@ -36,6 +36,5 @@
 3) Логирование `J_boundary`, `corr(E(t),E(t+Δt))` и `t_stable` до/после воздействия.
 
 Связанные протоколы:
-- маски/границы: `docs/rus/40_experiments/exp_object_masks.md`
-- скорость переноса/лаги: `docs/rus/40_experiments/exp_transfer_speed.md`
-
+- маски/границы: `docs/rus/50_experiments/exp_object_masks.md`
+- скорость переноса/лаги: `docs/rus/50_experiments/exp_transfer_speed.md`

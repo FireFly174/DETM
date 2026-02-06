@@ -34,7 +34,7 @@
 - замкнутость: `div(J) → 0` как признак циркуляции без утечки (если применимо);
 - геометрия: площадь/радиус маски, число компонент.
 
-Про маски/границы: `docs/rus/40_experiments/exp_object_masks.md`.
+Про маски/границы: `docs/rus/50_experiments/exp_object_masks.md`.
 
 ---
 
@@ -49,7 +49,6 @@
 
 ## Связанные гипотезы и эксперименты
 
-- режимы и фазовые карты: `docs/rus/40_experiments/exp_phase_map.md`
-- скорость переноса/лаги: `docs/rus/40_experiments/exp_transfer_speed.md`
-- базовые метрики: `docs/rus/40_experiments/metrics.md`
-
+- режимы и фазовые карты: `docs/rus/50_experiments/exp_phase_map.md`
+- скорость переноса/лаги: `docs/rus/50_experiments/exp_transfer_speed.md`
+- базовые метрики: `docs/rus/50_experiments/metrics.md`

@@ -26,6 +26,10 @@ class DETMConfig:
     boundary: str = "periodic"
     dynamics: DynamicsParameters = DynamicsParameters()
     initial_noise: float = 0.08
+    # "minimal" -> no CPU field copies; "cpu_full" -> allow CPU analyses (attractors, etc.)
+    observables_mode: str = "minimal"
+    # Trace-level boundary flux proxies (Φ_boundary(t) etc.). Off by default to avoid extra per-step work.
+    trace_boundary_flux: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
@@ -48,6 +52,8 @@ class DETMConfig:
             boundary=str(data.get("boundary", "periodic")),
             dynamics=dynamics,
             initial_noise=float(data.get("initial_noise", 0.08)),
+            observables_mode=str(data.get("observables_mode", "minimal")),
+            trace_boundary_flux=bool(data.get("trace_boundary_flux", False)),
         )
 
 
