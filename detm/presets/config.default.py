@@ -9,6 +9,9 @@ subsequent launches.
 CONFIG = {
     "backend": "torch",  # torch | numpy  /// вычислительный бэкенд
     "device": "cuda",  # cuda | cpu | cuda:0  /// устройство исполнения
+    # minimal | cpu_full  /// режим формирования observables (cpu_full разрешает тяжёлые CPU-анализы)
+    "observables_mode": "minimal",
+    "trace_boundary_flux": False,  # False | True  /// log Φ_boundary(t) proxies into trace.jsonl
     "width": 24,  # int > 0  /// ширина решётки
     "height": 24,  # int > 0  /// высота решётки
     "boundary": "periodic",  # periodic | open  /// условие границы

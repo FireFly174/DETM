@@ -60,8 +60,7 @@
 ## Как использовать в экспериментах
 
 - жизненный цикл: зарождение → стабилизация → взаимодействия → распад/переход режима;
-- сравнение режимов и фазовых переходов (см. `docs/rus/40_experiments/exp_phase_map.md`);
-- измерение скорости переноса внутри объекта и через границу (см. `docs/rus/40_experiments/exp_transfer_speed.md`).
+- сравнение режимов и фазовых переходов (см. `docs/rus/50_experiments/exp_phase_map.md`);
+- измерение скорости переноса внутри объекта и через границу (см. `docs/rus/50_experiments/exp_transfer_speed.md`).
 
-Сводка метрик: `docs/rus/40_experiments/metrics.md`.
-
+Сводка метрик: `docs/rus/50_experiments/metrics.md`.

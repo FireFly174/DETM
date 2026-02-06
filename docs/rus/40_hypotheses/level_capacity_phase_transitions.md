@@ -29,7 +29,6 @@
 
 ## Связанные материалы
 
-- фазовые карты режимов: `docs/rus/40_experiments/exp_phase_map.md`
-- метрики: `docs/rus/40_experiments/metrics.md`
-- маски/границы: `docs/rus/40_experiments/exp_object_masks.md`
-
+- фазовые карты режимов: `docs/rus/50_experiments/exp_phase_map.md`
+- метрики: `docs/rus/50_experiments/metrics.md`
+- маски/границы: `docs/rus/50_experiments/exp_object_masks.md`

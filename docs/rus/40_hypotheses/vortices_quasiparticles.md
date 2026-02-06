@@ -34,8 +34,7 @@
 
 ## Связанные эксперименты/метрики
 
-- фазовые режимы и карты: `docs/rus/40_experiments/exp_phase_map.md`
-- маски/границы: `docs/rus/40_experiments/exp_object_masks.md`
-- скорость переноса/орбитальность: `docs/rus/40_experiments/exp_transfer_speed.md`
-- сводка метрик: `docs/rus/40_experiments/metrics.md`
-
+- фазовые режимы и карты: `docs/rus/50_experiments/exp_phase_map.md`
+- маски/границы: `docs/rus/50_experiments/exp_object_masks.md`
+- скорость переноса/орбитальность: `docs/rus/50_experiments/exp_transfer_speed.md`
+- сводка метрик: `docs/rus/50_experiments/metrics.md`

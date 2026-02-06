@@ -16,7 +16,7 @@ from detm.runtime.diagnostics.attractors import detect_attractors
 from detm.runtime.influence import DETMInfluence, apply_influence
 from detm.runtime.serialization import deserialize_state, serialize_state
 from detm.runtime.schemas import get_schema_versions
-from detm.runtime.signature import DETMSignature, describe_field_from_array, digest_fields
+from detm.runtime.signature import DETMSignature, describe_field_any, digest_fields_any
 from detm.runtime.state import DETMFieldState, DETMState
 
 
@@ -186,23 +186,35 @@ def step(
     elapsed = time.perf_counter() - start
     state.store_rng(rng)
 
+    config = DETMConfig.from_dict(state.config) if state.config is not None else DETMConfig()
     lattice = state.lattice
-    energy_arr = _to_numpy(state.field_state.energy).reshape(lattice.height, lattice.width)
-    entropy_arr = _to_numpy(state.field_state.entropy).reshape(lattice.height, lattice.width)
-    time_arr = _to_numpy(state.field_state.internal_time).reshape(lattice.height, lattice.width)
+    energy = state.field_state.energy.reshape(lattice.height, lattice.width)
+    entropy = state.field_state.entropy.reshape(lattice.height, lattice.width)
+    internal_time = state.field_state.internal_time.reshape(lattice.height, lattice.width)
 
-    signature = digest_fields(energy_arr, entropy_arr, time_arr)
-    attractors = detect_attractors(energy_arr)
+    signature = digest_fields_any(energy, entropy, internal_time)
     summaries = FieldSummaries(
-        energy=describe_field_from_array(energy_arr),
-        entropy=describe_field_from_array(entropy_arr),
-        internal_time=describe_field_from_array(time_arr),
+        energy=describe_field_any(energy),
+        entropy=describe_field_any(entropy),
+        internal_time=describe_field_any(internal_time),
     )
+
+    attractors = []
+    if str(config.observables_mode).strip().lower() == "cpu_full":
+        # Explicitly opt-in: this path materializes a dense CPU copy for analysis.
+        energy_arr = _to_numpy(energy)
+        attractors = detect_attractors(energy_arr)
+
+    def _bytes_for(x) -> float:
+        if _is_torch_tensor(x):
+            return float(x.numel() * x.element_size())
+        arr = np.asarray(x)
+        return float(arr.nbytes)
 
     cost = {
         "cpu_time_ms": elapsed * 1000.0,
         "step_ops_estimate": float(lattice.size * max(1, n_ticks)),
-        "memory_bytes_estimate": float(energy_arr.nbytes + entropy_arr.nbytes + time_arr.nbytes),
+        "memory_bytes_estimate": _bytes_for(energy) + _bytes_for(entropy) + _bytes_for(internal_time),
     }
     quality = _apply_quality_proxies(signature.vector)
 
@@ -231,10 +243,10 @@ def step(
 
 def digest(state: DETMState) -> DETMSignature:
     lattice = state.lattice
-    energy = _to_numpy(state.field_state.energy).reshape(lattice.height, lattice.width)
-    entropy = _to_numpy(state.field_state.entropy).reshape(lattice.height, lattice.width)
-    internal_time = _to_numpy(state.field_state.internal_time).reshape(lattice.height, lattice.width)
-    return digest_fields(energy, entropy, internal_time)
+    energy = state.field_state.energy.reshape(lattice.height, lattice.width)
+    entropy = state.field_state.entropy.reshape(lattice.height, lattice.width)
+    internal_time = state.field_state.internal_time.reshape(lattice.height, lattice.width)
+    return digest_fields_any(energy, entropy, internal_time)
 
 
 def serialize(state: DETMState) -> bytes:

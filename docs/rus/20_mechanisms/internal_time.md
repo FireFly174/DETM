@@ -71,4 +71,4 @@
 - лаг‑корреляции между соседними узлами по `E(t)` (прокси «скорости сигнала»);
 - зависимость времени стабилизации и хвостовой активности от `lambda_t`.
 
-Метрики для проверки: `docs/rus/40_experiments/metrics.md`, эксперименты: `docs/rus/40_experiments/exp_transfer_speed.md`.
+Метрики для проверки: `docs/rus/50_experiments/metrics.md`, эксперименты: `docs/rus/50_experiments/exp_transfer_speed.md`.
