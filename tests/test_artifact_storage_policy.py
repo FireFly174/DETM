@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from detm.cli import run_headless
+from detm_app.cli import run_headless
 from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
 

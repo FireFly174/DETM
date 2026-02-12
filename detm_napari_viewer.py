@@ -3,12 +3,12 @@
 
 """Backward-compatible launcher for napari read-only subscriber mode.
 
-Canonical implementation lives in `detm.viz.napari_subscriber`.
+Canonical implementation lives in `detm_app.napari_subscriber`.
 """
 
 from __future__ import annotations
 
-from detm.viz.napari_subscriber import main
+from detm_app.napari_subscriber import main
 
 
 if __name__ == "__main__":

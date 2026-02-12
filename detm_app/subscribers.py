@@ -1,4 +1,4 @@
-"""Reusable subscribers for the EventBus."""
+﻿"""Reusable subscribers for the EventBus."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ from detm.runtime.outerfields import compute_outerfields_v1
 from detm.runtime.schemas import DETM_COMMIT_PACKET_V1
 from detm.runtime.state import DETMState
 from detm.runtime.watch_contract import OuterFieldsRef, WatchContractPacket
-from detm.viz.transport import VizTransport
+from detm_app.transport import VizTransport
 from detm.metrics.base import MetricContext, MetricPlugin
 from detm.metrics.builtin import default_metric_plugins
 

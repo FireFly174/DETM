@@ -1,44 +1,31 @@
-"""Small IPC protocol used by the visualization daemon.
+"""Deprecated compatibility wrapper for viz protocol helpers.
 
-We intentionally keep this minimal:
-- transport: TCP localhost
-- framing: 4-byte big-endian length prefix + msgpack payload
-- payload: dict with `type` and associated fields
+Canonical implementation lives in `detm_app.protocol`.
 """
 
 from __future__ import annotations
 
 import socket
-import struct
+import warnings
 from typing import Any, Dict
 
-import msgpack
+from detm_app.protocol import recv_msg as _app_recv_msg
+from detm_app.protocol import send_msg as _app_send_msg
+
+_DEPRECATION_MESSAGE = (
+    "`detm.viz.protocol` is deprecated; use `detm_app.protocol` instead. "
+    "Compatibility wrapper will be removed in a future release."
+)
 
 
 def send_msg(sock: socket.socket, payload: Dict[str, Any]) -> None:
-    data = msgpack.dumps(payload, use_bin_type=True)
-    header = struct.pack(">I", len(data))
-    sock.sendall(header + data)
-
-
-def _recv_exact(sock: socket.socket, size: int) -> bytes:
-    chunks: list[bytes] = []
-    remaining = size
-    while remaining:
-        chunk = sock.recv(remaining)
-        if not chunk:
-            raise EOFError("socket closed")
-        chunks.append(chunk)
-        remaining -= len(chunk)
-    return b"".join(chunks)
+    warnings.warn(_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=2)
+    _app_send_msg(sock, payload)
 
 
 def recv_msg(sock: socket.socket) -> Dict[str, Any]:
-    header = _recv_exact(sock, 4)
-    (length,) = struct.unpack(">I", header)
-    data = _recv_exact(sock, length)
-    return msgpack.loads(data, raw=False)
+    warnings.warn(_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=2)
+    return _app_recv_msg(sock)
 
 
 __all__ = ["recv_msg", "send_msg"]
-

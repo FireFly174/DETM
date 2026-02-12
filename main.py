@@ -54,7 +54,7 @@ def _ui_main(argv: list[str]) -> int:
     args = ap.parse_args(argv)
 
     from detm.app_settings import build_runtime_config, build_ui_overrides, load_merged_payload
-    from detm.ui.tk_runner import UiRunSettings, launch_tk_ui
+    from detm_app.tk_runner import UiRunSettings, launch_tk_ui
 
     payload = load_merged_payload(preset=str(args.preset), override_path=args.config)
     config = build_runtime_config(payload)
@@ -85,7 +85,7 @@ def main() -> int:
             return _ui_main(["--config", str(local_cfg)])
         return _ui_main(argv[1:] if argv and argv[0] == "ui" else argv)
 
-    from detm.cli import main as cli_mainou
+    from detm_app.cli import main as cli_mainou
 
 
     return int(cli_mainou(argv))

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import sys
 
-from detm.cli import main
+from detm_app.cli import main
 
 
 if __name__ == "__main__":

@@ -24,15 +24,17 @@
 - [x] OuterFields V1 вычислитель в коде (`detm/runtime/outerfields.py`)
 - [x] Интеграции: `runtime_bridge`, `ACGSDetmBackend`
 - [x] Рабочая визуализация: `Tk` + `embedded/tcp` transport
-- [x] Тестовый snapshot: `pytest -q -> 201 passed, 1 skipped`
+- [x] Тестовый snapshot: `pytest -q -> 214 passed, 1 skipped`
 - [x] Зафиксирован архитектурный вектор: текущий путь переходный, target-архитектура обязательна
 - [x] Выделенный пакет `detm_app` (orchestration перенесён; `detm/run/*` оставлен как compatibility facade)
 - [x] Поднят совместимый `detm_app` shim-пакет (`bus/session/scheduler/coarsening`) как migration-step этапа A без ломки API
 - [x] Entry points (`detm/cli.py`, `detm/ui/tk_runner.py`) переведены на app-layer импорты `detm_app.*` для `session/bus/coarsening`
+- [x] `main.py` и `detm.py` используют канонические entrypoints `detm_app.cli`/`detm_app.tk_runner`; `detm/cli.py`, `detm/ui/tk_runner.py`, `detm/ui/config_hints.py`, `detm/ui/tooltips.py` оставлены как deprecated compatibility facades
 - [x] Рабочий контур кода/тестов переведён на `detm_app.*`; `detm/run/*` остаётся только как compatibility facade
 - [x] `detm/run/*` переведён в lazy/deprecated compatibility facade (`DeprecationWarning` + lazy export resolution), чтобы `detm` оставался библиотечным слоем без eager-зависимости от `detm_app`
 - [x] Зафиксирован deprecation-policy для `detm/run/*` (removal target `0.3.0`, дата `2026-06-30`, миграционный гайд `docs/rus/30_architecture/detm_run_migration.md`)
 - [x] Добавлен CI-guard на новые импорты `detm.run.*` вне compatibility слоя (`tests/test_no_detm_run_imports.py`)
+- [x] Добавлен CI-guard на новые импорты legacy entrypoints `detm.cli`/`detm.ui.*`/`detm.viz.*` вне compatibility слоя (`tests/test_no_legacy_entrypoint_imports.py`)
 - [x] Централизованный runtime-контур `LevelPolicy` (schema + runtime usage + trace policy fields + microsteps/batch/publish wiring + multi-signal runtime adaptive tuning + directional delta-mode + auto profile selection + anti-flap cooldown + sampled/aggregated runtime-adaptive telemetry в trace/watch policy + runtime adaptive guardrails `min/max + reject_unsafe`)
 - [x] Расширены runtime observability профили (`adaptive_signal_event_types`, `adaptive_detail_mode`, `adaptive_hold_ticks`, `adaptive_allowed_event_types`) + signal-driven переключение в session runtime
 - [x] Рабочий `refinement` MVP (detectors `energy_overflow` + `state_nonfinite` + `capacity_pressure` -> локальный ROI/sanitize correction -> trace event; capacity detector policy-driven, multi-signal, temporal/memory-driven, learned/cross-level, operator-driven/cross-node, distributed/signed, cryptographic/consensus-grade, attestation/Byzantine-grade)
@@ -43,7 +45,7 @@
 - [x] L0 artifact storage policy расширена на ключевые артефакты (`trace/watch_trace/watch_contract/outerfields/commits/commits_audit/history/invariants/commit_validation/fabric_acks/fabric_ack_envelopes/fabric_delivery_acks/fabric_dead_letters/fabric_quorum_report`)
 - [x] Multi-level fallback для artifact storage policy (`L2 -> L1 -> L0 -> default/*`) + e2e coverage для `active_level=L1/L2`
 - [x] Production watch-contract (`watch_contract.jsonl` + `outerfields/*.npz` + `OuterFieldsRef` linkage с `trace_ref`)
-- [x] Каноническая napari-интеграция (read-only subscriber path через `detm/viz/napari_subscriber.py`)
+- [x] Каноническая napari-интеграция (read-only subscriber path через `detm_app/napari_subscriber.py`)
 - [x] Добавлен endpoint-registry для napari auto-discovery (`runs/viz_endpoint.json`) + cleanup stale endpoint при закрытии локального viz-daemon
 - [x] Расширен тестовый napari coverage для read-only path (`endpoint resolution/precedence`, `poll timeout`, `layer presenter update/autoscale`, `multi-level active_level meta`)
 - [x] Для дополнительных runtime-отчётов добавлены policy-driven history контуры (`commit_validation_history.jsonl`, `fabric_quorum_report_history.jsonl`) с multi-level retention
@@ -133,6 +135,11 @@
 - [x] `detm/runtime/fabric_epoch_consensus.py`: `TransportEpochConsensusCoordinator` (`epoch_proposal/epoch_vote` pre-consensus layer).
 - [x] `detm/runtime/fabric_tcp_transport.py`: `TcpFabricTransport`, `TcpFabricRelay`, `open_fabric_transport`.
 - [x] `detm/run/subscribers.py`: `FabricHandshakeRecorder` (локальный wiring между `CommitJsonlWriter` и handshake-service, запись `fabric_acks.jsonl`, split-mode channel policy).
+- [x] `detm_app/cli.py`: канонический headless entrypoint; `detm/cli.py` — deprecated facade.
+- [x] `detm_app/tk_runner.py`: канонический Tk entrypoint; `detm/ui/tk_runner.py` — deprecated facade.
+- [x] `detm_app/config_hints.py`, `detm_app/tooltips.py`: канонические UI-helper модули; `detm/ui/config_hints.py`, `detm/ui/tooltips.py` — deprecated facades.
+- [x] `detm_app/tk_panel.py`, `detm_app/napari_subscriber.py`: канонические viz-entrypoint модули; `detm/viz/tk_panel.py`, `detm/viz/napari_subscriber.py` — deprecated facades.
+- [x] `detm_app/protocol.py`, `detm_app/client.py`, `detm_app/daemon.py`, `detm_app/subscriber.py`, `detm_app/transport.py`: канонический runtime-neutral viz-контур; `detm/viz/*` оставлен только как deprecated compatibility facade слой.
 - [x] `detm/runtime/outerfields.py`: `OuterFieldsV1` и базовый вычислитель каналов.
 - [x] `detm/runtime/watch_contract.py`: `OuterFieldsRef`, `WatchContractPacket` (artifact-first watch contract).
 - [x] `detm/runtime/serialization.py`: pack/unpack state, schema-aware digest.
@@ -141,8 +148,8 @@
 - [x] `detm/run/coarsening.py`: инвариантные time streams.
 - [x] `detm/run/subscribers.py`: writer-ы артефактов, trace, `realtime/audit` commits, invariants, viz streaming.
 - [x] `detm/integrations/acgs_backend.py`: stateful adapter для ACGS-stub.
-- [x] `detm/ui/tk_runner.py`: интерактивный launcher.
-- [x] `detm/viz/*`: daemon/protocol/transport/tk panel/napari subscriber.
+- [x] `detm/ui/tk_runner.py`: deprecated compatibility launcher facade.
+- [x] `detm/viz/*`: только deprecated compatibility facades на `detm_app` (без канонической runtime-логики).
 - [x] `detm_app/*`: app-layer orchestration (`EventBus`, `DetmSession`, `TickScheduler`, `TickRunner`, coarsening, subscribers); `detm/run/*` оставлен как re-export compatibility layer.
 
 ## Что уже реализовано (по документации)
@@ -200,7 +207,11 @@
 - [x] `tests/test_fabric_handshake_recorder_config.py`
 - [x] `tests/test_detm_app_shim.py`
 - [x] `tests/test_run_compat_facade.py`
+- [x] `tests/test_entrypoint_facades.py`
+- [x] `tests/test_ui_helper_facades.py`
 - [x] `tests/test_no_detm_run_imports.py`
+- [x] `tests/test_no_legacy_entrypoint_imports.py`
+- [x] `tests/test_viz_facades.py`
 - [x] `tests/test_napari_subscriber_path.py`
 - [x] `tests/test_viz_streamer_multilevel.py`
 - [x] `tests/test_watch_contract_writer.py`
@@ -209,12 +220,12 @@
 
 ## Текущие пробелы (критично закрыть)
 
-- [ ] Граница между библиотекой ядра и приложением остаётся неполной: `detm_app` выделен, `detm/run/*` уже lazy/deprecated, но compatibility facade всё ещё присутствует в `detm`.
+- [ ] Граница между библиотекой ядра и приложением остаётся неполной: `detm_app` выделен, а в `detm` всё ещё присутствуют compatibility facades (`detm/run/*`, `detm/cli.py`, `detm/ui/*`, `detm/viz/*`).
 - [x] `LevelPolicy` доведён до полного runtime wiring для `microsteps/batch/publish`; multi-signal runtime adaptive contour расширен guardrails-ограничениями (`runtime_adaptive_guard_*`: `min/max`, `reject_unsafe`) и отражается в trace policy telemetry.
 - [x] `refinement` есть как MVP (overflow/nonfinite/capacity detectors + ROI/sanitize correction); базовые temporal/memory-driven, learned/cross-level, operator-driven/cross-node, distributed/signed, cryptographic/consensus-grade и attestation/Byzantine-grade signals для ёмкости уровня добавлены.
 - [x] Контур памяти паттернов расширен policy-driven scope-режимами (`pattern_reuse_scope`: `global|portable|strict`) с переносимостью между уровнями/режимами и тестовым покрытием.
 - [x] Pruning по `error/deviation` реализован как MVP и покрыт расширенной абляционной валидацией на длинных сериях (`tests/test_pattern_memory.py`).
-- [x] Канонический napari subscriber path реализован (`detm/viz/napari_subscriber.py`, `detm_napari_viewer.py` как launcher-wrapper).
+- [x] Канонический napari subscriber path реализован (`detm_app/napari_subscriber.py`; `detm_napari_viewer.py` как launcher-wrapper).
 - [x] Production watch-contract и расширяющие тесты для watch/read-only проекций реализованы (`watch_contract.jsonl`, `outerfields/*.npz`, `tests/test_watch_contract_writer.py`).
 - [x] Базовый набор runtime-профилей наблюдаемости и переключение профилей от adaptive signals реализованы (MVP).
 - [x] Политика хранения `L0..Ln` покрывает ключевые L0-артефакты, runtime/fabric handshake отчёты, multi-level fallback профили и дополнительные runtime-отчёты (`commit_validation`, `fabric_quorum_report` history).
@@ -235,6 +246,7 @@
 - [x] Вынести `Session/Bus/Scheduler` из `detm/run` в `detm_app`.
 - [x] Зафиксировать deprecation-policy и migration guide для `detm/run/*` до полного удаления facade.
 - [x] Добавить CI-guard, запрещающий новые импорты `detm.run.*` вне compatibility слоя.
+- [x] Добавить CI-guard, запрещающий новые импорты legacy entrypoints `detm.cli`/`detm.ui.*`/`detm.viz.*`.
 - [ ] Оставить в `detm` только библиотечные контракты и вычислительное ядро.
 - [x] Обеспечить совместимость CLI/UI без ломки текущего API.
 

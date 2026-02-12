@@ -92,7 +92,7 @@ def build_runtime_config(payload: Mapping[str, Any]) -> DETMConfig:
 
 def build_ui_overrides(ui_payload: Mapping[str, Any]) -> Dict[str, Any]:
     # Keep only keys that exist on UiRunSettings to avoid accidental typos.
-    from detm.ui.tk_runner import UiRunSettings
+    from detm_app.tk_runner import UiRunSettings
 
     allowed = {f.name for f in fields(UiRunSettings)} - {"config"}
     clean: Dict[str, Any] = {}
