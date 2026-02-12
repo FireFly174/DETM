@@ -1,12 +1,12 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import numpy as np
 
 from detm.runtime import api
 from detm.runtime.config import DETMConfig
-from detm.viz.client import VizClient
-from detm.viz.daemon import VizHub
-from detm.viz.napari_subscriber import (
+from detm_app.client import VizClient
+from detm_app.daemon import VizHub
+from detm_app.napari_subscriber import (
     _LayerPresenter,
     NapariFrame,
     packet_to_layer_frame,
@@ -14,8 +14,8 @@ from detm.viz.napari_subscriber import (
     run_napari_subscriber,
     wait_latest_packet,
 )
-from detm.viz.subscriber import TcpVizSubscriber, VizPacket
-from detm.viz.transport import (
+from detm_app.subscriber import TcpVizSubscriber, VizPacket
+from detm_app.transport import (
     clear_viz_endpoint_registry,
     load_viz_endpoint_registry,
     open_viz_transport,
