@@ -1,76 +1,35 @@
-"""Minimal pub/sub event bus inspired by the legacy bundle patterns."""
+"""Backward-compatible app-layer re-export for event bus primitives (deprecated)."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Callable, DefaultDict, Dict, List, Optional
+from typing import TYPE_CHECKING
 
+from detm.run._compat import load_export
 
-EventHandler = Callable[..., None]
-
-
-@dataclass
-class Event:
-    name: str
-    payload: Dict[str, Any]
-
-
-class EventBus:
-    """Synchronous event bus.
-
-    The bus is intentionally simple: handlers are called in subscription order.
-    Handlers should be fast and non-blocking; heavy work is expected to be done
-    in separate processes/threads at the orchestrator layer (ACGS), or by
-    throttling/dropping updates.
-    """
-
-    def __init__(self) -> None:
-        self._listeners: Dict[str, List[EventHandler]] = {}
-        self._once: Dict[str, List[EventHandler]] = {}
-
-    def add_event_listener(self, event: str, listener: EventHandler) -> None:
-        self._listeners.setdefault(str(event), []).append(listener)
-        return None
-
-    def add_event_listener_unsub(self, event: str, listener: EventHandler) -> Callable[[], None]:
-        """Add listener and return an unsubscribe callable."""
-
-        name = str(event)
-        listeners = self._listeners.setdefault(name, [])
-        listeners.append(listener)
-
-        def unsubscribe() -> None:
-            current = self._listeners.get(name, [])
-            try:
-                current.remove(listener)
-            except ValueError:
-                return
-
-        return unsubscribe
-
-    def remove_event_listener(self, event: str) -> None:
-        self._listeners.pop(str(event), None)
-        self._once.pop(str(event), None)
-
-    def remove_all_listeners(self) -> None:
-        self._listeners.clear()
-        self._once.clear()
-
-    def publish(self, event: str, **payload: Any) -> None:
-        name = str(event)
-        listeners = list(self._listeners.get(name, ()))
-        for listener in listeners:
-            listener(**payload)
-
-        once = self._once.pop(name, [])
-        for listener in once:
-            listener(**payload)
-
-    def publish_once(self, event: str, listener: EventHandler) -> None:
-        self._once.setdefault(str(event), []).append(listener)
-
-    def emit(self, event: Event) -> None:
-        self.publish(event.name, **event.payload)
-
+if TYPE_CHECKING:
+    from detm_app.bus import Event, EventBus, EventHandler
 
 __all__ = ["Event", "EventBus", "EventHandler"]
+
+_EXPORTS = {
+    "Event": ("detm_app.bus", "Event"),
+    "EventBus": ("detm_app.bus", "EventBus"),
+    "EventHandler": ("detm_app.bus", "EventHandler"),
+}
+
+
+def __getattr__(name: str):
+    target = _EXPORTS.get(str(name))
+    if target is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    target_module, target_symbol = target
+    return load_export(
+        shim_module=__name__,
+        symbol=str(name),
+        target_module=str(target_module),
+        target_symbol=str(target_symbol),
+    )
+
+
+def __dir__() -> list[str]:
+    return sorted(set(list(globals().keys()) + list(__all__)))

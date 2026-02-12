@@ -11,19 +11,23 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from detm.runtime.config import DETMConfig
-from detm.runtime.influence import DETMInfluence
-from detm.runtime.symbols import list_symbols, make_symbol
-from detm.run.bus import EventBus
-from detm.run.coarsening import InvariantCoarsener, parse_invariant_streams
-from detm.run.session import DetmSession
-from detm.run.subscribers import (
+from detm_app.bus import EventBus
+from detm_app.coarsening import InvariantCoarsener, parse_invariant_streams
+from detm_app.session import DetmSession
+from detm_app.subscribers import (
     ArtifactWriter,
+    CommitJsonlWriter,
+    CommitValidationReporter,
     FieldHistoryRecorder,
     InvariantTickJsonlWriter,
     JsonlTraceWriter,
+    WatchContractWriter,
+    WatchTraceWriter,
     VizStreamer,
 )
+from detm.runtime.config import DETMConfig
+from detm.runtime.influence import DETMInfluence
+from detm.runtime.symbols import list_symbols, make_symbol
 from detm.viz.transport import VizTransport, open_viz_transport
 from detm.viz.tk_panel import DetmVizPanel
 from detm.viz.subscriber import TcpVizSubscriber
@@ -76,6 +80,11 @@ class DetmTkRunner:
         self._viz_streamer: VizStreamer | None = None
         self._viz_key: tuple | None = None
         self._trace_writer: JsonlTraceWriter | None = None
+        self._watch_trace_writer: WatchTraceWriter | None = None
+        self._watch_contract_writer: WatchContractWriter | None = None
+        self._commit_writer: CommitJsonlWriter | None = None
+        self._audit_commit_writer: CommitJsonlWriter | None = None
+        self._commit_validation_reporter: CommitValidationReporter | None = None
         self._invariant_writer: InvariantTickJsonlWriter | None = None
         self._artifact_writer: ArtifactWriter | None = None
         self._fields_recorder: FieldHistoryRecorder | None = None
@@ -199,6 +208,13 @@ class DetmTkRunner:
     def is_running(self) -> bool:
         return self._running
 
+    def _storage_policy(self, artifact: str) -> dict[str, int]:
+        level_name = str(self.settings.config.level_policy.active_level or "L0")
+        return self.settings.config.resolve_artifact_storage_policy(
+            artifact=str(artifact),
+            level=level_name,
+        )
+
     def _disable_viz(self) -> None:
         if self._viz_streamer is not None:
             self._viz_streamer.detach()
@@ -246,6 +262,21 @@ class DetmTkRunner:
         if self._trace_writer is not None:
             self._trace_writer.on_close()
             self._trace_writer = None
+        if self._watch_trace_writer is not None:
+            self._watch_trace_writer.on_close()
+            self._watch_trace_writer = None
+        if self._watch_contract_writer is not None:
+            self._watch_contract_writer.on_close()
+            self._watch_contract_writer = None
+        if self._commit_writer is not None:
+            self._commit_writer.on_close()
+            self._commit_writer = None
+        if self._audit_commit_writer is not None:
+            self._audit_commit_writer.on_close()
+            self._audit_commit_writer = None
+        if self._commit_validation_reporter is not None:
+            self._commit_validation_reporter.detach()
+            self._commit_validation_reporter = None
         if self._invariant_writer is not None:
             self._invariant_writer.on_close()
             self._invariant_writer = None
@@ -288,12 +319,23 @@ class DetmTkRunner:
 
         record_dir = Path(record_dir)
         desired_path = record_dir / "invariants.jsonl"
+        inv_policy = self._storage_policy("invariants")
         if self._invariant_writer is None:
-            self._invariant_writer = InvariantTickJsonlWriter.attach(self._session.bus, desired_path)
+            self._invariant_writer = InvariantTickJsonlWriter.attach(
+                self._session.bus,
+                desired_path,
+                retention_window=int(inv_policy.get("retention_window", 0)),
+                compaction_budget=int(inv_policy.get("compaction_budget", 0)),
+            )
             return
         if self._invariant_writer.path.resolve() != desired_path.resolve():
             self._invariant_writer.on_close()
-            self._invariant_writer = InvariantTickJsonlWriter.attach(self._session.bus, desired_path)
+            self._invariant_writer = InvariantTickJsonlWriter.attach(
+                self._session.bus,
+                desired_path,
+                retention_window=int(inv_policy.get("retention_window", 0)),
+                compaction_budget=int(inv_policy.get("compaction_budget", 0)),
+            )
 
     def _configure_recording(self) -> None:
         record_dir = self.settings.record_dir
@@ -302,8 +344,62 @@ class DetmTkRunner:
             return
 
         record_dir = Path(record_dir)
+        trace_policy = self._storage_policy("trace")
+        watch_policy = self._storage_policy("watch_trace")
+        watch_contract_policy = self._storage_policy("watch_contract")
+        outerfields_policy = self._storage_policy("outerfields")
+        commits_policy = self._storage_policy("commits")
+        commits_audit_policy = self._storage_policy("commits_audit")
+        commit_validation_policy = self._storage_policy("commit_validation")
         if self._trace_writer is None:
-            self._trace_writer = JsonlTraceWriter.attach(self._session.bus, record_dir / "trace.jsonl")
+            self._trace_writer = JsonlTraceWriter.attach(
+                self._session.bus,
+                record_dir / "trace.jsonl",
+                retention_window=int(trace_policy.get("retention_window", 0)),
+                compaction_budget=int(trace_policy.get("compaction_budget", 0)),
+            )
+            if bool(self.settings.config.watch_trace_enabled):
+                self._watch_trace_writer = WatchTraceWriter.attach(
+                    self._session.bus,
+                    record_dir / "watch_trace.jsonl",
+                    retention_window=int(watch_policy.get("retention_window", 0)),
+                    compaction_budget=int(watch_policy.get("compaction_budget", 0)),
+                )
+                self._watch_contract_writer = WatchContractWriter.attach(
+                    self._session.bus,
+                    record_dir / "watch_contract.jsonl",
+                    outerfields_dir=record_dir / "outerfields",
+                    level_src=str(self.settings.config.level_policy.active_level or "L0"),
+                    base_level="L0",
+                    retention_window=int(watch_contract_policy.get("retention_window", 0)),
+                    compaction_budget=int(watch_contract_policy.get("compaction_budget", 0)),
+                    outerfields_retention_window=int(outerfields_policy.get("retention_window", 0)),
+                    outerfields_compaction_budget=int(outerfields_policy.get("compaction_budget", 0)),
+                )
+            self._commit_writer = CommitJsonlWriter.attach(
+                self._session.bus,
+                record_dir / "commits.jsonl",
+                node_id=f"ui_seed_{int(self.settings.seed):04d}",
+                mode="realtime",
+                retention_window=int(commits_policy.get("retention_window", 0)),
+                compaction_budget=int(commits_policy.get("compaction_budget", 0)),
+            )
+            if bool(self.settings.config.level_policy.audit_commit_enabled):
+                self._audit_commit_writer = CommitJsonlWriter.attach(
+                    self._session.bus,
+                    record_dir / "commits_audit.jsonl",
+                    node_id=f"ui_seed_{int(self.settings.seed):04d}",
+                    commit_type="proof",
+                    mode="audit",
+                    retention_window=int(commits_audit_policy.get("retention_window", 0)),
+                    compaction_budget=int(commits_audit_policy.get("compaction_budget", 0)),
+                )
+            self._commit_validation_reporter = CommitValidationReporter.attach(
+                self._session.bus,
+                record_dir,
+                retention_window=int(commit_validation_policy.get("retention_window", 0)),
+                compaction_budget=int(commit_validation_policy.get("compaction_budget", 0)),
+            )
             self._configure_invariant_recording()
             self._artifact_writer = ArtifactWriter.attach(self._session.bus, record_dir)
             if bool(self.settings.record_fields):
@@ -312,12 +408,85 @@ class DetmTkRunner:
 
         if self._trace_writer.path.resolve() != (record_dir / "trace.jsonl").resolve():
             self._disable_recording()
-            self._trace_writer = JsonlTraceWriter.attach(self._session.bus, record_dir / "trace.jsonl")
+            self._trace_writer = JsonlTraceWriter.attach(
+                self._session.bus,
+                record_dir / "trace.jsonl",
+                retention_window=int(trace_policy.get("retention_window", 0)),
+                compaction_budget=int(trace_policy.get("compaction_budget", 0)),
+            )
+            if bool(self.settings.config.watch_trace_enabled):
+                self._watch_trace_writer = WatchTraceWriter.attach(
+                    self._session.bus,
+                    record_dir / "watch_trace.jsonl",
+                    retention_window=int(watch_policy.get("retention_window", 0)),
+                    compaction_budget=int(watch_policy.get("compaction_budget", 0)),
+                )
+                self._watch_contract_writer = WatchContractWriter.attach(
+                    self._session.bus,
+                    record_dir / "watch_contract.jsonl",
+                    outerfields_dir=record_dir / "outerfields",
+                    level_src=str(self.settings.config.level_policy.active_level or "L0"),
+                    base_level="L0",
+                    retention_window=int(watch_contract_policy.get("retention_window", 0)),
+                    compaction_budget=int(watch_contract_policy.get("compaction_budget", 0)),
+                    outerfields_retention_window=int(outerfields_policy.get("retention_window", 0)),
+                    outerfields_compaction_budget=int(outerfields_policy.get("compaction_budget", 0)),
+                )
+            self._commit_writer = CommitJsonlWriter.attach(
+                self._session.bus,
+                record_dir / "commits.jsonl",
+                node_id=f"ui_seed_{int(self.settings.seed):04d}",
+                mode="realtime",
+                retention_window=int(commits_policy.get("retention_window", 0)),
+                compaction_budget=int(commits_policy.get("compaction_budget", 0)),
+            )
+            if bool(self.settings.config.level_policy.audit_commit_enabled):
+                self._audit_commit_writer = CommitJsonlWriter.attach(
+                    self._session.bus,
+                    record_dir / "commits_audit.jsonl",
+                    node_id=f"ui_seed_{int(self.settings.seed):04d}",
+                    commit_type="proof",
+                    mode="audit",
+                    retention_window=int(commits_audit_policy.get("retention_window", 0)),
+                    compaction_budget=int(commits_audit_policy.get("compaction_budget", 0)),
+                )
+            self._commit_validation_reporter = CommitValidationReporter.attach(
+                self._session.bus,
+                record_dir,
+                retention_window=int(commit_validation_policy.get("retention_window", 0)),
+                compaction_budget=int(commit_validation_policy.get("compaction_budget", 0)),
+            )
             self._configure_invariant_recording()
             self._artifact_writer = ArtifactWriter.attach(self._session.bus, record_dir)
             if bool(self.settings.record_fields):
                 self._fields_recorder = FieldHistoryRecorder.attach(self._session.bus, record_dir / "fields_hist.npz")
         else:
+            watch_enabled = bool(self.settings.config.watch_trace_enabled)
+            if watch_enabled and self._watch_trace_writer is None:
+                self._watch_trace_writer = WatchTraceWriter.attach(
+                    self._session.bus,
+                    record_dir / "watch_trace.jsonl",
+                    retention_window=int(watch_policy.get("retention_window", 0)),
+                    compaction_budget=int(watch_policy.get("compaction_budget", 0)),
+                )
+            if watch_enabled and self._watch_contract_writer is None:
+                self._watch_contract_writer = WatchContractWriter.attach(
+                    self._session.bus,
+                    record_dir / "watch_contract.jsonl",
+                    outerfields_dir=record_dir / "outerfields",
+                    level_src=str(self.settings.config.level_policy.active_level or "L0"),
+                    base_level="L0",
+                    retention_window=int(watch_contract_policy.get("retention_window", 0)),
+                    compaction_budget=int(watch_contract_policy.get("compaction_budget", 0)),
+                    outerfields_retention_window=int(outerfields_policy.get("retention_window", 0)),
+                    outerfields_compaction_budget=int(outerfields_policy.get("compaction_budget", 0)),
+                )
+            if (not watch_enabled) and self._watch_trace_writer is not None:
+                self._watch_trace_writer.on_close()
+                self._watch_trace_writer = None
+            if (not watch_enabled) and self._watch_contract_writer is not None:
+                self._watch_contract_writer.on_close()
+                self._watch_contract_writer = None
             # Toggle field recorder without changing directory
             if bool(self.settings.record_fields) and self._fields_recorder is None:
                 self._fields_recorder = FieldHistoryRecorder.attach(self._session.bus, record_dir / "fields_hist.npz")

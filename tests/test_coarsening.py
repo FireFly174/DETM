@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from fractions import Fraction
 
-from detm.run.coarsening import InvariantCoarsener, InvariantStreamSpec
-from detm.run.session import DetmSession
+from detm_app.coarsening import InvariantCoarsener, InvariantStreamSpec
+from detm_app.session import DetmSession
 from detm.runtime.config import DETMConfig
 
 

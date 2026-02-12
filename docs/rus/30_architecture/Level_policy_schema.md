@@ -96,6 +96,14 @@ LevelWindow = [Ln .. Ln+K]
 
   * Частота публикации commit (каждый тик или раз в N тиков).
 
+* `audit_commit_enabled`
+
+  * Включает/выключает thick audit commit-поток.
+
+* `audit_commit_stride`
+
+  * Частота публикации audit commit (в глобальных тиках).
+
 * `teleportation_allowed`
 
   * Разрешена ли телепортация как схлопывание внутренних шагов.

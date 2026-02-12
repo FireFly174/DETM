@@ -9,6 +9,7 @@
 - Контракты как инварианты переноса (канон механизма): `docs/rus/20_mechanisms/contracts_as_flow_invariants.md`
 - Видимые метрики и граничные readout: `docs/rus/50_experiments/metrics.md`
 - OuterFields и подписки (канон интерфейса между уровнями): `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
+- Протокол readout/anti-Goodhart (операционально): `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
 
 ---
 
@@ -72,4 +73,3 @@
 - какие дополнительные readout подтверждают устойчивость (спектр/корреляции/throughput на границе).
 
 Иначе система неизбежно будет оптимизировать “интерфейс смысла”, а не динамику.
-

@@ -8,9 +8,16 @@
 Справочно:
 - Контракт интеграции: `docs/rus/integration_contract.md`
 - Архитектура runtime/UI/viz: `docs/rus/architecture.md`
+- Синтез целевой архитектуры (north star): `docs/rus/30_architecture/target_architecture_synthesis.md`
 - OuterFields и подписки: `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
+- Commit-протокол и межнодовое согласование: `docs/rus/30_architecture/commit_protocol.md`
+- Миграция `detm.run` -> `detm_app`: `docs/rus/30_architecture/detm_run_migration.md`
 - Контракты как инварианты переноса: `docs/rus/20_mechanisms/contracts_as_flow_invariants.md`
 - Карта исходников → канон: `docs/rus/90_notes/source_materials.md`
+- Единый источник концепций из книги: `docs/rus/90_notes/book_concepts_single_source.md`
+- Модель обучения DETM (без повторов из книги): `docs/rus/90_notes/learning_model_detm.md`
+- Протокол readout/anti-Goodhart: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
+- Архив архитектурных вариантов из обсуждений: `docs/rus/90_notes/architecture_variants_l0_and_fabric_2026-02-09.md`
 
 
 

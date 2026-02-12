@@ -1,0 +1,112 @@
+from __future__ import annotations
+
+import json
+
+import numpy as np
+
+from detm_app.session import DetmSession
+from detm_app.subscribers import JsonlTraceWriter, WatchContractWriter
+from detm.runtime.config import DETMConfig
+from detm.runtime.level_policy import LevelPolicy
+from detm.runtime.watch_contract import WatchContractPacket
+
+
+def _read_jsonl(path):
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def test_watch_contract_trace_ref_and_outerfields_linkage(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=7,
+        height=5,
+        initial_noise=0.01,
+        level_policy=LevelPolicy(commit_stride=1, microsteps_per_global_tick=1),
+    )
+    session = DetmSession.create(cfg, seed=31)
+
+    trace_path = tmp_path / "trace.jsonl"
+    contract_path = tmp_path / "watch_contract.jsonl"
+    outerfields_dir = tmp_path / "outerfields"
+
+    JsonlTraceWriter.attach(session.bus, trace_path, metric_plugins=[])
+    WatchContractWriter.attach(
+        session.bus,
+        contract_path,
+        outerfields_dir=outerfields_dir,
+        retention_window=0,
+        compaction_budget=0,
+    )
+
+    for _ in range(4):
+        session.step(None, 1, rng=session.state.restore_rng())
+    session.close()
+
+    trace_entries = _read_jsonl(trace_path)
+    contract_entries = _read_jsonl(contract_path)
+    assert [entry["tick"] for entry in contract_entries] == [1, 2, 3, 4]
+    assert [entry["trace_ref"] for entry in contract_entries] == [
+        entry["trace_ref"] for entry in trace_entries
+    ]
+
+    for entry in contract_entries:
+        packet = WatchContractPacket.from_dict(entry)
+        ref = packet.outerfields_ref
+        assert ref.kind == "outerfields"
+        policy = dict(packet.policy)
+        watchpoints = dict(dict(packet.metrics).get("watchpoints", {}))
+        assert "runtime_adaptive_window_active" in policy
+        assert "runtime_adaptive_profile" in policy
+        assert "runtime_adaptive_signal_triggered" in policy
+        assert "runtime_adaptive_window_active" in watchpoints
+        assert "runtime_adaptive_profile" in watchpoints
+        assert "runtime_adaptive_signal_triggered" in watchpoints
+        artifact_path = contract_path.parent / ref.uri
+        assert artifact_path.exists()
+        with np.load(artifact_path) as data:
+            assert {
+                "dir_x",
+                "dir_y",
+                "strength",
+                "stability",
+                "instability",
+                "boundary_activity",
+                "capacity_violation_density",
+                "meta_json",
+            }.issubset(set(data.files))
+            assert data["strength"].shape == (int(cfg.height), int(cfg.width))
+
+
+def test_watch_contract_storage_policy_prunes_entries_and_artifacts(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=6,
+        height=6,
+        initial_noise=0.01,
+        level_policy=LevelPolicy(commit_stride=1, microsteps_per_global_tick=1),
+    )
+    session = DetmSession.create(cfg, seed=32)
+
+    contract_path = tmp_path / "watch_contract.jsonl"
+    outerfields_dir = tmp_path / "outerfields"
+
+    WatchContractWriter.attach(
+        session.bus,
+        contract_path,
+        outerfields_dir=outerfields_dir,
+        retention_window=5,
+        compaction_budget=3,
+    )
+
+    for _ in range(6):
+        session.step(None, 1, rng=session.state.restore_rng())
+    session.close()
+
+    contract_entries = _read_jsonl(contract_path)
+    assert [entry["tick"] for entry in contract_entries] == [4, 5, 6]
+
+    artifact_rows = sorted(outerfields_dir.glob("outerfields_*.npz"), key=lambda p: p.name)
+    assert len(artifact_rows) == 3
+    assert [int(path.stem.split("_")[-1]) for path in artifact_rows] == [4, 5, 6]
