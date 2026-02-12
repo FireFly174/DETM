@@ -33,7 +33,7 @@
   - фазовые карты режимов: `docs/rus/50_experiments/exp_phase_map.md`
   - маски/границы объектов: `docs/rus/50_experiments/exp_object_masks.md`
   - скорость переноса/лаги: `docs/rus/50_experiments/exp_transfer_speed.md`
-- Ограничения (limits): `docs/rus/50_limits/limits.md`
+- Ограничения (limits): `docs/rus/60_limits/limits.md`
 
 ---
 
@@ -46,6 +46,7 @@
 - инерция/«масса» из локальности: `docs/rus/40_hypotheses/inertia_mass_locality.md`
 - вихри как квазичастицы: `docs/rus/40_hypotheses/vortices_quasiparticles.md`
 - ёмкость уровня и фазовые переходы: `docs/rus/40_hypotheses/level_capacity_phase_transitions.md`
+- e как естественный шаг масштаба/границы и O(1)-нормировка: `docs/rus/40_hypotheses/e_scale_boundary_invariants.md`
 
 ---
 
@@ -66,5 +67,11 @@
 - инженерный паспорт DETM (заполненный черновик): `docs/rus/90_notes/DETM_solution_passport_filled.md`
 - вариационная/гамильтонова интерпретация DETM: `docs/rus/90_notes/variational_interpretation.md`
 - набросок системной архитектуры (термины): `docs/rus/90_notes/system_architecture_sketch.md`
+- статус-снимок и план извлечения из книги (2026-02-09): `docs/rus/90_notes/status_recovery_2026-02-09.md`
+- спецификация кодовой базы (snapshot 2026-02-09): `docs/rus/90_notes/codebase_spec_2026-02-09.md`
+- единый источник концепций книги для DETM: `docs/rus/90_notes/book_concepts_single_source.md`
+- модель обучения DETM (удержание инварианта): `docs/rus/90_notes/learning_model_detm.md`
+- протокол readout/anti-Goodhart: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
+- архив двух архитектурных вариантов (L0-подписчики vs Node/Fabric): `docs/rus/90_notes/architecture_variants_l0_and_fabric_2026-02-09.md`
 
 Эти темы не должны требоваться для работы канонического L0 API (`detm/runtime/api.py`).
