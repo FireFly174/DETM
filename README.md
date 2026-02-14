@@ -128,6 +128,7 @@ DETM:
 ## Документация (RU/EN)
 
 - `docs/README.md`
+- `docs/BRANCHING.md` (branching policy: `dev/main` -> `main`)
 
 ---
 

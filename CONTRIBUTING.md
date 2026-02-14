@@ -45,11 +45,14 @@ Lint/type checks are currently non-blocking in CI, but please run them locally w
 
 ## Branch and PR Guidelines
 
-1. Create a branch from `main`.
-2. Keep PRs focused (one concern per PR when possible).
-3. Add or update tests for behavioral changes.
-4. Update docs if API, runtime semantics, or architecture changed.
-5. Include a short validation section in the PR description (what you ran).
+1. If you do not have write access, fork the repository and create a branch in your fork.
+2. If you have write access, create a branch from `dev/main` (not from `main`).
+3. Keep PRs focused (one concern per PR when possible).
+4. Target regular PRs to `dev/main`.
+5. Use PRs from `dev/main` to `main` only for release-ready merges.
+6. Add or update tests for behavioral changes.
+7. Update docs if API, runtime semantics, or architecture changed.
+8. Include a short validation section in the PR description (what you ran).
 
 ## Commit Style
 
