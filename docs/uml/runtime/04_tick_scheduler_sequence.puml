@@ -1,0 +1,28 @@
+﻿@startuml
+autonumber
+title TickScheduler + TickRunner Global Tick Lifecycle
+
+participant "Controller" as C
+participant "TickRunner" as TR
+participant "TickScheduler" as TS
+participant "DetmSession" as S
+participant "EventBus" as B
+
+C -> TR : run(n_ticks)
+loop each tick
+  TR -> TS : pop_due(tick)
+  TR -> B : publish("tick", tick)
+
+  alt due influence exists
+    loop for due item
+      TR -> B : publish("signal", influence, application)
+    end
+    TR -> S : step(override_influence, 1)
+  else no due influences
+    TR -> S : step(None, 1)
+  end
+
+  TR -> TS : tick = tick + 1
+end
+
+@enduml

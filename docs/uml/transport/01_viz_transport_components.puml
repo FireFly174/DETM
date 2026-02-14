@@ -1,0 +1,21 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Viz Transport Components
+
+component "open_viz_transport" as Open
+component "NullVizTransport" as Null
+component "TcpVizTransport" as Tcp
+component "VizClient" as Client
+component "VizDaemon" as Daemon
+component "transport.protocol\nsend_msg/recv_msg" as Protocol
+component "napari.subscriber" as Subscriber
+
+Open --> Null : enabled=false / transport=none
+Open --> Tcp : transport=tcp
+Tcp --> Client
+Tcp --> Daemon : optional local daemon
+Client --> Protocol
+Subscriber --> Protocol
+
+@enduml

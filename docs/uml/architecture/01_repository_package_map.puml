@@ -1,0 +1,96 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Repository Package Map
+
+package "Entrypoint" {
+  component "main.py" as Main
+}
+
+package "Core Library (detm)" {
+  package "core" {
+    component "fields"
+    component "entropy"
+    component "invariants"
+  }
+  package "runtime" {
+    component "api"
+    component "config"
+    component "state"
+    component "backends"
+    component "influence"
+    component "level_policy"
+    component "refinement"
+    component "pattern_memory"
+    component "fabric"
+    component "signature/serialization"
+  }
+  package "analysis" {
+    component "fields"
+    component "boundary_flux"
+    component "grid_timeseries"
+  }
+  package "metrics" {
+    component "base"
+    component "builtin"
+    component "boundary_flux"
+  }
+  package "integrations" {
+    component "runtime_bridge"
+    component "acgs_backend"
+  }
+  package "presets" {
+    component "default.json"
+    component "config.default.py"
+  }
+}
+
+package "Application Layer (detm_app)" {
+  package "config" {
+    component "app_settings"
+    component "ui_models"
+    component "tooltips"
+  }
+  package "runtime" {
+    component "session"
+    component "scheduler"
+    component "bus"
+    component "coarsening"
+    component "ui_runtime"
+    component "subscribers/*"
+  }
+  package "runner" {
+    component "headless/*"
+    component "shell"
+    component "viewer_registry"
+    component "batch_service"
+  }
+  package "ui" {
+    component "napari/lab"
+    component "napari/subscriber"
+    component "napari/interactive/*"
+    component "tk/runner/*"
+  }
+  package "transport" {
+    component "protocol"
+    component "client"
+    component "daemon"
+    component "subscriber"
+  }
+}
+
+Main --> "detm_app.runner.headless.main" : headless mode
+Main --> "detm_app.ui.napari.lab.main" : napari mode
+Main --> "detm_app.runner.shell.main" : shell mode
+
+"detm_app.runtime.session" --> "detm.runtime.api"
+"detm_app.runtime.ui_runtime" --> "detm_app.runtime.session"
+"detm_app.runtime.ui_runtime" --> "detm_app.transport"
+"detm_app.runner.headless/*" --> "detm_app.runtime"
+"detm_app.ui.*" --> "detm_app.runtime.ui_runtime"
+"detm.runtime.api" --> "detm.runtime.state"
+"detm.runtime.api" --> "detm.runtime.backends"
+"detm.runtime.api" --> "detm.runtime.influence"
+"detm.runtime.api" --> "detm.runtime.fabric"
+
+@enduml

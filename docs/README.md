@@ -19,6 +19,7 @@ Key docs:
 - EN integration contract: `docs/eng/integration_contract.md`
 - RU runtime/UI/viz architecture: `docs/rus/architecture.md`
 - EN runtime/UI/viz architecture: `docs/eng/architecture.md`
+- UML diagrams (PlantUML): `docs/uml/README.md`
 
 ## Table of contents
 
@@ -36,6 +37,8 @@ Key docs:
 - Runtime/UI/viz architecture (current implementation)
   - RU: `docs/rus/architecture.md`
   - EN: `docs/eng/architecture.md`
+- UML diagrams
+  - `docs/uml/README.md`
 - Model (core)
   - RU: `docs/rus/10_model/model_core.md`
   - EN: `docs/eng/10_model/model_core.md`
@@ -62,6 +65,12 @@ Key docs:
     - Level capacity/phase transitions: RU `docs/rus/40_hypotheses/level_capacity_phase_transitions.md`, EN `docs/eng/30_hypotheses/level_capacity_phase_transitions.md`
     - e as scale/boundary step and O(1) normalization (RU only): `docs/rus/40_hypotheses/e_scale_boundary_invariants.md`
 - Experiments
+  - Research program (RU): `docs/rus/50_experiments/00_research_program.md`
+  - Research program (EN): `docs/eng/40_experiments/00_research_program.md`
+  - Baseline tests (RU): `docs/rus/50_experiments/01_baseline_tests.md`
+  - Baseline tests (EN): `docs/eng/40_experiments/01_baseline_tests.md`
+  - Regime transitions (RU): `docs/rus/50_experiments/02_regime_transition_tests.md`
+  - Regime transitions (EN): `docs/eng/40_experiments/02_regime_transition_tests.md`
   - Metrics: RU `docs/rus/50_experiments/metrics.md`, EN `docs/eng/40_experiments/metrics.md`
   - Phase map: RU `docs/rus/50_experiments/exp_phase_map.md`, EN `docs/eng/40_experiments/exp_phase_map.md`
   - Object masks: RU `docs/rus/50_experiments/exp_object_masks.md`, EN `docs/eng/40_experiments/exp_object_masks.md`

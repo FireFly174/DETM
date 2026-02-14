@@ -1,0 +1,31 @@
+﻿@startuml
+autonumber
+title Headless Single Run Sequence
+
+actor User
+participant "headless.main" as Main
+participant "run_headless_request" as Run
+participant "DetmSession" as S
+participant "attach_headless_subscribers" as Subs
+participant "execute_headless_steps" as Exec
+participant "detm.runtime.symbols" as Symbols
+
+User -> Main : main(argv)
+Main -> Main : parse args + build config/options
+Main -> Run : run_headless_request(request)
+Run -> S : DetmSession.create(config, seed)
+Run -> Subs : attach_headless_subscribers(...)
+Run -> Exec : execute_headless_steps(...)
+
+loop steps loop
+  Exec -> Symbols : make_symbol(symbol_id)
+  Symbols --> Exec : DETMInfluence
+  Exec -> S : step(influence, n_ticks)
+end
+
+Run -> S : digest()
+Run -> S : close()
+Run --> Main : run summary
+Main --> User : exit code 0
+
+@enduml

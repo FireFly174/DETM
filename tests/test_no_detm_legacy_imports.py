@@ -18,8 +18,6 @@ SCAN_TARGETS = (
     REPO_ROOT / "tools",
     REPO_ROOT / "visualization",
     REPO_ROOT / "main.py",
-    REPO_ROOT / "detm.py",
-    REPO_ROOT / "detm_napari_viewer.py",
 )
 
 def _iter_python_files() -> list[Path]:

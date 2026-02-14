@@ -225,8 +225,8 @@ Correction-пакеты, возникающие при телепортации:
 * `detm/runtime/fabric/validator_registry.py` (`ValidatorRegistry`, `StaticValidatorRegistry`: membership source for quorum policies)
 * `detm/runtime/fabric/artifact_store.py` (`FabricArtifactStore`, `FileFabricArtifactStore`: durable commit/ack resolver)
 * `detm/runtime/fabric/tcp_transport/*` (`TcpFabricTransport`, `TcpFabricRelay`, `open_fabric_transport`)
-* `detm_app/runtime/subscribers/fabric.py` (`FabricHandshakeRecorder`: runtime wiring + `fabric_acks.jsonl`, split-mode channel policy)
-* `detm_app/runtime/subscribers/commit.py` (`CommitJsonlWriter`, `commits.jsonl`, linkage через `trace_ref`)
+* `detm_app/runtime/subscribers/fabric/*` (`FabricHandshakeRecorder`: runtime wiring + `fabric_acks.jsonl`, split-mode channel policy)
+* `detm_app/runtime/subscribers/commit/stream.py` (`CommitJsonlWriter`, `commits.jsonl`, linkage через `trace_ref`)
 * `detm/runtime/level_policy/*` (`audit_commit_enabled`, `audit_commit_stride`) для policy-driven `commits_audit.jsonl`
 * `detm/runtime/fabric/validation/*` + `commit_validation.json` (local chain/proof/watermark validator report)
 

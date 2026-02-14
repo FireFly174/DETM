@@ -6,6 +6,7 @@ from detm.runtime.api import (
     deserialize,
     deserialize_state,
     digest,
+    migrate_state,
     reset,
     serialize,
     serialize_state,
@@ -155,6 +156,7 @@ __all__ = [
     "deserialize",
     "serialize_state",
     "deserialize_state",
+    "migrate_state",
 ]
 
 

@@ -1,0 +1,39 @@
+﻿@startuml
+title Runtime Global Tick Sequence (TickRunner)
+autonumber
+
+actor Controller as C
+participant "TickRunner" as TR
+participant "TickScheduler" as TS
+participant "DetmSession" as S
+participant "detm.runtime.api.step" as API
+participant "EventBus" as B
+participant "Subscribers" as SUB
+participant "VizStreamer" as V
+
+C -> TR : run(n_ticks)
+loop for each global tick
+  TR -> TS : pop_due(tick)
+  TR -> B : publish("tick", tick)
+
+  alt due influence items exist
+    loop for each due influence
+      TR -> B : publish("signal", influence, application)
+    end
+    note right of TR
+      Due influences are merged into
+      override_influence.dynamics_overrides
+    end note
+    TR -> S : step(override_influence, 1, rng)
+  else no due influence
+    TR -> S : step(None, 1, rng)
+  end
+
+  S -> API : step(state, influence, n_ticks=1, rng)
+  API --> S : state + observables
+  S -> B : publish("step", state, observables, policy_decision)
+  B -> SUB : on_step(...)
+  SUB -> V : send_state(state_blob, tick, signature, meta)
+end
+
+@enduml

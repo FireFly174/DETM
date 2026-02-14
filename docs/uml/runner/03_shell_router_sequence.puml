@@ -1,0 +1,24 @@
+﻿@startuml
+autonumber
+title Shell Router Sequence
+
+actor User
+participant "main.py" as Entry
+participant "detm_app.runner.shell.main" as Shell
+participant "viewer_registry" as Registry
+participant "napari.lab.main" as Napari
+participant "headless.main" as Headless
+
+User -> Entry : main.py shell --controller ... --viewer ...
+Entry -> Shell : shell.main(argv)
+Shell -> Shell : build_shell_contract(...)
+Shell -> Registry : resolve_viewer_adapter(viewer)
+
+alt viewer=napari
+  Shell -> Registry : run_napari_viewer(...)
+  Registry -> Napari : napari.lab.main(args)
+else viewer=none
+  Shell -> Headless : headless.main(forwarded_args)
+end
+
+@enduml

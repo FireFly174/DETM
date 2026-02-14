@@ -1,0 +1,39 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Tk Runner Detailed Composition
+
+component "launcher.py\nlaunch_tk_ui" as Launcher
+component "flow/layout.py" as Layout
+component "flow/window.py" as Window
+component "flow/controls/builder.py" as ControlsBuilder
+component "flow/controls/influence.py" as ControlsInfluence
+component "flow/controls/runtime.py" as ControlsRuntime
+component "flow/controls/recording_viz.py" as ControlsRecViz
+component "flow/settings/flow.py" as SettingsFlow
+component "flow/settings/apply.py" as SettingsApply
+component "flow/settings/runtime_config.py" as RuntimeConfig
+component "flow/actions.py\nTkRuntimeActionFlow" as ActionFlow
+component "flow/batch.py\nTkBatchFlow" as BatchFlow
+component "flow/viz/flow.py\nTkVizFlow" as VizFlow
+component "DetmUiRunner" as UiRunner
+
+Launcher --> Layout
+Launcher --> Window
+Launcher --> ControlsBuilder
+Launcher --> SettingsFlow
+Launcher --> ActionFlow
+Launcher --> BatchFlow
+Launcher --> VizFlow
+
+ControlsBuilder --> ControlsInfluence
+ControlsBuilder --> ControlsRuntime
+ControlsBuilder --> ControlsRecViz
+SettingsFlow --> SettingsApply
+SettingsFlow --> RuntimeConfig
+
+ActionFlow --> UiRunner
+SettingsFlow --> UiRunner
+VizFlow --> UiRunner
+
+@enduml

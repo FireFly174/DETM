@@ -143,8 +143,8 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 
 #### 3.7.2 Прототипы / следы миграции
 
-- `detm_napari_viewer.py` присутствует как минимальный napari viewer prototype
-  (вне канонического runtime-контура).
+- legacy wrappers `detm_napari_viewer.py`/`detm_napari_lab.py` удалены;
+  канонический запуск napari идёт через `python main.py napari ...`.
 - В notes зафиксирован целевой UX-вектор:
   - `docs/rus/90_notes/DETM_solution_passport_filled.md`
   - `docs/rus/90_notes/solution_passport.md`

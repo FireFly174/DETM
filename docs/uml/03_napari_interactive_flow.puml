@@ -1,0 +1,40 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Napari Interactive Flow Composition
+
+package "detm_app.ui.napari.interactive" {
+  component "controller.py\n_InteractiveDockController" as Controller
+
+  package "flow" {
+    component "controls.py\nbuild_interactive_controls" as Controls
+    component "settings.py\nbuild_config/apply_settings" as Settings
+    component "actions/*\nstep/reset/run/mode" as Actions
+    component "influence.py\nmode/policy sync" as Influence
+    component "batch/*\nrequest/state/toggle" as Batch
+    component "render.py\nNapariRenderFlow" as Render
+    component "ui_wiring.py\nbuttons/shortcuts" as Wiring
+    component "widget_io.py\nline/read_*" as WidgetIO
+  }
+}
+
+component "detm_app.runtime.ui_runtime\nDetmUiRunner" as UiRunner
+component "detm_app.runtime.session\nDetmSession" as Session
+component "detm.runtime.api" as Api
+component "napari Viewer" as Viewer
+
+Controller --> Controls
+Controller --> Settings
+Controller --> Actions
+Controller --> Influence
+Controller --> Batch
+Controller --> Render
+Controller --> Wiring
+Controller --> WidgetIO
+
+Controller --> UiRunner
+Render --> Viewer
+UiRunner --> Session
+Session --> Api
+
+@enduml

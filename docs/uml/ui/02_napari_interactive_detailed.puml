@@ -1,0 +1,35 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Napari Interactive Detailed Composition
+
+component "_InteractiveDockController" as Controller
+component "controls.py" as Controls
+component "settings.py" as Settings
+component "influence.py" as Influence
+component "actions/interaction.py" as ActionInteraction
+component "actions/mode.py" as ActionMode
+component "batch/request.py" as BatchRequest
+component "batch/state.py" as BatchState
+component "batch/toggle.py" as BatchToggle
+component "render.py\nNapariRenderFlow" as Render
+component "ui_wiring.py" as Wiring
+component "widget_io.py" as WidgetIO
+component "DetmUiRunner" as UiRunner
+component "napari Viewer" as Viewer
+
+Controller --> Controls
+Controller --> Settings
+Controller --> Influence
+Controller --> ActionInteraction
+Controller --> ActionMode
+Controller --> BatchRequest
+Controller --> BatchState
+Controller --> BatchToggle
+Controller --> Render
+Controller --> Wiring
+Controller --> WidgetIO
+Controller --> UiRunner
+Render --> Viewer
+
+@enduml

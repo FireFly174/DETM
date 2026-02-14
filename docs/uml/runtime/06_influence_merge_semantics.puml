@@ -1,0 +1,39 @@
+﻿@startuml
+autonumber
+title Influence Merge Semantics (Deterministic, Not Commutative)
+
+participant "TickScheduler" as TS
+participant "TickRunner" as TR
+participant "DetmSession" as S
+participant "detm.runtime.api" as API
+
+TS -> TR : due items (sorted by tick/order)
+loop due influences
+  TR -> TR : merged_overrides.update(dynamics_overrides)
+end
+
+note right of TR
+Deterministic order: scheduler queue order.
+If same key appears multiple times:
+last write wins (order-sensitive).
+=> Not commutative.
+end note
+
+TR -> S : step(override_influence, 1)
+S -> S : policy decision + chunking
+
+alt first chunk
+  S -> API : step(state, full influence, chunk_n_ticks)
+else subsequent chunks
+  S -> API : step(state, override-only influence, chunk_n_ticks)
+end
+
+S -> S : merge chunk observables
+note right of S
+_merge_observables contract:
+- events: concatenated in chunk order
+- cost: summed by key
+- signature/quality/field_summaries: last chunk
+end note
+
+@enduml

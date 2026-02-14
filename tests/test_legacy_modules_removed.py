@@ -7,6 +7,7 @@ import pytest
 
 
 REMOVED_PATHS = (
+    "detm.py",
     "detm/cli.py",
     "detm/app_settings.py",
     "detm/_compat.py",

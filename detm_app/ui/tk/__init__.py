@@ -2,7 +2,7 @@
 
 from detm_app.ui.tk.panel import DetmVizPanel, VizFrame
 from detm_app.ui.tk.runner import DetmTkRunner, UiRunSettings, launch_tk_ui
-from detm_app.ui.tk.config_hints import load_tooltips_from_config_default
+from detm_app.config.tooltips import load_tooltips_from_config_default
 from detm_app.ui.tk.tooltips import Tooltip, attach_tooltip
 
 __all__ = [

@@ -1,0 +1,265 @@
+"""Flow helpers for DeliveryTrackingCoordinator."""
+
+from __future__ import annotations
+
+import json
+import time
+from pathlib import Path
+from typing import Any, Dict
+
+from detm.runtime.fabric import FabricEnvelope
+
+
+def state_file(tracker: Any) -> Path | None:
+    if tracker.state_path is None:
+        return None
+    text = str(tracker.state_path).strip()
+    if not text:
+        return None
+    return Path(text)
+
+
+def persist_state(tracker: Any) -> None:
+    path = state_file(tracker)
+    if path is None:
+        return
+    payload = {
+        "schema_version": "detm.fabric.delivery_tracking_state.v1",
+        "accepted_count": int(tracker.accepted_count),
+        "rejected_count": int(tracker.rejected_count),
+        "retries_total": int(tracker.retries_total),
+        "pending": {
+            str(delivery_id): {
+                "delivery_id": str(row.get("delivery_id", delivery_id)),
+                "commit_ref": str(row.get("commit_ref", "")),
+                "mode": str(row.get("mode", "")),
+                "first_sent_ms": int(row.get("first_sent_ms", 0)),
+                "last_sent_ms": int(row.get("last_sent_ms", 0)),
+                "attempts": int(row.get("attempts", 0)),
+                "reason": row.get("reason"),
+                "created_at_ms": int(row.get("created_at_ms", 0)),
+                "envelope": row["envelope"].to_dict()
+                if isinstance(row.get("envelope"), FabricEnvelope)
+                else None,
+            }
+            for delivery_id, row in dict(tracker.pending).items()
+            if str(delivery_id).strip()
+        },
+        "receipt_state": tracker.receipt_coordinator.snapshot_state()
+        if hasattr(tracker.receipt_coordinator, "snapshot_state")
+        else {},
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(".tmp")
+    tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(path)
+
+
+def load_state(tracker: Any) -> None:
+    path = state_file(tracker)
+    if path is None or not path.exists():
+        return
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    if not isinstance(payload, dict):
+        return
+
+    tracker.accepted_count = max(0, int(payload.get("accepted_count", 0)))
+    tracker.rejected_count = max(0, int(payload.get("rejected_count", 0)))
+    tracker.retries_total = max(0, int(payload.get("retries_total", 0)))
+    tracker.pending.clear()
+
+    pending_rows = dict(payload.get("pending", {})) if isinstance(payload.get("pending"), dict) else {}
+    for delivery_id, row in pending_rows.items():
+        did = str(delivery_id).strip()
+        if not did or not isinstance(row, dict):
+            continue
+        envelope_raw = row.get("envelope")
+        envelope = None
+        if isinstance(envelope_raw, dict):
+            try:
+                envelope = FabricEnvelope.from_dict(envelope_raw)
+            except Exception:
+                envelope = None
+        if envelope is None:
+            continue
+        tracker.pending[did] = {
+            "delivery_id": str(row.get("delivery_id", did)),
+            "commit_ref": str(row.get("commit_ref", "")),
+            "mode": str(row.get("mode", "")),
+            "first_sent_ms": max(0, int(row.get("first_sent_ms", 0))),
+            "last_sent_ms": max(0, int(row.get("last_sent_ms", 0))),
+            "attempts": max(0, int(row.get("attempts", 0))),
+            "envelope": envelope,
+            "reason": row.get("reason"),
+            "created_at_ms": max(0, int(row.get("created_at_ms", 0))),
+        }
+
+    if hasattr(tracker.receipt_coordinator, "load_snapshot"):
+        try:
+            tracker.receipt_coordinator.load_snapshot(payload.get("receipt_state", {}))
+        except Exception:
+            pass
+
+
+def register_delivery(tracker: Any, envelope: FabricEnvelope, *, now_ms: int | None = None) -> str | None:
+    if not tracker.enabled():
+        return None
+    delivery_id = str(envelope.delivery_id or "").strip()
+    if not delivery_id:
+        return None
+    row = tracker.pending.get(delivery_id)
+    if row is None:
+        now = int(now_ms) if now_ms is not None else int(time.time() * 1000)
+        row = {
+            "delivery_id": delivery_id,
+            "commit_ref": str(envelope.commit_ref or ""),
+            "mode": str(envelope.mode),
+            "first_sent_ms": 0,
+            "last_sent_ms": 0,
+            "attempts": 0,
+            "envelope": envelope,
+            "reason": None,
+            "created_at_ms": now,
+        }
+        tracker.pending[delivery_id] = row
+        tracker.receipt_coordinator.register_delivery(
+            delivery_id,
+            commit_ref=str(envelope.commit_ref or ""),
+            created_at_ms=now,
+        )
+        tracker._persist_state()
+    return delivery_id
+
+
+def mark_publish_attempt(tracker: Any, delivery_id: str, *, now_ms: int | None = None) -> None:
+    did = str(delivery_id).strip()
+    row = tracker.pending.get(did)
+    if row is None:
+        return
+    now = int(now_ms) if now_ms is not None else int(time.time() * 1000)
+    row["attempts"] = int(row.get("attempts", 0)) + 1
+    row["last_sent_ms"] = now
+    if int(row.get("first_sent_ms", 0)) <= 0:
+        row["first_sent_ms"] = now
+    tracker._persist_state()
+
+
+def tick(tracker: Any, republish: Any, *, now_ms: int | None = None) -> None:
+    if not tracker.enabled():
+        return
+    if not tracker.pending:
+        return
+    now = int(now_ms) if now_ms is not None else int(time.time() * 1000)
+    timeout_ms = max(1, int(tracker.timeout_ms))
+    max_attempts = max(1, int(tracker.max_attempts))
+    retry_interval_ms = max(0, int(tracker.retry_interval_ms))
+    required_receipts = max(0, int(tracker.required_receipts))
+
+    to_remove: list[str] = []
+    for delivery_id, row in list(tracker.pending.items()):
+        eval_row = tracker.receipt_coordinator.evaluate(delivery_id)
+        status = str(eval_row.get("status", "pending"))
+        reason = None if eval_row.get("reason") is None else str(eval_row.get("reason"))
+        accepted_senders = [str(v) for v in list(eval_row.get("accepted_senders", []))]
+        missing_required = [str(v) for v in list(eval_row.get("missing_required_validators", []))]
+        if status == "accepted":
+            tracker.accepted_count += 1
+            to_remove.append(delivery_id)
+            continue
+        if status == "rejected":
+            row["reason"] = reason or "delivery rejected by receipt policy"
+            tracker.rejected_count += 1
+            to_remove.append(delivery_id)
+            continue
+
+        first_sent = int(row.get("first_sent_ms", 0))
+        if first_sent <= 0:
+            first_sent = int(row.get("created_at_ms", now))
+        last_sent = int(row.get("last_sent_ms", first_sent))
+        attempts = int(row.get("attempts", 0))
+
+        if (now - first_sent) >= timeout_ms:
+            row["reason"] = f"delivery timeout ({now - first_sent}ms >= {timeout_ms}ms)"
+            tracker.rejected_count += 1
+            to_remove.append(delivery_id)
+            continue
+        if attempts >= max_attempts:
+            row["reason"] = f"delivery max attempts exceeded ({attempts} >= {max_attempts})"
+            tracker.rejected_count += 1
+            to_remove.append(delivery_id)
+            continue
+
+        if (now - last_sent) < retry_interval_ms:
+            continue
+        env = row.get("envelope")
+        if not isinstance(env, FabricEnvelope):
+            row["reason"] = "delivery retry failed: envelope missing"
+            tracker.rejected_count += 1
+            to_remove.append(delivery_id)
+            continue
+        tracker.mark_publish_attempt(delivery_id, now_ms=now)
+        if bool(republish(env)):
+            tracker.retries_total += 1
+        if int(row.get("attempts", 0)) >= max_attempts:
+            row["reason"] = (
+                f"delivery max attempts exceeded ({int(row.get('attempts', 0))} >= {max_attempts}); "
+                f"accepted={len(accepted_senders)}/{required_receipts}, missing_required={missing_required}"
+            )
+            tracker.rejected_count += 1
+            to_remove.append(delivery_id)
+
+    for delivery_id in to_remove:
+        tracker.pending.pop(delivery_id, None)
+        tracker.receipt_coordinator.remove(delivery_id)
+    tracker._persist_state()
+
+
+def snapshot(tracker: Any) -> Dict[str, object]:
+    pending_rows: list[dict[str, object]] = []
+    for row in list(tracker.pending.values()):
+        delivery_id = str(row.get("delivery_id", ""))
+        eval_row = tracker.receipt_coordinator.evaluate(delivery_id)
+        pending_rows.append(
+            {
+                "delivery_id": delivery_id,
+                "commit_ref": str(row.get("commit_ref", "")),
+                "attempts": int(row.get("attempts", 0)),
+                "receipt_count": len(list(eval_row.get("accepted_senders", []))),
+                "receipt_status_by_sender": dict(eval_row.get("status_by_sender", {}))
+                if isinstance(eval_row.get("status_by_sender"), dict)
+                else {},
+                "missing_required_validators": list(eval_row.get("missing_required_validators", [])),
+                "first_sent_ms": int(row.get("first_sent_ms", 0)),
+                "last_sent_ms": int(row.get("last_sent_ms", 0)),
+                "reason": row.get("reason"),
+            }
+        )
+    return {
+        "accepted_count": int(tracker.accepted_count),
+        "rejected_count": int(tracker.rejected_count),
+        "pending_count": len(tracker.pending),
+        "retries_total": int(tracker.retries_total),
+        "pending": pending_rows,
+    }
+
+
+def clear(tracker: Any) -> None:
+    for did in list(tracker.pending.keys()):
+        tracker.receipt_coordinator.remove(did)
+    tracker.pending.clear()
+    tracker._persist_state()
+
+
+__all__ = [
+    "clear",
+    "load_state",
+    "mark_publish_attempt",
+    "persist_state",
+    "register_delivery",
+    "snapshot",
+    "state_file",
+    "tick",
+]

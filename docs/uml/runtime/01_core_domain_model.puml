@@ -1,0 +1,56 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+title Runtime Core Domain Model (detm.runtime)
+
+class DETMConfig
+class DynamicsParameters
+class DETMState {
+  +state_version: str
+  +field_state: DETMFieldState
+  +step_count: int
+  +rng_state: dict
+  +config: dict
+  +dynamics: DynamicsParameters
+}
+class DETMFieldState {
+  +lattice: Lattice
+  +energy
+  +entropy
+  +internal_time
+}
+class Lattice
+class DETMInfluence
+class Observables {
+  +signature: DETMSignature
+  +field_summaries: FieldSummaries
+  +events: list
+  +cost: dict
+  +quality: dict
+}
+class FieldSummaries
+class DETMSignature
+
+class RuntimeAPI {
+  +reset(config, seed)
+  +step(state, influence, n_ticks, rng)
+  +digest(state)
+  +serialize(state)
+  +deserialize(blob)
+}
+
+DETMState *-- DETMFieldState
+DETMFieldState --> Lattice
+DETMState --> DynamicsParameters
+RuntimeAPI ..> DETMConfig
+RuntimeAPI ..> DETMInfluence
+RuntimeAPI ..> DETMState
+RuntimeAPI ..> Observables
+Observables *-- FieldSummaries
+Observables --> DETMSignature
+
+note right of RuntimeAPI
+implemented by:
+detm/runtime/api/core.py
+end note
+
+@enduml

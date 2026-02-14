@@ -1,0 +1,58 @@
+@startuml
+skinparam classAttributeIconSize 0
+title PolicyDecision Runtime-Adaptive Class View
+
+class LevelPolicy {
+  +active_level: str
+  +microsteps_per_global_tick: int
+  +batch_size: int
+  +commit_stride: int
+  +runtime_adaptive_* thresholds/guards/profile settings
+  --
+  +decide(step_count, requested_n_ticks): PolicyDecision
+  +decide_runtime_adaptive(step_count, requested_n_ticks, profile): PolicyDecision
+  +runtime_adaptive_signal_hits(events, quality, cost): dict[str,bool]
+  +runtime_adaptive_signal_triggered(...): bool
+}
+
+class ObservabilityProfile {
+  +allowed_event_types: tuple[str,...]
+  +detail_mode: str
+  +adaptive_signal_event_types: tuple[str,...]
+  +adaptive_detail_mode: str
+  +adaptive_hold_ticks: int
+  +adaptive_allowed_event_types: tuple[str,...]
+}
+
+class PolicyDecision {
+  +active_level: str
+  +requested_n_ticks: int
+  +effective_n_ticks: int
+  +batch_size: int
+  +commit_stride: int
+  +audit_commit_enabled: bool
+  +audit_commit_stride: int
+  +commit_boundary_crossed: bool
+  +allow_refinement: bool
+  +observability_profile: ObservabilityProfile
+  --
+  +runtime_adaptive_window_active: bool
+  +runtime_adaptive_profile: str
+  +runtime_adaptive_signal_triggered: bool
+  +runtime_adaptive_signal_hits: dict[str,bool]
+  +runtime_adaptive_signal_hits_sampled: bool
+  +runtime_adaptive_aggregate: dict[str,any]
+  +runtime_adaptive_guard: dict[str,any]
+}
+
+LevelPolicy ..> PolicyDecision : builds/returns
+PolicyDecision --> ObservabilityProfile : snapshot
+LevelPolicy --> ObservabilityProfile : default profile source
+
+note right of PolicyDecision
+Telemetry fields are populated in session step flow
+via policy_with_runtime_telemetry(...), then emitted
+with step event payload.
+end note
+
+@enduml

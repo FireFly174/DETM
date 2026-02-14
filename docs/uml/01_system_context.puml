@@ -1,0 +1,54 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title DETM System Context
+
+actor User
+component "main.py\nLauncher" as Main
+
+package "App Layer (detm_app)" {
+  component "Headless Runner\n(detm_app.runner.headless.main)" as Headless
+  component "Napari Lab\n(detm_app.ui.napari.lab)" as NapariLab
+  component "Shell Router\n(detm_app.runner.shell)" as Shell
+  component "Tk Launcher\n(detm_app.ui.tk.runner.launcher)" as TkLauncher
+  component "Napari Interactive\n(detm_app.ui.napari.interactive.controller)" as NapariInteractive
+  component "UI Runtime Facade\n(detm_app.runtime.ui_runtime.DetmUiRunner)" as UiRunner
+  component "Tick Scheduler/Runner\n(detm_app.runtime.scheduler)" as Scheduler
+  component "Session\n(detm_app.runtime.session.DetmSession)" as Session
+  component "Event Bus\n(detm_app.runtime.bus.EventBus)" as Bus
+  component "Subscribers\n(trace/watch/commit/viz/fabric)" as Subscribers
+  component "Viz Transport\n(detm_app.transport.*)" as VizTransport
+  component "Napari Subscriber\n(detm_app.ui.napari.subscriber)" as NapariSubscriber
+}
+
+package "Core Library (detm)" {
+  component "Runtime API\n(detm.runtime.api)" as Api
+  component "Influence + Symbols\n(detm.runtime.influence / symbols)" as Influence
+  component "State + Config\n(detm.runtime.state / config)" as StateConfig
+  component "Fabric Runtime\n(detm.runtime.fabric.*)" as Fabric
+}
+
+User --> Main
+Main --> NapariLab : napari
+Main --> Shell : shell
+Main --> Headless : headless / passthrough args
+Main --> NapariLab : no args => --interactive
+
+NapariLab --> Headless : starts producer
+NapariLab --> NapariSubscriber : opens viewer
+
+TkLauncher --> UiRunner
+NapariInteractive --> UiRunner
+Headless --> Scheduler
+Scheduler --> Session
+UiRunner --> Session
+Session --> Api
+Session --> Influence
+Api --> StateConfig
+Session --> Bus
+Bus --> Subscribers
+Subscribers --> VizTransport
+VizTransport --> NapariSubscriber
+Subscribers --> Fabric
+
+@enduml

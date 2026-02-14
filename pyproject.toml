@@ -21,7 +21,6 @@ package-dir = {"" = "."}
 [tool.setuptools.packages.find]
 where = ["."]
 include = [
-  "detm_logging*",
   "detm*",
 ]
 
@@ -31,7 +30,7 @@ include = [
 [tool.black]
 line-length = 100
 target-version = ["py312"]
-extend-exclude = "/(legacy|experiments|examples|visualization|docs|detm_logging|fallback|runtime|tools|bundle_project\\.py)/"
+extend-exclude = "/(legacy|experiments|examples|visualization|docs|runtime|tools|bundle_project\\.py)/"
 
 [tool.ruff]
 target-version = "py312"
@@ -43,8 +42,6 @@ extend-exclude = [
   "examples",
   "visualization",
   "docs",
-  "detm_logging",
-  "fallback",
   "tools",
   "bundle_project.py",
 ]

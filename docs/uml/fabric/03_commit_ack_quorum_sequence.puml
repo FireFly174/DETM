@@ -1,0 +1,23 @@
+﻿@startuml
+autonumber
+title Fabric Commit -> Ack -> Quorum Sequence
+
+participant "Session bus" as Bus
+participant "FabricCommitIngressService" as Ingress
+participant "FabricTransportAdapter" as Transport
+participant "FabricHandshakeService" as Handshake
+participant "LocalFabricValidator" as Validator
+participant "FabricAckIngressService" as AckIngress
+participant "FabricQuorumRuntimeService" as Quorum
+
+Bus -> Ingress : publish commit_packet
+Ingress -> Transport : publish commit envelope
+Transport -> Handshake : on_commit_envelope(envelope)
+Handshake -> Validator : validate_commit(packet)
+Validator --> Handshake : ProofAck + TrustAck
+Handshake -> Transport : publish ack envelopes
+Transport -> AckIngress : on_ack_envelope
+AckIngress -> Quorum : register ack(s)
+Quorum --> Bus : publish quorum snapshot/report
+
+@enduml

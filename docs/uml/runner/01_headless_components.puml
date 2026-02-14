@@ -1,0 +1,26 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Headless Runner Components
+
+component "headless.main" as Main
+component "parser/options" as Options
+component "app_settings\n(load_merged_payload)" as Settings
+component "run_headless_request" as RunReq
+component "attach_headless_subscribers" as AttachSubs
+component "execute_headless_steps" as Exec
+component "DetmSession" as Session
+component "open_viz_transport" as VizOpen
+
+Main --> Options
+Main --> Settings
+Main --> VizOpen
+Main --> RunReq
+RunReq --> Session
+RunReq --> AttachSubs
+RunReq --> Exec
+AttachSubs --> "core subscribers"
+AttachSubs --> "fabric subscriber"
+AttachSubs --> "streaming subscribers"
+
+@enduml

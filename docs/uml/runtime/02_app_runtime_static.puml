@@ -1,0 +1,34 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title App Runtime Static Architecture (detm_app.runtime)
+
+component "DetmSession\n(session/core.py)" as Session
+component "TickScheduler\n(scheduler.py)" as Scheduler
+component "TickRunner\n(scheduler.py)" as Runner
+component "EventBus\n(bus.py)" as Bus
+component "InvariantCoarsener\n(coarsening.py)" as Coarsener
+component "DetmUiRunner\n(ui_runtime/core.py)" as UiRunner
+component "Subscribers\n(trace/watch/commit/viz/fabric)" as Subscribers
+component "detm.runtime.api" as Api
+component "detm.runtime.influence" as Influence
+
+UiRunner --> Session
+UiRunner --> Subscribers
+UiRunner --> Coarsener
+Runner --> Scheduler
+Runner --> Session
+Session --> Api
+Session --> Influence
+Session --> Bus
+Scheduler --> Bus
+Bus --> Subscribers
+
+note right of Runner
+per global tick:
+1) publish tick
+2) apply due influences (n_ticks=0)
+3) session.step(..., 1)
+end note
+
+@enduml

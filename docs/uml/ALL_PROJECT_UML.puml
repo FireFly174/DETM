@@ -1,0 +1,1327 @@
+﻿' ALL_PROJECT_UML.puml
+' Auto-generated aggregate of project UML blocks
+' Source root: docs/uml
+
+' ============================================================
+' BEGIN BLOCK: 01_system_context.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title DETM System Context
+
+actor User
+component "main.py\nLauncher" as Main
+
+package "App Layer (detm_app)" {
+  component "Headless Runner\n(detm_app.runner.headless.main)" as Headless
+  component "Napari Lab\n(detm_app.ui.napari.lab)" as NapariLab
+  component "Shell Router\n(detm_app.runner.shell)" as Shell
+  component "Tk Launcher\n(detm_app.ui.tk.runner.launcher)" as TkLauncher
+  component "Napari Interactive\n(detm_app.ui.napari.interactive.controller)" as NapariInteractive
+  component "UI Runtime Facade\n(detm_app.runtime.ui_runtime.DetmUiRunner)" as UiRunner
+  component "Tick Scheduler/Runner\n(detm_app.runtime.scheduler)" as Scheduler
+  component "Session\n(detm_app.runtime.session.DetmSession)" as Session
+  component "Event Bus\n(detm_app.runtime.bus.EventBus)" as Bus
+  component "Subscribers\n(trace/watch/commit/viz/fabric)" as Subscribers
+  component "Viz Transport\n(detm_app.transport.*)" as VizTransport
+  component "Napari Subscriber\n(detm_app.ui.napari.subscriber)" as NapariSubscriber
+}
+
+package "Core Library (detm)" {
+  component "Runtime API\n(detm.runtime.api)" as Api
+  component "Influence + Symbols\n(detm.runtime.influence / symbols)" as Influence
+  component "State + Config\n(detm.runtime.state / config)" as StateConfig
+  component "Fabric Runtime\n(detm.runtime.fabric.*)" as Fabric
+}
+
+User --> Main
+Main --> NapariLab : napari
+Main --> Shell : shell
+Main --> Headless : headless / passthrough args
+Main --> NapariLab : no args => --interactive
+
+NapariLab --> Headless : starts producer
+NapariLab --> NapariSubscriber : opens viewer
+
+TkLauncher --> UiRunner
+NapariInteractive --> UiRunner
+Headless --> Scheduler
+Scheduler --> Session
+UiRunner --> Session
+Session --> Api
+Session --> Influence
+Api --> StateConfig
+Session --> Bus
+Bus --> Subscribers
+Subscribers --> VizTransport
+VizTransport --> NapariSubscriber
+Subscribers --> Fabric
+
+@enduml
+
+' END BLOCK: 01_system_context.puml
+
+' ============================================================
+' BEGIN BLOCK: 02_runtime_tick_sequence.puml
+' ============================================================
+@startuml
+title Runtime Global Tick Sequence (TickRunner)
+autonumber
+
+actor Controller as C
+participant "TickRunner" as TR
+participant "TickScheduler" as TS
+participant "DetmSession" as S
+participant "detm.runtime.api.step" as API
+participant "EventBus" as B
+participant "Subscribers" as SUB
+participant "VizStreamer" as V
+
+C -> TR : run(n_ticks)
+loop for each global tick
+  TR -> TS : pop_due(tick)
+  TR -> B : publish("tick", tick)
+
+  alt due influence items exist
+    loop for each due influence
+      TR -> B : publish("signal", influence, application)
+    end
+    note right of TR
+      Due influences are merged into
+      override_influence.dynamics_overrides
+    end note
+    TR -> S : step(override_influence, 1, rng)
+  else no due influence
+    TR -> S : step(None, 1, rng)
+  end
+
+  S -> API : step(state, influence, n_ticks=1, rng)
+  API --> S : state + observables
+  S -> B : publish("step", state, observables, policy_decision)
+  B -> SUB : on_step(...)
+  SUB -> V : send_state(state_blob, tick, signature, meta)
+end
+
+@enduml
+
+' END BLOCK: 02_runtime_tick_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: 03_napari_interactive_flow.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Napari Interactive Flow Composition
+
+package "detm_app.ui.napari.interactive" {
+  component "controller.py\n_InteractiveDockController" as Controller
+
+  package "flow" {
+    component "controls.py\nbuild_interactive_controls" as Controls
+    component "settings.py\nbuild_config/apply_settings" as Settings
+    component "actions/*\nstep/reset/run/mode" as Actions
+    component "influence.py\nmode/policy sync" as Influence
+    component "batch/*\nrequest/state/toggle" as Batch
+    component "render.py\nNapariRenderFlow" as Render
+    component "ui_wiring.py\nbuttons/shortcuts" as Wiring
+    component "widget_io.py\nline/read_*" as WidgetIO
+  }
+}
+
+component "detm_app.runtime.ui_runtime\nDetmUiRunner" as UiRunner
+component "detm_app.runtime.session\nDetmSession" as Session
+component "detm.runtime.api" as Api
+component "napari Viewer" as Viewer
+
+Controller --> Controls
+Controller --> Settings
+Controller --> Actions
+Controller --> Influence
+Controller --> Batch
+Controller --> Render
+Controller --> Wiring
+Controller --> WidgetIO
+
+Controller --> UiRunner
+Render --> Viewer
+UiRunner --> Session
+Session --> Api
+
+@enduml
+
+' END BLOCK: 03_napari_interactive_flow.puml
+
+' ============================================================
+' BEGIN BLOCK: 04_tk_runner_flow.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Tk Runner Flow Composition
+
+package "detm_app.ui.tk.runner" {
+  component "launcher.py\nlaunch_tk_ui" as Launcher
+
+  package "flow" {
+    component "layout.py/window.py\nTkLauncherLayout" as Layout
+    component "controls.builder\nTkControlVars" as Controls
+    component "settings.flow\nTkSettingsFlow" as SettingsFlow
+    component "actions.py\nTkRuntimeActionFlow" as ActionFlow
+    component "batch.py\nTkBatchFlow" as BatchFlow
+    component "viz.flow\nTkVizFlow" as VizFlow
+  }
+}
+
+component "detm_app.runtime.ui_runtime\nDetmUiRunner" as UiRunner
+component "detm_app.runtime.session\nDetmSession" as Session
+component "detm.runtime.api" as Api
+
+Launcher --> Layout
+Launcher --> Controls
+Launcher --> SettingsFlow
+Launcher --> ActionFlow
+Launcher --> BatchFlow
+Launcher --> VizFlow
+
+Launcher --> UiRunner
+SettingsFlow --> UiRunner
+ActionFlow --> UiRunner
+VizFlow --> UiRunner
+UiRunner --> Session
+Session --> Api
+
+@enduml
+
+' END BLOCK: 04_tk_runner_flow.puml
+
+' ============================================================
+' BEGIN BLOCK: architecture/00_two_minute_explainer.puml
+' ============================================================
+@startuml
+left to right direction
+title DETM 2-Minute Architecture Explainer
+
+actor "New Developer" as Dev
+component "main.py\nLauncher" as Launcher
+component "Run Mode\n(napari | headless | shell)" as Mode
+component "Orchestrator\n(session/scheduler/ui_runtime)" as Orch
+component "detm.runtime.api\n(L0 core)" as API
+component "Observables\n(signature/events/cost/quality)" as Obs
+component "EventBus\n(sync, ordered)" as Bus
+component "Subscribers\n(trace/watch/commit/viz/fabric)" as Subs
+component "Outputs\nUI files transport" as Out
+
+Dev --> Launcher : start run
+Launcher --> Mode
+Mode --> Orch
+Orch --> API : step/reset/digest
+API --> Obs
+Orch --> Bus : publish(reset/step/tick/signal)
+Bus --> Subs
+Subs --> Out
+
+note bottom of API
+Core/app separation:
+- detm/* = simulation core
+- detm_app/* = orchestration, UI, IO
+end note
+
+@enduml
+
+' END BLOCK: architecture/00_two_minute_explainer.puml
+
+' ============================================================
+' BEGIN BLOCK: architecture/01_repository_package_map.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Repository Package Map
+
+package "Entrypoint" {
+  component "main.py" as Main
+}
+
+package "Core Library (detm)" {
+  package "core" {
+    component "fields"
+    component "entropy"
+    component "invariants"
+  }
+  package "runtime" {
+    component "api"
+    component "config"
+    component "state"
+    component "backends"
+    component "influence"
+    component "level_policy"
+    component "refinement"
+    component "pattern_memory"
+    component "fabric"
+    component "signature/serialization"
+  }
+  package "analysis" {
+    component "fields"
+    component "boundary_flux"
+    component "grid_timeseries"
+  }
+  package "metrics" {
+    component "base"
+    component "builtin"
+    component "boundary_flux"
+  }
+  package "integrations" {
+    component "runtime_bridge"
+    component "acgs_backend"
+  }
+  package "presets" {
+    component "default.json"
+    component "config.default.py"
+  }
+}
+
+package "Application Layer (detm_app)" {
+  package "config" {
+    component "app_settings"
+    component "ui_models"
+    component "tooltips"
+  }
+  package "runtime" {
+    component "session"
+    component "scheduler"
+    component "bus"
+    component "coarsening"
+    component "ui_runtime"
+    component "subscribers/*"
+  }
+  package "runner" {
+    component "headless/*"
+    component "shell"
+    component "viewer_registry"
+    component "batch_service"
+  }
+  package "ui" {
+    component "napari/lab"
+    component "napari/subscriber"
+    component "napari/interactive/*"
+    component "tk/runner/*"
+  }
+  package "transport" {
+    component "protocol"
+    component "client"
+    component "daemon"
+    component "subscriber"
+  }
+}
+
+Main --> "detm_app.runner.headless.main" : headless mode
+Main --> "detm_app.ui.napari.lab.main" : napari mode
+Main --> "detm_app.runner.shell.main" : shell mode
+
+"detm_app.runtime.session" --> "detm.runtime.api"
+"detm_app.runtime.ui_runtime" --> "detm_app.runtime.session"
+"detm_app.runtime.ui_runtime" --> "detm_app.transport"
+"detm_app.runner.headless/*" --> "detm_app.runtime"
+"detm_app.ui.*" --> "detm_app.runtime.ui_runtime"
+"detm.runtime.api" --> "detm.runtime.state"
+"detm.runtime.api" --> "detm.runtime.backends"
+"detm.runtime.api" --> "detm.runtime.influence"
+"detm.runtime.api" --> "detm.runtime.fabric"
+
+@enduml
+
+' END BLOCK: architecture/01_repository_package_map.puml
+
+' ============================================================
+' BEGIN BLOCK: architecture/02_entrypoints_and_modes.puml
+' ============================================================
+@startuml
+left to right direction
+title Entrypoints and Run Modes
+
+actor User
+
+rectangle "main.py" as Main
+
+package "Modes" {
+  rectangle "napari" as NapariMode
+  rectangle "headless" as HeadlessMode
+  rectangle "shell" as ShellMode
+  rectangle "default (no args)\nnapari --interactive" as DefaultMode
+}
+
+package "Entrypoints" {
+  rectangle "detm_app.ui.napari.lab.main" as NapariMain
+  rectangle "detm_app.runner.headless.main" as HeadlessMain
+  rectangle "detm_app.runner.shell.main" as ShellMain
+}
+
+User --> Main
+Main --> NapariMode : "main.py napari ..."
+Main --> HeadlessMode : "main.py headless ..."
+Main --> ShellMode : "main.py shell ..."
+Main --> DefaultMode : "main.py"
+Main --> HeadlessMode : "main.py [other args]"
+
+NapariMode --> NapariMain
+HeadlessMode --> HeadlessMain
+ShellMode --> ShellMain
+DefaultMode --> NapariMain
+
+note bottom of NapariMain
+normal mode: producer + subscriber
+interactive mode: in-process controls
+end note
+
+@enduml
+
+' END BLOCK: architecture/02_entrypoints_and_modes.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/01_core_domain_model.puml
+' ============================================================
+@startuml
+skinparam classAttributeIconSize 0
+title Runtime Core Domain Model (detm.runtime)
+
+class DETMConfig
+class DynamicsParameters
+class DETMState {
+  +state_version: str
+  +field_state: DETMFieldState
+  +step_count: int
+  +rng_state: dict
+  +config: dict
+  +dynamics: DynamicsParameters
+}
+class DETMFieldState {
+  +lattice: Lattice
+  +energy
+  +entropy
+  +internal_time
+}
+class Lattice
+class DETMInfluence
+class Observables {
+  +signature: DETMSignature
+  +field_summaries: FieldSummaries
+  +events: list
+  +cost: dict
+  +quality: dict
+}
+class FieldSummaries
+class DETMSignature
+
+class RuntimeAPI {
+  +reset(config, seed)
+  +step(state, influence, n_ticks, rng)
+  +digest(state)
+  +serialize(state)
+  +deserialize(blob)
+}
+
+DETMState *-- DETMFieldState
+DETMFieldState --> Lattice
+DETMState --> DynamicsParameters
+RuntimeAPI ..> DETMConfig
+RuntimeAPI ..> DETMInfluence
+RuntimeAPI ..> DETMState
+RuntimeAPI ..> Observables
+Observables *-- FieldSummaries
+Observables --> DETMSignature
+
+note right of RuntimeAPI
+implemented by:
+detm/runtime/api/core.py
+end note
+
+@enduml
+
+' END BLOCK: runtime/01_core_domain_model.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/02_app_runtime_static.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title App Runtime Static Architecture (detm_app.runtime)
+
+component "DetmSession\n(session/core.py)" as Session
+component "TickScheduler\n(scheduler.py)" as Scheduler
+component "TickRunner\n(scheduler.py)" as Runner
+component "EventBus\n(bus.py)" as Bus
+component "InvariantCoarsener\n(coarsening.py)" as Coarsener
+component "DetmUiRunner\n(ui_runtime/core.py)" as UiRunner
+component "Subscribers\n(trace/watch/commit/viz/fabric)" as Subscribers
+component "detm.runtime.api" as Api
+component "detm.runtime.influence" as Influence
+
+UiRunner --> Session
+UiRunner --> Subscribers
+UiRunner --> Coarsener
+Runner --> Scheduler
+Runner --> Session
+Session --> Api
+Session --> Influence
+Session --> Bus
+Scheduler --> Bus
+Bus --> Subscribers
+
+note right of Runner
+per global tick:
+1) publish tick
+2) apply due influences (n_ticks=0)
+3) session.step(..., 1)
+end note
+
+@enduml
+
+' END BLOCK: runtime/02_app_runtime_static.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/03_session_step_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title Session Step Flow (policy, chunking, publish)
+
+participant "Caller\n(UI/headless)" as C
+participant "DetmSession" as S
+participant "LevelPolicy" as P
+participant "detm.runtime.api" as API
+participant "EventBus" as B
+participant "Subscribers" as SUB
+
+C -> S : step(influence, n_ticks, rng)
+S -> P : decide(step_count, requested_n_ticks)
+P --> S : PolicyDecision
+
+alt effective_n_ticks <= 0
+  S -> API : step(state, influence, 0, rng)
+  API --> S : state + observables
+else effective_n_ticks > 0
+  loop chunked execution
+    S -> API : step(state, chunk_influence, chunk_n_ticks, rng)
+    API --> S : chunk_observables
+  end
+  S -> S : merge observables
+end
+
+S -> B : publish("step", state, observables, policy_decision, ...)
+B -> SUB : on_step(...)
+S --> C : observables
+
+@enduml
+
+' END BLOCK: runtime/03_session_step_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/04_tick_scheduler_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title TickScheduler + TickRunner Global Tick Lifecycle
+
+participant "Controller" as C
+participant "TickRunner" as TR
+participant "TickScheduler" as TS
+participant "DetmSession" as S
+participant "EventBus" as B
+
+C -> TR : run(n_ticks)
+loop each tick
+  TR -> TS : pop_due(tick)
+  TR -> B : publish("tick", tick)
+
+  alt due influence exists
+    loop for due item
+      TR -> B : publish("signal", influence, application)
+    end
+    TR -> S : step(override_influence, 1)
+  else no due influences
+    TR -> S : step(None, 1)
+  end
+
+  TR -> TS : tick = tick + 1
+end
+
+@enduml
+
+' END BLOCK: runtime/04_tick_scheduler_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/05_subscribers_matrix.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Runtime Subscribers Matrix
+
+component "DetmSession.bus" as Bus
+
+package "Trace" {
+  component "JsonlTraceWriter"
+  component "SystemTraceWriter"
+  component "ArtifactWriter"
+  component "FieldHistoryRecorder"
+}
+
+package "Watch" {
+  component "WatchTraceWriter"
+  component "WatchContractWriter"
+}
+
+package "Commit" {
+  component "CommitJsonlWriter"
+  component "CommitValidationReporter"
+  component "InvariantTickJsonlWriter"
+}
+
+package "Streaming" {
+  component "VizStreamer"
+}
+
+package "Fabric" {
+  component "FabricHandshakeRecorder"
+}
+
+Bus --> JsonlTraceWriter
+Bus --> SystemTraceWriter
+Bus --> ArtifactWriter
+Bus --> FieldHistoryRecorder
+Bus --> WatchTraceWriter
+Bus --> WatchContractWriter
+Bus --> CommitJsonlWriter
+Bus --> CommitValidationReporter
+Bus --> InvariantTickJsonlWriter
+Bus --> VizStreamer
+Bus --> FabricHandshakeRecorder
+
+@enduml
+
+' END BLOCK: runtime/05_subscribers_matrix.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/06_influence_merge_semantics.puml
+' ============================================================
+@startuml
+autonumber
+title Influence Merge Semantics (Deterministic, Not Commutative)
+
+participant "TickScheduler" as TS
+participant "TickRunner" as TR
+participant "DetmSession" as S
+participant "detm.runtime.api" as API
+
+TS -> TR : due items (sorted by tick/order)
+loop due influences
+  TR -> TR : merged_overrides.update(dynamics_overrides)
+end
+
+note right of TR
+Deterministic order: scheduler queue order.
+If same key appears multiple times:
+last write wins (order-sensitive).
+=> Not commutative.
+end note
+
+TR -> S : step(override_influence, 1)
+S -> S : policy decision + chunking
+
+alt first chunk
+  S -> API : step(state, full influence, chunk_n_ticks)
+else subsequent chunks
+  S -> API : step(state, override-only influence, chunk_n_ticks)
+end
+
+S -> S : merge chunk observables
+note right of S
+_merge_observables contract:
+- events: concatenated in chunk order
+- cost: summed by key
+- signature/quality/field_summaries: last chunk
+end note
+
+@enduml
+
+' END BLOCK: runtime/06_influence_merge_semantics.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/07_l0_tick_state_machine.puml
+' ============================================================
+@startuml
+title L0 Tick Lifecycle State Machine (DetmSession)
+
+[*] --> Idle
+Idle --> Resetting : create()/reset()
+Resetting --> Ready
+
+Ready --> EvaluatingPolicy : step(influence, n_ticks)
+EvaluatingPolicy --> DirectStep : effective_n_ticks <= 0
+EvaluatingPolicy --> ChunkedStep : effective_n_ticks > 0
+
+DirectStep --> Publishing : publish step event
+
+state ChunkedStep {
+  [*] --> ChunkStart
+  ChunkStart --> CallAPI : api.step(chunk)
+  CallAPI --> ChunkBoundaryPublish : boundary crossed
+  CallAPI --> NextChunk : boundary not crossed
+  ChunkBoundaryPublish --> NextChunk
+  NextChunk --> ChunkStart : remaining > 0
+  NextChunk --> [*] : remaining == 0
+}
+
+ChunkedStep --> Publishing : final merged observables
+Publishing --> UpdateAdaptiveWindows
+UpdateAdaptiveWindows --> Ready
+
+Ready --> Closed : close()
+Closed --> [*]
+
+@enduml
+
+' END BLOCK: runtime/07_l0_tick_state_machine.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/08_eventbus_sync_contract.puml
+' ============================================================
+@startuml
+autonumber
+title EventBus Sync Contract (Potential Blocking)
+
+participant "Publisher\n(session/scheduler)" as Pub
+participant "EventBus" as Bus
+participant "Subscriber A" as A
+participant "Subscriber B" as B
+participant "Subscriber C" as C
+
+Pub -> Bus : publish(event, payload)
+Bus -> A : handler(payload)
+A --> Bus : return
+Bus -> B : handler(payload)
+B --> Bus : return
+Bus -> C : handler(payload)
+C --> Bus : return
+Bus --> Pub : publish() returns
+
+note right of Bus
+Synchronous and ordered by subscription.
+Any slow handler blocks whole publish chain
+(and can delay tick loop).
+end note
+
+@enduml
+
+' END BLOCK: runtime/08_eventbus_sync_contract.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/09_runtime_adaptive_window_state_machine.puml
+' ============================================================
+@startuml
+title Runtime Adaptive Window State Machine (LevelPolicy/DetmSession)
+
+[*] --> Manual
+
+state Manual {
+  [*] --> Monitoring
+}
+
+Manual --> AdaptiveWindow : signal_triggered && step_after > cooldown_until\nset profile + adaptive_until + cooldown_until
+AdaptiveWindow --> AdaptiveWindow : signal_triggered && step_after < adaptive_until\nextend adaptive_until (max)
+AdaptiveWindow --> Cooldown : step_after >= adaptive_until
+Cooldown --> Cooldown : signal_triggered && step_after <= cooldown_until\nignored (guard)
+Cooldown --> Manual : step_after > cooldown_until
+
+note right of Manual
+Mode in policy_decision:
+runtime_adaptive_profile = "manual"
+end note
+
+note right of AdaptiveWindow
+Mode in policy_decision:
+runtime_adaptive_profile = selected profile
+runtime_adaptive_window_active = true
+end note
+
+note right of Cooldown
+Window closed, re-entry blocked until cooldown expires.
+end note
+
+@enduml
+
+' END BLOCK: runtime/09_runtime_adaptive_window_state_machine.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/10_runtime_adaptive_telemetry_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title Runtime Adaptive Telemetry/Aggregation Sequence
+
+participant "DetmSession.step" as Step
+participant "policy_with_runtime_telemetry" as TelemetryFn
+participant "LevelPolicy" as Policy
+participant "_runtime_adaptive_telemetry_snapshot" as Snapshot
+participant "runtime telemetry deque" as Deque
+
+Step -> TelemetryFn : policy_with_runtime_telemetry(base_decision, observables)
+TelemetryFn -> Policy : runtime_adaptive_signal_hits(events, quality, cost)
+Policy --> TelemetryFn : signal_hits
+TelemetryFn -> Policy : runtime_adaptive_signal_triggered(..., signal_hits)
+Policy --> TelemetryFn : signal_triggered
+
+TelemetryFn -> Snapshot : snapshot(tick, signal_triggered, signal_hits, profile, window_active)
+Snapshot -> Policy : read sample_stride + aggregation_window
+Policy --> Snapshot : thresholds
+
+Snapshot -> Snapshot : include_hits = signal_triggered || tick % sample_stride == 0
+Snapshot -> Deque : append current record
+Snapshot -> Deque : trim to aggregation_window
+
+loop aggregate over window
+  Snapshot -> Snapshot : count triggered/window_active
+  Snapshot -> Snapshot : count profile_counts
+  Snapshot -> Snapshot : count signal_hit_counts
+end
+
+Snapshot --> TelemetryFn : sampled_hits, sampled_flag, aggregate
+TelemetryFn --> Step : PolicyDecision with telemetry fields
+
+note right of TelemetryFn
+PolicyDecision extensions:
+- runtime_adaptive_signal_triggered
+- runtime_adaptive_signal_hits
+- runtime_adaptive_signal_hits_sampled
+- runtime_adaptive_aggregate
+end note
+
+@enduml
+
+' END BLOCK: runtime/10_runtime_adaptive_telemetry_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: runtime/11_policydecision_runtime_adaptive_class.puml
+' ============================================================
+@startuml
+skinparam classAttributeIconSize 0
+title PolicyDecision Runtime-Adaptive Class View
+
+class LevelPolicy {
+  +active_level: str
+  +microsteps_per_global_tick: int
+  +batch_size: int
+  +commit_stride: int
+  +runtime_adaptive_* thresholds/guards/profile settings
+  --
+  +decide(step_count, requested_n_ticks): PolicyDecision
+  +decide_runtime_adaptive(step_count, requested_n_ticks, profile): PolicyDecision
+  +runtime_adaptive_signal_hits(events, quality, cost): dict[str,bool]
+  +runtime_adaptive_signal_triggered(...): bool
+}
+
+class ObservabilityProfile {
+  +allowed_event_types: tuple[str,...]
+  +detail_mode: str
+  +adaptive_signal_event_types: tuple[str,...]
+  +adaptive_detail_mode: str
+  +adaptive_hold_ticks: int
+  +adaptive_allowed_event_types: tuple[str,...]
+}
+
+class PolicyDecision {
+  +active_level: str
+  +requested_n_ticks: int
+  +effective_n_ticks: int
+  +batch_size: int
+  +commit_stride: int
+  +audit_commit_enabled: bool
+  +audit_commit_stride: int
+  +commit_boundary_crossed: bool
+  +allow_refinement: bool
+  +observability_profile: ObservabilityProfile
+  --
+  +runtime_adaptive_window_active: bool
+  +runtime_adaptive_profile: str
+  +runtime_adaptive_signal_triggered: bool
+  +runtime_adaptive_signal_hits: dict[str,bool]
+  +runtime_adaptive_signal_hits_sampled: bool
+  +runtime_adaptive_aggregate: dict[str,any]
+  +runtime_adaptive_guard: dict[str,any]
+}
+
+LevelPolicy ..> PolicyDecision : builds/returns
+PolicyDecision --> ObservabilityProfile : snapshot
+LevelPolicy --> ObservabilityProfile : default profile source
+
+note right of PolicyDecision
+Telemetry fields are populated in session step flow
+via policy_with_runtime_telemetry(...), then emitted
+with step event payload.
+end note
+
+@enduml
+
+' END BLOCK: runtime/11_policydecision_runtime_adaptive_class.puml
+
+' ============================================================
+' BEGIN BLOCK: runner/01_headless_components.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Headless Runner Components
+
+component "headless.main" as Main
+component "parser/options" as Options
+component "app_settings\n(load_merged_payload)" as Settings
+component "run_headless_request" as RunReq
+component "attach_headless_subscribers" as AttachSubs
+component "execute_headless_steps" as Exec
+component "DetmSession" as Session
+component "open_viz_transport" as VizOpen
+
+Main --> Options
+Main --> Settings
+Main --> VizOpen
+Main --> RunReq
+RunReq --> Session
+RunReq --> AttachSubs
+RunReq --> Exec
+AttachSubs --> "core subscribers"
+AttachSubs --> "fabric subscriber"
+AttachSubs --> "streaming subscribers"
+
+@enduml
+
+' END BLOCK: runner/01_headless_components.puml
+
+' ============================================================
+' BEGIN BLOCK: runner/02_headless_run_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title Headless Single Run Sequence
+
+actor User
+participant "headless.main" as Main
+participant "run_headless_request" as Run
+participant "DetmSession" as S
+participant "attach_headless_subscribers" as Subs
+participant "execute_headless_steps" as Exec
+participant "detm.runtime.symbols" as Symbols
+
+User -> Main : main(argv)
+Main -> Main : parse args + build config/options
+Main -> Run : run_headless_request(request)
+Run -> S : DetmSession.create(config, seed)
+Run -> Subs : attach_headless_subscribers(...)
+Run -> Exec : execute_headless_steps(...)
+
+loop steps loop
+  Exec -> Symbols : make_symbol(symbol_id)
+  Symbols --> Exec : DETMInfluence
+  Exec -> S : step(influence, n_ticks)
+end
+
+Run -> S : digest()
+Run -> S : close()
+Run --> Main : run summary
+Main --> User : exit code 0
+
+@enduml
+
+' END BLOCK: runner/02_headless_run_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: runner/03_shell_router_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title Shell Router Sequence
+
+actor User
+participant "main.py" as Entry
+participant "detm_app.runner.shell.main" as Shell
+participant "viewer_registry" as Registry
+participant "napari.lab.main" as Napari
+participant "headless.main" as Headless
+
+User -> Entry : main.py shell --controller ... --viewer ...
+Entry -> Shell : shell.main(argv)
+Shell -> Shell : build_shell_contract(...)
+Shell -> Registry : resolve_viewer_adapter(viewer)
+
+alt viewer=napari
+  Shell -> Registry : run_napari_viewer(...)
+  Registry -> Napari : napari.lab.main(args)
+else viewer=none
+  Shell -> Headless : headless.main(forwarded_args)
+end
+
+@enduml
+
+' END BLOCK: runner/03_shell_router_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: ui/01_napari_lab_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title Napari Lab Mode Sequence (producer + subscriber)
+
+actor User
+participant "napari.lab.main" as Lab
+participant "subprocess\nheadless.main" as Producer
+participant "TCP endpoint" as TCP
+participant "napari.subscriber" as Sub
+
+User -> Lab : main(argv)
+Lab -> Producer : Popen(headless bootstrap, --viz tcp ...)
+Lab -> Lab : wait_for_tcp_endpoint(...)
+Producer -> TCP : open/serve frames
+Lab -> Sub : run_napari_subscriber(host, port, ...)
+Sub -> TCP : poll/recv frames
+Sub --> User : live read-only visualization
+
+@enduml
+
+' END BLOCK: ui/01_napari_lab_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: ui/02_napari_interactive_detailed.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Napari Interactive Detailed Composition
+
+component "_InteractiveDockController" as Controller
+component "controls.py" as Controls
+component "settings.py" as Settings
+component "influence.py" as Influence
+component "actions/interaction.py" as ActionInteraction
+component "actions/mode.py" as ActionMode
+component "batch/request.py" as BatchRequest
+component "batch/state.py" as BatchState
+component "batch/toggle.py" as BatchToggle
+component "render.py\nNapariRenderFlow" as Render
+component "ui_wiring.py" as Wiring
+component "widget_io.py" as WidgetIO
+component "DetmUiRunner" as UiRunner
+component "napari Viewer" as Viewer
+
+Controller --> Controls
+Controller --> Settings
+Controller --> Influence
+Controller --> ActionInteraction
+Controller --> ActionMode
+Controller --> BatchRequest
+Controller --> BatchState
+Controller --> BatchToggle
+Controller --> Render
+Controller --> Wiring
+Controller --> WidgetIO
+Controller --> UiRunner
+Render --> Viewer
+
+@enduml
+
+' END BLOCK: ui/02_napari_interactive_detailed.puml
+
+' ============================================================
+' BEGIN BLOCK: ui/03_tk_runner_detailed.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Tk Runner Detailed Composition
+
+component "launcher.py\nlaunch_tk_ui" as Launcher
+component "flow/layout.py" as Layout
+component "flow/window.py" as Window
+component "flow/controls/builder.py" as ControlsBuilder
+component "flow/controls/influence.py" as ControlsInfluence
+component "flow/controls/runtime.py" as ControlsRuntime
+component "flow/controls/recording_viz.py" as ControlsRecViz
+component "flow/settings/flow.py" as SettingsFlow
+component "flow/settings/apply.py" as SettingsApply
+component "flow/settings/runtime_config.py" as RuntimeConfig
+component "flow/actions.py\nTkRuntimeActionFlow" as ActionFlow
+component "flow/batch.py\nTkBatchFlow" as BatchFlow
+component "flow/viz/flow.py\nTkVizFlow" as VizFlow
+component "DetmUiRunner" as UiRunner
+
+Launcher --> Layout
+Launcher --> Window
+Launcher --> ControlsBuilder
+Launcher --> SettingsFlow
+Launcher --> ActionFlow
+Launcher --> BatchFlow
+Launcher --> VizFlow
+
+ControlsBuilder --> ControlsInfluence
+ControlsBuilder --> ControlsRuntime
+ControlsBuilder --> ControlsRecViz
+SettingsFlow --> SettingsApply
+SettingsFlow --> RuntimeConfig
+
+ActionFlow --> UiRunner
+SettingsFlow --> UiRunner
+VizFlow --> UiRunner
+
+@enduml
+
+' END BLOCK: ui/03_tk_runner_detailed.puml
+
+' ============================================================
+' BEGIN BLOCK: transport/01_viz_transport_components.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Viz Transport Components
+
+component "open_viz_transport" as Open
+component "NullVizTransport" as Null
+component "TcpVizTransport" as Tcp
+component "VizClient" as Client
+component "VizDaemon" as Daemon
+component "transport.protocol\nsend_msg/recv_msg" as Protocol
+component "napari.subscriber" as Subscriber
+
+Open --> Null : enabled=false / transport=none
+Open --> Tcp : transport=tcp
+Tcp --> Client
+Tcp --> Daemon : optional local daemon
+Client --> Protocol
+Subscriber --> Protocol
+
+@enduml
+
+' END BLOCK: transport/01_viz_transport_components.puml
+
+' ============================================================
+' BEGIN BLOCK: transport/02_viz_message_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title Viz Frame Message Sequence (length-prefixed msgpack)
+
+participant "VizStreamer" as Streamer
+participant "VizTransport\n(TcpVizTransport)" as Transport
+participant "VizClient" as Client
+participant "TCP Socket" as Socket
+participant "VizSubscriber" as Sub
+participant "Protocol\n(send_msg/recv_msg)" as Protocol
+
+Streamer -> Transport : send_state(state_blob, tick, signature, meta)
+Transport -> Client : send_state(...)
+Client -> Protocol : send_msg(payload)
+Protocol -> Socket : 4-byte length + msgpack bytes
+Socket -> Sub : framed bytes
+Sub -> Protocol : recv_msg(socket)
+Protocol --> Sub : payload dict
+Sub -> Sub : decode + render frame
+
+@enduml
+
+' END BLOCK: transport/02_viz_message_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: fabric/01_namespace_map.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Fabric Namespace Map (detm.runtime.fabric)
+
+package "Core" {
+  component "envelope"
+  component "ack"
+  component "artifact_store/artifact_resolver"
+}
+
+package "Handshake" {
+  component "handshake/contracts"
+  component "handshake/policies"
+  component "handshake/service"
+}
+
+package "Quorum + Runtime" {
+  component "quorum/*"
+  component "quorum_report"
+  component "quorum_runtime"
+  component "runtime_bundle"
+  component "runtime_composer/*"
+  component "runtime_helpers"
+}
+
+package "Commit + Delivery" {
+  component "commit_ingress"
+  component "commit_delivery/*"
+  component "delivery/*"
+  component "delivery_receipts/*"
+  component "delivery_tracking/*"
+}
+
+package "Epoch + Consensus" {
+  component "epoch/*"
+  component "epoch_consensus/*"
+}
+
+package "Transport" {
+  component "transport/*"
+  component "tcp_transport/*"
+}
+
+package "Validator" {
+  component "validator/*"
+  component "validator_registry"
+}
+
+package "Validation/Reports" {
+  component "validation/*"
+  component "report_writer/*"
+}
+
+"runtime_composer/*" --> "handshake/service"
+"runtime_composer/*" --> "commit_ingress"
+"runtime_composer/*" --> "commit_delivery/*"
+"runtime_composer/*" --> "quorum_runtime"
+"runtime_composer/*" --> "transport/*"
+"runtime_composer/*" --> "validator/*"
+"runtime_composer/*" --> "epoch/*"
+
+@enduml
+
+' END BLOCK: fabric/01_namespace_map.puml
+
+' ============================================================
+' BEGIN BLOCK: fabric/02_runtime_composition.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Fabric Handshake Runtime Composition
+
+component "FabricHandshakeRecorder\n(detm_app.runtime.subscribers.fabric)" as Recorder
+component "compose_fabric_handshake_runtime" as Composer
+component "FabricTransportAdapter\n(open_fabric_transport)" as Transport
+component "FileFabricArtifactStore" as Store
+component "FabricArtifactResolver" as Resolver
+component "LocalFabricValidator" as Validator
+component "FabricEpochCoordinator" as Epoch
+component "FabricHandshakeService" as Service
+component "FabricAckIngressService" as AckIngress
+component "FabricQuorumRuntimeService" as QuorumRuntime
+component "FabricCommitIngressService" as CommitIngress
+component "FabricCommitDeliveryService" as Delivery
+component "DeliveryTrackingCoordinator" as DeliveryTracking
+component "ValidatorRegistry" as Registry
+component "FabricRuntimeReportWriter" as ReportWriter
+
+Recorder --> Composer
+Composer --> Transport
+Composer --> Store
+Composer --> Resolver
+Composer --> Validator
+Composer --> Epoch
+Composer --> Service
+Composer --> AckIngress
+Composer --> QuorumRuntime
+Composer --> CommitIngress
+Composer --> Delivery
+Composer --> DeliveryTracking
+Composer --> Registry
+Composer --> ReportWriter
+
+@enduml
+
+' END BLOCK: fabric/02_runtime_composition.puml
+
+' ============================================================
+' BEGIN BLOCK: fabric/03_commit_ack_quorum_sequence.puml
+' ============================================================
+@startuml
+autonumber
+title Fabric Commit -> Ack -> Quorum Sequence
+
+participant "Session bus" as Bus
+participant "FabricCommitIngressService" as Ingress
+participant "FabricTransportAdapter" as Transport
+participant "FabricHandshakeService" as Handshake
+participant "LocalFabricValidator" as Validator
+participant "FabricAckIngressService" as AckIngress
+participant "FabricQuorumRuntimeService" as Quorum
+
+Bus -> Ingress : publish commit_packet
+Ingress -> Transport : publish commit envelope
+Transport -> Handshake : on_commit_envelope(envelope)
+Handshake -> Validator : validate_commit(packet)
+Validator --> Handshake : ProofAck + TrustAck
+Handshake -> Transport : publish ack envelopes
+Transport -> AckIngress : on_ack_envelope
+AckIngress -> Quorum : register ack(s)
+Quorum --> Bus : publish quorum snapshot/report
+
+@enduml
+
+' END BLOCK: fabric/03_commit_ack_quorum_sequence.puml
+
+' ============================================================
+' BEGIN BLOCK: fabric/04_complexity_hotspots.puml
+' ============================================================
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Fabric Complexity Hotspots
+
+component "FabricHandshakeRecorder\n(detm_app runtime subscriber)" as Recorder
+component "runtime_composer" as Composer
+component "handshake service" as Handshake
+component "ack ingress" as AckIngress
+component "quorum runtime" as Quorum
+component "delivery runtime" as Delivery
+component "epoch coordinator" as Epoch
+component "transport adapter" as Transport
+component "validator registry" as Registry
+component "report writer" as Report
+
+Recorder --> Composer
+Composer --> Handshake
+Composer --> AckIngress
+Composer --> Quorum
+Composer --> Delivery
+Composer --> Epoch
+Composer --> Transport
+Composer --> Registry
+Composer --> Report
+
+note bottom of Handshake
+Hotspot 1: policy matrix
+(ack rules, retries, required validators)
+end note
+
+note bottom of Delivery
+Hotspot 2: guarantees + tracking
+(at-least-once, receipts, outbox)
+end note
+
+note bottom of Epoch
+Hotspot 3: consensus/watermark
+(ordering and safety boundaries)
+end note
+
+note bottom of Transport
+Hotspot 4: auth/tls/backpressure/dedup
+operational complexity
+end note
+
+@enduml
+
+' END BLOCK: fabric/04_complexity_hotspots.puml
+

@@ -1,0 +1,42 @@
+@startuml
+autonumber
+title Runtime Adaptive Telemetry/Aggregation Sequence
+
+participant "DetmSession.step" as Step
+participant "policy_with_runtime_telemetry" as TelemetryFn
+participant "LevelPolicy" as Policy
+participant "_runtime_adaptive_telemetry_snapshot" as Snapshot
+participant "runtime telemetry deque" as Deque
+
+Step -> TelemetryFn : policy_with_runtime_telemetry(base_decision, observables)
+TelemetryFn -> Policy : runtime_adaptive_signal_hits(events, quality, cost)
+Policy --> TelemetryFn : signal_hits
+TelemetryFn -> Policy : runtime_adaptive_signal_triggered(..., signal_hits)
+Policy --> TelemetryFn : signal_triggered
+
+TelemetryFn -> Snapshot : snapshot(tick, signal_triggered, signal_hits, profile, window_active)
+Snapshot -> Policy : read sample_stride + aggregation_window
+Policy --> Snapshot : thresholds
+
+Snapshot -> Snapshot : include_hits = signal_triggered || tick % sample_stride == 0
+Snapshot -> Deque : append current record
+Snapshot -> Deque : trim to aggregation_window
+
+loop aggregate over window
+  Snapshot -> Snapshot : count triggered/window_active
+  Snapshot -> Snapshot : count profile_counts
+  Snapshot -> Snapshot : count signal_hit_counts
+end
+
+Snapshot --> TelemetryFn : sampled_hits, sampled_flag, aggregate
+TelemetryFn --> Step : PolicyDecision with telemetry fields
+
+note right of TelemetryFn
+PolicyDecision extensions:
+- runtime_adaptive_signal_triggered
+- runtime_adaptive_signal_hits
+- runtime_adaptive_signal_hits_sampled
+- runtime_adaptive_aggregate
+end note
+
+@enduml

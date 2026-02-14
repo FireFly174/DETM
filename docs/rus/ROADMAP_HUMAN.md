@@ -1,6 +1,6 @@
 ﻿# ROADMAP (human)
 
-Обновлено: 2026-02-13
+Обновлено: 2026-02-14
 
 > Этот файл — человеческая версия roadmap в старом формате (как в `D:\github\game\ROADMAP.md`).
 > Детальная инженерная спецификация с PM-полями: `docs/rus/ROADMAP.md`.
@@ -28,7 +28,7 @@
 - [x] Есть network MVP: TCP relay/transport, TLS/HMAC, dedup, backpressure, delivery receipts
 - [x] Есть epoch/watermark + pre-consensus MVP + quorum/reporting
 - [x] Архитектурные docs/cards синхронизированы с текущим layout (`detm_app/runtime/*`, launcher `main.py`, `detm/runtime/fabric/*`)
-- [x] Тестовый snapshot зелёный: `pytest -q -> 331 passed, 1 skipped`
+- [x] Тестовый snapshot зелёный: `pytest -q -> 348 passed`
 
 ## Зафиксированные архитектурные решения
 
@@ -59,8 +59,8 @@
 - [ ] Нет code-contour фазы F (reaction operators + transferability + anti-Goodhart)
 - [ ] Нет N-D runtime модели и межуровневой геометрии
 - [ ] Нет отдельной formal спецификации `local-first + validation-sync` как R&D трека
-- [ ] Остался app-layer архитектурный долг (`config -> runner` coupling, hardcoded viewer path в shell, duplicated batch UI logic)
-- [ ] Остался runtime structural debt в `detm/runtime` (крупные monolith modules + placeholder migration path)
+- [x] Закрыт app-layer maintenance debt (`config -> runner` decoupling, viewer adapter registry, shared batch service)
+- [ ] Остался P1 runtime/app structural debt (крупные orchestration-модули: `detm/runtime/fabric/tcp_transport/transport.py`, `detm_app/runtime/subscribers/fabric/*`)
 
 ## План по этапам
 
@@ -75,7 +75,8 @@
 - [x] E-MNT-02: вынести `UiRunSettings` в отдельный config-model слой
 - [x] E-MNT-03: adapter-registry для viewer в `detm_app.runner.shell`
 - [x] E-MNT-04: единый batch service для napari/tk UI
-- [ ] E-MNT-05: декомпозиция крупных app-layer модулей (`runner/headless/*`, `napari/interactive/*`, `tk/runner/*`) — в процессе
+- [x] E-MNT-05: декомпозиция крупных app-layer модулей (`runner/headless/*`, `napari/interactive/*`, `tk/runner/*`)
+- [x] Pre-tag cleanup migration-артефактов: удалён `detm.py` (каноничный вход только `main.py`), переписаны boundary checks в устойчивом AST-формате, убраны дубли import-guard тестов
 
 ### Этап FAB (production baseline)
 
@@ -103,18 +104,18 @@
 
 ### Этап RT-MNT (`detm/runtime` structural refactor)
 
-- [ ] RT-MNT-01: декомпозиция `refinement/runtime.py` (`maybe_apply_refinement` pipeline split)
-- [ ] RT-MNT-02: разделение `level_policy/contracts.py` на model/normalize/decision
-- [ ] RT-MNT-03: декомпозиция `fabric/runtime_composer` + handshake normalize path
-- [ ] RT-MNT-04: убрать placeholder `serialization.migrate_state` и закрыть schema migration path
+- [x] RT-MNT-01: декомпозиция `refinement/apply.py` (`maybe_apply_refinement` pipeline split)
+- [x] RT-MNT-02: разделение `level_policy/*` на model/normalize/decision
+- [x] RT-MNT-03: декомпозиция `fabric/runtime_composer` + handshake normalize path
+- [x] RT-MNT-04: закрыть schema migration path в `detm/runtime/serialization/*`
 
 ## Следующие 5 шагов (приоритет)
 
-- [ ] 1. Закрыть `E-MNT-05` (декомпозиция крупных app-layer модулей)
-- [ ] 2. Закрыть `RT-MNT-01` (pipeline split в refinement runtime)
-- [ ] 3. Закрыть `RT-MNT-02` (split level_policy contracts)
-- [ ] 4. Закрыть `RT-MNT-03` (fabric composer/normalize split)
-- [ ] 5. Закрыть `RT-MNT-04` (schema migration вместо placeholder)
+- [ ] 1. Закрыть `F-01` (контур reaction/correction operators в коде)
+- [ ] 2. Закрыть `G-ND-01` (эволюция `DETMState` к `shape[N]`)
+- [ ] 3. Закрыть `F-02` (переносимость операторов)
+- [ ] 4. Закрыть `F-03` (anti-Goodhart readout + `goodhart_flag`)
+- [ ] 5. Закрыть `G-ND-02` (N-D контракты serialization/refinement/outerfields)
 
 ## Imported from game (кратко)
 

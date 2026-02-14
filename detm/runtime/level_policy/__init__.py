@@ -1,5 +1,5 @@
-"""LevelPolicy runtime contract and policy decisions."""
+"""Level policy models and runtime decision contracts."""
 
-from detm.runtime.level_policy.contracts import LevelPolicy, ObservabilityProfile, PolicyDecision
+from detm.runtime.level_policy.model import LevelPolicy, ObservabilityProfile, PolicyDecision
 
 __all__ = ["LevelPolicy", "ObservabilityProfile", "PolicyDecision"]

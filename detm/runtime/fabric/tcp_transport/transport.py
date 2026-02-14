@@ -2,18 +2,33 @@
 
 from __future__ import annotations
 
-import hashlib
-import hmac
 import json
 import socket
-import ssl
 import threading
 from collections import defaultdict
 from dataclasses import dataclass, field
 
 from detm.runtime.fabric import FabricEnvelope
-from detm.runtime.fabric.tcp_transport.relay import TcpFabricRelay
 from detm.runtime.fabric import FabricHandler
+from detm.runtime.fabric.tcp_transport.auth import (
+    attach_auth_payload,
+    compute_auth_sig,
+    verify_auth_payload,
+)
+from detm.runtime.fabric.tcp_transport.flow import (
+    close_transport,
+    connect_tcp_socket,
+    dispatch_envelope,
+    normalize_transport_config,
+    run_read_loop,
+    snapshot_transport,
+    start_local_relay_and_socket,
+)
+from detm.runtime.fabric.tcp_transport.relay import TcpFabricRelay
+from detm.runtime.fabric.tcp_transport.tls import (
+    maybe_wrap_client_tls_socket,
+    normalize_tls_identity_source,
+)
 from detm.runtime.fabric.transport.idempotency import EnvelopeIdempotencyCache
 
 
@@ -52,24 +67,13 @@ class TcpFabricTransport:
 
     def __post_init__(self) -> None:
         self._handlers = defaultdict(list)
-        self.auth_key = None if self.auth_key is None else str(self.auth_key)
-        self.auth_key_id = None if self.auth_key_id is None else str(self.auth_key_id).strip() or None
-        self.tls_server_hostname = (
-            None if self.tls_server_hostname is None else str(self.tls_server_hostname).strip() or None
-        )
-        self.tls_ca_file = None if self.tls_ca_file is None else str(self.tls_ca_file).strip() or None
-        self.tls_cert_file = None if self.tls_cert_file is None else str(self.tls_cert_file).strip() or None
-        self.tls_key_file = None if self.tls_key_file is None else str(self.tls_key_file).strip() or None
-        self.tls_client_ca_file = None if self.tls_client_ca_file is None else str(self.tls_client_ca_file).strip() or None
+        normalize_transport_config(self)
         self.tls_identity_source = self._normalize_tls_identity_source(self.tls_identity_source)
-        if bool(self.auth_enabled) and not str(self.auth_key or ""):
-            raise ValueError("auth_key must be non-empty when auth_enabled=true")
         self._dedup = EnvelopeIdempotencyCache(
             enabled=bool(self.dedup_ingress_enabled),
             ttl_ms=int(self.dedup_ttl_ms),
             max_entries=int(self.dedup_max_entries),
         )
-        self._sock.settimeout(0.2)
         self._reader = threading.Thread(target=self._read_loop, name="fabric-tcp-reader", daemon=True)
         self._reader.start()
 
@@ -97,24 +101,17 @@ class TcpFabricTransport:
         tls_identity_source: str = "auto",
         tls_identity_fallback_to_fingerprint: bool = False,
     ) -> "TcpFabricTransport":
-        sock = socket.create_connection((str(host), int(port)), timeout=float(timeout_s))
-        try:
-            sock = cls._maybe_wrap_client_tls_socket(
-                sock,
-                host=str(host),
-                tls_enabled=bool(tls_enabled),
-                tls_server_hostname=tls_server_hostname,
-                tls_ca_file=tls_ca_file,
-                tls_cert_file=tls_cert_file,
-                tls_key_file=tls_key_file,
-                tls_insecure_skip_verify=bool(tls_insecure_skip_verify),
-            )
-        except Exception:
-            try:
-                sock.close()
-            except OSError:
-                pass
-            raise
+        sock = connect_tcp_socket(
+            host=str(host),
+            port=int(port),
+            timeout_s=float(timeout_s),
+            tls_enabled=bool(tls_enabled),
+            tls_server_hostname=tls_server_hostname,
+            tls_ca_file=tls_ca_file,
+            tls_cert_file=tls_cert_file,
+            tls_key_file=tls_key_file,
+            tls_insecure_skip_verify=bool(tls_insecure_skip_verify),
+        )
         return cls(
             sock,
             dedup_ingress_enabled=bool(dedup_ingress_enabled),
@@ -160,38 +157,21 @@ class TcpFabricTransport:
         tls_identity_source: str = "auto",
         tls_identity_fallback_to_fingerprint: bool = False,
     ) -> "TcpFabricTransport":
-        relay = TcpFabricRelay(
-            host=host,
+        sock, relay = start_local_relay_and_socket(
+            host=str(host),
             port=int(port),
+            timeout_s=float(timeout_s),
             tls_enabled=bool(tls_enabled),
+            tls_server_hostname=tls_server_hostname,
+            tls_ca_file=tls_ca_file,
             tls_cert_file=tls_cert_file,
             tls_key_file=tls_key_file,
             tls_require_client_cert=bool(tls_require_client_cert),
             tls_client_ca_file=tls_client_ca_file,
-            tls_identity_source=tls_identity_source,
+            tls_insecure_skip_verify=bool(tls_insecure_skip_verify),
+            tls_identity_source=str(tls_identity_source),
             tls_identity_fallback_to_fingerprint=bool(tls_identity_fallback_to_fingerprint),
         )
-        relay.start()
-        r_host, r_port = relay.address
-        sock = socket.create_connection((r_host, int(r_port)), timeout=float(timeout_s))
-        try:
-            sock = cls._maybe_wrap_client_tls_socket(
-                sock,
-                host=str(r_host),
-                tls_enabled=bool(tls_enabled),
-                tls_server_hostname=tls_server_hostname,
-                tls_ca_file=tls_ca_file,
-                tls_cert_file=tls_cert_file,
-                tls_key_file=tls_key_file,
-                tls_insecure_skip_verify=bool(tls_insecure_skip_verify),
-            )
-        except Exception:
-            relay.stop()
-            try:
-                sock.close()
-            except OSError:
-                pass
-            raise
         return cls(
             sock,
             _relay=relay,
@@ -250,132 +230,25 @@ class TcpFabricTransport:
         return 1
 
     def _read_loop(self) -> None:
-        buf = b""
-        while self._running:
-            try:
-                chunk = self._sock.recv(4096)
-            except TimeoutError:
-                continue
-            except OSError:
-                break
-            if not chunk:
-                break
-            buf += chunk
-            while b"\n" in buf:
-                raw, buf = buf.split(b"\n", 1)
-                raw = raw.strip()
-                if not raw:
-                    continue
-                try:
-                    payload = json.loads(raw.decode("utf-8"))
-                except Exception:
-                    continue
-                if not isinstance(payload, dict):
-                    continue
-                if bool(self.auth_enabled) and not self._verify_auth_payload(payload):
-                    continue
-                try:
-                    envelope = FabricEnvelope.from_dict(payload)
-                except Exception:
-                    continue
-                if not self._dedup.allow(envelope):
-                    continue
-                self._dispatch(envelope)
+        run_read_loop(self)
 
     def _dispatch(self, envelope: FabricEnvelope) -> None:
-        keys = [
-            (envelope.channel, None),
-            (envelope.channel, envelope.mode),
-            ("*", None),
-            ("*", envelope.mode),
-        ]
-        for key in keys:
-            with self._lock:
-                handlers = list(self._handlers.get(key, []))
-            for handler in handlers:
-                handler(envelope)
+        dispatch_envelope(self, envelope)
 
     def close(self) -> None:
-        self._running = False
-        try:
-            self._sock.close()
-        except OSError:
-            pass
-        if self._reader is not None:
-            self._reader.join(timeout=0.5)
-            self._reader = None
-        if self._relay is not None and not self._keep_open:
-            self._relay.stop()
-            self._relay = None
-        with self._lock:
-            self._handlers.clear()
+        close_transport(self)
 
     def snapshot(self) -> dict[str, object]:
-        with self._lock:
-            return {
-                "enabled": True,
-                "kind": "tcp",
-                "address": {"host": str(self.address[0]), "port": int(self.address[1])},
-                "subscription_count": int(sum(len(v) for v in self._handlers.values())),
-                "dedup": self._dedup.snapshot(),
-                "auth": {
-                    "enabled": bool(self.auth_enabled),
-                    "key_id": self.auth_key_id,
-                    "verified_total": int(self._auth_verified_total),
-                    "rejected_total": int(self._auth_rejected_total),
-                    "missing_total": int(self._auth_missing_total),
-                    "bad_key_id_total": int(self._auth_bad_key_id_total),
-                },
-                "tls": {
-                    "enabled": bool(self.tls_enabled),
-                    "server_hostname": self.tls_server_hostname,
-                    "ca_file": self.tls_ca_file,
-                    "cert_file": self.tls_cert_file,
-                    "key_file": self.tls_key_file,
-                    "require_client_cert": bool(self.tls_require_client_cert),
-                    "client_ca_file": self.tls_client_ca_file,
-                    "insecure_skip_verify": bool(self.tls_insecure_skip_verify),
-                    "identity_source": self.tls_identity_source,
-                    "identity_fallback_to_fingerprint": bool(self.tls_identity_fallback_to_fingerprint),
-                },
-            }
+        return snapshot_transport(self)
 
     def _attach_auth(self, payload: dict[str, object]) -> dict[str, object]:
-        out = dict(payload)
-        key_id = str(self.auth_key_id or "").strip()
-        if key_id:
-            out["auth_key_id"] = key_id
-        out["auth_sig"] = self._compute_auth_sig(out)
-        return out
+        return attach_auth_payload(self, payload)
 
     def _verify_auth_payload(self, payload: dict[str, object]) -> bool:
-        raw_sig = str(payload.get("auth_sig", "")).strip()
-        if not raw_sig:
-            self._auth_missing_total += 1
-            self._auth_rejected_total += 1
-            return False
-        expected_key_id = str(self.auth_key_id or "").strip()
-        actual_key_id = str(payload.get("auth_key_id", "")).strip()
-        if expected_key_id and actual_key_id and actual_key_id != expected_key_id:
-            self._auth_bad_key_id_total += 1
-            self._auth_rejected_total += 1
-            return False
-        expected_sig = self._compute_auth_sig(payload)
-        ok = hmac.compare_digest(expected_sig, raw_sig)
-        if ok:
-            self._auth_verified_total += 1
-            return True
-        self._auth_rejected_total += 1
-        return False
+        return verify_auth_payload(self, payload)
 
     def _compute_auth_sig(self, payload: dict[str, object]) -> str:
-        key = str(self.auth_key or "").encode("utf-8")
-        canonical = dict(payload)
-        canonical.pop("auth_sig", None)
-        # Relay can inject transport identity metadata after sender-side signing.
-        canonical.pop("transport_identity", None)
-        body = json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-        return hmac.new(key, body, hashlib.sha256).hexdigest()
+        return compute_auth_sig(auth_key=self.auth_key, payload=payload)
 
     @staticmethod
     def _maybe_wrap_client_tls_socket(
@@ -389,28 +262,20 @@ class TcpFabricTransport:
         tls_key_file: str | None,
         tls_insecure_skip_verify: bool,
     ) -> socket.socket:
-        if not bool(tls_enabled):
-            return sock
-        ca_file = None if tls_ca_file is None else str(tls_ca_file).strip() or None
-        cert_file = None if tls_cert_file is None else str(tls_cert_file).strip() or None
-        key_file = None if tls_key_file is None else str(tls_key_file).strip() or None
-        server_hostname = (
-            None if tls_server_hostname is None else str(tls_server_hostname).strip() or None
-        ) or str(host).strip() or None
-        context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=ca_file)
-        if cert_file is not None:
-            context.load_cert_chain(certfile=cert_file, keyfile=key_file)
-        if bool(tls_insecure_skip_verify):
-            context.check_hostname = False
-            context.verify_mode = ssl.CERT_NONE
-        return context.wrap_socket(sock, server_hostname=server_hostname)
+        return maybe_wrap_client_tls_socket(
+            sock,
+            host=host,
+            tls_enabled=bool(tls_enabled),
+            tls_server_hostname=tls_server_hostname,
+            tls_ca_file=tls_ca_file,
+            tls_cert_file=tls_cert_file,
+            tls_key_file=tls_key_file,
+            tls_insecure_skip_verify=bool(tls_insecure_skip_verify),
+        )
 
     @staticmethod
     def _normalize_tls_identity_source(raw: str | object) -> str:
-        source = str(raw).strip().lower()
-        if source not in {"auto", "cn", "san", "fingerprint"}:
-            raise ValueError("tls_identity_source must be one of: auto|cn|san|fingerprint")
-        return source
+        return normalize_tls_identity_source(raw)
 
 
 __all__ = ["TcpFabricTransport"]

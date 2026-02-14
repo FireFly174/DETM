@@ -1,0 +1,63 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Fabric Namespace Map (detm.runtime.fabric)
+
+package "Core" {
+  component "envelope"
+  component "ack"
+  component "artifact_store/artifact_resolver"
+}
+
+package "Handshake" {
+  component "handshake/contracts"
+  component "handshake/policies"
+  component "handshake/service"
+}
+
+package "Quorum + Runtime" {
+  component "quorum/*"
+  component "quorum_report"
+  component "quorum_runtime"
+  component "runtime_bundle"
+  component "runtime_composer/*"
+  component "runtime_helpers"
+}
+
+package "Commit + Delivery" {
+  component "commit_ingress"
+  component "commit_delivery/*"
+  component "delivery/*"
+  component "delivery_receipts/*"
+  component "delivery_tracking/*"
+}
+
+package "Epoch + Consensus" {
+  component "epoch/*"
+  component "epoch_consensus/*"
+}
+
+package "Transport" {
+  component "transport/*"
+  component "tcp_transport/*"
+}
+
+package "Validator" {
+  component "validator/*"
+  component "validator_registry"
+}
+
+package "Validation/Reports" {
+  component "validation/*"
+  component "report_writer/*"
+}
+
+"runtime_composer/*" --> "handshake/service"
+"runtime_composer/*" --> "commit_ingress"
+"runtime_composer/*" --> "commit_delivery/*"
+"runtime_composer/*" --> "quorum_runtime"
+"runtime_composer/*" --> "transport/*"
+"runtime_composer/*" --> "validator/*"
+"runtime_composer/*" --> "epoch/*"
+
+@enduml
