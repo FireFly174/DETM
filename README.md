@@ -130,8 +130,6 @@ DETM:
 - `docs/README.md`
 - `docs/BRANCHING.md` (branching policy: `dev/main` -> `main`)
 
----
-
 ## Конфигурация запуска (1 файл)
 
 По умолчанию `python main.py` использует локальный файл `config.example.py` в корне репозитория:
@@ -181,5 +179,3 @@ DETM:
 - Кодекс поведения: `CODE_OF_CONDUCT.md`
 - Правила security-репортов: `SECURITY.md`
 - Поддержка и каналы связи: `SUPPORT.md`
-- Чеклист публичного релиза: `PUBLIC_RELEASE_CHECKLIST.md`
-

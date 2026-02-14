@@ -34,6 +34,9 @@ outputs/
 *.ckpt
 *.log
 PROMT_SHORT.md
+AGENTS.md
+PUBLIC_RELEASE_CHECKLIST.md
+PUBLIC_REPO_GOVERNANCE.md
 bundle_project.py
 *_bundle.txt
 Prev_proj.txt

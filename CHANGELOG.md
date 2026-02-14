@@ -7,8 +7,7 @@ All notable changes to this project are documented in this file.
 - Added explicit branching policy and workflow docs:
   - `docs/BRANCHING.md`
   - `CONTRIBUTING.md` updates for `dev/main` -> `main` release flow
-- Clarified public release checklist links and required check names:
-  - `PUBLIC_RELEASE_CHECKLIST.md`
+- Clarified public release process and required check names.
 - Moved legal docs under `docs/legal/*` and synchronized root/docs links.
 - Updated dependency manifest for default launcher and experiment tooling:
   - `requirements.txt` now includes runtime UI/analysis dependencies used by default paths
