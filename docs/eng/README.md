@@ -10,3 +10,4 @@ Start here:
 - Integration contract: `docs/eng/integration_contract.md`
 - Source materials mapping: `docs/eng/90_notes/source_materials.md`
 - Branching policy (shared): `docs/BRANCHING.md`
+- Book (EN v2, non-canon): `docs/book/en_v2/_compiled_v2.md`
