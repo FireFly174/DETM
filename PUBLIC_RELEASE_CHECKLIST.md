@@ -30,6 +30,11 @@ This file captures the remaining steps to make the repository public safely.
   - required status checks (`CI`, `torch-tests`)
   - block force-push
   - require PR review for protected branches (if desired)
+- [ ] Enable auto-delete for merged branches.
+- [ ] Prune stale branches (local and remote) before switching visibility.
+- [ ] Lock down Actions permissions:
+  - default workflow token permissions: read-only
+  - no broad write permissions unless explicitly needed by workflow
 - [ ] Add repository topics and short public description.
 - [ ] Add Social Preview image.
 - [ ] Decide whether Discussions should be enabled.
@@ -43,3 +48,7 @@ This file captures the remaining steps to make the repository public safely.
 - [ ] Add a minimal roadmap badge or status badge to `README.md`.
 - [ ] Add pinned example command outputs/screenshots in docs.
 - [ ] Publish first GitHub Release based on `v0.2.0`.
+
+## Governance Notes
+
+- Maintainer playbook: `PUBLIC_REPO_GOVERNANCE.md`
