@@ -1,6 +1,6 @@
-# Experiment: marker scaling
+﻿# Experiment: marker scaling
 
-Note: first-pass translation of `docs/rus/40_experiments/exp_marker_scaling.md`.
+Note: first-pass translation of `docs/rus/50_experiments/exp_marker_scaling.md`.
 
 Goal: evaluate how markers/structures behave under scale changes and coarsening schedules.
 
@@ -12,3 +12,4 @@ When changing lattice size `N`, comparisons are only meaningful if you explicitl
 - fix `E_total ∝ N` or `E_total ∝ N^2` (depending on the intended scaling interpretation)
 
 Record the chosen normalization in the run `meta/config` so metrics are comparable.
+

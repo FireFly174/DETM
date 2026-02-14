@@ -1,6 +1,6 @@
-# Metrics and observables
+﻿# Metrics and observables
 
-Note: first-pass translation of `docs/rus/40_experiments/metrics.md`.
+Note: first-pass translation of `docs/rus/50_experiments/metrics.md`.
 
 ## General principles
 
@@ -99,3 +99,4 @@ If you have a mask, you can test how predictive the boundary is for the interior
 - reconstruction of `E_in` from `E_boundary` via a simple model (linear/ML, as an external analysis step)
 
 This lives in the interpretation layer, but provides useful diagnostics for regimes and interactions.
+

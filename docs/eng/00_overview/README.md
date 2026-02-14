@@ -48,9 +48,24 @@ DETM is not a physical/biological/cognitive theory. Any analogies outside the fo
 - `90_notes`: drafts and archives
 - `architecture.md`: repository and module overview
 
+Current EN parity:
+- core model/mechanisms/hypotheses/experiments/limits cards are mirrored from `docs/rus`.
+- architecture deep-cards and long-form research notes remain canonical in Russian.
+
 ---
 
 ## Project status
 
 The project is in an active research stage. Results are preliminary and must be validated by reproducible runs.
 
+Source-of-truth roadmap is maintained in Russian:
+- `docs/rus/ROADMAP.md`
+- `docs/rus/ROADMAP_HUMAN.md`
+
+English snapshot:
+- `docs/eng/00_overview/roadmap_snapshot.md`
+
+Development flow:
+- active development branch: `dev/main`
+- release branch: `main`
+- policy: `docs/BRANCHING.md`

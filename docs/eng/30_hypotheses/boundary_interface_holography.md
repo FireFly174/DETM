@@ -1,6 +1,6 @@
-# Boundary as an interface and “holography” (hypotheses)
+﻿# Boundary as an interface and “holography” (hypotheses)
 
-Note: first-pass translation of `docs/rus/30_hypotheses/boundary_interface_holography.md`.
+Note: first-pass translation of `docs/rus/40_hypotheses/boundary_interface_holography.md`.
 
 ## Boundary as an interaction interface
 
@@ -53,4 +53,5 @@ This is not physical holography; it is an operational statement about predictabi
 - masks and boundaries: `docs/eng/40_experiments/exp_object_masks.md`
 - transfer speed / lags: `docs/eng/40_experiments/exp_transfer_speed.md`
 - metric summary: `docs/eng/40_experiments/metrics.md`
+
 

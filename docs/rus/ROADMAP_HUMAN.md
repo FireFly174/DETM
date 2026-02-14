@@ -29,6 +29,7 @@
 - [x] Есть epoch/watermark + pre-consensus MVP + quorum/reporting
 - [x] Архитектурные docs/cards синхронизированы с текущим layout (`detm_app/runtime/*`, launcher `main.py`, `detm/runtime/fabric/*`)
 - [x] Тестовый snapshot зелёный: `pytest -q -> 348 passed`
+- [x] Веточная политика зафиксирована: разработка через `dev/main`, релизы через `main` (`docs/BRANCHING.md`)
 
 ## Зафиксированные архитектурные решения
 
@@ -108,6 +109,14 @@
 - [x] RT-MNT-02: разделение `level_policy/*` на model/normalize/decision
 - [x] RT-MNT-03: декомпозиция `fabric/runtime_composer` + handshake normalize path
 - [x] RT-MNT-04: закрыть schema migration path в `detm/runtime/serialization/*`
+
+### Этап PUB (public packaging, non-blocking)
+
+- [ ] PUB-01: добавить 3-5 demo assets (`docs/assets`) и встроить их в `README.md`
+- [ ] PUB-02: зафиксировать 2-3 каноничных визуальных пресета с командами воспроизведения
+- [ ] PUB-03: сделать one-page описание проекта (RU/EN)
+- [ ] QLT-01: усилить docstrings/type hints для ключевых runtime API
+- [ ] DAGM-01: оформить RFC по отдельному DAGM general-graph runtime треку (без срыва текущего фокуса)
 
 ## Следующие 5 шагов (приоритет)
 

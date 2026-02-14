@@ -1,6 +1,6 @@
-# Object masks and boundary diagnostics
+﻿# Object masks and boundary diagnostics
 
-Note: first-pass translation of `docs/rus/40_experiments/exp_object_masks.md`.
+Note: first-pass translation of `docs/rus/50_experiments/exp_object_masks.md`.
 
 ## Why this exists
 
@@ -66,4 +66,5 @@ Practically:
 - transfer speed inside the object and across its boundary (see `docs/eng/40_experiments/exp_transfer_speed.md`).
 
 Metric summary: `docs/eng/40_experiments/metrics.md`.
+
 

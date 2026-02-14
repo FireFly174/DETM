@@ -58,6 +58,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - Зафиксирован канон DETM и north star (`PROMT.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`).
 - Граница `detm`/`detm_app` очищена; legacy entrypoints удалены.
 - `System Trace`/`Watch Trace` и `watch_contract` в production-контуре.
+- Веточный контур разработки зафиксирован: активная разработка идёт через `dev/main`, `main` используется как release-ветка (`docs/BRANCHING.md`).
 
 ### Runtime/Fabric
 
@@ -132,6 +133,18 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `RT-MNT-02` Разделение `level_policy/*` на model/normalize/decision слои.
 - `RT-MNT-03` Разделение `fabric/runtime_composer/composer.py` и handshake-normalize path на более мелкие сервисы.
 - `RT-MNT-04` Завершение schema migration контура в `serialization/*` (убрать placeholder `migrate_state`).
+
+## WS-PUB — Public Research Packaging (non-blocking)
+
+Цель: усилить публичную читаемость и воспроизводимость проекта без изменения канона L0/runtime.
+
+Состав:
+
+- `PUB-01` Demo assets в `docs/assets` (визуальный baseline для README).
+- `PUB-02` Каноничный пакет визуальных пресетов.
+- `PUB-03` One-page overview (RU/EN) для быстрого входа.
+- `QLT-01` Code-level docstrings/type hints для ключевых runtime-модулей.
+- `DAGM-01` RFC по general-graph runtime треку (DAGM beyond lattice).
 
 ## PM Registry (open items)
 
@@ -546,6 +559,91 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `risks`: silent data corruption при неполной миграции.
 - `dod`: migration path реализован и покрыт тестами; placeholder ветка удалена.
 - `readout` (2026-02-14): placeholder `migrate_state(...)` удалён; в `detm/runtime/serialization/*` добавлен формализованный migration registry с version graph и adapters (`0.0.0` legacy unversioned <-> `1.0.0`), `deserialize_state` теперь выполняет автоматическую миграцию legacy payload к канонической схеме, а `migrate_state(blob, from_version, to_version)` валидирует embedded-version и применяет versioned adapters; добавлены compatibility tests `tests/test_state_schema_migration.py`; публичные экспорты `migrate_state` добавлены в `detm.runtime.api`/`detm.runtime`; regression snapshots: `pytest -q tests/test_state_schema_migration.py -> 3 passed`, `pytest -q tests/test_integration_contract.py -> 2 passed`, `pytest -q -> 340 passed`.
+
+### PUB-01 — Demo assets для README и docs
+
+- `id`: `PUB-01`
+- `status`: `todo`
+- `priority`: `P0`
+- `owner_role`: `docs`
+- `target_date`: `2026-02-28`
+- `depends_on`: `[]`
+- `scope_in`: добавить 3-5 наглядных GIF/MP4 демо (рост структуры, коарсинг, устойчивый объект) и встроить в `README.md`/`docs/assets`.
+- `scope_out`: изменение runtime-логики, новые алгоритмы.
+- `deliverables`: curated demo assets + обновлённый блок preview в `README.md`.
+- `api_contract_changes`: нет.
+- `tests_required`: smoke-check ссылок/путей в docs, ручной sanity просмотр.
+- `readout_artifacts`: `docs/assets/*`, `README.md`.
+- `risks`: визуализации не отражают каноничный режим (маркетинг вместо факта).
+- `dod`: минимум 3 воспроизводимых демо-артефакта с подписью параметров запуска и ссылкой на сценарий.
+
+### PUB-02 — Каноничный пакет визуальных пресетов
+
+- `id`: `PUB-02`
+- `status`: `todo`
+- `priority`: `P0`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-03`
+- `depends_on`: `[PUB-01]`
+- `scope_in`: зафиксировать 2-3 публичных пресета (`classic_coarsing`, `stable_object`, `channel_tunnel`) с командами запуска и ожидаемыми артефактами.
+- `scope_out`: добавление новых фундаментальных механик.
+- `deliverables`: preset configs + короткие runbooks + ссылка в README/experiments docs.
+- `api_contract_changes`: нет (config-level only).
+- `tests_required`: reproducibility smoke (`headless` runs с фиксированными seed) + проверка наличия expected artifacts.
+- `readout_artifacts`: `experiments/*`, `runs/*` exemplar paths, docs references.
+- `risks`: пресеты окажутся нестабильными между окружениями/backend.
+- `dod`: каждый пресет воспроизводится одной командой и даёт documented artifacts (`catalog/metrics/summary/final_state`).
+
+### PUB-03 — One-page overview (RU/EN)
+
+- `id`: `PUB-03`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `docs`
+- `target_date`: `2026-03-05`
+- `depends_on`: `[PUB-01]`
+- `scope_in`: создать одностраничный обзор проекта (`что это`, `что это не`, `как запустить`, `куда смотреть дальше`) на RU/EN.
+- `scope_out`: глубокая переработка canonical docs/cards.
+- `deliverables`: `docs/rus/00_overview/one_pager.md`, `docs/eng/00_overview/one_pager.md`, ссылки из `README.md`/`docs/README.md`.
+- `api_contract_changes`: нет.
+- `tests_required`: docs link check.
+- `readout_artifacts`: one-pager files + README/docs index updates.
+- `risks`: дублирование и рассинхрон с canonical документацией.
+- `dod`: one-pager синхронизирован с roadmap и launch-командами, ссылки валидны.
+
+### QLT-01 — Code-level docstrings и type hints (runtime core)
+
+- `id`: `QLT-01`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-10`
+- `depends_on`: `[]`
+- `scope_in`: усилить docstrings/type hints в ключевых runtime-контрактах (`detm/runtime/api/*`, critical services в `detm_app/runtime/*`).
+- `scope_out`: масштабный refactor архитектуры и изменение runtime semantics.
+- `deliverables`: обновлённые сигнатуры и docstrings + краткая note о coverage зон.
+- `api_contract_changes`: нет (аннотации/док-комментарии, без изменения поведения).
+- `tests_required`: regression suite + static type check smoke (если включён).
+- `readout_artifacts`: updated runtime modules, test snapshot.
+- `risks`: расхождение docstrings с фактическим поведением.
+- `dod`: покрыты основные public API точки и orchestrator-контракты, regression без изменений поведения.
+
+### DAGM-01 — RFC: general-graph runtime трек
+
+- `id`: `DAGM-01`
+- `status`: `todo`
+- `priority`: `P2`
+- `owner_role`: `docs`
+- `target_date`: `2026-03-15`
+- `depends_on`: `[G-ND-01]`
+- `scope_in`: подготовить RFC/spec для отдельного runtime-трека DAGM на произвольном графе (границы с DETM-lattice, миграционный план, non-goals).
+- `scope_out`: реализация production-ready graph runtime в текущем цикле.
+- `deliverables`: RFC документ + decision matrix (benefits/risks/cost) + критерии старта отдельного workstream.
+- `api_contract_changes`: doc-level proposal only.
+- `tests_required`: concept-level scenario matrix.
+- `readout_artifacts`: RFC в `docs/rus/90_notes/*` (и EN short note при необходимости).
+- `risks`: преждевременный распыл фокуса до закрытия F/N-D.
+- `dod`: RFC явно разделяет `research idea` vs `execution plan`, без изменения канона текущего runtime.
 
 ## PM Registry (done doc-items)
 

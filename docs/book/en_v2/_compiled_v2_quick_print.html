@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>DETM - EN v2 (quick)</title>
+  <style>
+
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+border: none;
+border-top: 1px solid #1a1a1a;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">DETM - EN v2 (quick)</h1>
+</header>
+<h1 id="detm-book-en-v2-quick">DETM Book (EN v2 quick)</h1>
+<p><em>mode: print</em></p>
+<h2 id="содержание">Содержание</h2>
+<ol type="1">
+<li>Where to start (short hook, with teeth)</li>
+<li>Levels map (L0..L5)</li>
+<li>Quickstart (10 minutes)</li>
+<li>First aid: 5-minute diagnostic protocol</li>
+<li>Reader map</li>
+<li>How to read this book</li>
+<li>Level summaries (L0-L5), practical version</li>
+<li>Navigation cheat sheet (S-T-C)</li>
+<li>Invariants and tests</li>
+<li>Terms</li>
+<li>Index (terms, themes, operators)</li>
+<li>Case registry</li>
+</ol>
+<h2 id="where-to-start-short-hook-with-teeth">Where to start (short
+hook, with teeth)</h2>
+<p>Imagine a bridge.</p>
+<p>From the outside it can look healthy: smooth traffic, clean
+dashboards, green reports, confident speech. But a bridge does not stand
+on speech. It stands on load limits, joints, maintenance windows,
+corrosion control, and honest stress signals.</p>
+<p>Complex human systems fail in the same way. We usually see words
+first, and then try to repair reality with more words. But the break may
+be elsewhere:</p>
+<ul>
+<li>people ran out of basis resource and can only imitate
+participation,</li>
+<li>actions no longer produce verifiable effects,</li>
+<li>rules and metrics started training imitation,</li>
+<li>institutions defend captured interests instead of system
+resilience,</li>
+<li>the active regime has crossed a boundary and no longer
+converges.</li>
+</ul>
+<p>This is neither a moral sermon nor a motivation script. It is a
+diagnostic and operator handbook:</p>
+<ol type="1">
+<li>locate where causality broke,</li>
+<li>identify the active description level,</li>
+<li>apply the smallest operator that restores control.</li>
+</ol>
+<p>If you keep one idea in mind, keep this one. If you keep two ideas,
+let this be the first:</p>
+<blockquote>
+<p>Most hard conflicts inside systems are conflicts between levels of
+description.</p>
+</blockquote>
+<p>One actor talks about basis (L0), another about operations (L1),
+another about narratives (L2), another about metrics and rules (L3),
+another about institutions and power (L4), and another about boundaries
+(L5). They can all be locally correct and still produce global failure
+together.</p>
+<p>Two reading modes for you:</p>
+<ul>
+<li>Fast: open Quickstart, pick the nearest symptom, execute one first
+operator.</li>
+<li>Deep: go through L0-L5 and reconstruct the causal cascade
+end-to-end.</li>
+</ul>
+<p>If at any point the text feels abstract, treat that as a signal: you
+have not fixed the observable inputs and the scene scale yet.</p>
+<h2 id="levels-map-l0l5">Levels map (L0..L5)</h2>
+<p>The model uses six operational levels.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Question</th>
+<th>Typical failure</th>
+<th>Typical operator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Does the system still hold?</td>
+<td>basis collapse, fake participation</td>
+<td>stop, exit, load reduction</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Do actions produce verified effects?</td>
+<td>activity without effect</td>
+<td>minimal action + readout</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Which stories/roles gate behavior?</td>
+<td>rationalization, taboo, shame loops</td>
+<td>reframe + permission update</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Which metrics/rules define reality?</td>
+<td>Goodhart, metric theater</td>
+<td>axis policy, anti-capture checks</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Who can change rules legitimately?</td>
+<td>institutional capture</td>
+<td>governance reset, veto rights</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Where are the regime boundaries?</td>
+<td>delayed transition, hard crash</td>
+<td>transition protocol</td>
+</tr>
+</tbody>
+</table>
+<p>Use this map as routing logic, not ideology.</p>
+<h2 id="quickstart-10-minutes">Quickstart (10 minutes)</h2>
+<p><a id="quickstart"></a></p>
+<p>Start here if you want the operational core before reading the full
+theory. Do not optimize for perfect understanding on first pass;
+optimize for the first useful move.</p>
+<h3 id="1-one-sentence-summary">1) One-sentence summary</h3>
+<p>Systems optimize what is cheaper to hold right now. They fail where
+regime-holding cost stops converging.</p>
+<h3 id="2-60-second-map-l0-l5">2) 60-second map (L0-L5)</h3>
+<ul>
+<li><strong>L0 (basis):</strong> is there enough
+resource/safety/trust/stopping rights for causality to exist?</li>
+<li><strong>L1 (step -&gt; effect):</strong> do we have a minimal action
+and readout, or only visible activity?</li>
+<li><strong>L2 (stories/roles):</strong> which narratives make action
+allowed, blocked, or shameful?</li>
+<li><strong>L3 (rules/metrics):</strong> which axes define reality, and
+who pays the cost of those rules?</li>
+<li><strong>L4 (institutions/power):</strong> who can change rules and
+why that is considered legitimate?</li>
+<li><strong>L5 (boundaries):</strong> where the regime stops converging
+and transition operators are required.</li>
+</ul>
+<h3 id="3-two-navigation-modes-depth-vs-breadth">3) Two navigation
+modes: depth vs breadth</h3>
+<ul>
+<li><strong>Depth-first</strong> when the system does not respond:
+restore causality by descending L3 -&gt; L1 -&gt; L0.</li>
+<li><strong>Breadth-first</strong> when causality is stable: compare
+options inside allowed space (usually L2-L3).</li>
+</ul>
+<p>Quick test: if &quot;any choice leads to the same trajectory&quot;, go
+depth-first.</p>
+<h3 id="4-fast-symptom-routing">4) Fast symptom routing</h3>
+<p>Use the nearest symptom and do one first move.</p>
+<ul>
+<li>&quot;Everything is urgent, fire mode, overload&quot; -&gt; start
+<code>L0-C1</code> (pause/stop as causal protection).</li>
+<li>&quot;People disengage, silent refusal, formal participation only&quot; -&gt;
+start <code>L0-C2</code> (refusal as truth sensor).</li>
+<li>&quot;System survives on heroic overuse&quot; -&gt; start <code>L0-C3</code>
+then <code>L0-C4</code> (recognize overspend, reduce obligations).</li>
+<li>&quot;Promises exceed capacity&quot; -&gt; start <code>L0-C4</code>
+(scope/obligation reduction).</li>
+<li>&quot;One toxic node infects everything&quot; -&gt; start <code>L0-C5</code>
+(quarantine coupling).</li>
+<li>&quot;Metrics improve while reality degrades&quot; -&gt; start
+<code>L0-C6</code> and <code>L3-C6</code> (restore feedback, break
+report game).</li>
+<li>&quot;Metric/narrative war, no shared reality axis&quot; -&gt; start
+<code>L3-C7</code> (explicit axis policy).</li>
+</ul>
+<h3 id="5-minimal-route-after-quickstart">5) Minimal route after
+quickstart</h3>
+<ol type="1">
+<li>Read <a href="#reader-map">Reader map</a> and choose your
+route.</li>
+<li>Open <a href="#nav-cheatsheet">Navigation cheat sheet</a> and use
+<code>Sx/Ty</code> and <code>Lx-Cn</code> codes.</li>
+<li>Continue with either:
+<ul>
+<li>practitioner route: L0 -&gt; L1 -&gt; L3 -&gt; L5,</li>
+<li>meaning/language route: L0 -&gt; L2 -&gt; L3 -&gt; L5.</li>
+</ul></li>
+</ol>
+<h2 id="first-aid-5-minute-diagnostic-protocol">First aid: 5-minute
+diagnostic protocol</h2>
+<p><a id="first-aid"></a></p>
+<p>When you do not know where to start, run this sequence.</p>
+<ol type="1">
+<li><p><strong>Choose scene scale (<code>S1..S5</code>)</strong> person,
+family, society/game, organization, state/institutions.</p></li>
+<li><p><strong>Fix 5-10 observable inputs</strong> facts before
+explanations: what repeats, what is measured, where cost
+appears.</p></li>
+<li><p><strong>Choose mode: depth or breadth</strong></p>
+<ul>
+<li>if readout is unstable and any choice keeps same failure -&gt; depth
+(<code>L1 -&gt; L0</code>),</li>
+<li>if readout is stable but goal/axis is unclear -&gt; breadth
+(<code>L2-L3</code>).</li>
+</ul></li>
+<li><p><strong>Pick one theme and one first operator</strong> route via
+Quickstart symptoms or <code>S/T/C</code> cheat sheet.</p></li>
+<li><p><strong>Validate readout</strong> what changed after the step, on
+what horizon. If nothing changed, go one level deeper.</p></li>
+</ol>
+<p>Practical hints:</p>
+<ul>
+<li>Heroic survival mode is usually a price architecture problem, not
+motivation shortage.</li>
+<li>Metric theater is fixed by restoring sensors and anti-imitation
+constraints, not by more reporting.</li>
+<li>Meaning conflict with no field effect is often an axis-policy
+conflict (L3), sometimes basis collapse (L0).</li>
+</ul>
+<p>Emergency priority rule:</p>
+<blockquote>
+<p>Preserve causality first, optimize goals second.</p>
+</blockquote>
+<h2 id="reader-map">Reader map</h2>
+<p><a id="reader-map"></a></p>
+<p>This book is a level ladder (L0-L5), but it is best read from your
+current task, not linearly. Use the route that matches your role and
+pressure mode.</p>
+<h3 id="if-you-are-an-engineerpractitioner">If you are an
+engineer/practitioner</h3>
+<p>Goal: restore causality and controllability; reduce imitation
+cost.</p>
+<ul>
+<li>Prioritize: L0 (basis), L1 (minimal operation/readout), L3
+(rules/metrics), L5 (boundaries).</li>
+<li>Typical scenes: S4 (organization), S1 (person).</li>
+<li>Main question: &quot;What makes truthful action cheaper than
+imitation?&quot;</li>
+</ul>
+<p>Route: L0 -&gt; L1 -&gt; L3 -&gt; L5. Use L2/L4 only when blocked by
+legitimacy or taboo dynamics.</p>
+<h3 id="if-you-are-a-managerleader">If you are a manager/leader</h3>
+<p>Goal: redesign participation cost so the system does not depend on
+heroics.</p>
+<ul>
+<li>Prioritize: L0, L3, L4, L5.</li>
+<li>Typical scenes: S4, S5.</li>
+<li>Main question: &quot;Who pays now, and where does the bill surface next
+month/quarter?&quot;</li>
+</ul>
+<p>Route: L0 -&gt; L3 -&gt; L4 -&gt; L5. Return to L1 when feedback
+loops are too long or noisy.</p>
+<h3 id="if-you-are-a-researcheranalyst">If you are a
+researcher/analyst</h3>
+<p>Goal: model systems without collapsing too early into one favorite
+cause.</p>
+<ul>
+<li>Prioritize: L2 (models/language), L3 (axes/projections), L5
+(applicability boundaries), always cross-check with L0.</li>
+<li>Typical scenes: S3-S5.</li>
+<li>Main question: &quot;Which inputs are we not observing, and which axis is
+silently treated as reality?&quot;</li>
+</ul>
+<p>Route: L0 -&gt; L2 -&gt; L3 -&gt; L5 -&gt; L4 (when power
+distribution matters).</p>
+<h3 id="if-you-are-new-to-the-framework">If you are new to the
+framework</h3>
+<p>Goal: get a practical map without overloading with formalism.</p>
+<ul>
+<li>Start from <a href="#quickstart">Quickstart</a>.</li>
+<li>Then read Thesis and How to read.</li>
+<li>Keep three anchors in mind: L0 (basis), L1 (step-&gt;effect), L5
+(boundary).</li>
+<li>If text feels abstract, jump to <a href="#nav-cheatsheet">Navigation
+cheat sheet</a> and route by code.</li>
+</ul>
+<p>Route: Quickstart -&gt; Thesis -&gt; How to read -&gt; L0 -&gt; L1
+-&gt; (L2 or L3) -&gt; L5. If this still feels heavy, run only one scene
+(<code>Sx</code>) and one operator (<code>Lx-Cn</code>) first.</p>
+<h3 id="student-route">Student route</h3>
+<p>Goal: learn system diagnostics without pretending certainty.</p>
+<ul>
+<li>Start with Quickstart and Level summaries.</li>
+<li>Practice with one real scene and one minimal operator.</li>
+<li>Treat &quot;I do not know yet&quot; as valid diagnostic state.</li>
+</ul>
+<p>Route: Quickstart -&gt; Level summaries -&gt; L0 -&gt; L1 -&gt;
+Appendix.</p>
+<p>If the model feels too broad, narrow scene first (S1..S5) before
+making claims.</p>
+<h2 id="how-to-read-this-book">How to read this book</h2>
+<p>The book is organized as L0-L5, but each level should be read in
+projection to others: what this level changes below, and what it looks
+like from above.</p>
+<p>Primary rule:</p>
+<blockquote>
+<p>Do not transport conclusions outside their basis.</p>
+</blockquote>
+<p>If argument collapses in the current basis, this is often a
+convergence failure signal, not a debate failure.</p>
+<p>Recommended routes:</p>
+<ul>
+<li>Fast route: L0 -&gt; L3 -&gt; L5.</li>
+<li>Engineering route: L0 -&gt; L1 -&gt; L3 -&gt; L4 -&gt; L5.</li>
+<li>Meaning route: L0 -&gt; L2 -&gt; L3 -&gt; L4 -&gt; L5.</li>
+</ul>
+<h3 id="two-orthogonal-navigation-modes">Two orthogonal navigation
+modes</h3>
+<h4 id="depth-first-causal-reachability-check">Depth-first (causal
+reachability check)</h4>
+<p>Use depth when &quot;the system does not respond&quot;: readout is unstable,
+any choice yields same failure, or control becomes symbolic.</p>
+<p>Depth path: L3 -&gt; L1 -&gt; L0.</p>
+<p>Objective: recover minimal causal coupling before optimizing
+goals.</p>
+<h4 id="breadth-first-option-search-in-stable-regime">Breadth-first
+(option search in stable regime)</h4>
+<p>Use breadth when readout is stable and causality holds.</p>
+<p>Breadth usually operates at L2-L3: change frame, role contract, axis
+policy, local tactics.</p>
+<p>Objective: choose better option inside current boundaries.</p>
+<p>Switching rule:</p>
+<ul>
+<li>unstable readout -&gt; depth,</li>
+<li>stable readout -&gt; breadth.</li>
+</ul>
+<h3 id="integral-intuition-of-levels">Integral intuition of levels</h3>
+<p>A useful reading heuristic:</p>
+<blockquote>
+<p>Ln is accumulated trace of Ln-1 repeated long enough to become cheap
+norm.</p>
+</blockquote>
+<p>What appears at higher levels as institution/rule/identity was
+previously repeated lower-level behavior with convergent cost.</p>
+<p>Examples:</p>
+<ul>
+<li>L2 as integral of L1: repeated actions and their prices become
+narratives/roles.</li>
+<li>L3 as integral of L2: narratives crystallize into
+metrics/rules/contracts.</li>
+<li>L4 as integral of L3: rules outlive individuals as institutions and
+sanction systems.</li>
+<li>L5 as integral of all levels: boundary surface where aggregate drift
+becomes visible.</li>
+</ul>
+<p><img role="img" aria-label="Integral intuition of levels" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjgyMCIgdmlld0JveD0iMCAwIDE0MDAgODIwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAuYm94IHsgZmlsbDogI2Y4ZmFmYzsgc3Ryb2tlOiAjMGYxNzJhOyBzdHJva2Utd2lkdGg6IDI7IHJ4OiAxODsgfQogICAgICAudGl0bGUgeyBmb250OiA3MDAgMjhweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5oIHsgZm9udDogNzAwIDIycHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQ6IDUwMCAxOHB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLm11dGVkIHsgZm9udDogNTAwIDE2cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMzsgZmlsbDogbm9uZTsgbWFya2VyLWVuZDogdXJsKCNtKTsgfQogICAgICAuYXJyb3cyIHsgc3Ryb2tlOiAjNDc1NTY5OyBzdHJva2Utd2lkdGg6IDIuNTsgZmlsbDogbm9uZTsgbWFya2VyLWVuZDogdXJsKCNtMik7IH0KICAgICAgLnBpbGwgeyBmaWxsOiAjZTJlOGYwOyBzdHJva2U6ICM0NzU1Njk7IHN0cm9rZS13aWR0aDogMS41OyByeDogOTk5OyB9CiAgICAgIC5waWxsdGV4dCB7IGZvbnQ6IDYwMCAxNnB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMwZjE3MmE7IH0KICAgIDwvc3R5bGU+CiAgICA8bWFya2VyIGlkPSJtIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIxMCIgbWFya2VySGVpZ2h0PSIxMCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNIDAgMCBMIDEwIDUgTCAwIDEwIHoiIGZpbGw9IiMwZjE3MmEiLz4KICAgIDwvbWFya2VyPgogICAgPG1hcmtlciBpZD0ibTIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjEwIiBtYXJrZXJIZWlnaHQ9IjEwIiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzQ3NTU2OSIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgoKICA8cmVjdCBjbGFzcz0iYmciIHg9IjAiIHk9IjAiIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjgyMCIvPgoKICA8dGV4dCBjbGFzcz0idGl0bGUiIHg9IjYwIiB5PSI3MCI+0JjQvdGC0LXQs9GA0LDQu9GM0L3QsNGPINC40L3RgtGD0LjRhtC40Y8g0YPRgNC+0LLQvdC10Lk6IExuINC60LDQuiDQuNC90YLQtdCz0YDQsNC7IExu4oiSMTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjYwIiB5PSIxMDUiPtCh0LzRi9GB0Ls6INC/0L7QstGC0L7RgNGP0LXQvNGL0LUg0LvQvtC60LDQu9GM0L3Ri9C1INGI0LDQs9C4INC4INC40YUg0YbQtdC90LAsINC90LDQutC+0L/Qu9C10L3QvdGL0LUg0LLQviDQstGA0LXQvNC10L3QuCwg0LrRgNC40YHRgtCw0LvQu9C40LfRg9GO0YLRgdGPINCyINCx0L7Qu9C10LUgwqvQtNC+0LvQs9C+0LbQuNCy0YPRidGD0Y7CuyDRgdGC0YDRg9C60YLRg9GA0YMg0YHQu9C10LTRg9GO0YnQtdCz0L4g0YPRgNC+0LLQvdGPLjwvdGV4dD4KCiAgPCEtLSBCb3hlcyAtLT4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI5MCIgeT0iMTYwIiB3aWR0aD0iNTIwIiBoZWlnaHQ9IjExMCIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSIyOTAiIHdpZHRoPSI1MjAiIGhlaWdodD0iMTEwIi8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iOTAiIHk9IjQyMCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSIxMTAiLz4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI5MCIgeT0iNTUwIiB3aWR0aD0iNTIwIiBoZWlnaHQ9IjExMCIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSI2ODAiIHdpZHRoPSI1MjAiIGhlaWdodD0iMTEwIi8+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSIxMjAiIHk9IjIwNSI+TDE8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjE3MCIgeT0iMjA1Ij7QqNCw0LPQuCDQuCByZWFkb3V0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iMTIwIiB5PSIyMzgiPtC80LjQvdC40LzQsNC70YzQvdCw0Y8g0L7Qv9C10YDQsNGG0LjRjyDigKIg0LrQvtGA0L7RgtC60LjQuSDRhtC40LrQuyDigKIg0L/RgNC+0LLQtdGA0Y/QtdC80YvQuSDRjdGE0YTQtdC60YI8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSIxMjAiIHk9IjMzNSI+TDI8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjE3MCIgeT0iMzM1Ij7QmNGB0YLQvtGA0LjQuCDQuCDRgNC+0LvQuDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iMzY4Ij7Qu9C10LPQuNGC0LjQvNCw0YbQuNGPIOKAoiDRhNGA0LXQudC80Ysg4oCiIMKr0LrRgtC+INC80YsgLyDQstC+INGH0YLQviDQuNCz0YDQsNC10LzCuzwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9IjEyMCIgeT0iNDY1Ij5MMzwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTcwIiB5PSI0NjUiPtCe0YHQuCwg0LzQtdGC0YDQuNC60LgsINC60L7QvdGC0YDQsNC60YLRizwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iNDk4Ij7Qv9GA0LDQstC40LvQsCDQutCw0Log0LDRgNGF0LjRgtC10LrRgtGD0YDQsCDRhtC10L3RiyDigKIg0LTQsNGC0YfQuNC60Lgg4oCiINGB0LDQvdC60YbQuNC4PC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iMTIwIiB5PSI1OTUiPkw0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSIxNzAiIHk9IjU5NSI+0JjQvdGB0YLQuNGC0YPRgtGLINC4INCy0LvQsNGB0YLRjDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iNjI4Ij7Qv9GA0LDQstCwIOKAoiDQu9C10LPQuNGC0LjQvNC90L7RgdGC0Ywg4oCiINC60YLQviDQvNC+0LbQtdGCINC80LXQvdGP0YLRjCDQv9GA0LDQstC40LvQsDwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9IjEyMCIgeT0iNzI1Ij5MNTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTcwIiB5PSI3MjUiPtCT0YDQsNC90LjRhtGLINC4INC/0LXRgNC10YXQvtC00Ys8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSIxMjAiIHk9Ijc1OCI+0L/QvtCy0LXRgNGF0L3QvtGB0YLRjCDQvdCw0LHQu9GO0LTQtdC90LjRjyDigKIg0YDQtdC20LjQvNGLIOKAoiDCq9Cz0LTQtSDQu9C+0LzQsNC10YLRgdGPwrs8L3RleHQ+CgogIDwhLS0gVmVydGljYWwgYXJyb3dzICsgbGFiZWxzIC0tPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgMjcwIEwgMzUwIDI5MCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgNDAwIEwgMzUwIDQyMCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgNTMwIEwgMzUwIDU1MCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgNjYwIEwgMzUwIDY4MCIvPgoKICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iNjQ1IiB5PSIyMDgiIHdpZHRoPSI2NDAiIGhlaWdodD0iNTIiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjY3MCIgeT0iMjQyIj7QmNC90YLQtdCz0YDQsNC7INC/0L4g0LLRgNC10LzQtdC90Lg6IMKr0L/QvtCy0YLQvtGA0LXQvdC40LUgKyDRhtC10L3QsMK7IOKGkiDCq9C90L7RgNC80LAv0YHRgtGA0YPQutGC0YPRgNCwINGB0LvQtdC00YPRjtGJ0LXQs9C+INGD0YDQvtCy0L3Rj8K7PC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iYXJyb3cyIiBkPSJNIDYxMCAyMzQgTCA2NDIgMjM0Ii8+CgogIDwhLS0gUmlnaHQtc2lkZSBub3RlcyAtLT4KICA8dGV4dCBjbGFzcz0iaCIgeD0iNjkwIiB5PSIzMjAiPtCa0LDQuiDRh9C40YLQsNGC0Ywg0YHRgtGA0LXQu9C60YM8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI2OTAiIHk9IjM1MiI+0JXRgdC70Lgg0L3QsCBMbiDCq9Cy0LTRgNGD0LMg0L/QvtGP0LLQuNC70L7RgdGMwrs6PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzA1IiB5PSIzODIiPjEpINC40YnQuCDQvdCwIExu4oiSMSDQv9C+0LLRgtC+0YDRj9C10LzRi9C1INGI0LDQs9C4PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzA1IiB5PSI0MDgiPjIpINC/0YDQvtCy0LXRgNGMLCDQutCw0LrQsNGPINGG0LXQvdCwINC00LXQu9Cw0LvQsCDQuNGFIMKr0LTQtdGI0ZHQstGL0LzQuMK7PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzA1IiB5PSI0MzQiPjMpINGN0YLQviDQuCDQtdGB0YLRjCDQvNCw0YLQtdGA0LjQsNC7LCDQuNC3INC60L7RgtC+0YDQvtCz0L4g0LLRi9GA0L7RgdC70LAg0YHRgtGA0YPQutGC0YPRgNCwIExuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iNjkwIiB5PSI1MDAiPtCf0YDQuNC80LXRgCAo0LPRgNGD0LHQvik8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI2OTAiIHk9IjUzMiI+TDIgPSDiiKtMMTog0L/QvtCy0YLQvtGA0Y/QtdC80YvQtSDRiNCw0LPQuCArINC40YUg0YbQtdC90LAg4oaSINGA0L7Qu9GML9C40YHRgtC+0YDQuNGPPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNjkwIiB5PSI1NTgiPkwzID0g4oirTDI6INC40YHRgtC+0YDQuNC4INC60YDQuNGB0YLQsNC70LvQuNC30YPRjtGC0YHRjyDihpIg0L7RgdC4L9C80LXRgtGA0LjQutC4L9C60L7QvdGC0YDQsNC60YLRizwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjY5MCIgeT0iNTg0Ij5MNCA9IOKIq0wzOiDQv9GA0LDQstC40LvQsCDQttC40LLRg9GCINC00L7Qu9GM0YjQtSDQu9GO0LTQtdC5IOKGkiDQuNC90YHRgtC40YLRg9GC0Ys8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI2OTAiIHk9IjYxMCI+TDUgPSDiiKso0LLRgdC10LPQvik6INCy0LjQtNC90L4g0LPRgNCw0L3QuNGG0Ysg0YDQtdC20LjQvNCwINC4INC/0LXRgNC10YXQvtC00Ys8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNjAiIHk9IjgwNSI+REVUTSAvIMKr0KPRgNC+0LLQvdC4IEww4oCTTDXCuyAodjIpOiDRgdGF0LXQvNCwINC00LvRjyDRh9GC0LXQvdC40Y8sINC90LUgwqvQvNCw0YLQtdC80LDRgtC40YfQtdGB0LrQvtC1INC00L7QutCw0LfQsNGC0LXQu9GM0YHRgtCy0L7Cuy48L3RleHQ+Cjwvc3ZnPgo=" alt="Integral intuition of levels" /></p>
+<p>Operational implication: if something &quot;suddenly appeared&quot; at Ln,
+inspect repeated costed patterns at Ln-1.</p>
+<h3 id="field-intuition-one-system-multiple-control-fields">Field
+intuition: one system, multiple control fields</h3>
+<p>You can read L1-LL4 not as floors, but as interaction fields shaping
+trajectories:</p>
+<ul>
+<li>L1: short-range action-effect coupling,</li>
+<li>L2: state transformation through roles/identity/story,</li>
+<li>L3: signal and measurement field (Goodhart risk core),</li>
+<li>L4: institutional inertia and sanction gravity,</li>
+<li>L5: observation surface and applicability boundary.</li>
+</ul>
+<p>This is not physics reduction of humans. It is engineering discipline
+for descriptions: where causality is preserved, where it is not.</p>
+<p>A compact way to remember it: you can ignore gravity for a while, but
+gravity still settles the account. Usually with interest. In system
+terms, ignored constraints return as transition debt.</p>
+<h3 id="practical-invariants-while-reading">Practical invariants while
+reading</h3>
+<ol type="1">
+<li>If one KPI explains everything, you are likely in projection
+error.</li>
+<li>If stop/exit rights are taboo, your diagnostics are already
+biased.</li>
+<li>If report improves while field signal degrades, switch from
+optimization to anti-imitation mode.</li>
+<li>If no operator changes trajectory, descend one level.</li>
+<li>If conflict persists with no shared axis policy, treat it as L3/L4
+issue, not &quot;communication style&quot;.</li>
+</ol>
+<h3 id="minimal-chapter-protocol">Minimal chapter protocol</h3>
+<p>For each chapter do three passes:</p>
+<ol type="1">
+<li><strong>Observation pass:</strong> what is directly observable
+here?</li>
+<li><strong>Operator pass:</strong> what is the smallest
+<code>Lx-Cn</code> operator?</li>
+<li><strong>Validation pass:</strong> what readout must change if the
+operator works?</li>
+</ol>
+<p>If validation is absent, treat the step as narrative only.</p>
+<h3 id="diagnostic-bridge-l0---t1t7---l5">Diagnostic bridge: L0
+&lt;-&gt; T1..T7 &lt;-&gt; L5</h3>
+<p>The model can be used as one bridge:</p>
+<ul>
+<li>L0: where basis stress originates,</li>
+<li>T1..T7: reusable symptom themes,</li>
+<li>L5: where boundary crossing becomes visible.</li>
+</ul>
+<p><img role="img" aria-label="Diagnostic bridge map" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAwIiBoZWlnaHQ9Ijk4MCIgdmlld0JveD0iMCAwIDE2MDAgOTgwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAudGl0bGUgeyBmb250OiA4MDAgMzBweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zdWIgeyBmb250OiA1MDAgMThweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5oIHsgZm9udDogODAwIDE4cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQ6IDUwMCAxNnB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLm11dGVkIHsgZm9udDogNTAwIDE0cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAuY29sIHsgZmlsbDogI2Y4ZmFmYzsgc3Ryb2tlOiAjMGYxNzJhOyBzdHJva2Utd2lkdGg6IDI7IHJ4OiAxNDsgfQogICAgICAucm93IHsgZmlsbDogI2ZmZmZmZjsgc3Ryb2tlOiAjY2JkNWUxOyBzdHJva2Utd2lkdGg6IDEuNTsgcng6IDEyOyB9CiAgICAgIC50YWcgeyBmaWxsOiAjMGYxNzJhOyByeDogMTA7IH0KICAgICAgLnRhZ3RleHQgeyBmb250OiA4MDAgMTRweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjZmZmZmZmOyB9CiAgICAgIC5waWxsIHsgZmlsbDogI2UyZThmMDsgc3Ryb2tlOiAjNjQ3NDhiOyBzdHJva2Utd2lkdGg6IDEuMjU7IHJ4OiA5OTk7IH0KICAgICAgLnBpbGx0ZXh0IHsgZm9udDogNzAwIDEzcHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICM2NDc0OGI7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyBtYXJrZXItZW5kOiB1cmwoI20pOyB9CiAgICA8L3N0eWxlPgogICAgPG1hcmtlciBpZD0ibSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTSAwIDAgTCAxMCA1IEwgMCAxMCB6IiBmaWxsPSIjNjQ3NDhiIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDxyZWN0IGNsYXNzPSJiZyIgeD0iMCIgeT0iMCIgd2lkdGg9IjE2MDAiIGhlaWdodD0iOTgwIi8+CgogIDx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iNzAiIHk9IjcwIj7QlNC40LDQs9C90L7RgdGC0LjRh9C10YHQutCw0Y8g0YHQstGP0LfQutCwOiBMMCDihpQgVDHigJNUNyDihpQgTDU8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iNzAiIHk9IjEwNSI+0JjQtNC10Y86IMKr0L/QtdGA0LXQutC+0YEv0LTQtdGE0LjRhtC40YIg0LIg0LHQsNC30LjRgdC1IChMMCkg4oaSINGC0LjQv9C+0LLQvtC5INGA0LXQttC40LwgKFQpIOKGkiDQvdCw0LHQu9GO0LTQsNC10LzRi9C5INGB0LjQvNC/0YLQvtC8INC90LAg0L/QvtCy0LXRgNGF0L3QvtGB0YLQuCAoTDUpIOKGkiDQv9C10YDQstGL0Lkg0L7Qv9C10YDQsNGC0L7RgCDQtNC70Y8g0YHRgtCw0LHQuNC70LjQt9Cw0YbQuNC4wrsuPC90ZXh0PgoKICA8IS0tIENvbHVtbiBoZWFkZXJzIC0tPgogIDxyZWN0IGNsYXNzPSJjb2wiIHg9IjcwIiB5PSIxNTAiIHdpZHRoPSI0NzAiIGhlaWdodD0iNjQiLz4KICA8cmVjdCBjbGFzcz0iY29sIiB4PSI1NjUiIHk9IjE1MCIgd2lkdGg9IjQyMCIgaGVpZ2h0PSI2NCIvPgogIDxyZWN0IGNsYXNzPSJjb2wiIHg9IjEwMTAiIHk9IjE1MCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI2NCIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5NSIgeT0iMTkxIj5MMDog0YfRgtC+IMKr0L3QtSDRgtGP0L3QtdGCwrsgKNC/0LXRgNC10LrQvtGBKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0iaCIgeD0iNTkwIiB5PSIxOTEiPtCi0LXQvNCwIChUKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0iaCIgeD0iMTAzNSIgeT0iMTkxIj5MNTog0YfRgtC+INCy0LjQtNC90L4gwqvRgdCy0LXRgNGF0YPCuyAo0YHQuNC80L/RgtC+0LwpICsg0L/QtdGA0LLRi9C5INC+0L/QtdGA0LDRgtC+0YA8L3RleHQ+CgogIDwhLS0gUm93IHRlbXBsYXRlIHNldHRpbmdzIC0tPgogIDwhLS0gUm93cyB5OiAyNDAsIDMzMCwgNDIwLCA1MTAsIDYwMCwgNjkwLCA3ODAgLS0+CgogIDwhLS0gVDEgLS0+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjI0MCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iNzYiLz4KICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjI2MiIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+CiAgPHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iMjg0Ij5UMTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjI3MCI+0J/QtdGA0LXQs9GA0LXQsiDQutC+0L3RgtGD0YDQsCAvINC90LXRgiDQvtC60L3QsCDQvtGB0YLQsNC90L7QstC60Lg8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iMjk1Ij7Rg9GB0LrQvtGA0LXQvdC40LUgPiDQv9GA0L7QstC10YDRj9C10LzQvtGB0YLRjCwg0YbQtdC90LAg0L7RiNC40LHQutC4INGA0LDRgdGC0ZHRgiDQsdGL0YHRgtGA0LXQtSDQsdGD0YTQtdGA0LA8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iMjcwIj7QntGB0YLQsNC90L7QstC60LAgLyDQv9Cw0YPQt9CwINC60LDQuiDQt9Cw0YnQuNGC0LAg0L/RgNC40YfQuNC90L3QvtGB0YLQuDwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iMjcwIj7QodGA0YvQstGLLCDQsNCy0LDRgNC40LnQvdC+0YHRgtGMLCDCq9Cy0YHRkSDRgdGA0L7Rh9C90L7Cuywg0LrQsNGB0LrQsNC0INC+0YjQuNCx0L7QujwvdGV4dD4KICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iMTAzNSIgeT0iMjg2IiB3aWR0aD0iMTcyIiBoZWlnaHQ9IjI0Ii8+CiAgPHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxMDUwIiB5PSIzMDMiPtGB0YLQsNGA0YI6IEwwLUMxPC90ZXh0PgoKICA8IS0tIFQyIC0tPgogIDxyZWN0IGNsYXNzPSJyb3ciIHg9IjcwIiB5PSIzMzAiIHdpZHRoPSIxNDYwIiBoZWlnaHQ9Ijc2Ii8+CiAgPHJlY3QgY2xhc3M9InRhZyIgeD0iNTg1IiB5PSIzNTIiIHdpZHRoPSI1NCIgaGVpZ2h0PSIzMiIvPgogIDx0ZXh0IGNsYXNzPSJ0YWd0ZXh0IiB4PSI2MDAiIHk9IjM3NCI+VDI8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9Ijk1IiB5PSIzNjAiPtCm0LXQvdCwINGD0YfQsNGB0YLQuNGPINC90LUg0YHRhdC+0LTQuNGC0YHRjyAvINC/0YDQsNCy0LTRgyDQtNC10YDQttCw0YLRjCDRgdC70LjRiNC60L7QvCDQtNC+0YDQvtCz0L48L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iMzg1Ij7QstGL0YXQvtC0L9C80L7Qu9GH0LDQvdC40LUv0YHQsNCx0L7RgtCw0LYg0YHRgtCw0L3QvtCy0LjRgtGB0Y8g0YDQsNGG0LjQvtC90LDQu9GM0L3Ri9C8PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI2NTUiIHk9IjM2MCI+0J7RgtC60LDQtyDRg9GH0LDRgdGC0LLQvtCy0LDRgtGMIC8g0YDQsNC30YDRi9CyINGB0LLRj9C30Lgg0YEg0LvQvtC20YzRjjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iMzYwIj7Qo9GF0L7QtCDQsiDRgtC10L3RjCwg0LjQvNC40YLQsNGG0LjRjywgwqvQtNC10LvQsNC10Lwg0LLQuNC0wrssINC80LDRgdGB0L7QstGL0LUg0L7RgtC60LDQt9GLPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSIzNzYiIHdpZHRoPSIxNzIiIGhlaWdodD0iMjQiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9IjM5MyI+0YHRgtCw0YDRgjogTDAtQzI8L3RleHQ+CgogIDwhLS0gVDMgLS0+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjQyMCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iNzYiLz4KICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjQ0MiIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+CiAgPHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iNDY0Ij5UMzwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjQ1MCI+0J3QtdGCINCx0YPRhNC10YDQsC/RgNC10YHRg9GA0YHQsCDihpIg0YHQv9Cw0YHQsNC10LzRgdGPINC/0LXRgNC10YDQsNGB0YXQvtC00L7QvDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSI0NzUiPsKr0LTQvtGC0Y/QvdC10Lwg0L3QsCDQs9C10YDQvtC40LfQvNC1wrsg0LLQvNC10YHRgtC+INGD0L/RgNCw0LLQu9C10L3QuNGPINC4INC/0LXRgNC10YHQsdC+0YDQutC4INC90LDQs9GA0YPQt9C60Lg8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iNDUwIj7Qk9C10YDQvtC40YfQtdGB0LrQuNC5INGA0LXQttC40LwgKNC/0LXRgNC10YDQsNGB0YXQvtC0INGA0LXRgdGD0YDRgdCwINCy0LzQtdGB0YLQviDRg9C/0YDQsNCy0LvQtdC90LjRjyk8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjEwMzUiIHk9IjQ1MCI+0JLRi9Cz0L7RgNCw0L3QuNC1LCDQv9C+0LbQsNGA0Ysg0LrQsNC6INC90L7RgNC80LAsINC30LDQstC40YHQuNC80L7RgdGC0Ywg0L7RgiDQs9C10YDQvtC10LIsINC+0LHRgNGL0LI8L3RleHQ+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjEwMzUiIHk9IjQ2NiIgd2lkdGg9IjE3MiIgaGVpZ2h0PSIyNCIvPgogIDx0ZXh0IGNsYXNzPSJwaWxsdGV4dCIgeD0iMTA1MCIgeT0iNDgzIj7RgdGC0LDRgNGCOiBMMC1DMzwvdGV4dD4KCiAgPCEtLSBUNCAtLT4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNTEwIiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI3NiIvPgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iNTMyIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz4KICA8dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI1NTQiPlQ0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iNTQwIj7QntCx0Y/Qt9Cw0YLQtdC70YzRgdGC0LLQsCA+INC80L7RidC90L7RgdGC0YwgLyDQtNC+0LvQsyDRgNCw0YHRgtGR0YIg0LHRi9GB0YLRgNC10LUg0LLRi9C/0L7Qu9C90LXQvdC40Y88L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iNTY1Ij7QvdGD0LbQvdC+INGB0L3QuNC20LDRgtGMINC+0LHQtdGJ0LDQvdC40Y8g0LTQviDQsdCw0LfQuNGB0LAsINC40L3QsNGH0LUg0LTQtdGE0L7Qu9GCPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI2NTUiIHk9IjU0MCI+0KHQvdC40LbQtdC90LjQtSDQvtCx0Y/Qt9Cw0YLQtdC70YzRgdGC0LIg0LTQviDQsdCw0LfQuNGB0LAgKNC30LDQvNC+0YDQvtC30LrQsC/Rg9GA0LXQt9Cw0L3QuNC1KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iNTQwIj7QndC10LLRi9C/0L7Qu9C90LjQvNC+0YHRgtGMLCDQstC10YfQvdGL0LUg0L/QtdGA0LXQvdC+0YHRiywg0LTQtdCz0YDQsNC00LDRhtC40Y8g0LrQsNGH0LXRgdGC0LLQsCwg0LrRgNC40LfQuNGBPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSI1NTYiIHdpZHRoPSIxNzIiIGhlaWdodD0iMjQiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9IjU3MyI+0YHRgtCw0YDRgjogTDAtQzQ8L3RleHQ+CgogIDwhLS0gVDUgLS0+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjYwMCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iNzYiLz4KICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjYyMiIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+CiAgPHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iNjQ0Ij5UNTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjYzMCI+0KLQvtC60YHQuNGH0L3Ri9C5INGD0LfQtdC7L9C60L7QvdGC0YPRgCDQt9Cw0YDQsNC20LDQtdGCINC+0YHRgtCw0LvRjNC90L7QtTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSI2NTUiPtGA0LjRgdC6INGA0LDRgdC/0YDQvtGB0YLRgNCw0L3Rj9C10YLRgdGPLCDQvdGD0LbQtdC9INCx0LDRgNGM0LXRgC/QuNC30L7Qu9GP0YbQuNGPPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI2NTUiIHk9IjYzMCI+0JrQsNGA0LDQvdGC0LjQvSDRgNCw0LfRgNGL0LLQsCAo0LjQt9C+0LvRj9GG0LjRjyDRgtC+0LrRgdC40YfQvdC+0LPQviDRg9C30LvQsC/QutC+0L3RgtGD0YDQsCk8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjEwMzUiIHk9IjYzMCI+0JrQsNGB0LrQsNC0LCDQt9Cw0YDQsNC20LXQvdC40LUsINGA0LDRgdC/0L7Qu9C30LDQvdC40LUg0LrQvtC90YTQu9C40LrRgtC+0LIv0LjQvdGG0LjQtNC10L3RgtC+0LI8L3RleHQ+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjEwMzUiIHk9IjY0NiIgd2lkdGg9IjE3MiIgaGVpZ2h0PSIyNCIvPgogIDx0ZXh0IGNsYXNzPSJwaWxsdGV4dCIgeD0iMTA1MCIgeT0iNjYzIj7RgdGC0LDRgNGCOiBMMC1DNTwvdGV4dD4KCiAgPCEtLSBUNiAtLT4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNjkwIiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI3NiIvPgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iNzEyIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz4KICA8dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI3MzQiPlQ2PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iNzIwIj7QndC10YIg0LTQsNGC0YfQuNC60L7Qsi/Qv9GA0LDQstC00Ysg4oaSINC90LXQu9GM0LfRjyDRgNCw0LfQu9C+0LbQuNGC0Ywg0L/RgNC40YfQuNC90YMg0L3QsCDRiNCw0LPQuDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSI3NDUiPnJlYWRvdXQg0LvQvtC80LDQtdGC0YHRjywg0YHQuNGB0YLQtdC80LAg0L7Qv9GC0LjQvNC40LfQuNGA0YPQtdGCINC+0YLRh9GR0YI8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iNzIwIj7QktC+0YHRgdGC0LDQvdC+0LLQu9C10L3QuNC1INC+0LHRgNCw0YLQvdC+0Lkg0YHQstGP0LfQuCAo0YHQtNC10LvQsNGC0Ywg0L/RgNCw0LLQtNGDINC00LXRiNGR0LLQvtC5KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iNzIwIj7QoNC+0YHRgiDQuNC80LjRgtCw0YbQuNC4LCDQvNC10YLRgNC40LrQuCDQsdC10Lcg0Y3RhNGE0LXQutGC0LAsIMKr0L3QtdC/0L7QvdGP0YLQvdC+INGH0YLQviDRgNCw0LHQvtGC0LDQtdGCwrs8L3RleHQ+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjEwMzUiIHk9IjczNiIgd2lkdGg9IjE3MiIgaGVpZ2h0PSIyNCIvPgogIDx0ZXh0IGNsYXNzPSJwaWxsdGV4dCIgeD0iMTA1MCIgeT0iNzUzIj7RgdGC0LDRgNGCOiBMMC1DNjwvdGV4dD4KCiAgPCEtLSBUNyAtLT4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNzgwIiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI3NiIvPgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iODAyIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz4KICA8dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI4MjQiPlQ3PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iODEwIj7QmtC+0L3RhNC70LjQutGCINC+0YHQtdC5IC8g0LTRgNC10LnRhCDRgNC10YTQtdGA0LXQvdGB0LAgLyDCq9GH0YLQviDRgdGH0LjRgtCw0YLRjCDRgNC10LDQu9GM0L3QvtGB0YLRjNGOwrs8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iODM1Ij7Qv9C+0LvQuNGC0LjQutCwINC80LXRgtGA0LjQuiDQuCDQuNC90YLQtdGA0L/RgNC10YLQsNGG0LjQuSDRgdGC0LDQvdC+0LLQuNGC0YHRjyDQv9C+0LvQtdC8INCx0L7RjzwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNjU1IiB5PSI4MTAiPtCa0L7QvdGC0YDQvtC70Ywg0LjQvdGC0LXRgNC/0YDQtdGC0LDRhtC40LggKNC60LDQutC40LUg0L7RgdC4INGB0YfQuNGC0LDRjtGC0YHRjyDRgNC10LDQu9GM0L3QvtGB0YLRjNGOKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iODEwIj7QktC+0LnQvdCwINC80LXRgtGA0LjQuiwg0JPRg9C00YXQsNGA0YIg0LrQsNC6INC90L7RgNC80LAsINGB0L/QvtGAINC90LUg0L/RgNC+0LLQtdGA0Y/QtdC8PC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSI4MjYiIHdpZHRoPSIxNzIiIGhlaWdodD0iMjQiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9Ijg0MyI+0YHRgtCw0YDRgjogTDMtQzc8L3RleHQ+CgogIDwhLS0gQXJyb3dzIGJldHdlZW4gY29sdW1ucyAtLT4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDI3OCBMIDU2NSAyNzgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDM2OCBMIDU2NSAzNjgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDQ1OCBMIDU2NSA0NTgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDU0OCBMIDU2NSA1NDgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDYzOCBMIDU2NSA2MzgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDcyOCBMIDU2NSA3MjgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDgxOCBMIDU2NSA4MTgiLz4KCiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSAyNzggTCAxMDEwIDI3OCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSA5ODUgMzY4IEwgMTAxMCAzNjgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gOTg1IDQ1OCBMIDEwMTAgNDU4Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSA1NDggTCAxMDEwIDU0OCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSA5ODUgNjM4IEwgMTAxMCA2MzgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gOTg1IDcyOCBMIDEwMTAgNzI4Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSA4MTggTCAxMDEwIDgxOCIvPgoKICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjcwIiB5PSI5NDAiPtCf0L7QtNGB0LrQsNC30LrQsDog0LXRgdC70LggwqvQu9GO0LHQvtC5INCy0YvQsdC+0YAg0L3QtSDQvNC10L3Rj9C10YIg0YLRgNCw0LXQutGC0L7RgNC40Y7Cuywg0YHQvdCw0YfQsNC70LAg0LTQtdC70LDQuSDRiNCw0LMg0LLQs9C70YPQsdGMIChyZWFkb3V0L9Cx0LDQt9C40YEpLCDQuCDRgtC+0LvRjNC60L4g0L/QvtGC0L7QvCDQv9C10YDQtdCx0LjRgNCw0Lkg0LLQsNGA0LjQsNC90YLRiyDQstGI0LjRgNGMLjwvdGV4dD4KPC9zdmc+Cgo=" alt="Diagnostic bridge map" /></p>
+<h3 id="reading-discipline-under-uncertainty">Reading discipline under
+uncertainty</h3>
+<p>When you are unsure how to interpret a chapter, apply this fallback
+discipline:</p>
+<ol type="1">
+<li>Name the current scene (<code>S1..S5</code>) explicitly.</li>
+<li>Separate observed facts from interpretation in two lists.</li>
+<li>Pick one tentative operator and one falsification condition.</li>
+<li>Do not escalate narrative certainty before readout changes.</li>
+</ol>
+<p>This prevents the common failure mode where explanation quality grows
+while control quality declines. If in doubt, prefer a smaller truthful
+step over a larger elegant theory.</p>
+<h2 id="level-summaries-l0-l5-practical-version">Level summaries
+(L0-L5), practical version</h2>
+<p>This file is a compressed action-oriented synthesis. Use it when you
+need routing and first operators quickly.</p>
+<h3 id="l0---basis-existence-yesno">L0 - Basis (existence yes/no)</h3>
+<ul>
+<li>L0 is not personality language. It is minimum causal viability.</li>
+<li>If L0 is degraded, upper-level optimization will look coherent but
+behave non-causally.</li>
+<li>First operators are usually coarse and protective:
+<code>L0-C1</code> (pause), <code>L0-C4</code> (scope reduction),
+<code>L0-C6</code> (feedback restoration), <code>L0-C2</code> (refusal
+normalization).</li>
+</ul>
+<p>Action translation:</p>
+<ul>
+<li>Make stop/exit rights explicit and non-punitive.</li>
+<li>Reduce obligations to real capacity before process tuning.</li>
+<li>Restore one honest feedback channel or stop pretending control
+exists.</li>
+</ul>
+<p>Checklist:</p>
+<ul>
+<li>Are basic obligations defaulting repeatedly?</li>
+<li>Is stop/exit legally or socially available?</li>
+<li>Is there at least one honest readout after action?</li>
+</ul>
+<h3 id="l1---minimal-operation--readout">L1 - Minimal operation +
+readout</h3>
+<ul>
+<li>L1 is the minimal step and its verification.</li>
+<li>No readout means no control, even with high activity.</li>
+<li>Start by making verification cheap and frequent: <code>L1-C2</code>,
+<code>L1-C3</code>, <code>L1-C4</code>.</li>
+</ul>
+<p>Action translation:</p>
+<ul>
+<li>Define minimum operation and &quot;done = verified&quot; rule
+(<code>L1-C1</code>, <code>L1-C7</code>).</li>
+<li>Attach one or two low-cost readouts to each step.</li>
+<li>Shorten cycle time until readout stabilizes.</li>
+</ul>
+<p>Checklist:</p>
+<ul>
+<li>Is &quot;done&quot; equivalent to verified effect?</li>
+<li>Did we reduce parallel work enough to see signal?</li>
+</ul>
+<h3 id="l2---narratives-roles-legitimacyshame">L2 - Narratives, roles,
+legitimacy/shame</h3>
+<ul>
+<li>L2 controls what actions feel allowed or forbidden.</li>
+<li>Healthy L2 lowers truth cost and supports causal tests.</li>
+<li>Pathological L2 replaces tests with stories.</li>
+</ul>
+<p>Action translation:</p>
+<ul>
+<li>If argument loops forever, run one minimal experiment
+(<code>L2-C7</code> -&gt; <code>L1-C2</code>).</li>
+<li>Remove taboo against saying &quot;we do not know&quot;
+(<code>L2-C6</code>).</li>
+<li>Normalize refusal/stop as valid operator (<code>L2-C4</code>).</li>
+</ul>
+<p>Checklist:</p>
+<ul>
+<li>Is truth socially punishable?</li>
+<li>Is stop/exit treated as betrayal?</li>
+</ul>
+<h3 id="l3---rules-metrics-incentives-axes">L3 - Rules, metrics,
+incentives, axes</h3>
+<ul>
+<li>L3 designs action price architecture.</li>
+<li>Good L3 makes truth cheaper than imitation.</li>
+<li>Bad L3 creates metric theater and reward hacking.</li>
+</ul>
+<p>Action translation:</p>
+<ul>
+<li>Treat metrics as sensors tied to observables
+(<code>L3-C1</code>).</li>
+<li>Prevent metric improvement without field readout.</li>
+<li>Return error cost to source (<code>L3-C5</code>).</li>
+<li>Declare axis policy explicitly (<code>L3-C7</code>).</li>
+</ul>
+<p>Checklist:</p>
+<ul>
+<li>Can each KPI be decomposed to observable facts?</li>
+<li>Do people have stop rights against harmful metric pressure?</li>
+</ul>
+<h3 id="l4---institutions-power-sanction-legitimacy">L4 - Institutions,
+power, sanction legitimacy</h3>
+<ul>
+<li>L4 is about who can rewrite rules and how that power is
+checked.</li>
+<li>If L4 forbids truth/stop/exit, imitation becomes rational.</li>
+<li>Anti-capture and reversibility are not extras; they are survival
+conditions.</li>
+</ul>
+<p>Action translation:</p>
+<ul>
+<li>Institutionalize stop and truth rights (<code>L4-C1</code>,
+<code>L4-C2</code>).</li>
+<li>Add anti-capture constraints (<code>L4-C5</code>,
+<code>L4-C7</code>).</li>
+<li>Make obligation reduction legitimate when basis cannot sustain
+current promises (<code>L4-C4</code>).</li>
+</ul>
+<p>Checklist:</p>
+<ul>
+<li>Can a process be stopped without heroics?</li>
+<li>Is there monopoly on sanction or interpretation of reality?</li>
+</ul>
+<h3 id="l5---regime-boundary-and-transition">L5 - Regime boundary and
+transition</h3>
+<ul>
+<li>L5 is where non-convergence becomes visible.</li>
+<li>At L5 the goal is not &quot;win the argument&quot; but execute legitimate
+transition.</li>
+<li>Typical operators: stop, reduce obligations, quarantine cascade,
+rebase axes (<code>L5-C1</code>, <code>L5-C4</code>, <code>L5-C5</code>,
+<code>L5-C7</code>).</li>
+</ul>
+<p>Action translation:</p>
+<ul>
+<li>Make boundary observable (restore readout first).</li>
+<li>Choose one transition operator and publish criteria.</li>
+<li>Return to L0/L1 to re-establish causality after transition.</li>
+</ul>
+<p>Checklist:</p>
+<ul>
+<li>Is readout stable or are we in &quot;numbers exist, effect absent&quot;
+mode?</li>
+<li>Are stop/exit/truth rights blocked right before transition?</li>
+</ul>
+<h3 id="fast-routing-by-symptom">Fast routing by symptom</h3>
+<ul>
+<li>Fire mode / overload -&gt; L0 first.</li>
+<li>No next step / no effect -&gt; L1 first.</li>
+<li>Metric theater -&gt; L3 first.</li>
+<li>Legitimacy/power conflict -&gt; L4 first.</li>
+<li>Regime non-convergence -&gt; L5 first.</li>
+</ul>
+<p>If first operator does not change readout, descend one level.</p>
+<h2 id="navigation-cheat-sheet-s-t-c">Navigation cheat sheet
+(S-T-C)</h2>
+<p><a id="nav-cheatsheet"></a></p>
+<p>Use short codes for direct search in the compiled book.</p>
+<h3 id="1-core-diagnostic-fork-breadth-or-depth">1) Core diagnostic
+fork: breadth or depth</h3>
+<p>Rule:</p>
+<ul>
+<li><strong>Depth</strong> when readout is unstable or any option yields
+same trajectory.</li>
+<li><strong>Breadth</strong> when readout is stable and you optimize
+within current boundaries.</li>
+</ul>
+<p>Pseudo-flow:</p>
+<pre class="text"><code>if readout unstable or trajectory invariant under options:
+    go_depth()   # L3 -&gt; L1 -&gt; L0
+else:
+    go_breadth() # mostly L2-L3</code></pre>
+<p>Quick symptom map:</p>
+<ul>
+<li>&quot;Any decision gives same failure&quot; -&gt; <code>L1-C2</code>, then
+<code>L0-C1</code> / <code>L0-C6</code></li>
+<li>&quot;Metrics up, reality down&quot; -&gt; <code>L3-C1</code>,
+<code>L3-C6</code>, then <code>L5-C6</code></li>
+<li>&quot;No shared reality axis&quot; -&gt; <code>L3-C7</code>, then
+<code>L2-C5</code> / <code>L4-C7</code></li>
+<li>&quot;No next step&quot; -&gt; <code>L1-C2</code>; if still blind, descend to
+L0</li>
+</ul>
+<h3 id="2-scene-codes-sx">2) Scene codes (<code>Sx</code>)</h3>
+<ul>
+<li><code>S1</code>: person</li>
+<li><code>S2</code>: family/close network</li>
+<li><code>S3</code>: society/game</li>
+<li><code>S4</code>: organization</li>
+<li><code>S5</code>: state/institutions</li>
+</ul>
+<h3 id="3-theme-codes-ty">3) Theme codes (<code>Ty</code>)</h3>
+<ul>
+<li><code>T1</code>: pause/stop</li>
+<li><code>T2</code>: refusal/exit</li>
+<li><code>T3</code>: heroism/overspend</li>
+<li><code>T4</code>: obligation reduction</li>
+<li><code>T5</code>: quarantine</li>
+<li><code>T6</code>: feedback restoration</li>
+<li><code>T7</code>: axis/interpretation control</li>
+</ul>
+<h3 id="4-combined-scene-theme-search-sxty">4) Combined scene-theme
+search (<code>Sx/Ty</code>)</h3>
+<p>Examples:</p>
+<ul>
+<li><code>S4/T6</code> -&gt; organization-level feedback failure and
+restoration</li>
+<li><code>S1/T3</code> -&gt; personal heroism overspend</li>
+<li><code>S5/T7</code> -&gt; institutional axis-control conflict</li>
+</ul>
+<h3 id="5-operator-search-lx-cn">5) Operator search
+(<code>Lx-Cn</code>)</h3>
+<h4 id="l0-existence-operators">L0 (existence operators)</h4>
+<p><code>L0-C1..L0-C7</code>: stop, refusal signal, overspend diagnosis,
+obligation reduction, quarantine, feedback restoration, report-game
+exit.</p>
+<h4 id="l1-actionreadout-operators">L1 (action/readout operators)</h4>
+<p><code>L1-C1..L1-C7</code>: minimal operation, minimal readout, cycle
+reduction, parallelism reduction, incident review without punishment,
+recovery windows, done=verified.</p>
+<h4 id="l2-narrativerole-operators">L2 (narrative/role operators)</h4>
+<p><code>L2-C1..L2-C7</code>: blame mode, hero legitimation, stop taboo,
+refusal normalization, frame change, observation taboo,
+explanation-over-experiment.</p>
+<h4 id="l3-metricrule-operators">L3 (metric/rule operators)</h4>
+<p><code>L3-C1..L3-C7</code>: metric-as-sensor, heroism incentive,
+capacity-aligned commitments, stop rules, error-cost return,
+anti-imitation, axis policy.</p>
+<h4 id="l4-institution-operators">L4 (institution operators)</h4>
+<p><code>L4-C1..L4-C7</code>: institutional stop rights, truth/refusal
+protection, heroism institutionalization, legitimate de-scope,
+anti-capture quarantine, honest feedback institution, axis governance
+institution.</p>
+<h4 id="l5-boundarytransition-operators">L5 (boundary/transition
+operators)</h4>
+<p><code>L5-C1..L5-C7</code>: stop boundary, mass-refusal transition,
+heroism bifurcation, capacity boundary, cascade boundary, feedback
+boundary, basis rebasing.</p>
+<h3 id="6-practical-navigation-pattern">6) Practical navigation
+pattern</h3>
+<ol type="1">
+<li>Search by <code>Sx/Ty</code> to get context.</li>
+<li>Jump to first operator <code>Lx-Cn</code>.</li>
+<li>Execute one change.</li>
+<li>Validate readout.</li>
+<li>Repeat or descend.</li>
+</ol>
+<p>This cheat sheet is optimized for digital reading and incident-time
+routing.</p>
+<h3 id="7-fast-routing-bundles">7) Fast routing bundles</h3>
+<p>Use these bundles when you need a first move in under 2 minutes.</p>
+<ul>
+<li><p><strong>Bundle A: overload + chaos</strong></p>
+<ul>
+<li>First: <code>L0-C1</code> -&gt; <code>L1-C4</code> -&gt;
+<code>L3-C4</code></li>
+<li>Check: queue age, incident throughput, recovery window
+integrity.</li>
+</ul></li>
+<li><p><strong>Bundle B: green metrics, red reality</strong></p>
+<ul>
+<li>First: <code>L3-C1</code> -&gt; <code>L3-C6</code> -&gt;
+<code>L5-C6</code></li>
+<li>Check: KPI/counter-KPI divergence, trace evidence consistency.</li>
+</ul></li>
+<li><p><strong>Bundle C: silent disengagement</strong></p>
+<ul>
+<li>First: <code>L0-C2</code> -&gt; <code>L2-C4</code> -&gt;
+<code>L4-C2</code></li>
+<li>Check: participation authenticity and contradiction channel
+usage.</li>
+</ul></li>
+<li><p><strong>Bundle D: endless interpretation war</strong></p>
+<ul>
+<li>First: <code>L3-C7</code> -&gt; <code>L4-C7</code> -&gt; (if
+unresolved) <code>L5-C7</code></li>
+<li>Check: axis-policy clarity and contradiction resolution lag.</li>
+</ul></li>
+</ul>
+<h3 id="8-escalation-guards">8) Escalation guards</h3>
+<p>Escalate to depth mode immediately if any of these persist:</p>
+<ul>
+<li>any option yields same failure trajectory,</li>
+<li>readout cannot be trusted,</li>
+<li>contradiction channels are blocked by sanction risk,</li>
+<li>intervention effort rises while stabilization gain shrinks.</li>
+</ul>
+<p>These are boundary-pressure indicators, not &quot;communication
+problems&quot;.</p>
+<h2 id="invariants-and-tests">Invariants and tests</h2>
+<p>This section keeps the framework operational. Its goal is to prevent
+the language from degrading into slogans.</p>
+<h3 id="1-kpi-contour-transparency-test">1) KPI contour transparency
+test</h3>
+<p>Canonical honest KPI sentence:</p>
+<blockquote>
+<p>We intentionally optimize X and accept Y losses.</p>
+</blockquote>
+<p>If Y cannot be stated explicitly, KPI usually functions as
+self-deception or power instrument.</p>
+<p>Checklist:</p>
+<ol type="1">
+<li>What exactly is optimized (which axis)?</li>
+<li>Which losses are accepted in exchange?</li>
+<li>What time horizon carries the bill?</li>
+<li>What field readout must change besides the report number?</li>
+<li>Where is the applicability boundary for this KPI?</li>
+<li>Who gains and who pays, and how is that verified?</li>
+<li>How does this KPI map to basis viability (L0)?</li>
+</ol>
+<h3 id="2-anti-goodhart-test-report---cost-coupling">2) Anti-Goodhart
+test: report &lt;-&gt; cost coupling</h3>
+<p>Rule:</p>
+<p>If report is decoupled from real cost/pain, system trains reward
+hacking.</p>
+<p>Operational tests:</p>
+<ul>
+<li>Can metric be decomposed to observables?</li>
+<li>Is price transfer visible (errors, risk, burnout, quality
+debt)?</li>
+<li>Is there a stop/rebuild mechanism when metric becomes target?</li>
+</ul>
+<h3 id="3-ruledecision-decomposition-as-optimization-function">3)
+Rule/decision decomposition as optimization function</h3>
+<p>For any rule, KPI, incentive, or process, decompose:</p>
+<ol type="1">
+<li>objective function (what is really optimized),</li>
+<li>constraints (what is forbidden/costly),</li>
+<li>readout (where success is claimed),</li>
+<li>applicability boundary,</li>
+<li>price distribution and lag.</li>
+</ol>
+<p>Output should identify:</p>
+<ul>
+<li>whose basis is protected,</li>
+<li>whose basis is sacrificed (often on hidden credit).</li>
+</ul>
+<h3 id="4-presence-theater-test-schedule-vs-effect">4) Presence theater
+test (schedule vs effect)</h3>
+<p>Common projection error: compensation and control drift to
+attendance/presence instead of outcome.</p>
+<p>Symptoms:</p>
+<ul>
+<li>time-in-place becomes target,</li>
+<li>report discipline grows,</li>
+<li>action-effect coupling degrades,</li>
+<li>imitation becomes rational.</li>
+</ul>
+<p>Schedule can be useful. It becomes harmful when it cannot be adapted
+to observed reality.</p>
+<h3 id="5-prediction-boundary-predict-regimes-not-persons">5) Prediction
+boundary: predict regimes, not persons</h3>
+<p>Framework target is regime diagnostics: price gradients, feedback
+failure zones, transition likelihood.</p>
+<p>It is usually valid for distributions and contour behavior, not for
+deterministic individual trajectories.</p>
+<h3 id="6-repository-level-verification-linkage">6) Repository-level
+verification linkage</h3>
+<p>Map conceptual invariants to repo checks:</p>
+<ul>
+<li>reproducible headless runs (<code>catalog.json</code>,
+<code>metrics.csv</code>, <code>summary.json</code>,
+<code>final_state.*</code>),</li>
+<li>trace continuity and subscriber consistency,</li>
+<li>metric/counter-metric coherence,</li>
+<li>no forbidden cross-layer dependencies from <code>detm/*</code> into
+app/UI layers.</li>
+</ul>
+<h3 id="7-minimal-release-gate-for-architecture-changes">7) Minimal
+release gate for architecture changes</h3>
+<p>Before tagging a release with architecture impact:</p>
+<ol type="1">
+<li>invariants documented,</li>
+<li>changed contracts reflected in docs,</li>
+<li>tests for changed boundaries pass,</li>
+<li>migration artifacts (if any) are clearly marked.</li>
+</ol>
+<p>If these are missing, delay release and treat state as transition
+draft.</p>
+<h2 id="terms">Terms</h2>
+<p><a id="terms"></a></p>
+<p>This is the operational dictionary for this book. Definitions here
+are contracts of meaning, not absolute truth claims.</p>
+<h3 id="human-translation-quick-hints">Human translation (quick
+hints)</h3>
+<ul>
+<li><strong>Causality</strong>: stable link between action and
+consequence.</li>
+<li><strong>Basis (L0)</strong>: what keeps the system alive as a
+controllable system.</li>
+<li><strong>Readout</strong>: minimal check that something changed after
+the step.</li>
+<li><strong>Regime</strong>: current operating mode and its holding
+cost.</li>
+<li><strong>Systemic lie</strong>: reporting became cheaper than reality
+maintenance.</li>
+<li><strong>Imitation</strong>: optimization of appearance instead of
+outcome.</li>
+<li><strong>Axis/projection</strong>: chosen dimension treated as
+reality.</li>
+<li><strong>Sanction</strong>: mechanism that changes action cost.</li>
+<li><strong>Boundary (L5)</strong>: region where old regime stops
+converging.</li>
+</ul>
+<h3 id="quick-pointer">Quick pointer</h3>
+<ul>
+<li>Basis layer: <a href="#term-regime">Regime</a>, <a href="#term-basis">Basis (L0)</a>, <a href="#term-boundary">Boundary</a></li>
+<li>Failure signals: <a href="#term-lie">Systemic lie</a>, <a href="#term-imitation">Imitation</a>, <a href="#term-heroism">Heroism</a>, <a href="#term-capture">Capture</a>,
+<a href="#term-tabu">Taboo</a></li>
+<li>Participation economy: <a href="#term-energy">Energy</a>, <a href="#term-energy-readiness">Energy readiness</a>, <a href="#term-participation">Participation</a>, <a href="#term-minimal-operation">Minimal operation</a></li>
+<li>Measurement/control: <a href="#term-readout">Readout</a>, <a href="#term-kpi">KPI</a>, <a href="#term-sla">SLA</a>, <a href="#term-observables">Observables</a>, <a href="#term-input-selection-bias">Input selection bias</a>, <a href="#term-metric">Metric</a>, <a href="#term-rule">Rule</a></li>
+<li>Institutional/social: <a href="#term-role">Role</a>, <a href="#term-contract">Contract</a>, <a href="#term-sanction">Sanction</a>, <a href="#term-legitimacy">Legitimacy</a></li>
+<li>Geometry/model terms: <a href="#term-need-octahedron">Need
+octahedron</a>, <a href="#term-axis-projection">Axis/projection</a>, <a href="#term-search-axes">Search axes</a>, <a href="#term-reference">Reference</a>, <a href="#term-observation-surface">Observation surface</a>, <a href="#term-resultant-vector">Resultant vector</a>, <a href="#term-level-integral">Level integral</a>, <a href="#term-coherence">Coherence</a>, <a href="#term-compensator">Compensator</a></li>
+</ul>
+<p><a id="term-regime"></a></p>
+<h3 id="regime">Regime</h3>
+<p>A stable operating mode on a chosen time horizon: which actions are
+cheap/expensive, which signals are accepted as reality, and what cost is
+paid to keep causality alive.</p>
+<p><a id="term-basis"></a></p>
+<h3 id="basis-l0">Basis (L0)</h3>
+<p>Minimum conditions required for meaningful causality: resource,
+safety, trust, stop rights, minimal contractual viability.</p>
+<p><a id="term-boundary"></a></p>
+<h3 id="boundary">Boundary</h3>
+<p>Region where the current basis/description level stops holding.
+Actions stop producing verifiable effect, rules turn into theater, and
+participation no longer converges by cost.</p>
+<p><a id="term-lie"></a></p>
+<h3 id="systemic-lie-non-moral-use">Systemic lie (non-moral use)</h3>
+<p>A mode where sustaining report/story is cheaper than sustaining
+reality. The term is economic-operational here, not
+moral-psychological.</p>
+<p><a id="term-capture"></a></p>
+<h3 id="capture">Capture</h3>
+<p>A state where one group can rewrite axes/rules/sanctions in its
+favor, while pushing cost downward and suppressing feedback.</p>
+<p>Operational marker: metric/reality conflict is resolved by sanction
+power, not by evidence.</p>
+<p><a id="term-tabu"></a></p>
+<h3 id="taboo">Taboo</h3>
+<p>A sanction-backed ban on stating or testing certain observations.
+Taboo increases truth cost and accelerates imitation.</p>
+<p><a id="term-energy"></a></p>
+<h3 id="energy-in-this-book">Energy (in this book)</h3>
+<p>Not physical energy. Operationally: subjective current action price
+(attention, effort, time, risk, social penalty, shame/fear, conflict
+cost).</p>
+<p><a id="term-energy-readiness"></a></p>
+<h3 id="energy-readiness">Energy readiness</h3>
+<p>Behavioral measure of how much energy basis is willing to invest now
+in this regime. Usually drops when participation price stops
+converging.</p>
+<p><a id="term-participation"></a></p>
+<h3 id="participation">Participation</h3>
+<p>Operationally: willingness of basis to invest
+effort/risk/time/attention under current rules.</p>
+<p>Forms:</p>
+<ul>
+<li>live participation (contribution + feedback),</li>
+<li>formal participation (ritual compliance without real
+contribution),</li>
+<li>imitative participation (supporting report instead of reality),</li>
+<li>zero participation (exit/refusal/silence).</li>
+</ul>
+<p><a id="term-minimal-operation"></a></p>
+<h3 id="minimal-operation">Minimal operation</h3>
+<p>Smallest causal step that must alter the system: available actions,
+cost/risk profile, or contract state.</p>
+<p><a id="term-readout"></a></p>
+<h3 id="readout">Readout</h3>
+<p>Minimal verification of what changed after a step. A sensor, not a
+goal and not a performance ideology.</p>
+<p><a id="term-kpi"></a></p>
+<h3 id="kpi">KPI</h3>
+<p>A chosen effectiveness indicator used for steering.</p>
+<p>KPI risk in this framework: if KPI becomes goal instead of sensor, it
+trains imitation and drifts from basis.</p>
+<p>Short formula: KPI is manipulation under wrong basis, and regulation
+under correct basis.</p>
+<p><a id="term-sla"></a></p>
+<h3 id="sla">SLA</h3>
+<p>Contract on service obligations (response time, availability, quality
+constraints, etc.). Useful L3/L4 example of commitments that must match
+real basis capacity.</p>
+<p><a id="term-observables"></a></p>
+<h3 id="observables-inputs">Observables (inputs)</h3>
+<p>Facts that can be honestly fixed before interpretation: constraints,
+behavior signals, measurements, repeated patterns.</p>
+<p><a id="term-input-selection-bias"></a></p>
+<h3 id="input-selection-bias">Input selection bias</h3>
+<p>When analysis pre-selects &quot;important&quot; inputs and ignores the rest of
+observables, causing conclusions to reflect selection policy, not system
+reality.</p>
+<p><a id="term-role"></a></p>
+<h3 id="role">Role</h3>
+<p>Structured set of expectations, permissions, and prohibitions.</p>
+<ul>
+<li>At L2: identity/story mask shaping what feels allowed.</li>
+<li>At L3/L4: contract-like package of rights, access, sanctions,
+accountability.</li>
+</ul>
+<p><a id="term-rule"></a></p>
+<h3 id="rule">Rule</h3>
+<p>Constraint/permission that changes action cost: what is rewarded,
+what is penalized, who pays. A rule is valid only if it preserves
+causality and does not make lie cheaper than truth.</p>
+<p><a id="term-metric"></a></p>
+<h3 id="metric">Metric</h3>
+<p>Sensor over a chosen axis. Without stop rights and decomposition to
+observables, metric quickly mutates into target (Goodhart mode).</p>
+<p><a id="term-contract"></a></p>
+<h3 id="contract">Contract</h3>
+<p>Explicit or implicit obligation structure: what is guaranteed, who is
+accountable, where risk is allocated.</p>
+<p><a id="term-sanction"></a></p>
+<h3 id="sanction">Sanction</h3>
+<p>Mechanism that changes action price: penalty, access loss,
+reputational hit, threat, reward.</p>
+<p><a id="term-legitimacy"></a></p>
+<h3 id="legitimacy">Legitimacy</h3>
+<p>Reason why acceptance is cheaper than resistance: trust, law,
+procedure, habit, fear, benefit. Fear-only legitimacy degrades
+participation into imitation or exit.</p>
+<p><a id="term-imitation"></a></p>
+<h3 id="imitation">Imitation</h3>
+<p>Regime where producing appearance/report is cheaper than preserving
+reality. An economic optimum under bad cost architecture.</p>
+<p><a id="term-heroism"></a></p>
+<h3 id="heroism">Heroism</h3>
+<p>Not virtue language here. A regime of basis overspend: continuous
+overeffort, manual control, burnout risk. Short-term stabilizing,
+long-term debt-amplifying.</p>
+<p><a id="term-compensator"></a></p>
+<h3 id="compensator">Compensator</h3>
+<p>Internal balancing contour that keeps L0=1 by redistributing
+pressure. When compensator fails, upper levels are forced to service
+lower-level distortions.</p>
+<p><a id="term-need-octahedron"></a></p>
+<h3 id="need-octahedron-model">Need octahedron (model)</h3>
+<p>Geometric metaphor of basis with multiple poles kept in dynamic
+balance. Dominance of one pole appears as basis skew; upper levels then
+optimize skew maintenance instead of global stability.</p>
+<p><img role="img" aria-label="L0 need octahedron" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjkwMCIgdmlld0JveD0iMCAwIDE0MDAgOTAwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAudGl0bGUgeyBmb250OiA4MDAgMzBweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zdWIgeyBmb250OiA1MDAgMThweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5oIHsgZm9udDogODAwIDE2cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQ6IDUwMCAxNHB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMzMzQxNTU7IH0KICAgICAgLnN0cm9rZSB7IHN0cm9rZTogIzBmMTcyYTsgc3Ryb2tlLXdpZHRoOiAyOyBmaWxsOiBub25lOyB9CiAgICAgIC5jdXQgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyB9CiAgICAgIC5kYXNoIHsgc3Ryb2tlOiAjNjQ3NDhiOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IHN0cm9rZS1kYXNoYXJyYXk6IDcgNzsgfQogICAgICAubGF5ZXIwIHsgZmlsbDogI2UyZThmMDsgfQogICAgICAubGF5ZXIxIHsgZmlsbDogI2NiZDVlMTsgfQogICAgICAubGF5ZXIyIHsgZmlsbDogI2I2YzJkMTsgfQogICAgICAubGF5ZXIzIHsgZmlsbDogIzk0YTNiODsgfQogICAgICAubGF5ZXI0IHsgZmlsbDogIzBmMTcyYTsgfQogICAgICAub3V0ZXIgeyBmaWxsOiAjMGYxNzJhOyBvcGFjaXR5OiAwLjg4OyB9CiAgICAgIC5jYWxsIHsgc3Ryb2tlOiAjNjQ3NDhiOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IG1hcmtlci1lbmQ6IHVybCgjbSk7IH0KICAgICAgLnBpbGwgeyBmaWxsOiAjZjFmNWY5OyBzdHJva2U6ICNjYmQ1ZTE7IHN0cm9rZS13aWR0aDogMS41OyByeDogMTI7IH0KICAgICAgLnBpbGx0ZXh0IHsgZm9udDogNzAwIDE0cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuc3Bpa2UgeyBmaWxsOiAjZGMyNjI2OyBvcGFjaXR5OiAwLjkyOyB9CiAgICA8L3N0eWxlPgogICAgPG1hcmtlciBpZD0ibSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTSAwIDAgTCAxMCA1IEwgMCAxMCB6IiBmaWxsPSIjNjQ3NDhiIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDxyZWN0IGNsYXNzPSJiZyIgeD0iMCIgeT0iMCIgd2lkdGg9IjE0MDAiIGhlaWdodD0iOTAwIi8+CgogIDx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iNjAiIHk9IjcwIj5MMDog0LHQsNC30LjRgSDQutCw0Log0YHRhNC10YDQsCDRgdC+INGB0YDQtdC30L7QvCAo0LzQvtC00LXQu9GMKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI2MCIgeT0iMTA1Ij7QodC90LDRgNGD0LbQuCDQvdCw0LHQu9GO0LTQsNGC0LXQu9GMINCy0LjQtNC40YIg0YLQvtC70YzQutC+INCy0L3QtdGI0L3QuNC5ICjRgdC80YvRgdC70L7QstC+0LkpINGB0LvQvtC5LiDQktC90YPRgtGA0LXQvdC90LjQtSDRgdC70L7QuCDRgdGC0LDQvdC+0LLRj9GC0YHRjyDQstC40LTQuNC80YvQvNC4INGC0L7Qu9GM0LrQviDQvdCwINGB0YDQtdC30LUuPC90ZXh0PgoKICA8IS0tIFNwaGVyZSAoZnVsbCBvdXRzaWRlIHZpZXcpIC0tPgogIDwhLS0gQ2VudGVyICg0MzAsIDUyMCksIFI9MjYwIC0tPgogIDxjaXJjbGUgY3g9IjQzMCIgY3k9IjUyMCIgcj0iMjYwIiBjbGFzcz0ib3V0ZXIiLz4KICA8Y2lyY2xlIGN4PSI0MzAiIGN5PSI1MjAiIHI9IjI2MCIgY2xhc3M9InN0cm9rZSIgc3R5bGU9Im9wYWNpdHk6MC42NSIvPgoKICA8IS0tIEN1dC1vdXQgc2VjdG9yIChhYm91dCAxMjDCsCkgdG8gcmV2ZWFsIGxheWVycyAtLT4KICA8IS0tIFNlY3RvciBhbmdsZXMgcm91Z2hseSAzMjDCsCB0byA4MMKwICh3cmFwKSwgY2VudGVyIHRvIHRoZSByaWdodCAtLT4KICA8IS0tIFdlJ2xsIHJlbW92ZSBhIHdlZGdlIHBvaW50aW5nIHRvIHRoZSByaWdodC91cC1yaWdodCAtLT4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2OTAgNDUwIEEgMjYwIDI2MCAwIDAgMSA2OTAgNTkwIFoiIGZpbGw9IiNmZmZmZmYiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2OTAgNDUwIEEgMjYwIDI2MCAwIDAgMSA2OTAgNTkwIFoiIGNsYXNzPSJjdXQiLz4KCiAgPCEtLSBDb25jZW50cmljIGxheWVyIHdlZGdlcyB2aXNpYmxlIG9ubHkgb24gdGhlIGN1dCBmYWNlIC0tPgogIDwhLS0gUmFkaWk6IDcwLCAxMTUsIDE2MCwgMjA1LCAyNTAgKG91dGVyKSAtLT4KICA8IS0tIE91dGVyIGxheWVyIChzcGlyaXR1YWwpIHNlZ21lbnQgLS0+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjgwIDQ3MCBBIDI1MCAyNTAgMCAwIDEgNjgwIDU3MCBaIiBjbGFzcz0ibGF5ZXI0IiBvcGFjaXR5PSIwLjI1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjM1IDQ4NSBBIDIwNSAyMDUgMCAwIDEgNjM1IDU1NSBaIiBjbGFzcz0ibGF5ZXIzIiBvcGFjaXR5PSIwLjM1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNTkwIDUwMCBBIDE2MCAxNjAgMCAwIDEgNTkwIDU0MCBaIiBjbGFzcz0ibGF5ZXIyIiBvcGFjaXR5PSIwLjQ1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNTQ1IDUxMCBBIDExNSAxMTUgMCAwIDEgNTQ1IDUzMCBaIiBjbGFzcz0ibGF5ZXIxIiBvcGFjaXR5PSIwLjU1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNTAwIDUxNiBBIDcwIDcwIDAgMCAxIDUwMCA1MjQgWiIgY2xhc3M9ImxheWVyMCIgb3BhY2l0eT0iMC44NSIvPgoKICA8IS0tIEN1dCBib3VuZGFyeSBlbXBoYXNpcyAtLT4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2OTAgNDUwIiBjbGFzcz0iY3V0Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjkwIDU5MCIgY2xhc3M9ImN1dCIvPgoKICA8IS0tIEF4ZXMgZnJvbSBjb3JlIChkb3R0ZWQpIC0tPgogIDxwYXRoIGQ9Ik0gNDMwIDUyMCBMIDY0NSA1MDAiIGNsYXNzPSJkYXNoIi8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjQ1IDU0MCIgY2xhc3M9ImRhc2giLz4KCiAgPCEtLSBTcGlrZXMgLyBkaXN0b3J0aW9uczogb25seSBvbiBvdXRlciBsYXllcnMsIGRlY2F5aW5nIGlud2FyZCAtLT4KICA8IS0tIFNwaWtlIGFsb25nIHVwcGVyIGF4aXMgLS0+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjY0NSw1MDAgNjkwLDQ4OCA2ODgsNTEyIi8+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjU5MCw1MDUgNjIwLDQ5NyA2MTksNTEzIiBvcGFjaXR5PSIwLjY1Ii8+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjU0NSw1MTAgNTYwLDUwNiA1NjAsNTE0IiBvcGFjaXR5PSIwLjM1Ii8+CgogIDwhLS0gU3Bpa2UgYWxvbmcgbG93ZXIgYXhpcyAtLT4KICA8cG9seWdvbiBjbGFzcz0ic3Bpa2UiIHBvaW50cz0iNjQ1LDU0MCA2OTAsNTI4IDY4OCw1NTIiLz4KICA8cG9seWdvbiBjbGFzcz0ic3Bpa2UiIHBvaW50cz0iNTkwLDUzNSA2MjAsNTI3IDYxOSw1NDMiIG9wYWNpdHk9IjAuNjUiLz4KICA8cG9seWdvbiBjbGFzcz0ic3Bpa2UiIHBvaW50cz0iNTQ1LDUzMCA1NjAsNTI2IDU2MCw1MzQiIG9wYWNpdHk9IjAuMzUiLz4KCiAgPCEtLSBPdXRzaWRlLW9ubHkgbGFiZWwgLS0+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjE3MCIgeT0iMjM1IiB3aWR0aD0iNTIwIiBoZWlnaHQ9IjU2Ii8+CiAgPHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxOTAiIHk9IjI2OCI+0KHQvdCw0YDRg9C20Lgg0LLQuNC00L3Qvjog0YLQvtC70YzQutC+IMKr0LTRg9GF0L7QstC90L7QtSAvINGB0LzRi9GB0LvQvtCy0L7QtcK7PC90ZXh0PgoKICA8IS0tIENhbGxvdXRzIGZvciBsYXllcnMgb24gY3V0IC0tPgogIDxwYXRoIGNsYXNzPSJjYWxsIiBkPSJNIDcyMCA0NzAgTCA5ODAgMzgwIi8+CiAgPHRleHQgY2xhc3M9ImgiIHg9Ijk5NSIgeT0iMzg1Ij7QlNGD0YXQvtCy0L3QvtC1IC8g0YHQvNGL0YHQu9C+0LLQvtC1PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5OTUiIHk9IjQwNSI+0LLQvdC10YjQvdGP0Y8g0L/QvtCy0LXRgNGF0L3QvtGB0YLRjCAo0LLQuNC00L3QviDRgdC90LDRgNGD0LbQuCk8L3RleHQ+CgogIDxwYXRoIGNsYXNzPSJjYWxsIiBkPSJNIDcwNSA1MDUgTCA5ODAgNDUwIi8+CiAgPHRleHQgY2xhc3M9ImgiIHg9Ijk5NSIgeT0iNDU1Ij7QodCw0LzQvtGD0LLQsNC20LXQvdC40LU8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9Ijk5NSIgeT0iNDc1Ij7Qv9C10YDQtdC60L7RgdGLL9C/0LjQutC4INC80L7Qs9GD0YIg0L/RgNC+0Y/QstC70Y/RgtGM0YHRjzwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImNhbGwiIGQ9Ik0gNjg1IDUzMCBMIDk4MCA1MjAiLz4KICA8dGV4dCBjbGFzcz0iaCIgeD0iOTk1IiB5PSI1MjUiPtCh0L7RhtC40LDQu9GM0L3Ri9C1PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5OTUiIHk9IjU0NSI+0LrQvtC90YLQtdC60YHRgiwg0YHQstGP0LfQuCwg0YHRgtCw0YLRg9GBPC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iY2FsbCIgZD0iTSA2NjAgNTUwIEwgOTgwIDU5MCIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5OTUiIHk9IjU5NSI+0JHQtdC30L7Qv9Cw0YHQvdC+0YHRgtGMPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5OTUiIHk9IjYxNSI+0LPRgNCw0L3QuNGG0YssINGA0LjRgdC6LCDQsdCw0LfQvtCy0YvQtSDQs9Cw0YDQsNC90YLQuNC4PC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iY2FsbCIgZD0iTSA1MjAgNTI1IEwgOTgwIDY2MCIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5OTUiIHk9IjY2NSI+0KTQuNC30LjQvtC70L7Qs9C40Y8gKNGP0LTRgNC+KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTk1IiB5PSI2ODUiPtGB0LPQu9Cw0LbQtdC90L47INC/0LjQutC4INC30LDRgtGD0YXQsNGO0YIg0Log0YbQtdC90YLRgNGDIOKGkiAwPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iNzgwIiB5PSI3MzUiIHdpZHRoPSI1NjAiIGhlaWdodD0iOTIiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjgwMCIgeT0iNzcwIj7QodC80YvRgdC7INC60LDRgNGC0LjQvdC60Lg8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjgwMCIgeT0iNzk0Ij7QmtC+0LzQv9C10L3RgdCw0YbQuNC4INC4IMKr0L/QuNC60LjCuyDQtdGB0YLRjCDQvdCwINCy0L3QtdGI0L3QuNGFINGB0LvQvtGP0YUsINC90L4g0LIg0Y/QtNGA0LUg0L7QvdC4INC30LDRgtGD0YXQsNGO0YIuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI4MDAiIHk9IjgxNiI+0KfRgtC+0LHRiyDRg9Cy0LjQtNC10YLRjCDQstC90YPRgtGA0LXQvdC90Y7RjiDQvNC10YXQsNC90LjQutGDLCDQvdGD0LbQtdC9IMKr0YHRgNC10LfCuyAo0L3QsNCx0LvRjtC00LXQvdC40LUv0LTQuNCw0LPQvdC+0YHRgtC40LrQsCkuPC90ZXh0Pgo8L3N2Zz4K" alt="L0 need octahedron" /></p>
+<p><a id="term-axis-projection"></a></p>
+<h3 id="axis--projection">Axis / projection</h3>
+<p>Axis: selected dimension used to compress reality (speed, money,
+safety, control, etc.). Projection: state value on that axis. Many
+social terms are hidden projection labels.</p>
+<p><a id="term-search-axes"></a></p>
+<h3 id="search-axes-breadth-vs-depth">Search axes: breadth vs depth</h3>
+<p>Breadth search: option exploration inside fixed depth (mostly L2-L3),
+without rebuilding basis.</p>
+<p>Depth search: causal descent (L3 -&gt; L1 -&gt; L0), restoring
+readout and truth/stop/exit rights.</p>
+<p>Switch rule: unstable readout -&gt; depth, stable readout -&gt;
+breadth.</p>
+<p><a id="term-reference"></a></p>
+<h3 id="reference">Reference</h3>
+<p>Stable comparison anchor over time: units, contracts, interfaces,
+interpretive rules. Reference drift breaks coherence and increases
+holding cost.</p>
+<p><a id="term-observation-surface"></a></p>
+<h3 id="observation-surface-l5">Observation surface (L5)</h3>
+<p>Boundary surface where aggregate effects of lower levels become
+visible: incentive skew, feedback loss, debt accumulation, axis
+divergence.</p>
+<p><a id="term-resultant-vector"></a></p>
+<h3 id="resultant-vector-model">Resultant vector (model)</h3>
+<p>Combined direction produced by multiple influences/skews. Useful to
+describe aggregate drift without premature single-cause reduction.</p>
+<p><a id="term-level-integral"></a></p>
+<h3 id="level-integral-model">Level integral (model)</h3>
+<p>Intuition of accumulation over time: Ln can be read as accumulated
+trace of Ln-1.</p>
+<p>Examples:</p>
+<ul>
+<li>L2 = integral of L1 actions,</li>
+<li>L3 = integral of L2 narratives,</li>
+<li>L4 = integral of L3 rules,</li>
+<li>L5 = integral of whole stack.</li>
+</ul>
+<p><a id="term-coherence"></a></p>
+<h3 id="coherence-in-this-book">Coherence (in this book)</h3>
+<p>Stable phase-like alignment across system parts on chosen axes.
+Visible when measurements repeat and actions add up rather than cancel
+out.</p>
+<p>Economically: coherence is when keeping phase is cheaper than losing
+it.</p>
+<h2 id="index-terms-themes-operators">Index (terms, themes,
+operators)</h2>
+<p><a id="index"></a></p>
+<p>Index is for speed, not for doctrine. Use it to jump from memory to
+exact section.</p>
+<h3 id="terms-1">Terms</h3>
+<p>Source: <a href="#terms">Terms</a></p>
+<ul>
+<li><a href="#term-basis">Basis (L0)</a></li>
+<li><a href="#term-boundary">Boundary</a></li>
+<li><a href="#term-capture">Capture</a></li>
+<li><a href="#term-coherence">Coherence</a></li>
+<li><a href="#term-compensator">Compensator</a></li>
+<li><a href="#term-contract">Contract</a></li>
+<li><a href="#term-energy">Energy</a></li>
+<li><a href="#term-energy-readiness">Energy readiness</a></li>
+<li><a href="#term-heroism">Heroism</a></li>
+<li><a href="#term-imitation">Imitation</a></li>
+<li><a href="#term-input-selection-bias">Input selection bias</a></li>
+<li><a href="#term-kpi">KPI</a></li>
+<li><a href="#term-legitimacy">Legitimacy</a></li>
+<li><a href="#term-level-integral">Level integral</a></li>
+<li><a href="#term-metric">Metric</a></li>
+<li><a href="#term-minimal-operation">Minimal operation</a></li>
+<li><a href="#term-need-octahedron">Need octahedron</a></li>
+<li><a href="#term-observation-surface">Observation surface</a></li>
+<li><a href="#term-observables">Observables</a></li>
+<li><a href="#term-participation">Participation</a></li>
+<li><a href="#term-readout">Readout</a></li>
+<li><a href="#term-reference">Reference</a></li>
+<li><a href="#term-regime">Regime</a></li>
+<li><a href="#term-role">Role</a></li>
+<li><a href="#term-rule">Rule</a></li>
+<li><a href="#term-sanction">Sanction</a></li>
+<li><a href="#term-search-axes">Search axes</a></li>
+<li><a href="#term-sla">SLA</a></li>
+<li><a href="#term-lie">Systemic lie</a></li>
+<li><a href="#term-tabu">Taboo</a></li>
+<li><a href="#term-axis-projection">Axis/projection</a></li>
+<li><a href="#term-resultant-vector">Resultant vector</a></li>
+</ul>
+<h3 id="themes-t1t7">Themes (<code>T1..T7</code>)</h3>
+<p>Source: <a href="#case-registry">Case registry</a></p>
+<ul>
+<li><code>T1</code>: pause/stop</li>
+<li><code>T2</code>: refusal/exit</li>
+<li><code>T3</code>: heroism/overspend</li>
+<li><code>T4</code>: obligation reduction</li>
+<li><code>T5</code>: quarantine</li>
+<li><code>T6</code>: feedback restoration</li>
+<li><code>T7</code>: axis/interpretation control</li>
+</ul>
+<h3 id="operator-ids-lx-cn">Operator IDs (<code>Lx-Cn</code>)</h3>
+<p>Source: <a href="#case-registry">Case registry</a>, <a href="#nav-cheatsheet">Navigation cheat sheet</a></p>
+<ul>
+<li><code>L0-C1..C7</code>: basis operators</li>
+<li><code>L1-C1..C7</code>: minimal operation/readout operators</li>
+<li><code>L2-C1..C7</code>: narrative-role operators</li>
+<li><code>L3-C1..C7</code>: metric-rule operators</li>
+<li><code>L4-C1..C7</code>: institution-power operators</li>
+<li><code>L5-C1..C7</code>: boundary-transition operators</li>
+</ul>
+<h3 id="scene-ids-sx">Scene IDs (<code>Sx</code>)</h3>
+<ul>
+<li><code>S1</code>: person</li>
+<li><code>S2</code>: family</li>
+<li><code>S3</code>: society/game</li>
+<li><code>S4</code>: organization</li>
+<li><code>S5</code>: state/institutions</li>
+</ul>
+<h3 id="fast-lookup-patterns">Fast lookup patterns</h3>
+<ul>
+<li>Symptom-first: use Quickstart, then jump by <code>Lx-Cn</code>.</li>
+<li>Context-first: use <code>Sx/Ty</code> route in case registry.</li>
+<li>Governance-first: start at <code>L3-C7</code>, <code>L4-C7</code>,
+<code>L5-C7</code>.</li>
+</ul>
+<h3 id="common-symptom-clusters---lookup-shortcuts">Common symptom
+clusters -&gt; lookup shortcuts</h3>
+<ul>
+<li>Fire mode + overload:
+<ul>
+<li>jump to <code>T1</code>, <code>L0-C1</code>, <code>L1-C4</code>,
+<code>L3-C4</code>.</li>
+</ul></li>
+<li>Silent disengagement:
+<ul>
+<li>jump to <code>T2</code>, <code>L0-C2</code>, <code>L2-C4</code>,
+<code>L4-C2</code>.</li>
+</ul></li>
+<li>Hero dependence:
+<ul>
+<li>jump to <code>T3</code>, <code>L0-C3</code>, <code>L3-C2</code>,
+<code>L5-C3</code>.</li>
+</ul></li>
+<li>Promise collapse:
+<ul>
+<li>jump to <code>T4</code>, <code>L0-C4</code>, <code>L3-C3</code>,
+<code>L4-C4</code>.</li>
+</ul></li>
+<li>Contagion propagation:
+<ul>
+<li>jump to <code>T5</code>, <code>L0-C5</code>, <code>L4-C5</code>,
+<code>L5-C5</code>.</li>
+</ul></li>
+<li>Metric theater:
+<ul>
+<li>jump to <code>T6</code>, <code>L3-C1</code>, <code>L3-C6</code>,
+<code>L5-C6</code>.</li>
+</ul></li>
+<li>Interpretation war:
+<ul>
+<li>jump to <code>T7</code>, <code>L3-C7</code>, <code>L4-C7</code>,
+<code>L5-C7</code>.</li>
+</ul></li>
+</ul>
+<h3 id="scene-first-lookup-shortcuts">Scene-first lookup shortcuts</h3>
+<ul>
+<li><code>S1</code> (person):
+<ul>
+<li>focus on basis/recovery/readout integrity.</li>
+</ul></li>
+<li><code>S2</code> (family/network):
+<ul>
+<li>focus on escalation pauses and role-balance contracts.</li>
+</ul></li>
+<li><code>S3</code> (society/game):
+<ul>
+<li>focus on participation authenticity and axis conflict.</li>
+</ul></li>
+<li><code>S4</code> (organization):
+<ul>
+<li>focus on WIP/incident/KPI-trace coupling.</li>
+</ul></li>
+<li><code>S5</code> (state/institutions):
+<ul>
+<li>focus on legitimacy, reversibility, and capture containment.</li>
+</ul></li>
+</ul>
+<h3 id="practical-index-usage-protocol">Practical index usage
+protocol</h3>
+<ol type="1">
+<li>Identify nearest symptom cluster.</li>
+<li>Select scene (<code>Sx</code>) and theme (<code>Ty</code>).</li>
+<li>Choose first operator (<code>Lx-Cn</code>).</li>
+<li>Validate readout within bounded horizon.</li>
+<li>If unchanged, descend one level.</li>
+</ol>
+<p>This protocol turns the index into a routing tool, not a glossary
+only.</p>
+<h2 id="case-registry">Case registry</h2>
+<p><a id="case-registry"></a></p>
+<p>The same base situation should stay semantically consistent across
+the book: one theme <code>T&lt;n&gt;</code> viewed through different
+levels <code>L0..L5</code> and scenes <code>S1..S5</code>.</p>
+<p>Identifier layers:</p>
+<ul>
+<li><code>T&lt;n&gt;</code>: cross-level theme (semantic pattern),</li>
+<li><code>Lx-Cn</code>: operator variant at a specific level.</li>
+</ul>
+<h3 id="theme-template-tn">Theme template (<code>T&lt;n&gt;</code>)</h3>
+<ul>
+<li>Pattern name</li>
+<li>L0 pain/need under protection or failure</li>
+<li>Real optimization objective</li>
+<li>Where price appears and who pays</li>
+<li>Short conclusion</li>
+<li>Linked operator variants (<code>Lx-Cn</code>)</li>
+</ul>
+<h3 id="operator-template-lx-cn">Operator template
+(<code>Lx-Cn</code>)</h3>
+<ul>
+<li>ID</li>
+<li>Level and action</li>
+<li>Observable effects (L1-L5)</li>
+<li>Cross-level interpretation</li>
+</ul>
+<h3 id="scene-carriers-s1s5">Scene carriers (<code>S1..S5</code>)</h3>
+<p>Same theme must be legible in multiple scales:</p>
+<ul>
+<li><code>S1</code>: person</li>
+<li><code>S2</code>: family/close network</li>
+<li><code>S3</code>: society/game layer</li>
+<li><code>S4</code>: organization/team/lab/company</li>
+<li><code>S5</code>: state/institutional operator</li>
+</ul>
+<p>Mini vignette structure for each scene:</p>
+<ul>
+<li>observables (5-10 facts),</li>
+<li>one minimal operation,</li>
+<li>readout horizon,</li>
+<li>price transfer (who pays, when, where).</li>
+</ul>
+<h3 id="cross-book-themes-t1t7">Cross-book themes
+(<code>T1..T7</code>)</h3>
+<ul>
+<li><code>T1</code>: pause/stop as causal protection</li>
+<li><code>T2</code>: refusal/exit as truth signal</li>
+<li><code>T3</code>: heroic overspend mode</li>
+<li><code>T4</code>: obligation reduction to basis capacity</li>
+<li><code>T5</code>: quarantine of toxic coupling</li>
+<li><code>T6</code>: feedback restoration</li>
+<li><code>T7</code>: interpretation/axis control</li>
+</ul>
+<h3 id="theme-to-scene-matrix-entry-points">Theme-to-scene matrix (entry
+points)</h3>
+<h4 id="t1-pause--stop">T1: pause / stop</h4>
+<ul>
+<li>S1: stop self-overload to recover causal capacity.</li>
+<li>S2: pause escalation before trust damage compounds.</li>
+<li>S3: freeze game incentives to prevent collapse spiral.</li>
+<li>S4: stop work inflow to protect quality and safety.</li>
+<li>S5: declare emergency brakes with legal legitimacy.</li>
+</ul>
+<p>Typical first operators: <code>L0-C1</code>, <code>L3-C4</code>,
+<code>L4-C1</code>.</p>
+<h4 id="t2-refusal--exit">T2: refusal / exit</h4>
+<ul>
+<li>S1: refusal to continue personal imitation contract.</li>
+<li>S2: silence/withdrawal as family safety signal.</li>
+<li>S3: mass non-participation in unfair game.</li>
+<li>S4: disengagement when truth becomes punishable.</li>
+<li>S5: institutional non-compliance as transition signal.</li>
+</ul>
+<p>Typical first operators: <code>L0-C2</code>, <code>L2-C4</code>,
+<code>L4-C2</code>, <code>L5-C2</code>.</p>
+<h4 id="t3-heroism">T3: heroism</h4>
+<ul>
+<li>S1: burnout-driven self-control illusion.</li>
+<li>S2: one member carrying system debt alone.</li>
+<li>S3: hero narrative replacing rule quality.</li>
+<li>S4: overtime as hidden production substrate.</li>
+<li>S5: emergency governance normalized as baseline.</li>
+</ul>
+<p>Typical first operators: <code>L0-C3</code>, <code>L0-C4</code>,
+<code>L3-C2</code>, <code>L4-C3</code>, <code>L5-C3</code>.</p>
+<h4 id="t4-obligation-reduction">T4: obligation reduction</h4>
+<ul>
+<li>S1: remove promises above real power.</li>
+<li>S2: narrow commitments to sustainable care.</li>
+<li>S3: reduce collective demand under constraint.</li>
+<li>S4: re-sign SLA/scope under real capacity.</li>
+<li>S5: legal downscaling to avoid systemic default.</li>
+</ul>
+<p>Typical first operators: <code>L0-C4</code>, <code>L3-C3</code>,
+<code>L4-C4</code>, <code>L5-C4</code>.</p>
+<h4 id="t5-quarantine">T5: quarantine</h4>
+<ul>
+<li>S1: isolate recurring toxic trigger/channel.</li>
+<li>S2: protect family boundary from contagion pattern.</li>
+<li>S3: isolate cheating/corruption propagation node.</li>
+<li>S4: quarantine process/component/team causing cascade.</li>
+<li>S5: institutional firebreak against capture spread.</li>
+</ul>
+<p>Typical first operators: <code>L0-C5</code>, <code>L4-C5</code>,
+<code>L5-C5</code>.</p>
+<h4 id="t6-feedback-restoration">T6: feedback restoration</h4>
+<ul>
+<li>S1: restart self-honest sensing without punishment.</li>
+<li>S2: restore conversation with testable commitments.</li>
+<li>S3: rebuild trustable public signals.</li>
+<li>S4: reconnect KPI/report to field observables.</li>
+<li>S5: institutionally protect truthful signal channels.</li>
+</ul>
+<p>Typical first operators: <code>L0-C6</code>, <code>L1-C2</code>,
+<code>L3-C1</code>, <code>L3-C6</code>, <code>L4-C6</code>,
+<code>L5-C6</code>.</p>
+<h4 id="t7-axisinterpretation-control">T7: axis/interpretation
+control</h4>
+<ul>
+<li>S1: remove taboo on key self-observations.</li>
+<li>S2: align family frame on what counts as reality.</li>
+<li>S3: conflict of meaning/projection regimes.</li>
+<li>S4: metric war over governing axis definitions.</li>
+<li>S5: monopoly struggle over legal reality language.</li>
+</ul>
+<p>Typical first operators: <code>L2-C5</code>, <code>L2-C6</code>,
+<code>L3-C7</code>, <code>L4-C7</code>, <code>L5-C7</code>.</p>
+<h3 id="operator-catalog-short-form">Operator catalog (short form)</h3>
+<h4 id="l0-operators">L0 operators</h4>
+<ul>
+<li><code>L0-C1</code>: pause/stop as causal protection</li>
+<li><code>L0-C2</code>: refusal as lie sensor</li>
+<li><code>L0-C3</code>: diagnose basis overspend</li>
+<li><code>L0-C4</code>: reduce obligations to capacity</li>
+<li><code>L0-C5</code>: quarantine toxic coupling</li>
+<li><code>L0-C6</code>: restore honest feedback</li>
+<li><code>L0-C7</code>: exit report game</li>
+</ul>
+<h4 id="l1-operators">L1 operators</h4>
+<ul>
+<li><code>L1-C1</code>: minimal operation instead of &quot;do
+everything&quot;</li>
+<li><code>L1-C2</code>: minimal readout sensor</li>
+<li><code>L1-C3</code>: shorter cycle</li>
+<li><code>L1-C4</code>: lower parallelism</li>
+<li><code>L1-C5</code>: failure review without punishment</li>
+<li><code>L1-C6</code>: built-in recovery windows</li>
+<li><code>L1-C7</code>: done = verified</li>
+</ul>
+<h4 id="l2-operators">L2 operators</h4>
+<ul>
+<li><code>L2-C1</code>: blame assignment instead of repair</li>
+<li><code>L2-C2</code>: heroism legitimized as norm</li>
+<li><code>L2-C3</code>: stopping taboo</li>
+<li><code>L2-C4</code>: refusal normalized</li>
+<li><code>L2-C5</code>: frame/axis reinterpretation</li>
+<li><code>L2-C6</code>: taboo on observation</li>
+<li><code>L2-C7</code>: explanation replacing experiment</li>
+</ul>
+<h4 id="l3-operators">L3 operators</h4>
+<ul>
+<li><code>L3-C1</code>: metric as sensor, not goal</li>
+<li><code>L3-C2</code>: incentive grows heroism</li>
+<li><code>L3-C3</code>: obligations re-signed to capacity</li>
+<li><code>L3-C4</code>: stop rule / load limiter</li>
+<li><code>L3-C5</code>: return error cost to source</li>
+<li><code>L3-C6</code>: break report game (anti-imitation)</li>
+<li><code>L3-C7</code>: explicit axis policy</li>
+</ul>
+<h4 id="l4-operators">L4 operators</h4>
+<ul>
+<li><code>L4-C1</code>: institutional stop/veto rights</li>
+<li><code>L4-C2</code>: protect refusal and truth rights</li>
+<li><code>L4-C3</code>: institutionalized heroism</li>
+<li><code>L4-C4</code>: legitimate promise reduction</li>
+<li><code>L4-C5</code>: anti-capture quarantine</li>
+<li><code>L4-C6</code>: institution of honest feedback</li>
+<li><code>L4-C7</code>: institution of axis governance</li>
+</ul>
+<h4 id="l5-operators">L5 operators</h4>
+<ul>
+<li><code>L5-C1</code>: stop boundary criterion</li>
+<li><code>L5-C2</code>: transition through mass refusal</li>
+<li><code>L5-C3</code>: heroism bifurcation management</li>
+<li><code>L5-C4</code>: capacity/scale boundary reset</li>
+<li><code>L5-C5</code>: cascade boundary localization</li>
+<li><code>L5-C6</code>: feedback boundary restoration</li>
+<li><code>L5-C7</code>: basis/axis rebasing</li>
+</ul>
+<h3 id="detailed-scene-vignettes-sxty">Detailed scene vignettes
+(<code>Sx/Ty</code>)</h3>
+<p>The goal of this block is practical recognition. For each theme we
+give a scene-specific signature, one minimal move, and one readout
+hint.</p>
+<h4 id="s1-person-basis--compensator">S1: Person (basis /
+compensator)</h4>
+<ul>
+<li><code>S1/T1</code> pause: overload loop, sleep collapse, repeated
+mistakes -&gt; stop intake for 24-72h and restore recovery windows;
+readout is lower noise and return of planning ability.</li>
+<li><code>S1/T2</code> refusal: &quot;I cannot keep pretending&quot; state, formal
+compliance only -&gt; normalize refusal as valid signal and renegotiate
+commitment scope; readout is disappearance of fake promises.</li>
+<li><code>S1/T3</code> heroism: chronic overeffort as identity -&gt;
+de-normalize overuse and reduce obligations; readout is lower incident
+frequency, not higher visible busyness.</li>
+<li><code>S1/T4</code> reduction: commitments exceed personal capacity
+-&gt; freeze/cut obligations to sustainable level; readout is completion
+quality recovery.</li>
+<li><code>S1/T5</code> quarantine: one channel/contact continuously
+drains basis -&gt; isolate trigger route; readout is measurable energy
+restoration.</li>
+<li><code>S1/T6</code> feedback: no honest self-sensing -&gt; track one
+non-punitive factual panel (sleep/time/error); readout is better action
+predictability.</li>
+<li><code>S1/T7</code> axis control: internal narrative forbids key
+facts (&quot;tired = lazy&quot;) -&gt; reframe fact-vs-judgment boundary; readout
+is reduced internal conflict and better step selection.</li>
+</ul>
+<h4 id="s2-family--close-network">S2: Family / close network</h4>
+<ul>
+<li><code>S2/T1</code> pause: recurring escalation loops -&gt;
+institutionalize pause protocol before discussion; readout is lower
+escalation frequency.</li>
+<li><code>S2/T2</code> refusal: silence/withdrawal from one member -&gt;
+treat refusal as safety signal, not disloyalty; readout is return of
+truthful dialogue.</li>
+<li><code>S2/T3</code> heroism: one person &quot;carries all&quot; -&gt;
+redistribute load and make support explicit; readout is reduced burnout
+pressure.</li>
+<li><code>S2/T4</code> reduction: too many obligations for current
+family capacity -&gt; reduce promise set and redefine minimum viable
+commitments; readout is fewer broken promises.</li>
+<li><code>S2/T5</code> quarantine: repeating toxic interaction node
+-&gt; isolate trigger context/time and add boundary contract; readout is
+conflict contagion reduction.</li>
+<li><code>S2/T6</code> feedback: &quot;we discussed&quot; without behavioral
+change -&gt; add one observable household readout; readout is actual
+routine update after agreement.</li>
+<li><code>S2/T7</code> axis control: no shared reality about what
+matters -&gt; define explicit family axis policy (safety/time/finance
+first); readout is less semantic warfare.</li>
+</ul>
+<h4 id="s3-society--game-layer">S3: Society / game layer</h4>
+<ul>
+<li><code>S3/T1</code> pause: game escalation without control -&gt;
+impose temporary brakes and audit conditions; readout is lower
+destructive volatility.</li>
+<li><code>S3/T2</code> refusal: mass disengagement/non-participation
+-&gt; interpret as convergence signal, not purely moral failure; readout
+is improved participation after rule correction.</li>
+<li><code>S3/T3</code> heroism: exceptional sacrifice normalized
+socially -&gt; redesign incentives toward resilience; readout is lower
+dependence on outlier actors.</li>
+<li><code>S3/T4</code> reduction: aggregate obligations exceed
+collective capacity -&gt; reduce systemic demand and sequence
+commitments; readout is fewer systemic defaults.</li>
+<li><code>S3/T5</code> quarantine: cheating/corruption contagion -&gt;
+isolate channels and increase reversibility of decisions; readout is
+reduced spread rate.</li>
+<li><code>S3/T6</code> feedback: public indicators drift from lived
+reality -&gt; rebuild independent negative-signal channels; readout is
+contradiction visibility before crisis.</li>
+<li><code>S3/T7</code> axis control: projection war over &quot;what is real&quot;
+-&gt; formalize axis governance and counter-signals; readout is lower
+policy oscillation.</li>
+</ul>
+<h4 id="s4-organization--team--lab">S4: Organization / team / lab</h4>
+<ul>
+<li><code>S4/T1</code> pause: chronic fire mode in delivery pipeline
+-&gt; enforce stop rules and WIP guardrails; readout is reduced incident
+throughput and better completion integrity.</li>
+<li><code>S4/T2</code> refusal: silent attrition and formal
+participation -&gt; protect refusal and truth channels; readout is lower
+hidden withdrawal and better issue surfacing.</li>
+<li><code>S4/T3</code> heroism: overtime as normal productivity source
+-&gt; remove hero incentives and add recovery as contract; readout is
+stable output with lower volatility.</li>
+<li><code>S4/T4</code> reduction: SLA/scope mismatch to real capacity
+-&gt; re-sign obligations to basis power; readout is lower default
+rate.</li>
+<li><code>S4/T5</code> quarantine: one process/component spreads failure
+-&gt; isolate coupling and localize blast radius; readout is fewer
+cross-team cascades.</li>
+<li><code>S4/T6</code> feedback: KPI green, field effect red -&gt; break
+report game (<code>L3-C6</code>) and enforce traceable readout; readout
+is KPI-real effect recoupling.</li>
+<li><code>S4/T7</code> axis control: metric wars block decisions -&gt;
+publish explicit axis policy and governance ownership; readout is faster
+conflict resolution with auditable rationale.</li>
+</ul>
+<h4 id="s5-state--institutional-operator">S5: State / institutional
+operator</h4>
+<ul>
+<li><code>S5/T1</code> pause: legal/economic/security escalation without
+brake -&gt; deploy legitimate stop criteria and temporary containment
+powers with rollback; readout is non-catastrophic stabilization.</li>
+<li><code>S5/T2</code> refusal: broad non-compliance or institutional
+withdrawal -&gt; treat as regime signal and renegotiate participation
+conditions; readout is compliance recovery without repression-only
+growth.</li>
+<li><code>S5/T3</code> heroism: emergency governance becomes permanent
+baseline -&gt; transition from heroic governance to resilient governance
+architecture; readout is lower emergency dependence.</li>
+<li><code>S5/T4</code> reduction: state commitments exceed
+fiscal/administrative capacity -&gt; legally structured de-scope and
+reprioritization; readout is reduced structural default risk.</li>
+<li><code>S5/T5</code> quarantine: institutional capture or systemic
+contamination spreads -&gt; apply anti-capture quarantine (audit,
+rotation, reversibility); readout is containment of propagation.</li>
+<li><code>S5/T6</code> feedback: official reporting diverges from field
+reality -&gt; protect independent observability channels and enforce
+contradiction handling; readout is earlier detection of regime
+drift.</li>
+<li><code>S5/T7</code> axis control: monopoly over interpretation of
+reality -&gt; decentralize axis governance and require counter-metric
+disclosure; readout is lower policy blindness.</li>
+</ul>
+<h3 id="operator-starter-matrix-symptom---first-move">Operator starter
+matrix (symptom -&gt; first move)</h3>
+<ul>
+<li>Fire mode + overload + no completion -&gt; <code>L0-C1</code>,
+<code>L1-C4</code>, then <code>L3-C4</code>.</li>
+<li>Silent disengagement + formal compliance -&gt; <code>L0-C2</code>,
+<code>L2-C4</code>, then <code>L4-C2</code>.</li>
+<li>Heroic throughput + rising hidden debt -&gt; <code>L0-C3</code>,
+<code>L0-C4</code>, <code>L3-C2</code>.</li>
+<li>Promises exceed capacity -&gt; <code>L3-C3</code>,
+<code>L4-C4</code>, and if needed <code>L5-C4</code>.</li>
+<li>Contagion from one toxic node -&gt; <code>L0-C5</code>,
+<code>L4-C5</code>, <code>L5-C5</code>.</li>
+<li>Green metrics + red reality -&gt; <code>L3-C1</code>,
+<code>L3-C6</code>, <code>L5-C6</code>.</li>
+<li>Endless interpretation war -&gt; <code>L3-C7</code>,
+<code>L4-C7</code>, and if needed <code>L5-C7</code>.</li>
+</ul>
+<h3 id="theme-cards-t1t7">Theme cards (<code>T1..T7</code>)</h3>
+<p>Each card summarizes L0 pain, local optimization, and usual price
+transfer.</p>
+<h4 id="t1-pause--stop-as-causal-protection"><code>T1</code> Pause /
+stop as causal protection</h4>
+<ul>
+<li>L0 pain: overload and runaway escalation.</li>
+<li>Local optimization: preserve causal viability by halting
+amplification.</li>
+<li>Typical hidden price if avoided: larger nonlinear failure
+later.</li>
+<li>Core operators: <code>L0-C1</code>, <code>L3-C4</code>,
+<code>L4-C1</code>, <code>L5-C1</code>.</li>
+</ul>
+<h4 id="t2-refusal--exit-as-truth-signal"><code>T2</code> Refusal / exit
+as truth signal</h4>
+<ul>
+<li>L0 pain: participation cost exceeds meaningful return.</li>
+<li>Local optimization: reduce immediate loss by disengagement.</li>
+<li>Typical hidden price if denied: formal compliance + hidden
+collapse.</li>
+<li>Core operators: <code>L0-C2</code>, <code>L2-C4</code>,
+<code>L4-C2</code>, <code>L5-C2</code>.</li>
+</ul>
+<h4 id="t3-heroic-overuse-mode"><code>T3</code> Heroic overuse mode</h4>
+<ul>
+<li>L0 pain: basis insufficient but commitments unchanged.</li>
+<li>Local optimization: bridge mismatch with exceptional effort.</li>
+<li>Typical hidden price if normalized: recovery debt and abrupt
+break.</li>
+<li>Core operators: <code>L0-C3</code>, <code>L0-C4</code>,
+<code>L3-C2</code>, <code>L4-C3</code>, <code>L5-C3</code>.</li>
+</ul>
+<h4 id="t4-obligation-reduction-1"><code>T4</code> Obligation
+reduction</h4>
+<ul>
+<li>L0 pain: promise volume exceeds sustainable power.</li>
+<li>Local optimization: regain convergence by controlled
+contraction.</li>
+<li>Typical hidden price if postponed: cascading defaults.</li>
+<li>Core operators: <code>L0-C4</code>, <code>L3-C3</code>,
+<code>L4-C4</code>, <code>L5-C4</code>.</li>
+</ul>
+<h4 id="t5-quarantine--containment"><code>T5</code> Quarantine /
+containment</h4>
+<ul>
+<li>L0 pain: local instability begins spreading.</li>
+<li>Local optimization: localize damage and preserve global
+viability.</li>
+<li>Typical hidden price if skipped: system-wide contagion.</li>
+<li>Core operators: <code>L0-C5</code>, <code>L4-C5</code>,
+<code>L5-C5</code>.</li>
+</ul>
+<h4 id="t6-feedback-restoration-1"><code>T6</code> Feedback
+restoration</h4>
+<ul>
+<li>L0 pain: truthful signal channels degraded.</li>
+<li>Local optimization: re-link action and consequence.</li>
+<li>Typical hidden price if ignored: report theater and delayed
+catastrophe.</li>
+<li>Core operators: <code>L0-C6</code>, <code>L1-C2</code>,
+<code>L3-C1</code>, <code>L3-C6</code>, <code>L4-C6</code>,
+<code>L5-C6</code>.</li>
+</ul>
+<h4 id="t7-axis--interpretation-control"><code>T7</code> Axis /
+interpretation control</h4>
+<ul>
+<li>L0 pain: no shared operational reality.</li>
+<li>Local optimization: lock one governing projection.</li>
+<li>Typical hidden price if captured: metric wars, legitimacy
+decay.</li>
+<li>Core operators: <code>L2-C5</code>, <code>L2-C6</code>,
+<code>L3-C7</code>, <code>L4-C7</code>, <code>L5-C7</code>.</li>
+</ul>
+<h3 id="operator-cards-lx-cn-with-effect-vectors">Operator cards
+(<code>Lx-Cn</code>) with effect vectors</h3>
+<p>This section extends short names with typical cross-level
+effects.</p>
+<h4 id="l0-cards">L0 cards</h4>
+<ul>
+<li><code>L0-C1</code> stop/pause:
+<ul>
+<li>Immediate: lowers escalation throughput.</li>
+<li>Cross-level: forces legitimacy check on who may stop.</li>
+</ul></li>
+<li><code>L0-C2</code> refusal signal:
+<ul>
+<li>Immediate: participation authenticity drops visibly.</li>
+<li>Cross-level: reveals hidden mismatch in role/rule design.</li>
+</ul></li>
+<li><code>L0-C3</code> overspend diagnosis:
+<ul>
+<li>Immediate: hero-mode reframed from virtue to debt signal.</li>
+<li>Cross-level: enables obligation redesign.</li>
+</ul></li>
+<li><code>L0-C4</code> obligation reduction:
+<ul>
+<li>Immediate: lowers chaos and unfinished work.</li>
+<li>Cross-level: status conflict becomes explicit but manageable.</li>
+</ul></li>
+<li><code>L0-C5</code> quarantine:
+<ul>
+<li>Immediate: isolates toxic coupling.</li>
+<li>Cross-level: prevents institutional contagion.</li>
+</ul></li>
+<li><code>L0-C6</code> feedback restore:
+<ul>
+<li>Immediate: readout becomes meaningful again.</li>
+<li>Cross-level: weakens report-only authority.</li>
+</ul></li>
+<li><code>L0-C7</code> report-game exit:
+<ul>
+<li>Immediate: symbolic performance drops.</li>
+<li>Cross-level: creates pressure for contract reset or separation.</li>
+</ul></li>
+</ul>
+<h4 id="l1-cards">L1 cards</h4>
+<ul>
+<li><code>L1-C1</code> minimal operation:
+<ul>
+<li>Immediate: action scope becomes testable.</li>
+<li>Cross-level: reduces narrative ambiguity.</li>
+</ul></li>
+<li><code>L1-C2</code> minimal readout:
+<ul>
+<li>Immediate: effect/no-effect becomes observable quickly.</li>
+<li>Cross-level: constrains metric manipulation space.</li>
+</ul></li>
+<li><code>L1-C3</code> shorter cycle:
+<ul>
+<li>Immediate: lower error-lag cost.</li>
+<li>Cross-level: faster detection of boundary drift.</li>
+</ul></li>
+<li><code>L1-C4</code> lower parallelism:
+<ul>
+<li>Immediate: improved completion integrity.</li>
+<li>Cross-level: clarifies real capacity constraints.</li>
+</ul></li>
+<li><code>L1-C5</code> non-punitive review:
+<ul>
+<li>Immediate: incident recurrence drops over time.</li>
+<li>Cross-level: truth cost decreases.</li>
+</ul></li>
+<li><code>L1-C6</code> recovery windows:
+<ul>
+<li>Immediate: volatility decreases.</li>
+<li>Cross-level: hero narrative loses institutional necessity.</li>
+</ul></li>
+<li><code>L1-C7</code> done=verified:
+<ul>
+<li>Immediate: closure inflation decreases.</li>
+<li>Cross-level: KPI semantics become more causal.</li>
+</ul></li>
+</ul>
+<h4 id="l2-cards">L2 cards</h4>
+<ul>
+<li><code>L2-C1</code> blame assignment:
+<ul>
+<li>Immediate: anxiety drops, diagnostics degrade.</li>
+<li>Cross-level: strengthens punitive governance loops.</li>
+</ul></li>
+<li><code>L2-C2</code> hero legitimation:
+<ul>
+<li>Immediate: effort intensity rises.</li>
+<li>Cross-level: hides basis mismatch and blocks reduction.</li>
+</ul></li>
+<li><code>L2-C3</code> stop taboo:
+<ul>
+<li>Immediate: escalation cannot be safely interrupted.</li>
+<li>Cross-level: transition is delayed to rupture point.</li>
+</ul></li>
+<li><code>L2-C4</code> refusal normalization:
+<ul>
+<li>Immediate: hidden refusal becomes explicit signal.</li>
+<li>Cross-level: enables contract redesign.</li>
+</ul></li>
+<li><code>L2-C5</code> frame change:
+<ul>
+<li>Immediate: shifts what is treated as evidence.</li>
+<li>Cross-level: may require new metric policy.</li>
+</ul></li>
+<li><code>L2-C6</code> observation taboo:
+<ul>
+<li>Immediate: contradiction suppression.</li>
+<li>Cross-level: accelerates capture through interpretation
+monopoly.</li>
+</ul></li>
+<li><code>L2-C7</code> explanation over experiment:
+<ul>
+<li>Immediate: conversation volume rises, effect certainty drops.</li>
+<li>Cross-level: policy becomes rhetoric-first.</li>
+</ul></li>
+</ul>
+<h4 id="l3-cards">L3 cards</h4>
+<ul>
+<li><code>L3-C1</code> metric as sensor:
+<ul>
+<li>Immediate: KPI linked to field readout.</li>
+<li>Cross-level: improves L1/L4 correction quality.</li>
+</ul></li>
+<li><code>L3-C2</code> hero incentive:
+<ul>
+<li>Immediate: speed overshoot.</li>
+<li>Cross-level: increases long-horizon failure risk.</li>
+</ul></li>
+<li><code>L3-C3</code> capacity re-sign:
+<ul>
+<li>Immediate: promise realism increases.</li>
+<li>Cross-level: legitimacy depends on transparent cost allocation.</li>
+</ul></li>
+<li><code>L3-C4</code> stop-rule:
+<ul>
+<li>Immediate: escalation bounded.</li>
+<li>Cross-level: normalizes preventive pause.</li>
+</ul></li>
+<li><code>L3-C5</code> cost-return:
+<ul>
+<li>Immediate: hiding errors becomes expensive.</li>
+<li>Cross-level: reduces capture rent extraction.</li>
+</ul></li>
+<li><code>L3-C6</code> anti-imitation:
+<ul>
+<li>Immediate: report-only gains decrease.</li>
+<li>Cross-level: truth channels regain value.</li>
+</ul></li>
+<li><code>L3-C7</code> axis policy:
+<ul>
+<li>Immediate: semantic conflict becomes auditable.</li>
+<li>Cross-level: governance conflict surfaces explicitly.</li>
+</ul></li>
+</ul>
+<h4 id="l4-cards">L4 cards</h4>
+<ul>
+<li><code>L4-C1</code> institutional stop-right:
+<ul>
+<li>Immediate: stop action no longer depends on heroics.</li>
+<li>Cross-level: reduces rupture probability near boundary.</li>
+</ul></li>
+<li><code>L4-C2</code> truth/refusal protection:
+<ul>
+<li>Immediate: safer contradiction reporting.</li>
+<li>Cross-level: improves transition quality.</li>
+</ul></li>
+<li><code>L4-C3</code> institutional heroism:
+<ul>
+<li>Immediate: overuse normalized.</li>
+<li>Cross-level: basis debt hidden until abrupt failure.</li>
+</ul></li>
+<li><code>L4-C4</code> legal de-scope:
+<ul>
+<li>Immediate: commitment realism increases.</li>
+<li>Cross-level: protects legitimacy during contraction.</li>
+</ul></li>
+<li><code>L4-C5</code> anti-capture quarantine:
+<ul>
+<li>Immediate: capture spread slows.</li>
+<li>Cross-level: preserves reversibility.</li>
+</ul></li>
+<li><code>L4-C6</code> feedback institution:
+<ul>
+<li>Immediate: signal reliability improves.</li>
+<li>Cross-level: policy drift detected earlier.</li>
+</ul></li>
+<li><code>L4-C7</code> axis governance institution:
+<ul>
+<li>Immediate: interpretation authority becomes explicit process.</li>
+<li>Cross-level: lowers hidden projection monopoly risk.</li>
+</ul></li>
+</ul>
+<h4 id="l5-cards">L5 cards</h4>
+<ul>
+<li><code>L5-C1</code> stop boundary:
+<ul>
+<li>Immediate: non-convergent continuation is formally blocked.</li>
+<li>Cross-level: forces recalibration of lower-level operators.</li>
+</ul></li>
+<li><code>L5-C2</code> mass-refusal transition:
+<ul>
+<li>Immediate: hidden refusal reclassified as regime signal.</li>
+<li>Cross-level: requires legitimacy and contract redesign.</li>
+</ul></li>
+<li><code>L5-C3</code> heroism bifurcation:
+<ul>
+<li>Immediate: overuse path split (controlled decline vs rupture).</li>
+<li>Cross-level: incentive architecture must change.</li>
+</ul></li>
+<li><code>L5-C4</code> capacity boundary reset:
+<ul>
+<li>Immediate: scale/promise rebase.</li>
+<li>Cross-level: restores L0/L1 controllability.</li>
+</ul></li>
+<li><code>L5-C5</code> cascade localization:
+<ul>
+<li>Immediate: blast radius reduction.</li>
+<li>Cross-level: preserves system-level survival options.</li>
+</ul></li>
+<li><code>L5-C6</code> feedback boundary reset:
+<ul>
+<li>Immediate: action-effect linkage rebuilt.</li>
+<li>Cross-level: enables meaningful policy and narrative updates.</li>
+</ul></li>
+<li><code>L5-C7</code> basis/axis rebasing:
+<ul>
+<li>Immediate: obsolete reality model replaced.</li>
+<li>Cross-level: new applicability boundary established.</li>
+</ul></li>
+</ul>
+<h3 id="readout-hints-by-scene">Readout hints by scene</h3>
+<p>Use these as quick candidate panels when choosing first
+operators.</p>
+<ul>
+<li>S1: sleep quality, daily error count, unfinished promise load,
+conflict recovery lag.</li>
+<li>S2: escalation frequency, repair completion rate, role-burden
+symmetry, trust restoration lag.</li>
+<li>S3: participation authenticity, contradiction visibility, policy
+response lag, contagion spread rate.</li>
+<li>S4: lead time, escaped defects, re-open rate, queue age, hidden
+attrition.</li>
+<li>S5: compliance quality vs coercion intensity, contradiction handling
+lag, reversibility of high-impact decisions.</li>
+</ul>
+<h3 id="incident-bundles-by-scene-ready-to-use">Incident bundles by
+scene (ready-to-use)</h3>
+<p>These bundles are templates for first 24-72h response.</p>
+<h4 id="s1-bundle-person">S1 bundle (person)</h4>
+<h5 id="s1-b1-burnout-edge">S1-B1: Burnout edge</h5>
+<ul>
+<li>Inputs: chronic sleep debt, rising mistakes, no recovery windows,
+irritability.</li>
+<li>First move: <code>L0-C1</code> + <code>L0-C4</code> (pause +
+obligation cut).</li>
+<li>Readout: lower noise and at least one stable daily planning
+block.</li>
+<li>Risk if skipped: transition into hidden refusal (<code>T2</code>) or
+hard crash (<code>T3</code>).</li>
+</ul>
+<h5 id="s1-b2-self-theater-loop">S1-B2: Self-theater loop</h5>
+<ul>
+<li>Inputs: many completed tasks, no meaningful outcome shift, anxiety
+relief via busyness.</li>
+<li>First move: <code>L1-C2</code> (one truthful readout) +
+<code>L1-C7</code>.</li>
+<li>Readout: at least one action-effect link verified end-to-end.</li>
+<li>Risk if skipped: internal axis drift (<code>T7</code>) and
+motivation collapse.</li>
+</ul>
+<h5 id="s1-b3-identity-conflict">S1-B3: Identity conflict</h5>
+<ul>
+<li>Inputs: &quot;I must perform&quot; narrative blocks stop/repair behavior.</li>
+<li>First move: <code>L2-C5</code> + <code>L2-C6</code> (frame change,
+taboo removal).</li>
+<li>Readout: ability to state basis facts without self-punishment.</li>
+<li>Risk if skipped: sustained overspend and abrupt disengagement.</li>
+</ul>
+<h4 id="s2-bundle-family--close-network">S2 bundle (family / close
+network)</h4>
+<h5 id="s2-b1-escalation-spiral">S2-B1: Escalation spiral</h5>
+<ul>
+<li>Inputs: repeated conflict cycles, no repair closure,
+children/partners withdrawing.</li>
+<li>First move: <code>L0-C1</code> + family pause protocol.</li>
+<li>Readout: reduction in escalation frequency in one week.</li>
+<li>Risk if skipped: refusal normalizes in covert form
+(<code>T2</code>).</li>
+</ul>
+<h5 id="s2-b2-one-person-load-sink">S2-B2: One-person load sink</h5>
+<ul>
+<li>Inputs: one actor carries all logistics/emotional load, resentment
+growth.</li>
+<li>First move: <code>L0-C4</code> + role redistribution contract.</li>
+<li>Readout: measurable reduction in role asymmetry.</li>
+<li>Risk if skipped: heroism institutionalized at micro-scale
+(<code>T3</code>).</li>
+</ul>
+<h5 id="s2-b3-trustreport-mismatch">S2-B3: Trust/report mismatch</h5>
+<ul>
+<li>Inputs: repeated promises, low completion, &quot;we talked&quot; without
+change.</li>
+<li>First move: <code>L1-C2</code> with one household readout.</li>
+<li>Readout: weekly observable change tied to explicit action.</li>
+<li>Risk if skipped: narrative cynicism and silent disengagement.</li>
+</ul>
+<h4 id="s3-bundle-society--game-layer">S3 bundle (society / game
+layer)</h4>
+<h5 id="s3-b1-participation-erosion">S3-B1: Participation erosion</h5>
+<ul>
+<li>Inputs: formal participation rates look fine, substantive engagement
+falls.</li>
+<li>First move: interpret as <code>T2</code> signal; run
+<code>L3-C7</code> + <code>L4-C2</code> probe.</li>
+<li>Readout: contradiction gap between official report and independent
+channel narrows.</li>
+<li>Risk if skipped: legitimacy debt accumulation.</li>
+</ul>
+<h5 id="s3-b2-metric-war">S3-B2: Metric war</h5>
+<ul>
+<li>Inputs: groups use incompatible performance axes, policy
+oscillates.</li>
+<li>First move: explicit axis policy (<code>L3-C7</code>) with
+counter-signals.</li>
+<li>Readout: lower policy volatility across cycles.</li>
+<li>Risk if skipped: interpretation capture.</li>
+</ul>
+<h5 id="s3-b3-contagion-node">S3-B3: Contagion node</h5>
+<ul>
+<li>Inputs: one exploit/corruption route spreads quickly.</li>
+<li>First move: <code>L5-C5</code> + containment transparency.</li>
+<li>Readout: spread rate reduction in bounded horizon.</li>
+<li>Risk if skipped: system-wide trust collapse.</li>
+</ul>
+<h4 id="s4-bundle-organization">S4 bundle (organization)</h4>
+<h5 id="s4-b1-fire-mode-delivery">S4-B1: Fire-mode delivery</h5>
+<ul>
+<li>Inputs: urgent queue saturation, high reopen rate, no preventive
+work.</li>
+<li>First move: <code>L1-C4</code> + <code>L3-C4</code> (WIP cap + stop
+rule).</li>
+<li>Readout: queue age and incident throughput decline.</li>
+<li>Risk if skipped: heroic dependency and quality collapse.</li>
+</ul>
+<h5 id="s4-b2-kpi-theater">S4-B2: KPI theater</h5>
+<ul>
+<li>Inputs: KPI improves, customer/reliability outcomes degrade.</li>
+<li>First move: <code>L3-C1</code> + <code>L3-C6</code> + trace
+sampling.</li>
+<li>Readout: KPI and field signals recouple.</li>
+<li>Risk if skipped: hard boundary crossing with false confidence.</li>
+</ul>
+<h5 id="s4-b3-hidden-attrition">S4-B3: Hidden attrition</h5>
+<ul>
+<li>Inputs: retention appears stable, ownership quality and initiative
+drop.</li>
+<li>First move: protect refusal/truth (<code>L4-C2</code>) and run
+participation authenticity audit.</li>
+<li>Readout: contradiction reporting and initiative quality
+recover.</li>
+<li>Risk if skipped: sudden team hollowing and transition shock.</li>
+</ul>
+<h4 id="s5-bundle-state--institutional-operator">S5 bundle (state /
+institutional operator)</h4>
+<h5 id="s5-b1-compliance-without-legitimacy">S5-B1: Compliance without
+legitimacy</h5>
+<ul>
+<li>Inputs: compliance maintained mainly by coercion, trust indicators
+collapse.</li>
+<li>First move: <code>L4-C2</code> + <code>L4-C7</code> review.</li>
+<li>Readout: higher voluntary compliance share.</li>
+<li>Risk if skipped: refusal shifts into shadow channels.</li>
+</ul>
+<h5 id="s5-b2-permanent-emergency-mode">S5-B2: Permanent emergency
+mode</h5>
+<ul>
+<li>Inputs: temporary emergency mechanisms become default
+governance.</li>
+<li>First move: <code>L5-C3</code> + reversible de-escalation
+roadmap.</li>
+<li>Readout: reduced emergency dependency across periods.</li>
+<li>Risk if skipped: institutional brittleness and capture
+amplification.</li>
+</ul>
+<h5 id="s5-b3-policy-blindness">S5-B3: Policy blindness</h5>
+<ul>
+<li>Inputs: official metrics stay positive while independent reality
+indicators deteriorate.</li>
+<li>First move: <code>L5-C6</code> with independent observability
+guarantees.</li>
+<li>Readout: contradiction detection lag shortens.</li>
+<li>Risk if skipped: regime rupture perceived as &quot;sudden&quot;.</li>
+</ul>
+<h3 id="seven-day-playbooks-by-scene">Seven-day playbooks by scene</h3>
+<p>These are compact execution templates for first stabilization
+week.</p>
+<h4 id="s1-seven-day-playbook-person">S1 seven-day playbook
+(person)</h4>
+<p>Day 1:</p>
+<ul>
+<li>Declare stop-right for non-essential commitments.</li>
+<li>Build one factual readout panel (sleep/time/error).</li>
+</ul>
+<p>Day 2:</p>
+<ul>
+<li>Remove one high-drain coupling (<code>T5</code> candidate).</li>
+<li>Reduce obligations to realistic bandwidth (<code>T4</code>
+candidate).</li>
+</ul>
+<p>Day 3:</p>
+<ul>
+<li>Run one minimal operation with explicit readout
+(<code>L1-C2</code>).</li>
+<li>Record whether action-effect link is restored.</li>
+</ul>
+<p>Day 4:</p>
+<ul>
+<li>Audit internal frame for taboo labels (<code>T7</code>).</li>
+<li>Replace one self-punitive narrative with operator language.</li>
+</ul>
+<p>Day 5:</p>
+<ul>
+<li>Re-check hidden refusal signals (<code>T2</code>): avoidance,
+silence, fake compliance.</li>
+<li>Adjust scope if refusal remains high.</li>
+</ul>
+<p>Day 6:</p>
+<ul>
+<li>Add one recovery protocol as non-negotiable routine.</li>
+<li>Verify decline of noise markers.</li>
+</ul>
+<p>Day 7:</p>
+<ul>
+<li>Decide: resume optimization or continue transition discipline.</li>
+</ul>
+<h4 id="s2-seven-day-playbook-familynetwork">S2 seven-day playbook
+(family/network)</h4>
+<p>Day 1:</p>
+<ul>
+<li>Introduce escalation pause protocol (<code>T1</code>).</li>
+<li>Agree on one shared readout (conflict repair completion).</li>
+</ul>
+<p>Day 2:</p>
+<ul>
+<li>Map role load asymmetry and identify overspend node
+(<code>T3</code>).</li>
+<li>Perform one concrete obligation redistribution.</li>
+</ul>
+<p>Day 3:</p>
+<ul>
+<li>Identify hidden refusal patterns (<code>T2</code>): silence, passive
+agreement, avoidance.</li>
+<li>Normalize explicit refusal channel.</li>
+</ul>
+<p>Day 4:</p>
+<ul>
+<li>Define one shared axis policy: safety first, then schedule, then
+preference.</li>
+</ul>
+<p>Day 5:</p>
+<ul>
+<li>Run one quarantine experiment on repeated trigger context
+(<code>T5</code>).</li>
+<li>Check if contagion rate decreases.</li>
+</ul>
+<p>Day 6:</p>
+<ul>
+<li>Test agreement quality via one observable follow-through.</li>
+</ul>
+<p>Day 7:</p>
+<ul>
+<li>Publish micro-contract update: what changed, what remains
+unstable.</li>
+</ul>
+<h4 id="s3-seven-day-playbook-societygame">S3 seven-day playbook
+(society/game)</h4>
+<p>Day 1:</p>
+<ul>
+<li>Identify dominant contradiction set between official and independent
+signals.</li>
+</ul>
+<p>Day 2:</p>
+<ul>
+<li>Define provisional axis policy with counter-signals.</li>
+</ul>
+<p>Day 3:</p>
+<ul>
+<li>Detect participation authenticity gaps (formal vs substantive
+engagement).</li>
+</ul>
+<p>Day 4:</p>
+<ul>
+<li>Apply limited containment to highest contagion node
+(<code>T5</code>).</li>
+</ul>
+<p>Day 5:</p>
+<ul>
+<li>Test refusal channel legitimacy and non-repressive correction route
+(<code>T2</code>).</li>
+</ul>
+<p>Day 6:</p>
+<ul>
+<li>Recompute risk map with updated readout.</li>
+</ul>
+<p>Day 7:</p>
+<ul>
+<li>Decide whether to stay in tuning mode or escalate to transition
+mode.</li>
+</ul>
+<h4 id="s4-seven-day-playbook-organization">S4 seven-day playbook
+(organization)</h4>
+<p>Day 1:</p>
+<ul>
+<li>Freeze intake above safe WIP threshold.</li>
+<li>Publish stop-rule criteria (<code>L3-C4</code>).</li>
+</ul>
+<p>Day 2:</p>
+<ul>
+<li>Link one key KPI to independent trace evidence
+(<code>L3-C1</code>).</li>
+</ul>
+<p>Day 3:</p>
+<ul>
+<li>Run incident review without punishment bias
+(<code>L1-C5</code>).</li>
+</ul>
+<p>Day 4:</p>
+<ul>
+<li>Identify hidden attrition/refusal indicators and protect reporting
+channel (<code>L4-C2</code>).</li>
+</ul>
+<p>Day 5:</p>
+<ul>
+<li>Re-sign one over-scoped commitment to real capacity
+(<code>L3-C3</code>).</li>
+</ul>
+<p>Day 6:</p>
+<ul>
+<li>Validate that done=verified is being enforced
+(<code>L1-C7</code>).</li>
+</ul>
+<p>Day 7:</p>
+<ul>
+<li>Publish short transition/tuning status with next-week
+guardrails.</li>
+</ul>
+<h4 id="s5-seven-day-playbook-stateinstitutions">S5 seven-day playbook
+(state/institutions)</h4>
+<p>Day 1:</p>
+<ul>
+<li>Declare boundary evidence and trigger criteria publicly.</li>
+</ul>
+<p>Day 2:</p>
+<ul>
+<li>Guarantee protected contradiction-report channels
+(<code>L4-C2</code>, <code>L5-C6</code>).</li>
+</ul>
+<p>Day 3:</p>
+<ul>
+<li>Freeze high-risk commitments lacking reversibility.</li>
+</ul>
+<p>Day 4:</p>
+<ul>
+<li>Execute one controlled de-scope operation (<code>L5-C4</code>).</li>
+</ul>
+<p>Day 5:</p>
+<ul>
+<li>Isolate one high-propagation capture/corruption route
+(<code>L5-C5</code>).</li>
+</ul>
+<p>Day 6:</p>
+<ul>
+<li>Publish readout delta and unresolved risks.</li>
+</ul>
+<p>Day 7:</p>
+<ul>
+<li>Confirm whether transition mode remains active and on what
+terms.</li>
+</ul>
+<h3 id="cross-theme-confusion-matrix">Cross-theme confusion matrix</h3>
+<p>Use this when two themes are frequently mixed in diagnosis.</p>
+<ul>
+<li><p><code>T1</code> vs <code>T4</code>:</p>
+<ul>
+<li><code>T1</code> is immediate brake.</li>
+<li><code>T4</code> is structural promise resize.</li>
+<li>Confusion cost: repeated pauses with no capacity realignment.</li>
+</ul></li>
+<li><p><code>T2</code> vs <code>T5</code>:</p>
+<ul>
+<li><code>T2</code> is participation refusal.</li>
+<li><code>T5</code> is containment of toxic spread.</li>
+<li>Confusion cost: punishing refusal instead of containing cause.</li>
+</ul></li>
+<li><p><code>T3</code> vs <code>T6</code>:</p>
+<ul>
+<li><code>T3</code> is overspend compensation.</li>
+<li><code>T6</code> is feedback restoration.</li>
+<li>Confusion cost: celebrating overuse as if it were learning.</li>
+</ul></li>
+<li><p><code>T7</code> vs <code>T6</code>:</p>
+<ul>
+<li><code>T7</code> governs reality axes.</li>
+<li><code>T6</code> governs signal integrity.</li>
+<li>Confusion cost: semantic debates without reliable evidence.</li>
+</ul></li>
+</ul>
+<h3 id="failure-to-recovery-conversion-examples">Failure-to-recovery
+conversion examples</h3>
+<p>Short conversion patterns from common anti-patterns to operators:</p>
+<ul>
+<li><p>&quot;Everyone is busy, nothing improves&quot; -&gt; <code>L1-C2</code> +
+<code>L1-C7</code> + <code>L3-C1</code>.</p></li>
+<li><p>&quot;No one dares to report bad news&quot; -&gt; <code>L2-C6</code> +
+<code>L4-C2</code> + <code>L4-C6</code>.</p></li>
+<li><p>&quot;We hit targets but customers are unhappy&quot; -&gt;
+<code>L3-C6</code> + counter-metric set + <code>L5-C6</code>.</p></li>
+<li><p>&quot;We keep promising and missing&quot; -&gt; <code>L0-C4</code> +
+<code>L3-C3</code> + <code>L4-C4</code>.</p></li>
+<li><p>&quot;One team failure breaks everything&quot; -&gt; <code>L0-C5</code> +
+<code>L5-C5</code> + dependency redesign.</p></li>
+<li><p>&quot;Arguments never end because each side uses its own truth&quot; -&gt;
+<code>L3-C7</code> + auditable axis governance + minimal shared
+readout.</p></li>
+</ul>
+<h3 id="registry-maintenance-rules">Registry maintenance rules</h3>
+<p>To keep registry useful over time:</p>
+<ol type="1">
+<li>Add only cases with explicit observables and readout.</li>
+<li>Store at least one failed operator attempt per major theme.</li>
+<li>Tag each case with scene + theme + first operator + outcome.</li>
+<li>Mark whether recovery came from depth or breadth navigation.</li>
+<li>Retire cards that no longer decompose to observables.</li>
+</ol>
+<p>Registry quality degrades quickly if it becomes narrative-only. Treat
+it as an operator catalog, not prose archive.</p>
+<h3 id="how-to-use-this-registry">How to use this registry</h3>
+<ol type="1">
+<li>Pick scene (<code>Sx</code>) and nearest theme
+(<code>Ty</code>).</li>
+<li>Execute one first operator (<code>Lx-Cn</code>).</li>
+<li>Validate readout on explicit horizon.</li>
+<li>If no change, descend one level.</li>
+</ol>
+<p>Registry goal is not storytelling. It is fast routing from symptom to
+verifiable intervention.</p>
+<hr />
+<p><em>stats: chars=66106, words=9174, pages=36.7 (rough)</em></p>
+</body>
+</html>

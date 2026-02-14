@@ -1,6 +1,6 @@
-# Regime phase map
+﻿# Regime phase map
 
-Note: first-pass translation of `docs/rus/40_experiments/exp_phase_map.md`.
+Note: first-pass translation of `docs/rus/50_experiments/exp_phase_map.md`.
 
 ## Goal
 
@@ -77,4 +77,5 @@ Boundaries are typically fuzzy, so keeping the raw metrics is as important as an
 - Comparing regimes across different `N` requires explicit normalization (see `docs/eng/40_experiments/exp_marker_scaling.md`).
 - For reproducibility: same seed + same influence sequence → same signature/metrics.
 - If you apply external influences, separate “environment regime” from “scenario response” (use the same influence sequence across the grid).
+
 

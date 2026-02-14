@@ -1,6 +1,6 @@
-# Inertia and “mass” as a consequence of locality (hypothesis)
+﻿# Inertia and “mass” as a consequence of locality (hypothesis)
 
-Note: first-pass translation of `docs/rus/30_hypotheses/inertia_mass_locality.md`.
+Note: first-pass translation of `docs/rus/40_hypotheses/inertia_mass_locality.md`.
 
 ## Idea
 
@@ -40,4 +40,5 @@ to “accelerate”/shift an object you need a sequence of local perturbations t
 Related protocols:
 - masks/boundaries: `docs/eng/40_experiments/exp_object_masks.md`
 - transfer speed/lags: `docs/eng/40_experiments/exp_transfer_speed.md`
+
 

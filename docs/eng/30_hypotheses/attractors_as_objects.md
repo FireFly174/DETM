@@ -1,6 +1,6 @@
-# Attractors as emergent “objects”
+﻿# Attractors as emergent “objects”
 
-Note: first-pass translation of `docs/rus/30_hypotheses/attractors_as_objects.md`.
+Note: first-pass translation of `docs/rus/40_hypotheses/attractors_as_objects.md`.
 
 ## Operational definition
 
@@ -54,4 +54,5 @@ Masks/boundaries: `docs/eng/40_experiments/exp_object_masks.md`.
 - regimes and phase maps: `docs/eng/40_experiments/exp_phase_map.md`
 - transfer speed / lags: `docs/eng/40_experiments/exp_transfer_speed.md`
 - metric summary: `docs/eng/40_experiments/metrics.md`
+
 
