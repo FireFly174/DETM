@@ -7,7 +7,7 @@ from typing import Any
 from detm.runtime.config import DETMConfig
 from detm_app.ui.tk.runner.flow.controls.model import TkControlVars
 from detm_app.ui.tk.runner.flow.settings.apply import apply_runtime_settings, read_invariant_streams
-from detm_app.ui.tk.runner.flow.settings.config import build_runtime_config
+from detm_app.ui.tk.runner.flow.settings.runtime_config import build_runtime_config
 
 
 class TkSettingsFlow:
