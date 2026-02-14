@@ -15,12 +15,13 @@ import os
 import sys
 import time
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Mapping, MutableMapping
+from typing import TYPE_CHECKING, Any, Dict, Iterable, MutableMapping
 
 import numpy as np
 
 from detm_app.transport.subscriber import TcpVizSubscriber, VizPacket
 from detm_app.transport import load_viz_endpoint_registry
+from detm_app.ui.napari import subscriber_flow as _flow
 
 if TYPE_CHECKING:
     from detm.runtime import api as runtime_api_module
@@ -43,15 +44,7 @@ def _patch_six_meta_path_importer() -> None:
 
 
 def _to_numpy_2d(array: Any, *, height: int, width: int) -> np.ndarray:
-    try:
-        import torch  # type: ignore
-    except ModuleNotFoundError:
-        torch = None
-    if torch is not None and isinstance(array, torch.Tensor):
-        out = array.detach().to("cpu").numpy()
-    else:
-        out = np.asarray(array)
-    return out.astype(np.float32, copy=False).reshape(int(height), int(width))
+    return _flow.to_numpy_2d(array, height=height, width=width)
 
 
 def _runtime_api():
@@ -65,24 +58,7 @@ def _runtime_api():
 
 def state_to_layers(state: "DETMState") -> Dict[str, np.ndarray]:
     """Project runtime state into canonical napari layer payload."""
-    lattice = state.lattice
-    return {
-        "energy": _to_numpy_2d(
-            state.field_state.energy,
-            height=lattice.height,
-            width=lattice.width,
-        ),
-        "entropy": _to_numpy_2d(
-            state.field_state.entropy,
-            height=lattice.height,
-            width=lattice.width,
-        ),
-        "internal_time": _to_numpy_2d(
-            state.field_state.internal_time,
-            height=lattice.height,
-            width=lattice.width,
-        ),
-    }
+    return _flow.state_to_layers(state)
 
 
 @dataclass(frozen=True)
@@ -95,33 +71,16 @@ class NapariFrame:
 
 
 def _extract_active_level(meta: Any) -> str | None:
-    if not isinstance(meta, dict):
-        return None
-    direct = str(meta.get("active_level", "")).strip()
-    if direct:
-        return direct
-    policy = meta.get("policy")
-    if isinstance(policy, dict):
-        value = str(policy.get("active_level", "")).strip()
-        if value:
-            return value
-    level_policy = meta.get("level_policy")
-    if isinstance(level_policy, dict):
-        value = str(level_policy.get("active_level", "")).strip()
-        if value:
-            return value
-    return None
+    return _flow.extract_active_level(meta)
 
 
 def packet_to_layer_frame(packet: VizPacket) -> NapariFrame:
-    state = _runtime_api().deserialize(packet.state_blob)
-    meta = dict(packet.meta) if isinstance(packet.meta, dict) else {}
-    return NapariFrame(
-        tick=int(packet.tick),
-        signature=None if packet.signature is None else [float(x) for x in list(packet.signature)],
-        active_level=_extract_active_level(meta),
-        meta=meta,
-        layers=state_to_layers(state),
+    return _flow.packet_to_layer_frame(
+        packet,
+        deserialize=_runtime_api().deserialize,
+        frame_factory=NapariFrame,
+        state_to_layers_fn=state_to_layers,
+        extract_active_level_fn=_extract_active_level,
     )
 
 
@@ -131,40 +90,14 @@ def wait_latest_packet(
     timeout_s: float = 2.0,
     poll_interval_s: float = 0.01,
 ) -> VizPacket | None:
-    deadline = time.perf_counter() + max(0.0, float(timeout_s))
-    while True:
-        pkt = subscriber.poll_latest()
-        if pkt is not None:
-            return pkt
-        if time.perf_counter() >= deadline:
-            return None
-        time.sleep(max(0.001, float(poll_interval_s)))
+    return _flow.wait_latest_packet(
+        subscriber,
+        timeout_s=float(timeout_s),
+        poll_interval_s=float(poll_interval_s),
+    )
 
 
-class _LayerPresenter:
-    def __init__(self, viewer: Any, *, autoscale: bool = False) -> None:
-        self._viewer = viewer
-        self._autoscale = bool(autoscale)
-
-    def _autoscale_layer(self, layer: Any) -> None:
-        if not self._autoscale:
-            return
-        arr = np.asarray(getattr(layer, "data", None))
-        if arr.size <= 0:
-            return
-        vmin = float(np.nanmin(arr))
-        vmax = float(np.nanmax(arr))
-        if np.isfinite(vmin) and np.isfinite(vmax) and vmin < vmax:
-            layer.contrast_limits = (vmin, vmax)
-
-    def render(self, frame: NapariFrame) -> None:
-        for name, image in frame.layers.items():
-            if name in self._viewer.layers:
-                layer = self._viewer.layers[name]
-                layer.data = image
-            else:
-                layer = self._viewer.add_image(image, name=name)
-            self._autoscale_layer(layer)
+_LayerPresenter = _flow.LayerPresenter
 
 
 def _format_status_text(
@@ -175,57 +108,12 @@ def _format_status_text(
     recv_frames: int,
     rendered_count: int,
 ) -> str:
-    sig = [] if frame.signature is None else list(frame.signature)
-    meta = dict(frame.meta) if isinstance(frame.meta, dict) else {}
-    chunk_n_ticks = int(meta.get("chunk_n_ticks", 0))
-    requested_n_ticks = int(meta.get("requested_n_ticks", 0))
-    step_requested_n_ticks = int(meta.get("step_requested_n_ticks", 0))
-    step_effective_n_ticks = int(meta.get("step_effective_n_ticks", 0))
-    commit_packets_total = int(meta.get("commit_packets_total", 0))
-    commit_packets_by_mode_raw = meta.get("commit_packets_by_mode")
-    commit_packets_by_mode = (
-        {str(k): int(v) for k, v in dict(commit_packets_by_mode_raw).items()}
-        if isinstance(commit_packets_by_mode_raw, Mapping)
-        else {}
-    )
-    fabric_raw = meta.get("fabric")
-    fabric = dict(fabric_raw) if isinstance(fabric_raw, Mapping) else {}
-    fabric_quorum = dict(fabric.get("quorum", {})) if isinstance(fabric.get("quorum"), Mapping) else {}
-    fabric_delivery = dict(fabric.get("delivery", {})) if isinstance(fabric.get("delivery"), Mapping) else {}
-    fabric_replay = dict(fabric.get("replay", {})) if isinstance(fabric.get("replay"), Mapping) else {}
-    commit_packets_realtime = int(commit_packets_by_mode.get("realtime", 0))
-    commit_packets_audit = int(commit_packets_by_mode.get("audit", 0))
-    fabric_line = (
-        "fabric: disabled"
-        if not fabric
-        else (
-            "fabric: "
-            + f"commits={int(fabric.get('commit_count', 0))} "
-            + f"acks={int(fabric.get('ack_count', 0))} "
-            + "quorum="
-            + f"{int(fabric_quorum.get('accepted_count', 0))}/"
-            + f"{int(fabric_quorum.get('pending_count', 0))}/"
-            + f"{int(fabric_quorum.get('rejected_count', 0))} "
-            + "delivery="
-            + f"{int(fabric_delivery.get('accepted_count', 0))}/"
-            + f"{int(fabric_delivery.get('pending_count', 0))}/"
-            + f"{int(fabric_delivery.get('rejected_count', 0))} "
-            + "replay="
-            + f"{int(fabric_replay.get('checks_failed', 0))}/"
-            + f"{int(fabric_replay.get('checks_total', 0))}"
-        )
-    )
-    return (
-        f"status: connected {host}:{int(port)}\n"
-        + f"tick={int(frame.tick)} recv={int(recv_frames)} rendered={int(rendered_count)}\n"
-        + f"active_level={str(frame.active_level or 'n/a')}\n"
-        + "ticks: "
-        + f"chunk={int(chunk_n_ticks)} requested={int(requested_n_ticks)} "
-        + f"step_requested={int(step_requested_n_ticks)} step_effective={int(step_effective_n_ticks)}\n"
-        + "commit_packets: "
-        + f"total={int(commit_packets_total)} realtime={int(commit_packets_realtime)} audit={int(commit_packets_audit)}\n"
-        + f"{fabric_line}\n"
-        + f"signature[:4]={sig[:4]}"
+    return _flow.format_status_text(
+        host=str(host),
+        port=int(port),
+        frame=frame,
+        recv_frames=int(recv_frames),
+        rendered_count=int(rendered_count),
     )
 
 
@@ -364,7 +252,7 @@ def resolve_napari_endpoint(*, host: str | None, port: int | None) -> tuple[str,
         + "Provide --port, or set DETM_VIZ_PORT, or run a producer that writes runs/viz_endpoint.json.\n"
         + "Example:\n"
         + "  python main.py --viz --viz-transport tcp --viz-port 5588 ...\n"
-        + "  python detm_napari_viewer.py --port 5588"
+        + "  python main.py napari -- --port 5588"
     )
 
 

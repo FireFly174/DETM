@@ -1,0 +1,314 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title DETM Mega Map (Single Diagram, 2026-02-14)
+
+actor User as actor_user
+component "main.py" as entry_main
+
+package "detm (core library)" as pkg_detm {
+  package "runtime" as pkg_detm_runtime {
+    package "api" as pkg_detm_runtime_api {
+      component "core" as detm_runtime_api_core
+      component "reset_flow" as detm_runtime_api_reset_flow
+      component "step_flow" as detm_runtime_api_step_flow
+      component "models/helpers" as detm_runtime_api_models
+    }
+
+    component "state" as detm_runtime_state
+    component "config" as detm_runtime_config
+    component "backends" as detm_runtime_backends
+    component "influence" as detm_runtime_influence
+    component "outerfields" as detm_runtime_outerfields
+    component "signature" as detm_runtime_signature
+    component "watch_contract" as detm_runtime_watch_contract
+    component "pattern_memory" as detm_runtime_pattern_memory
+
+    package "serialization" as pkg_detm_runtime_serialization {
+      component "payload" as detm_runtime_ser_payload
+      component "state" as detm_runtime_ser_state
+      component "migration" as detm_runtime_ser_migration
+    }
+
+    package "level_policy" as pkg_detm_runtime_level_policy {
+      component "model" as detm_runtime_lp_model
+      component "normalization_build" as detm_runtime_lp_norm_build
+      component "normalization_inputs" as detm_runtime_lp_norm_inputs
+      component "normalization_serialize" as detm_runtime_lp_norm_ser
+      component "decision_runtime_adaptive" as detm_runtime_lp_decision
+      component "decision_guard/signals" as detm_runtime_lp_decision_helpers
+    }
+
+    package "refinement" as pkg_detm_runtime_refinement {
+      component "apply" as detm_runtime_ref_apply
+      package "pipeline" as pkg_detm_runtime_ref_pipeline {
+        component "contracts" as detm_runtime_ref_pipe_contracts
+        component "detect" as detm_runtime_ref_pipe_detect
+        component "roi" as detm_runtime_ref_pipe_roi
+        component "correction" as detm_runtime_ref_pipe_correction
+        component "metrics" as detm_runtime_ref_pipe_metrics
+        component "orchestrator" as detm_runtime_ref_pipe_orch
+      }
+    }
+
+    package "fabric" as pkg_detm_runtime_fabric {
+      component "envelope/ack/commit_chain" as detm_fabric_protocol
+      component "artifact_store/resolver" as detm_fabric_artifacts
+
+      package "runtime_composer" as pkg_detm_fabric_composer {
+        component "composer" as detm_fabric_comp_composer
+        component "state/delivery/artifact" as detm_fabric_comp_state_delivery
+        component "transport/validator/epoch/quorum" as detm_fabric_comp_runtime
+        component "services/reporting" as detm_fabric_comp_services
+      }
+
+      package "handshake" as pkg_detm_fabric_handshake {
+        component "service/flow" as detm_fabric_handshake_service
+        component "contracts/policies" as detm_fabric_handshake_policies
+      }
+
+      package "handshake_recorder_config" as pkg_detm_fabric_handshake_cfg {
+        component "flow" as detm_fabric_hcfg_flow
+        component "helpers/profile" as detm_fabric_hcfg_helpers
+      }
+
+      package "delivery" as pkg_detm_fabric_delivery {
+        component "outbox/replicated" as detm_fabric_delivery_outbox
+      }
+
+      package "delivery_tracking" as pkg_detm_fabric_delivery_tracking {
+        component "coordinator/flow" as detm_fabric_tracking_core
+      }
+
+      package "delivery_receipts" as pkg_detm_fabric_delivery_receipts {
+        component "contracts/policies/coordinator" as detm_fabric_receipts
+      }
+
+      package "epoch" as pkg_detm_fabric_epoch {
+        component "memory/file/replicated" as detm_fabric_epoch_coord
+      }
+
+      package "epoch_consensus" as pkg_detm_fabric_epoch_consensus {
+        component "coordinator/flow/state" as detm_fabric_epoch_consensus_core
+      }
+
+      package "quorum" as pkg_detm_fabric_quorum {
+        component "contracts/policies/coordinator" as detm_fabric_quorum_core
+        component "resolver" as detm_fabric_quorum_resolver
+      }
+
+      package "transport" as pkg_detm_fabric_transport {
+        component "bus/buffered/contracts" as detm_fabric_transport_core
+        component "idempotency" as detm_fabric_transport_idempotency
+      }
+
+      package "tcp_transport" as pkg_detm_fabric_tcp_transport {
+        component "transport/relay/factory" as detm_fabric_tcp_core
+        component "auth/tls/flow" as detm_fabric_tcp_security
+      }
+
+      package "validator" as pkg_detm_fabric_validator {
+        component "local/contracts/policies" as detm_fabric_validator_core
+        component "registry" as detm_fabric_validator_registry
+      }
+
+      package "report_writer" as pkg_detm_fabric_report_writer {
+        component "contracts/writer" as detm_fabric_report_writer_core
+      }
+    }
+  }
+
+  package "analysis" as pkg_detm_analysis {
+    component "fields" as detm_analysis_fields
+    component "boundary_flux" as detm_analysis_boundary_flux
+    component "grid_timeseries" as detm_analysis_grid_timeseries
+  }
+
+  package "metrics" as pkg_detm_metrics {
+    component "base/builtin/boundary_flux" as detm_metrics_all
+  }
+}
+
+package "detm_app (application layer)" as pkg_app {
+  package "config" as pkg_app_config {
+    component "app_settings" as app_cfg_settings
+    component "ui_models" as app_cfg_ui_models
+    component "tooltips" as app_cfg_tooltips
+  }
+
+  package "runtime" as pkg_app_runtime {
+    package "session" as pkg_app_runtime_session {
+      component "core" as app_runtime_session_core
+      component "step_flow" as app_runtime_session_step
+      component "adaptive" as app_runtime_session_adaptive
+    }
+
+    component "scheduler" as app_runtime_scheduler
+    component "bus" as app_runtime_bus
+    component "coarsening" as app_runtime_coarsening
+
+    package "ui_runtime" as pkg_app_runtime_ui_runtime {
+      component "core" as app_runtime_ui_core
+      component "influence" as app_runtime_ui_influence
+      component "recording" as app_runtime_ui_recording
+    }
+
+    package "subscribers" as pkg_app_runtime_subscribers {
+      package "trace" as pkg_app_sub_trace {
+        component "flow/system/history/fields/artifacts" as app_sub_trace_core
+      }
+      package "watch" as pkg_app_sub_watch {
+        component "flow/trace/contract" as app_sub_watch_core
+      }
+      package "commit" as pkg_app_sub_commit {
+        component "flow/stream/invariant/validation" as app_sub_commit_core
+      }
+      package "fabric" as pkg_app_sub_fabric {
+        component "core/model/lifecycle/attach/flow" as app_sub_fabric_core
+      }
+      component "viz" as app_sub_viz
+      component "common" as app_sub_common
+    }
+  }
+
+  package "runner" as pkg_app_runner {
+    package "headless" as pkg_app_runner_headless {
+      component "main/request/executor" as app_headless_core
+      component "parser + parser_fabric/*" as app_headless_parser
+      component "options + options_fabric/*" as app_headless_options
+      component "subscribers/*" as app_headless_subscribers
+    }
+    component "shell" as app_runner_shell
+    component "viewer_registry" as app_runner_viewer_registry
+    component "batch_service" as app_runner_batch_service
+  }
+
+  package "ui" as pkg_app_ui {
+    package "napari" as pkg_app_ui_napari {
+      component "lab" as app_ui_napari_lab
+      component "subscriber + subscriber_flow" as app_ui_napari_subscriber
+      package "interactive" as pkg_app_ui_napari_interactive {
+        component "controller" as app_ui_napari_int_controller
+        component "flow/actions/*" as app_ui_napari_int_actions
+        component "flow/settings" as app_ui_napari_int_settings
+        component "flow/influence" as app_ui_napari_int_influence
+        component "flow/batch/*" as app_ui_napari_int_batch
+        component "flow/render" as app_ui_napari_int_render
+        component "flow/controls + controls_parts/*" as app_ui_napari_int_controls
+        component "flow/ui_wiring" as app_ui_napari_int_wiring
+        component "flow/widget_io" as app_ui_napari_int_widget_io
+      }
+    }
+
+    package "tk" as pkg_app_ui_tk {
+      component "panel + panel_flow" as app_ui_tk_panel
+      package "runner" as pkg_app_ui_tk_runner {
+        component "launcher" as app_ui_tk_launcher
+        component "flow/layout/window" as app_ui_tk_layout
+        component "flow/controls/*" as app_ui_tk_controls
+        component "flow/settings/*" as app_ui_tk_settings
+        component "flow/actions" as app_ui_tk_actions
+        component "flow/batch" as app_ui_tk_batch
+        component "flow/viz/*" as app_ui_tk_viz
+      }
+    }
+  }
+
+  package "transport" as pkg_app_transport {
+    component "protocol" as app_transport_protocol
+    component "client" as app_transport_client
+    component "daemon" as app_transport_daemon
+    component "subscriber" as app_transport_subscriber
+  }
+}
+
+actor_user --> entry_main
+entry_main --> app_ui_napari_lab : default/napari
+entry_main --> app_headless_core : headless
+entry_main --> app_runner_shell : shell
+
+app_runner_shell --> app_runner_viewer_registry
+app_runner_viewer_registry --> app_ui_napari_lab
+
+app_ui_napari_lab --> app_headless_core : producer
+app_ui_napari_lab --> app_ui_napari_subscriber : viewer
+app_ui_napari_int_controller --> app_runtime_ui_core
+app_ui_tk_launcher --> app_runtime_ui_core
+
+app_runtime_ui_core --> app_runtime_session_core
+app_runtime_ui_core --> app_runtime_ui_influence
+app_runtime_ui_core --> app_runtime_ui_recording
+app_runtime_ui_core --> app_runtime_coarsening
+app_runtime_ui_core --> pkg_app_runtime_subscribers
+
+app_runtime_scheduler --> app_runtime_bus
+app_runtime_session_core --> app_runtime_bus
+app_runtime_bus --> app_sub_trace_core
+app_runtime_bus --> app_sub_watch_core
+app_runtime_bus --> app_sub_commit_core
+app_runtime_bus --> app_sub_viz
+app_runtime_bus --> app_sub_fabric_core
+
+app_runtime_session_core --> detm_runtime_api_core
+app_runtime_session_step --> detm_runtime_api_step_flow
+app_runtime_session_adaptive --> detm_runtime_lp_decision
+
+pkg_app_runtime_subscribers --> detm_runtime_watch_contract
+app_sub_commit_core --> detm_runtime_outerfields
+app_sub_fabric_core --> detm_fabric_comp_composer
+app_sub_fabric_core --> detm_fabric_hcfg_flow
+
+app_sub_viz --> app_transport_client
+app_transport_client --> app_transport_protocol
+app_ui_napari_subscriber --> app_transport_protocol
+app_transport_daemon --> app_transport_protocol
+
+app_headless_core --> app_runtime_session_core
+app_headless_core --> app_runner_batch_service
+app_headless_subscribers --> pkg_app_runtime_subscribers
+app_headless_core --> app_cfg_settings
+app_cfg_settings --> app_cfg_ui_models
+
+
+
+detm_runtime_api_core --> detm_runtime_state
+detm_runtime_api_core --> detm_runtime_config
+detm_runtime_api_core --> detm_runtime_backends
+detm_runtime_api_core --> detm_runtime_influence
+detm_runtime_api_core --> detm_runtime_signature
+detm_runtime_api_core --> detm_runtime_outerfields
+detm_runtime_api_core --> detm_runtime_pattern_memory
+detm_runtime_api_core --> detm_runtime_ref_apply
+detm_runtime_api_core --> detm_runtime_ser_payload
+
+detm_runtime_ref_apply --> detm_runtime_ref_pipe_orch
+detm_runtime_ref_pipe_orch --> detm_runtime_ref_pipe_detect
+detm_runtime_ref_pipe_orch --> detm_runtime_ref_pipe_roi
+detm_runtime_ref_pipe_orch --> detm_runtime_ref_pipe_correction
+detm_runtime_ref_pipe_orch --> detm_runtime_ref_pipe_metrics
+
+detm_runtime_lp_decision --> detm_runtime_lp_model
+detm_runtime_lp_decision --> detm_runtime_lp_norm_build
+detm_runtime_lp_norm_build --> detm_runtime_lp_norm_inputs
+detm_runtime_lp_norm_build --> detm_runtime_lp_norm_ser
+
+detm_runtime_ser_payload --> detm_runtime_ser_state
+detm_runtime_ser_payload --> detm_runtime_ser_migration
+
+detm_fabric_comp_composer --> detm_fabric_comp_state_delivery
+detm_fabric_comp_composer --> detm_fabric_comp_runtime
+detm_fabric_comp_composer --> detm_fabric_comp_services
+detm_fabric_comp_runtime --> detm_fabric_handshake_service
+detm_fabric_comp_runtime --> detm_fabric_quorum_core
+detm_fabric_comp_runtime --> detm_fabric_delivery_outbox
+detm_fabric_comp_runtime --> detm_fabric_epoch_coord
+detm_fabric_comp_runtime --> detm_fabric_transport_core
+detm_fabric_comp_runtime --> detm_fabric_validator_core
+detm_fabric_transport_core --> detm_fabric_transport_idempotency
+detm_fabric_tcp_core --> detm_fabric_tcp_security
+detm_fabric_quorum_core --> detm_fabric_quorum_resolver
+detm_fabric_validator_core --> detm_fabric_validator_registry
+detm_fabric_handshake_service --> detm_fabric_handshake_policies
+detm_fabric_hcfg_flow --> detm_fabric_hcfg_helpers
+
+@enduml

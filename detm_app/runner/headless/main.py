@@ -4,7 +4,6 @@
 """DETM headless CLI runner (package entrypoint).
 
 Examples:
-  python detm.py
   python main.py --seed 1 --steps 4 --symbols pulse ring
   python main.py --batch 10 --seed0 0 --out runs/out/my_batch
   python main.py --viz   # start viz daemon and stream state

@@ -1,0 +1,46 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Runtime Subscribers Matrix
+
+component "DetmSession.bus" as Bus
+
+package "Trace" {
+  component "JsonlTraceWriter"
+  component "SystemTraceWriter"
+  component "ArtifactWriter"
+  component "FieldHistoryRecorder"
+}
+
+package "Watch" {
+  component "WatchTraceWriter"
+  component "WatchContractWriter"
+}
+
+package "Commit" {
+  component "CommitJsonlWriter"
+  component "CommitValidationReporter"
+  component "InvariantTickJsonlWriter"
+}
+
+package "Streaming" {
+  component "VizStreamer"
+}
+
+package "Fabric" {
+  component "FabricHandshakeRecorder"
+}
+
+Bus --> JsonlTraceWriter
+Bus --> SystemTraceWriter
+Bus --> ArtifactWriter
+Bus --> FieldHistoryRecorder
+Bus --> WatchTraceWriter
+Bus --> WatchContractWriter
+Bus --> CommitJsonlWriter
+Bus --> CommitValidationReporter
+Bus --> InvariantTickJsonlWriter
+Bus --> VizStreamer
+Bus --> FabricHandshakeRecorder
+
+@enduml

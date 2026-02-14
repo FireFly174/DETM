@@ -1,0 +1,19 @@
+﻿@startuml
+autonumber
+title Napari Lab Mode Sequence (producer + subscriber)
+
+actor User
+participant "napari.lab.main" as Lab
+participant "subprocess\nheadless.main" as Producer
+participant "TCP endpoint" as TCP
+participant "napari.subscriber" as Sub
+
+User -> Lab : main(argv)
+Lab -> Producer : Popen(headless bootstrap, --viz tcp ...)
+Lab -> Lab : wait_for_tcp_endpoint(...)
+Producer -> TCP : open/serve frames
+Lab -> Sub : run_napari_subscriber(host, port, ...)
+Sub -> TCP : poll/recv frames
+Sub --> User : live read-only visualization
+
+@enduml

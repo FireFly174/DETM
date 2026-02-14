@@ -1,0 +1,37 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Fabric Handshake Runtime Composition
+
+component "FabricHandshakeRecorder\n(detm_app.runtime.subscribers.fabric)" as Recorder
+component "compose_fabric_handshake_runtime" as Composer
+component "FabricTransportAdapter\n(open_fabric_transport)" as Transport
+component "FileFabricArtifactStore" as Store
+component "FabricArtifactResolver" as Resolver
+component "LocalFabricValidator" as Validator
+component "FabricEpochCoordinator" as Epoch
+component "FabricHandshakeService" as Service
+component "FabricAckIngressService" as AckIngress
+component "FabricQuorumRuntimeService" as QuorumRuntime
+component "FabricCommitIngressService" as CommitIngress
+component "FabricCommitDeliveryService" as Delivery
+component "DeliveryTrackingCoordinator" as DeliveryTracking
+component "ValidatorRegistry" as Registry
+component "FabricRuntimeReportWriter" as ReportWriter
+
+Recorder --> Composer
+Composer --> Transport
+Composer --> Store
+Composer --> Resolver
+Composer --> Validator
+Composer --> Epoch
+Composer --> Service
+Composer --> AckIngress
+Composer --> QuorumRuntime
+Composer --> CommitIngress
+Composer --> Delivery
+Composer --> DeliveryTracking
+Composer --> Registry
+Composer --> ReportWriter
+
+@enduml

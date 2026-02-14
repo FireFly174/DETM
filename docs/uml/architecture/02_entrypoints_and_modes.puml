@@ -1,0 +1,39 @@
+﻿@startuml
+left to right direction
+title Entrypoints and Run Modes
+
+actor User
+
+rectangle "main.py" as Main
+
+package "Modes" {
+  rectangle "napari" as NapariMode
+  rectangle "headless" as HeadlessMode
+  rectangle "shell" as ShellMode
+  rectangle "default (no args)\nnapari --interactive" as DefaultMode
+}
+
+package "Entrypoints" {
+  rectangle "detm_app.ui.napari.lab.main" as NapariMain
+  rectangle "detm_app.runner.headless.main" as HeadlessMain
+  rectangle "detm_app.runner.shell.main" as ShellMain
+}
+
+User --> Main
+Main --> NapariMode : "main.py napari ..."
+Main --> HeadlessMode : "main.py headless ..."
+Main --> ShellMode : "main.py shell ..."
+Main --> DefaultMode : "main.py"
+Main --> HeadlessMode : "main.py [other args]"
+
+NapariMode --> NapariMain
+HeadlessMode --> HeadlessMain
+ShellMode --> ShellMain
+DefaultMode --> NapariMain
+
+note bottom of NapariMain
+normal mode: producer + subscriber
+interactive mode: in-process controls
+end note
+
+@enduml

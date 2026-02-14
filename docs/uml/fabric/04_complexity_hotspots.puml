@@ -1,0 +1,47 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Fabric Complexity Hotspots
+
+component "FabricHandshakeRecorder\n(detm_app runtime subscriber)" as Recorder
+component "runtime_composer" as Composer
+component "handshake service" as Handshake
+component "ack ingress" as AckIngress
+component "quorum runtime" as Quorum
+component "delivery runtime" as Delivery
+component "epoch coordinator" as Epoch
+component "transport adapter" as Transport
+component "validator registry" as Registry
+component "report writer" as Report
+
+Recorder --> Composer
+Composer --> Handshake
+Composer --> AckIngress
+Composer --> Quorum
+Composer --> Delivery
+Composer --> Epoch
+Composer --> Transport
+Composer --> Registry
+Composer --> Report
+
+note bottom of Handshake
+Hotspot 1: policy matrix
+(ack rules, retries, required validators)
+end note
+
+note bottom of Delivery
+Hotspot 2: guarantees + tracking
+(at-least-once, receipts, outbox)
+end note
+
+note bottom of Epoch
+Hotspot 3: consensus/watermark
+(ordering and safety boundaries)
+end note
+
+note bottom of Transport
+Hotspot 4: auth/tls/backpressure/dedup
+operational complexity
+end note
+
+@enduml

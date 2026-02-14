@@ -1,6 +1,6 @@
 ﻿"""Normalization helpers for FabricHandshakeRecorder.attach(...) settings."""
 
-from detm.runtime.fabric.handshake_recorder_config.normalize import (
+from detm.runtime.fabric.handshake_recorder_config.flow import (
     normalize_fabric_handshake_recorder_attach_kwargs,
 )
 

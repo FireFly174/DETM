@@ -42,7 +42,7 @@ flowchart LR
 
 Оркестрация вынесена из legacy `detm.run` в `detm_app/runtime/*`:
 
-- `detm_app/runtime/session.py`: `DetmSession` (single-writer цикл поверх L0 API).
+- `detm_app/runtime/session/core.py`: `DetmSession` (single-writer цикл поверх L0 API).
 - `detm_app/runtime/scheduler.py`: `TickScheduler`, `TickRunner`.
 - `detm_app/runtime/bus.py`: синхронный `EventBus` для subscribers.
 - `detm_app/runtime/coarsening.py`: invariant tick streams (`InvariantCoarsener`).
@@ -95,6 +95,6 @@ flowchart LR
 ## 6) Fabric в текущем дереве
 
 Fabric runtime собран в `detm/runtime/fabric/*` (delivery/quorum/epoch/validator/transport).
-Subscriber wiring и запись runtime-артефактов подключаются через `detm_app/runtime/subscribers/fabric.py`.
+Subscriber wiring и запись runtime-артефактов подключаются через `detm_app/runtime/subscribers/fabric/*`.
 
 Канонический протокол и термины: `docs/rus/30_architecture/commit_protocol.md`.

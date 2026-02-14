@@ -1,0 +1,21 @@
+﻿@startuml
+autonumber
+title Viz Frame Message Sequence (length-prefixed msgpack)
+
+participant "VizStreamer" as Streamer
+participant "VizTransport\n(TcpVizTransport)" as Transport
+participant "VizClient" as Client
+participant "TCP Socket" as Socket
+participant "VizSubscriber" as Sub
+participant "Protocol\n(send_msg/recv_msg)" as Protocol
+
+Streamer -> Transport : send_state(state_blob, tick, signature, meta)
+Transport -> Client : send_state(...)
+Client -> Protocol : send_msg(payload)
+Protocol -> Socket : 4-byte length + msgpack bytes
+Socket -> Sub : framed bytes
+Sub -> Protocol : recv_msg(socket)
+Protocol --> Sub : payload dict
+Sub -> Sub : decode + render frame
+
+@enduml

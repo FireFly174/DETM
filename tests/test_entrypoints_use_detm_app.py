@@ -29,19 +29,11 @@ def test_main_entrypoint_uses_detm_app_only():
     assert "detm.app_settings" not in imported
 
 
-def test_detm_py_entrypoint_uses_detm_app_cli():
-    imported = _imported_modules("detm.py")
-    assert "detm_app.runner.headless" in imported
-    assert "detm.cli" not in imported
+def test_detm_py_legacy_entrypoint_removed():
+    assert not Path("detm.py").exists()
 
 
-def test_napari_viewer_entrypoint_uses_detm_app():
-    imported = _imported_modules("detm_napari_viewer.py")
-    assert "detm_app.ui.napari.subscriber" in imported
-    assert "detm.viz.napari_subscriber" not in imported
-
-
-def test_napari_lab_entrypoint_uses_detm_app():
-    imported = _imported_modules("detm_napari_lab.py")
-    assert "detm_app.ui.napari.lab" in imported
+def test_legacy_napari_entrypoint_wrappers_removed():
+    assert not Path("detm_napari_viewer.py").exists()
+    assert not Path("detm_napari_lab.py").exists()
 

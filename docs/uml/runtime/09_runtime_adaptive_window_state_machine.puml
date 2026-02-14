@@ -1,0 +1,31 @@
+@startuml
+title Runtime Adaptive Window State Machine (LevelPolicy/DetmSession)
+
+[*] --> Manual
+
+state Manual {
+  [*] --> Monitoring
+}
+
+Manual --> AdaptiveWindow : signal_triggered && step_after > cooldown_until\nset profile + adaptive_until + cooldown_until
+AdaptiveWindow --> AdaptiveWindow : signal_triggered && step_after < adaptive_until\nextend adaptive_until (max)
+AdaptiveWindow --> Cooldown : step_after >= adaptive_until
+Cooldown --> Cooldown : signal_triggered && step_after <= cooldown_until\nignored (guard)
+Cooldown --> Manual : step_after > cooldown_until
+
+note right of Manual
+Mode in policy_decision:
+runtime_adaptive_profile = "manual"
+end note
+
+note right of AdaptiveWindow
+Mode in policy_decision:
+runtime_adaptive_profile = selected profile
+runtime_adaptive_window_active = true
+end note
+
+note right of Cooldown
+Window closed, re-entry blocked until cooldown expires.
+end note
+
+@enduml

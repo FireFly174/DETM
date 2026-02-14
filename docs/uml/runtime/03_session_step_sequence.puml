@@ -1,0 +1,31 @@
+﻿@startuml
+autonumber
+title Session Step Flow (policy, chunking, publish)
+
+participant "Caller\n(UI/headless)" as C
+participant "DetmSession" as S
+participant "LevelPolicy" as P
+participant "detm.runtime.api" as API
+participant "EventBus" as B
+participant "Subscribers" as SUB
+
+C -> S : step(influence, n_ticks, rng)
+S -> P : decide(step_count, requested_n_ticks)
+P --> S : PolicyDecision
+
+alt effective_n_ticks <= 0
+  S -> API : step(state, influence, 0, rng)
+  API --> S : state + observables
+else effective_n_ticks > 0
+  loop chunked execution
+    S -> API : step(state, chunk_influence, chunk_n_ticks, rng)
+    API --> S : chunk_observables
+  end
+  S -> S : merge observables
+end
+
+S -> B : publish("step", state, observables, policy_decision, ...)
+B -> SUB : on_step(...)
+S --> C : observables
+
+@enduml

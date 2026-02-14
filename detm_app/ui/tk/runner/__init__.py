@@ -1,7 +1,4 @@
-"""Tk runner compatibility wrapper.
-
-Canonical implementation lives in `detm_app.ui.tk.runner.launcher`.
-"""
+"""Tk runner package exports."""
 
 from detm_app.ui.tk.runner.launcher import DetmTkRunner, UiRunSettings, launch_tk_ui
 

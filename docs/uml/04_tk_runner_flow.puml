@@ -1,0 +1,37 @@
+﻿@startuml
+skinparam componentStyle rectangle
+left to right direction
+title Tk Runner Flow Composition
+
+package "detm_app.ui.tk.runner" {
+  component "launcher.py\nlaunch_tk_ui" as Launcher
+
+  package "flow" {
+    component "layout.py/window.py\nTkLauncherLayout" as Layout
+    component "controls.builder\nTkControlVars" as Controls
+    component "settings.flow\nTkSettingsFlow" as SettingsFlow
+    component "actions.py\nTkRuntimeActionFlow" as ActionFlow
+    component "batch.py\nTkBatchFlow" as BatchFlow
+    component "viz.flow\nTkVizFlow" as VizFlow
+  }
+}
+
+component "detm_app.runtime.ui_runtime\nDetmUiRunner" as UiRunner
+component "detm_app.runtime.session\nDetmSession" as Session
+component "detm.runtime.api" as Api
+
+Launcher --> Layout
+Launcher --> Controls
+Launcher --> SettingsFlow
+Launcher --> ActionFlow
+Launcher --> BatchFlow
+Launcher --> VizFlow
+
+Launcher --> UiRunner
+SettingsFlow --> UiRunner
+ActionFlow --> UiRunner
+VizFlow --> UiRunner
+UiRunner --> Session
+Session --> Api
+
+@enduml

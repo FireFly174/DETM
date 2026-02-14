@@ -1,0 +1,31 @@
+﻿@startuml
+title L0 Tick Lifecycle State Machine (DetmSession)
+
+[*] --> Idle
+Idle --> Resetting : create()/reset()
+Resetting --> Ready
+
+Ready --> EvaluatingPolicy : step(influence, n_ticks)
+EvaluatingPolicy --> DirectStep : effective_n_ticks <= 0
+EvaluatingPolicy --> ChunkedStep : effective_n_ticks > 0
+
+DirectStep --> Publishing : publish step event
+
+state ChunkedStep {
+  [*] --> ChunkStart
+  ChunkStart --> CallAPI : api.step(chunk)
+  CallAPI --> ChunkBoundaryPublish : boundary crossed
+  CallAPI --> NextChunk : boundary not crossed
+  ChunkBoundaryPublish --> NextChunk
+  NextChunk --> ChunkStart : remaining > 0
+  NextChunk --> [*] : remaining == 0
+}
+
+ChunkedStep --> Publishing : final merged observables
+Publishing --> UpdateAdaptiveWindows
+UpdateAdaptiveWindows --> Ready
+
+Ready --> Closed : close()
+Closed --> [*]
+
+@enduml

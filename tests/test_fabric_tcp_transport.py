@@ -338,7 +338,9 @@ def test_tcp_fabric_transport_auth_rejects_with_mismatched_key():
                 }
             )
         )
-        time.sleep(0.05)
+        assert _wait_until(
+            lambda: int(dict(receiver.snapshot().get("auth", {})).get("rejected_total", 0)) >= 1
+        )
         assert len(received) == 0
         snap = receiver.snapshot()
         auth = dict(snap.get("auth", {}))

@@ -42,7 +42,7 @@ Invariants:
 
 Orchestration has moved from legacy `detm.run` into `detm_app/runtime/*`:
 
-- `detm_app/runtime/session.py`: `DetmSession` (single-writer loop over L0 API).
+- `detm_app/runtime/session/core.py`: `DetmSession` (single-writer loop over L0 API).
 - `detm_app/runtime/scheduler.py`: `TickScheduler`, `TickRunner`.
 - `detm_app/runtime/bus.py`: synchronous `EventBus` for subscribers.
 - `detm_app/runtime/coarsening.py`: invariant tick streams (`InvariantCoarsener`).
@@ -95,6 +95,6 @@ This keeps rendering/networking outside the L0 step.
 ## 6) Fabric in current tree
 
 Fabric runtime is consolidated under `detm/runtime/fabric/*` (delivery/quorum/epoch/validator/transport).
-Subscriber wiring and runtime artifact persistence are attached via `detm_app/runtime/subscribers/fabric.py`.
+Subscriber wiring and runtime artifact persistence are attached via `detm_app/runtime/subscribers/fabric/*`.
 
 Canonical protocol details: `docs/rus/30_architecture/commit_protocol.md`.

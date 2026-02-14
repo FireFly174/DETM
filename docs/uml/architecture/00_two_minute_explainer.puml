@@ -1,0 +1,30 @@
+﻿@startuml
+left to right direction
+title DETM 2-Minute Architecture Explainer
+
+actor "New Developer" as Dev
+component "main.py\nLauncher" as Launcher
+component "Run Mode\n(napari | headless | shell)" as Mode
+component "Orchestrator\n(session/scheduler/ui_runtime)" as Orch
+component "detm.runtime.api\n(L0 core)" as API
+component "Observables\n(signature/events/cost/quality)" as Obs
+component "EventBus\n(sync, ordered)" as Bus
+component "Subscribers\n(trace/watch/commit/viz/fabric)" as Subs
+component "Outputs\nUI files transport" as Out
+
+Dev --> Launcher : start run
+Launcher --> Mode
+Mode --> Orch
+Orch --> API : step/reset/digest
+API --> Obs
+Orch --> Bus : publish(reset/step/tick/signal)
+Bus --> Subs
+Subs --> Out
+
+note bottom of API
+Core/app separation:
+- detm/* = simulation core
+- detm_app/* = orchestration, UI, IO
+end note
+
+@enduml

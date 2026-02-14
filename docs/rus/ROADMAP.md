@@ -1,6 +1,6 @@
 ﻿# ROADMAP V2 — DETM
 
-Обновлено: 2026-02-13
+Обновлено: 2026-02-14
 
 Короткая версия для чтения: `docs/rus/ROADMAP_HUMAN.md`.
 Source-of-truth по статусам и зависимостям задач: `docs/rus/ROADMAP.md`.
@@ -67,7 +67,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 
 ### Тестовый срез
 
-- Локальный snapshot (2026-02-13): `pytest -q -> 331 passed, 1 skipped`.
+- Локальный snapshot (2026-02-14): `pytest -q -> 348 passed`.
 - Fabric-focused срез в roadmap и status snapshots уже зафиксирован (`docs/rus/90_notes/status_snapshot_2026-02-12_fabric_and_napari.md`, `docs/rus/90_notes/status_snapshot_2026-02-13_napari_phase_profiler.md`).
 
 ## Workstreams
@@ -128,10 +128,10 @@ Source-of-truth по статусам и зависимостям задач: `d
 
 Состав:
 
-- `RT-MNT-01` Декомпозиция `refinement/runtime.py` (`maybe_apply_refinement`) на pipeline-модули.
-- `RT-MNT-02` Разделение `level_policy/contracts.py` на model/normalize/decision слои.
+- `RT-MNT-01` Декомпозиция `refinement/apply.py` (`maybe_apply_refinement`) на pipeline-модули.
+- `RT-MNT-02` Разделение `level_policy/*` на model/normalize/decision слои.
 - `RT-MNT-03` Разделение `fabric/runtime_composer/composer.py` и handshake-normalize path на более мелкие сервисы.
-- `RT-MNT-04` Завершение schema migration контура в `serialization.py` (убрать placeholder `migrate_state`).
+- `RT-MNT-04` Завершение schema migration контура в `serialization/*` (убрать placeholder `migrate_state`).
 
 ## PM Registry (open items)
 
@@ -169,7 +169,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: `detm_app/config/app_settings.py`, новый config-model модуль, `tests/test_ui_layer_boundaries.py`.
 - `risks`: неполная миграция импортов и скрытые циклы.
 - `dod`: `detm_app.config.*` не содержит импортов `detm_app.runner.*`, контракт `UiRunSettings` доступен из config-model слоя.
-- `readout` (2026-02-13): `UiRunSettings` вынесен в `detm_app/config/ui_models.py`; `detm_app/config/app_settings.py` переведён на `detm_app.config.ui_models.UiRunSettings`; `DetmUiRunner` перенесён в `detm_app/runtime/ui_runtime.py`; обновлены импорты `napari/tk/__init__`; добавлены boundary checks (`tests/test_ui_layer_boundaries.py`).
+- `readout` (2026-02-13): `UiRunSettings` вынесен в `detm_app/config/ui_models.py`; `detm_app/config/app_settings.py` переведён на `detm_app.config.ui_models.UiRunSettings`; `DetmUiRunner` перенесён в `detm_app/runtime/ui_runtime/core.py`; обновлены импорты `napari/tk/__init__`; добавлены boundary checks (`tests/test_ui_layer_boundaries.py`).
 
 ### E-MNT-03 — Viewer adapter registry в `detm_app.runner.shell`
 
@@ -259,6 +259,11 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout` (2026-02-14): `headless fabric parser/options` дополнительно декомпозированы из модулей `detm_app/runner/headless/parser_fabric.py` и `detm_app/runner/headless/options_fabric.py` в сабпакеты `detm_app/runner/headless/parser_fabric/*` (`flow.py`, `handshake.py`, `transport.py`, `coordination.py`, `delivery.py`, `__init__.py`) и `detm_app/runner/headless/options_fabric/*` (`flow.py`, `handshake.py`, `transport.py`, `coordination.py`, `delivery.py`, `__init__.py`) с сохранением публичных импортов `detm_app.runner.headless.parser_fabric`/`detm_app.runner.headless.options_fabric`; обновлены boundary checks `tests/test_ui_layer_boundaries.py`; regression snapshot: `pytest -q -> 332 passed, 1 skipped`.
 - `readout` (2026-02-14): `headless subscriber wiring` дополнительно декомпозирован из `detm_app/runner/headless/subscribers.py` в сабпакет `detm_app/runner/headless/subscribers/*` (`flow.py`, `core.py`, `fabric.py`, `streaming.py`, `policy.py`, `__init__.py`) с сохранением публичного импорта `detm_app.runner.headless.subscribers`; обновлены boundary checks `tests/test_ui_layer_boundaries.py`; regression snapshot: `pytest -q -> 333 passed`.
 - `readout` (2026-02-14): `E-MNT-05` переведён в `done`: крупные app-layer модули `detm_app/runner/headless/*`, `detm_app/ui/napari/interactive/*`, `detm_app/ui/tk/runner/*` декомпозированы в feature-пакеты с сохранением публичных import-paths; текущий regression snapshot: `pytest -q -> 333 passed`.
+- `readout` (2026-02-14): post-refactor архитектурный regression sweep выполнен повторно (`pytest -q`, `tests/test_ui_layer_boundaries.py`, `tests/test_entrypoints_use_detm_app.py`, `tests/test_main_entrypoint_routing.py`); текущий snapshot: `pytest -q -> 340 passed`.
+- `readout` (2026-02-14): выполнен дополнительный alignment-pass по runtime/app structural hotspots без смены API: `detm/runtime/fabric/quorum_runtime.py` разделён на `quorum_runtime_factory.py` + `quorum_runtime_coordination.py`, `detm/runtime/fabric/tcp_transport/transport.py` разгружен auth/TLS helper-модулями (`tcp_transport/auth.py`, `tcp_transport/tls.py`), lifecycle wiring `FabricHandshakeRecorder` вынесен в `detm_app/runtime/subscribers/fabric/lifecycle.py`; regression snapshots: `pytest -q tests/test_fabric_quorum_runtime.py tests/test_fabric_runtime_composer.py tests/test_fabric_tcp_transport.py tests/test_fabric_handshake_recorder.py tests/test_ui_layer_boundaries.py -> 62 passed`, `pytest -q -> 340 passed`.
+- `readout` (2026-02-14): выполнен следующий alignment-pass по app runtime orchestration: flow `DetmSession.step` вынесен в `detm_app/runtime/session/step_flow.py` (класс `DetmSession` оставлен thin-wrapper), recording/invariant wiring вынесен из `detm_app/runtime/ui_runtime/core.py` в `detm_app/runtime/ui_runtime/recording.py` (публичные методы `_configure_recording`/`_configure_invariant_recording` сохранены); targeted regression snapshots: `pytest -q tests/test_level_policy_runtime.py tests/test_refinement_mvp.py tests/test_pattern_memory.py tests/test_system_watch_trace.py tests/test_commit_trace_linkage.py tests/test_ui_layer_boundaries.py -> 54 passed`, `pytest -q -> 340 passed`.
+- `readout` (2026-02-14): удалены неиспользуемые пустые placeholder-пакеты/файлы pre-tag cleanup (`fallback/*`, `learning/*`, `levels/*`, `detm_logging/*`, пустые `tools/*`, пустые `tests/test_*`, пустые `visualization/*` модули); packaging config очищен от `detm_logging*` include в `pyproject.toml`; regression snapshot: `pytest -q -> 340 passed`.
+- `readout` (2026-02-14): финальный pre-tag cleanup migration-артефактов: удалён legacy entrypoint `detm.py` (канонический вход только `main.py`), `tests/test_ui_layer_boundaries.py` переведён на устойчивые AST-boundary проверки вместо path-snapshot формата, удалены дублирующие import-guard тесты `tests/test_no_module_level_detm_app_imports_in_detm.py` и `tests/test_no_detm_app_imports_in_core.py`; актуальный regression snapshot: `pytest -q -> 348 passed`.
 
 ### G-FAB-01 — Delivery guarantees baseline (`at-least-once + idempotency`)
 
@@ -470,10 +475,10 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `risks`: смешение R&D и production в одном контуре.
 - `dod`: протокол описан как отдельный экспериментальный трек без влияния на канон.
 
-### RT-MNT-01 — Декомпозиция `detm/runtime/refinement/runtime.py`
+### RT-MNT-01 — Декомпозиция `detm/runtime/refinement/apply.py`
 
 - `id`: `RT-MNT-01`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-05`
@@ -483,36 +488,38 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `deliverables`: новые refinement submodules + orchestrator + backward-compatible entrypoint.
 - `api_contract_changes`: internal runtime API split для refinement helper contracts.
 - `tests_required`: existing refinement regression + unit tests на каждый pipeline step.
-- `readout_artifacts`: `detm/runtime/refinement/runtime.py`, новые `detm/runtime/refinement/*.py`, `tests/test_refinement_mvp.py`.
+- `readout_artifacts`: `detm/runtime/refinement/apply.py`, `detm/runtime/refinement/pipeline/*.py`, `tests/test_refinement_mvp.py`.
 - `risks`: незаметная смена порядка применения correction operators.
 - `dod`: `maybe_apply_refinement` либо тонкий orchestration-layer, либо полностью заменён модулярным pipeline без регрессий.
+- `readout` (2026-02-14): `refinement/apply.py` переведён в thin-facade и делегирует в pipeline-подмодуль `detm/runtime/refinement/pipeline/*` (`contracts.py`, `detect.py`, `roi.py`, `correction.py`, `metrics.py`, `orchestrator.py`) с явными stage-контрактами `detect -> roi -> correction -> metrics`; добавлены step-level unit tests `tests/test_refinement_pipeline_steps.py`; regression snapshots: `pytest -q tests/test_refinement_pipeline_steps.py -> 4 passed`, `pytest -q tests/test_refinement_mvp.py -> 18 passed`, `pytest -q -> 337 passed`.
 
-### RT-MNT-02 — Разделение `detm/runtime/level_policy/contracts.py`
+### RT-MNT-02 — Разделение `detm/runtime/level_policy/*`
 
 - `id`: `RT-MNT-02`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-07`
 - `depends_on`: `[RT-MNT-01]`
-- `scope_in`: разделить текущий monolithic `contracts.py` на model/normalization/decision модули с минимизацией cross-field coupling.
+- `scope_in`: разделить monolithic level-policy слой на model/normalization/decision модули с минимизацией cross-field coupling.
 - `scope_out`: изменение внешнего формата policy payload.
-- `deliverables`: `model.py` + `normalization.py` + `decision.py` (или эквивалент) и обновлённые импорты runtime.
+- `deliverables`: `model.py` + `normalization_build.py`/`normalization_inputs.py`/`normalization_serialize.py` + `decision_runtime_adaptive.py`/`decision_guard.py`/`decision_signals.py` и обновлённые импорты runtime.
 - `api_contract_changes`: internal module-path changes для `LevelPolicy` helper API.
 - `tests_required`: `tests/test_level_policy_runtime.py` + compatibility tests `from_dict/to_dict/decide_runtime_adaptive`.
 - `readout_artifacts`: split modules under `detm/runtime/level_policy/*`, updated tests.
 - `risks`: несовместимость defaults при переносе normalization logic.
 - `dod`: большие методы `from_dict/to_dict/decide_runtime_adaptive` декомпозированы, поведение подтверждено regression suite.
+- `readout` (2026-02-14): контракты вынесены в `detm/runtime/level_policy/model.py`, normalization/serialization вынесены в `detm/runtime/level_policy/normalization_build.py`, `normalization_inputs.py`, `normalization_serialize.py`, runtime-adaptive decision-логика вынесена в `detm/runtime/level_policy/decision_runtime_adaptive.py` (+ `decision_guard.py`, `decision_signals.py`); публичный импорт `detm.runtime.level_policy` сохранён; regression snapshots: `pytest -q tests/test_level_policy_runtime.py -> 15 passed`, `pytest -q -> 337 passed`.
 
 ### RT-MNT-03 — Декомпозиция Fabric composer/normalize path
 
 - `id`: `RT-MNT-03`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `fabric`
 - `target_date`: `2026-03-09`
 - `depends_on`: `[G-FAB-05]`
-- `scope_in`: декомпозировать `detm/runtime/fabric/runtime_composer/composer.py` и `detm/runtime/fabric/handshake_recorder_config/normalize.py` в отдельные сервисы/нормализаторы.
+- `scope_in`: декомпозировать `detm/runtime/fabric/runtime_composer/composer.py` и `detm/runtime/fabric/handshake_recorder_config/*` в отдельные сервисы/нормализаторы.
 - `scope_out`: изменение fabric handshake policy semantics.
 - `deliverables`: composer wiring modules (`transport/delivery/epoch/handshake`) + normalized config helpers per concern.
 - `api_contract_changes`: internal config-normalization API split.
@@ -520,11 +527,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: updated fabric composer modules, preserved `fabric_quorum_report` sections.
 - `risks`: частичная миграция и скрытые fallback ветки.
 - `dod`: composer/normalize path разбит на изолированные блоки; покрытие ключевых веток тестами сохранено.
+- `readout` (2026-02-14): `detm/runtime/fabric/runtime_composer/composer.py` переведён в thin-orchestrator, а composition path вынесен в подмодули `runtime_composer/state.py`, `delivery.py`, `artifact.py`, `transport.py`, `validator.py`, `epoch.py`, `quorum.py`, `services.py`, `reporting.py`; сохранены monkeypatch targets для regression tests (`open_fabric_transport`, `FabricQuorumRuntimeService.from_policy_settings`) и публичный API `compose_fabric_handshake_runtime`; normalization path вынесен в пакет `detm/runtime/fabric/handshake_recorder_config/*` (`flow.py`, `helpers.py`, `profile.py`); regression snapshots: `pytest -q tests/test_fabric_runtime_composer.py -> 10 passed`, `pytest -q tests/test_fabric_handshake_recorder_config.py -> 5 passed`, `pytest -q -> 337 passed`.
 
-### RT-MNT-04 — Завершить schema migration в `serialization.py`
+### RT-MNT-04 — Завершить schema migration в `serialization/*`
 
 - `id`: `RT-MNT-04`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-12`
@@ -534,9 +542,10 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `deliverables`: migration registry + versioned adapters + compatibility tests.
 - `api_contract_changes`: explicit migration contract for `serialize_state/deserialize_state`.
 - `tests_required`: forward/backward migration tests across supported schema versions.
-- `readout_artifacts`: `detm/runtime/serialization.py`, schema tests, migration report note.
+- `readout_artifacts`: `detm/runtime/serialization/*`, schema tests, migration report note.
 - `risks`: silent data corruption при неполной миграции.
 - `dod`: migration path реализован и покрыт тестами; placeholder ветка удалена.
+- `readout` (2026-02-14): placeholder `migrate_state(...)` удалён; в `detm/runtime/serialization/*` добавлен формализованный migration registry с version graph и adapters (`0.0.0` legacy unversioned <-> `1.0.0`), `deserialize_state` теперь выполняет автоматическую миграцию legacy payload к канонической схеме, а `migrate_state(blob, from_version, to_version)` валидирует embedded-version и применяет versioned adapters; добавлены compatibility tests `tests/test_state_schema_migration.py`; публичные экспорты `migrate_state` добавлены в `detm.runtime.api`/`detm.runtime`; regression snapshots: `pytest -q tests/test_state_schema_migration.py -> 3 passed`, `pytest -q tests/test_integration_contract.py -> 2 passed`, `pytest -q -> 340 passed`.
 
 ## PM Registry (done doc-items)
 
@@ -557,13 +566,14 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `risks`: потеря контекста при переносе старых разделов.
 - `dod`: новый формат принят и закрывает общие пункты.
 - `readout` (2026-02-13): синхронизированы архитектурные и launch-документы после migration `detm.run -> detm_app.runtime`: обновлены `README.md`, `docs/rus/architecture.md`, `docs/eng/architecture.md`, `docs/rus/00_overview/architecture.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`, `docs/rus/30_architecture/commit_protocol.md`, `docs/eng/integration_contract.md`, `docs/rus/integration_contract.md`, `PROMT_SHORT.md`.
+- `readout` (2026-02-14): актуализированы статусные карточки program-layer экспериментов (`docs/rus/50_experiments/{00,01,02}_*.md`, `docs/eng/40_experiments/{00,01,02}_*.md`, README-индексы), а также регенерирован единый mega UML (`docs/uml/ALL_PROJECT_UML_MEGA.puml`) под текущий layout `session/*`, `ui_runtime/*`, `subscribers/*`, `serialization/*`, `fabric/*`.
 
 ## Imported from game: implemented vs pending
 
 ### Implemented in DETM
 
 1. `System Trace + Watch Trace + trace_ref`
-- Evidence: `detm_app/runtime/subscribers/trace.py`, `detm_app/runtime/subscribers/watch.py`, `detm/runtime/watch_contract.py`, `tests/test_system_watch_trace.py`.
+- Evidence: `detm_app/runtime/subscribers/trace/*`, `detm_app/runtime/subscribers/watch/*`, `detm/runtime/watch_contract.py`, `tests/test_system_watch_trace.py`.
 
 2. Artifact-first watch contract (`OuterFieldsRef` linkage)
 - Evidence: `detm/runtime/watch_contract.py`, `tests/test_watch_contract_writer.py`, `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`.

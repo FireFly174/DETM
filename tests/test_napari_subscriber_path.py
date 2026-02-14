@@ -210,7 +210,7 @@ def test_resolve_napari_endpoint_without_sources_raises_system_exit(tmp_path, mo
     except SystemExit as exc:
         msg = str(exc)
         assert "Cannot resolve viz endpoint." in msg
-        assert "detm_napari_viewer.py --port" in msg
+        assert "main.py napari -- --port" in msg
     else:  # pragma: no cover
         raise AssertionError("Expected SystemExit when endpoint cannot be resolved")
 

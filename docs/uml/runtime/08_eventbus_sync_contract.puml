@@ -1,0 +1,26 @@
+﻿@startuml
+autonumber
+title EventBus Sync Contract (Potential Blocking)
+
+participant "Publisher\n(session/scheduler)" as Pub
+participant "EventBus" as Bus
+participant "Subscriber A" as A
+participant "Subscriber B" as B
+participant "Subscriber C" as C
+
+Pub -> Bus : publish(event, payload)
+Bus -> A : handler(payload)
+A --> Bus : return
+Bus -> B : handler(payload)
+B --> Bus : return
+Bus -> C : handler(payload)
+C --> Bus : return
+Bus --> Pub : publish() returns
+
+note right of Bus
+Synchronous and ordered by subscription.
+Any slow handler blocks whole publish chain
+(and can delay tick loop).
+end note
+
+@enduml
