@@ -1,6 +1,6 @@
-# DETM Book (EN v2 quick) [draft]
+# DETM Book (EN v2 quick)
 
-_mode: draft_
+_mode: print_
 
 ## Содержание
 
@@ -268,4 +268,4 @@ Extend this registry with domain-specific scenarios.
 
 ---
 
-_stats: chars=8377, words=1186, pages=4.7 (rough)_
+_stats: chars=8369, words=1185, pages=4.6 (rough)_

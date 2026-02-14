@@ -1,6 +1,6 @@
-# DETM Book (EN v2) [draft]
+# DETM Book (EN v2)
 
-_mode: draft_
+_mode: print_
 
 ## Содержание
 
@@ -488,4 +488,4 @@ For current execution status, see `docs/rus/ROADMAP.md`.
 
 ---
 
-_stats: chars=14694, words=2042, pages=8.2 (rough)_
+_stats: chars=14686, words=2041, pages=8.2 (rough)_

@@ -11,6 +11,8 @@ Build:
 - Full: `tools\\compile_book_en_v2.cmd`
 - Quick: `tools\\compile_book_en_v2.cmd draft quick`
 - Print-oriented markdown: `tools\\compile_book_en_v2.cmd print`
+- Render HTML/PDF from compiled markdown: `tools\\render_book_en_v2.cmd print`
+- Full export (compile + render): `tools\\export_book_en_v2.cmd print`
 
 Outputs:
 - `docs/book/en_v2/_compiled_v2.md`

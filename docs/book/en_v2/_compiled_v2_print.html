@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>DETM - EN v2</title>
+  <style>
+
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+border: none;
+border-top: 1px solid #1a1a1a;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">DETM - EN v2</h1>
+</header>
+<h1 id="detm-book-en-v2">DETM Book (EN v2)</h1>
+<p><em>mode: print</em></p>
+<h2 id="содержание">Содержание</h2>
+<ol type="1">
+<li>Where to start (short hook)</li>
+<li>Levels map (L0..L5)</li>
+<li>Quickstart (10 minutes)</li>
+<li>First aid protocol (when the system is melting)</li>
+<li>Thesis</li>
+<li>Reader map</li>
+<li>How to read this book</li>
+<li>L0: Existence (0/1) as minimal invariant</li>
+<li>L1: Minimal operation and verified effect</li>
+<li>L2: Narratives, roles, and interpretation</li>
+<li>L3: Metrics, rules, and axis policy</li>
+<li>L4: Institutions, power, and anti-capture</li>
+<li>L5: Boundaries, transitions, and regime change</li>
+<li>Terms</li>
+<li>Case registry (compact)</li>
+<li>Navigation cheat sheet (S-T-C)</li>
+<li>Invariants and tests</li>
+<li>Index (keywords)</li>
+</ol>
+<h2 id="where-to-start-short-hook">Where to start (short hook)</h2>
+<p>Imagine a bridge.</p>
+<p>From the outside, everything looks healthy: traffic flows, dashboards
+are green, reports look convincing. But bridges do not stand on reports.
+They stand on load limits, joints, maintenance windows, and the honesty
+of stress signals.</p>
+<p>Human systems fail the same way. Usually not because nobody &quot;wants
+good results&quot;, but because the system quietly learns that imitation is
+cheaper than reality:</p>
+<ul>
+<li>language still sounds correct while causality is already
+broken,</li>
+<li>metrics keep improving while field outcomes degrade,</li>
+<li>institutions defend capture instead of resilience,</li>
+<li>the old regime passes its boundary and no longer converges.</li>
+</ul>
+<p>This book is not a moral lecture and not a motivational script. It is
+an operational diagnostic guide:</p>
+<ol type="1">
+<li>identify the active failure level,</li>
+<li>apply the smallest operator that restores causality,</li>
+<li>move from emergency stabilization to controlled adaptation.</li>
+</ol>
+<p>Core claim:</p>
+<blockquote>
+<p>Most hard system conflicts are conflicts between levels of
+description.</p>
+</blockquote>
+<p>One actor speaks L0 (basis), another speaks L1 (actions), another
+speaks L2 (stories), another speaks L3 (metrics and rules), and another
+speaks L4/L5 (institutions and boundaries). They can all be &quot;right&quot;
+locally and still produce collective failure globally.</p>
+<h2 id="levels-map-l0l5">Levels map (L0..L5)</h2>
+<p>The model uses six operational levels.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Question</th>
+<th>Typical failure</th>
+<th>Typical operator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Does the system still hold?</td>
+<td>basis collapse, fake participation</td>
+<td>stop, exit, load reduction</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Do actions produce verified effects?</td>
+<td>activity without effect</td>
+<td>minimal action + readout</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Which stories/roles gate behavior?</td>
+<td>rationalization, taboo, shame loops</td>
+<td>reframe + permission update</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Which metrics/rules define reality?</td>
+<td>Goodhart, metric theater</td>
+<td>axis policy, anti-capture checks</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Who can change rules legitimately?</td>
+<td>institutional capture</td>
+<td>governance reset, veto rights</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Where are the regime boundaries?</td>
+<td>delayed transition, hard crash</td>
+<td>transition protocol</td>
+</tr>
+</tbody>
+</table>
+<p>Use this map as routing logic, not ideology.</p>
+<h2 id="quickstart-10-minutes">Quickstart (10 minutes)</h2>
+<p><a id="quickstart"></a></p>
+<h3 id="1-one-sentence-summary">1) One-sentence summary</h3>
+<p>Systems tend to optimize what is cheapest to hold now, and fail where
+regime-holding cost stops converging.</p>
+<h3 id="2-60-second-model-map">2) 60-second model map</h3>
+<ul>
+<li>L0: basis/existence (0/1)</li>
+<li>L1: action -&gt; observable effect</li>
+<li>L2: narratives and role contracts</li>
+<li>L3: metrics/rules/axis policy</li>
+<li>L4: institutions and sanctioning power</li>
+<li>L5: boundaries and transitions</li>
+</ul>
+<h3 id="3-first-move-protocol">3) First move protocol</h3>
+<p>If &quot;any option leads to the same failure&quot;: go depth-first (L3 -&gt;
+L1 -&gt; L0). If causality holds but choice is unclear: go breadth-first
+(usually L2/L3).</p>
+<h3 id="4-starter-symptoms">4) Starter symptoms</h3>
+<ul>
+<li>Fires everywhere, overload: start <code>L0-C1</code>
+(pause/stop)</li>
+<li>Metrics up, reality down: start <code>L3-C6</code> (break metric
+game)</li>
+<li>No clear next step: start <code>L1-C2</code> (minimal readout)</li>
+<li>Narrative deadlock: start <code>L3-C7</code> (axis policy)</li>
+</ul>
+<h3 id="5-fast-navigation">5) Fast navigation</h3>
+<p>Use <code>Sx/Ty</code> and <code>Lx-Cn</code> codes from appendix
+navigation to jump directly to the needed operator.</p>
+<h2 id="first-aid-protocol-when-the-system-is-melting">First aid
+protocol (when the system is melting)</h2>
+<p>Use this in emergency mode before deep analysis.</p>
+<ol type="1">
+<li>Freeze escalation (<code>L0-C1</code>): stop adding
+commitments.</li>
+<li>Restore a truthful sensor (<code>L0-C6</code>/<code>L1-C2</code>):
+one observable that cannot be faked cheaply.</li>
+<li>Remove impossible scope (<code>L0-C4</code>): reduce obligations to
+sustainable capacity.</li>
+<li>Isolate toxic coupling (<code>L0-C5</code>): quarantine the failure
+amplifier.</li>
+<li>Decide path:
+<ul>
+<li>if causality returns -&gt; move to L1/L2 refinement,</li>
+<li>if causality does not return -&gt; execute transition logic
+(L5).</li>
+</ul></li>
+</ol>
+<p>Rule:</p>
+<blockquote>
+<p>In emergency, survival of causality has priority over optimization of
+goals.</p>
+</blockquote>
+<h2 id="thesis">Thesis</h2>
+<p>This book is about how systems hold a regime, and at what price.</p>
+<p>By &quot;system&quot; we mean any coordinated structure where action and
+consequence must stay linked: person, family, team, organization,
+institution, state. By &quot;regime&quot; we mean the currently active way of
+operating: action cadence, feedback quality, cost distribution, and
+boundary handling.</p>
+<p>The practical thesis is strict:</p>
+<ol type="1">
+<li>Stability is not produced by good intentions. It is produced by
+convergent basis contracts.</li>
+<li>Learning is not &quot;loss goes down&quot;. Learning is invariant retention
+under perturbation.</li>
+<li>Metrics are sensors, not truth.</li>
+<li>Rules are cost architecture, not morality.</li>
+<li>Institutional quality is anti-capture plus reversibility.</li>
+<li>Boundary crossing without transition protocol creates systemic
+debt.</li>
+</ol>
+<p>Another way to read it:</p>
+<ul>
+<li>if report quality is decoupled from pain/cost, systems train reward
+hacking;</li>
+<li>if stopping rights are taboo, error debt accumulates invisibly;</li>
+<li>if axis policy is implicit, metric wars replace control.</li>
+</ul>
+<p>Pragmatic consequence:</p>
+<ul>
+<li>diagnose by level (<code>L0..L5</code>),</li>
+<li>act with the smallest operator that restores causality,</li>
+<li>validate by multi-signal readout, never by one KPI.</li>
+</ul>
+<h2 id="reader-map">Reader map</h2>
+<p>Choose your route.</p>
+<h3 id="practitioner-route">Practitioner route</h3>
+<p><code>Quickstart -&gt; L0 -&gt; L1 -&gt; L3 -&gt; L5 -&gt; Appendix: Navigation</code></p>
+<p>Use this route if you need immediate operational decisions.</p>
+<h3 id="research-route">Research route</h3>
+<p><code>Thesis -&gt; L0..L5 -&gt; Invariants and tests -&gt; Case registry</code></p>
+<p>Use this route for model building and hypothesis design.</p>
+<h3 id="governance-route">Governance route</h3>
+<p><code>L3 -&gt; L4 -&gt; L5 -&gt; Case registry</code></p>
+<p>Use this route for institutional design, policy and anti-capture
+work.</p>
+<h2 id="how-to-read-this-book">How to read this book</h2>
+<p>This is a diagnostic and operator handbook.</p>
+<p>Reading rules:</p>
+<ol type="1">
+<li>Start from observed symptoms, not from favorite theory.</li>
+<li>Identify active level(s) first.</li>
+<li>Apply one operator at a time.</li>
+<li>Validate with readout panel (never one KPI).</li>
+<li>Escalate to deeper level only if current level does not restore
+causality.</li>
+</ol>
+<p>Terminology:</p>
+<ul>
+<li><code>Sx/Ty</code>: scene/topic code (where the symptom
+appears)</li>
+<li><code>Lx-Cn</code>: level/operator code (what to do next)</li>
+</ul>
+<p>For implementation links, use:</p>
+<ul>
+<li><code>docs/eng/*</code> for narrative</li>
+<li><code>docs/rus/ROADMAP.md</code> for execution status</li>
+<li>runtime tests/artifacts for verification.</li>
+</ul>
+<h2 id="l0-existence-01-as-minimal-invariant">L0: Existence (0/1) as
+minimal invariant</h2>
+<p>L0 is the basis layer. It does not ask whether the system is
+efficient, elegant, or successful. It asks a harder question:</p>
+<blockquote>
+<p>Can this system still keep action and consequence connected over the
+current horizon?</p>
+</blockquote>
+<p>Operationally:</p>
+<ul>
+<li><code>L0 = 1</code>: basis contracts still hold (with recoverable
+default rate).</li>
+<li><code>L0 = 0</code>: basis defaults are systemic and causality
+degrades into noise.</li>
+</ul>
+<h3 id="why-l0-matters">Why L0 matters</h3>
+<p>When L0 collapses, upper layers become decorative:</p>
+<ul>
+<li>L1 becomes activity theater,</li>
+<li>L2 becomes rationalization,</li>
+<li>L3 becomes metric gaming,</li>
+<li>L4 becomes enforcement of drift,</li>
+<li>L5 arrives as forced transition instead of planned transition.</li>
+</ul>
+<h3 id="typical-l0-signals">Typical L0 signals</h3>
+<ul>
+<li>recurrent default on basic promises,</li>
+<li>imitation replacing real participation,</li>
+<li>chronic overload with no recovery windows,</li>
+<li>silent withdrawal from key actors,</li>
+<li>rising effort for shrinking stabilizing effect.</li>
+</ul>
+<h3 id="core-operators">Core operators</h3>
+<ul>
+<li><code>L0-C1</code>: pause/stop to prevent nonlinear escalation,</li>
+<li><code>L0-C2</code>: refusal/exit as truthful diagnostic signal,</li>
+<li><code>L0-C4</code>: obligation reduction to sustainable
+capacity,</li>
+<li><code>L0-C5</code>: quarantine of toxic coupling,</li>
+<li><code>L0-C6</code>: restoration of feedback that cannot be faked
+cheaply.</li>
+</ul>
+<h3 id="readout-panel">Readout panel</h3>
+<ul>
+<li>basis stability rate,</li>
+<li>basic-default frequency,</li>
+<li>participation authenticity,</li>
+<li>recovery-window integrity,</li>
+<li>intervention-energy / stabilization-gain ratio.</li>
+</ul>
+<p>If L0 cannot be restored in bounded attempts, switch from
+optimization mode to L5 transition mode.</p>
+<h2 id="l1-minimal-operation-and-verified-effect">L1: Minimal operation
+and verified effect</h2>
+<p>L1 is the action layer.</p>
+<p>Question:</p>
+<blockquote>
+<p>Which smallest action changes state in a measurable way?</p>
+</blockquote>
+<h3 id="failure-patterns">Failure patterns</h3>
+<ul>
+<li>high activity, zero state change,</li>
+<li>long loops with no truthful readout,</li>
+<li>parallelism overload and hidden queues,</li>
+<li>post-mortems that punish people instead of fixing operators.</li>
+</ul>
+<h3 id="core-operators-1">Core operators</h3>
+<ul>
+<li><code>L1-C1</code> minimum viable action,</li>
+<li><code>L1-C2</code> minimum truthful readout,</li>
+<li><code>L1-C3</code> cycle shortening,</li>
+<li><code>L1-C4</code> parallelism reduction,</li>
+<li><code>L1-C7</code> &quot;done = verified&quot;.</li>
+</ul>
+<h3 id="readout-panel-1">Readout panel</h3>
+<ul>
+<li>cycle time and variance,</li>
+<li>step success ratio,</li>
+<li>rework ratio,</li>
+<li>queue pressure.</li>
+</ul>
+<p>L1 must stay connected to L0 constraints and L3 axis policy.</p>
+<h2 id="l2-narratives-roles-and-interpretation">L2: Narratives, roles,
+and interpretation</h2>
+<p>L2 captures social semantics:</p>
+<ul>
+<li>what can be said,</li>
+<li>who may act,</li>
+<li>what is considered legitimate.</li>
+</ul>
+<h3 id="typical-failures">Typical failures</h3>
+<ul>
+<li>blame theater replacing diagnosis,</li>
+<li>heroism normalized as default,</li>
+<li>taboo on stopping or dissent,</li>
+<li>explanation replacing experiment.</li>
+</ul>
+<h3 id="core-operators-2">Core operators</h3>
+<ul>
+<li>explicit reframe (<code>L2-C5</code>),</li>
+<li>permission repair (who is allowed to pause/report truth),</li>
+<li>anti-taboo probes (<code>L2-C6</code>),</li>
+<li>shift from story to test (<code>L2-C7</code>).</li>
+</ul>
+<h3 id="readout">Readout</h3>
+<ul>
+<li>quality of disagreement,</li>
+<li>ability to report bad news safely,</li>
+<li>ratio of experiments to explanations.</li>
+</ul>
+<p>L2 is not optional: if roles forbid truth, L1/L3 degrade fast.</p>
+<h2 id="l3-metrics-rules-and-axis-policy">L3: Metrics, rules, and axis
+policy</h2>
+<p>L3 is the layer where systems decide what counts as reality.</p>
+<p>If this choice is implicit, control degrades quickly. If this choice
+is explicit, L3 becomes a stabilizer.</p>
+<p>Main risk:</p>
+<blockquote>
+<p>Goodhart mode: optimizing a sensor while degrading the underlying
+dynamics.</p>
+</blockquote>
+<h3 id="typical-failures-1">Typical failures</h3>
+<ul>
+<li>dashboard growth with declining field outcomes,</li>
+<li>incentives that reward imitation over repair,</li>
+<li>obligation growth detached from real capacity,</li>
+<li>hidden transfer of error cost to lower layers,</li>
+<li>post-hoc metric redefinition to avoid accountability.</li>
+</ul>
+<h3 id="core-operators-3">Core operators</h3>
+<ul>
+<li><code>L3-C1</code>: keep metric as sensor, never as standalone
+objective,</li>
+<li><code>L3-C4</code>: enforce stop-rule guardrails,</li>
+<li><code>L3-C5</code>: return error cost to source,</li>
+<li><code>L3-C6</code>: break report theater and reconnect report to
+field reality,</li>
+<li><code>L3-C7</code>: define axis policy explicitly (which projections
+govern decisions).</li>
+</ul>
+<h3 id="readout-panel-2">Readout panel</h3>
+<ul>
+<li>target metric plus at least two independent counter-signals,</li>
+<li>escalation/refinement pressure over time,</li>
+<li>transferability and robustness under perturbation,</li>
+<li>mismatch rate between report claims and trace-level evidence.</li>
+</ul>
+<p>L3 quality is measured by controllability, not by dashboard
+aesthetics.</p>
+<h2 id="l4-institutions-power-and-anti-capture">L4: Institutions, power,
+and anti-capture</h2>
+<p>L4 asks:</p>
+<blockquote>
+<p>Who can change rules, and under which legitimacy constraints?</p>
+</blockquote>
+<h3 id="failure-patterns-1">Failure patterns</h3>
+<ul>
+<li>concentrated interpretation monopoly,</li>
+<li>blocked veto/stop rights,</li>
+<li>irreversible decisions without rollback path,</li>
+<li>governance serving capture rather than system resilience.</li>
+</ul>
+<h3 id="core-operators-4">Core operators</h3>
+<ul>
+<li>distributed veto/stop rights,</li>
+<li>explicit rollback protocols,</li>
+<li>periodic legitimacy audits,</li>
+<li>anti-capture governance checks.</li>
+</ul>
+<h3 id="readout-1">Readout</h3>
+<ul>
+<li>reversibility index,</li>
+<li>authority concentration indicators,</li>
+<li>response time to confirmed systemic defects.</li>
+</ul>
+<p>L4 quality determines whether L3 corrections are possible in
+practice.</p>
+<h2 id="l5-boundaries-transitions-and-regime-change">L5: Boundaries,
+transitions, and regime change</h2>
+<p>L5 handles boundaries where old optimization stops converging.</p>
+<h3 id="typical-signs">Typical signs</h3>
+<ul>
+<li>repeated L0/L1 restoration attempts fail,</li>
+<li>growing intervention energy for shrinking effect,</li>
+<li>stable mismatch between reported and observed reality,</li>
+<li>structural debt accumulates faster than remediation.</li>
+</ul>
+<h3 id="core-operators-5">Core operators</h3>
+<ul>
+<li>transition trigger criteria,</li>
+<li>controlled shutdown or scope contraction,</li>
+<li>contract renegotiation before restart,</li>
+<li>post-transition invariant validation.</li>
+</ul>
+<h3 id="readout-2">Readout</h3>
+<ul>
+<li>transition success under fixed horizon,</li>
+<li>debt reduction trajectory,</li>
+<li>restored causality and participation quality.</li>
+</ul>
+<p>At L5, the question is not &quot;optimize more&quot;, but &quot;change regime
+safely&quot;.</p>
+<h2 id="terms">Terms</h2>
+<ul>
+<li><strong>Basis (L0)</strong>: minimal contracts/resources that keep
+causality alive.</li>
+<li><strong>Readout</strong>: multi-signal observation panel used for
+decision validation.</li>
+<li><strong>Goodhart mode</strong>: optimization of a sensor that
+degrades real dynamics.</li>
+<li><strong>Axis policy</strong>: explicit choice of which
+projections/metrics define reality.</li>
+<li><strong>Capture</strong>: concentration of interpretation/rule power
+in one actor/group.</li>
+<li><strong>Transition</strong>: explicit regime shift when current mode
+no longer converges.</li>
+<li><strong>Invariant</strong>: retained class/property under
+perturbation.</li>
+<li><strong>Operator</strong>: minimal action that changes state in a
+verifiable way.</li>
+</ul>
+<h2 id="case-registry-compact">Case registry (compact)</h2>
+<p><a id="case-registry"></a></p>
+<p>Use this table as an entry point.</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>First code</th>
+<th>Typical follow-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>overload, fire mode</td>
+<td><code>L0-C1</code></td>
+<td><code>L0-C4</code>, <code>L1-C2</code></td>
+</tr>
+<tr>
+<td>fake progress</td>
+<td><code>L3-C6</code></td>
+<td><code>L3-C7</code>, <code>L1-C2</code></td>
+</tr>
+<tr>
+<td>no next step</td>
+<td><code>L1-C2</code></td>
+<td><code>L1-C1</code>, <code>L2-C7</code></td>
+</tr>
+<tr>
+<td>role conflict</td>
+<td><code>L2-C5</code></td>
+<td><code>L3-C7</code>, <code>L4</code> checks</td>
+</tr>
+<tr>
+<td>capture suspicion</td>
+<td><code>L4</code> audit</td>
+<td><code>L3-C7</code>, <code>L5</code> transition criteria</td>
+</tr>
+</tbody>
+</table>
+<p>Extend this registry with domain-specific scenarios.</p>
+<h2 id="navigation-cheat-sheet-s-t-c">Navigation cheat sheet
+(S-T-C)</h2>
+<p><a id="nav-cheatsheet"></a></p>
+<h3 id="scenes">Scenes</h3>
+<ul>
+<li><code>S1</code>: person</li>
+<li><code>S2</code>: family/close network</li>
+<li><code>S3</code>: society/game layer</li>
+<li><code>S4</code>: organization</li>
+<li><code>S5</code>: state/institutions</li>
+</ul>
+<h3 id="topics">Topics</h3>
+<ul>
+<li><code>T1</code>: pause/stop</li>
+<li><code>T2</code>: refusal/exit</li>
+<li><code>T3</code>: heroic overuse</li>
+<li><code>T4</code>: obligation reduction</li>
+<li><code>T5</code>: quarantine</li>
+<li><code>T6</code>: feedback restoration</li>
+<li><code>T7</code>: interpretation/axis control</li>
+</ul>
+<h3 id="operator-map">Operator map</h3>
+<ul>
+<li>L0: <code>L0-C1..C7</code> (existence operators)</li>
+<li>L1: <code>L1-C1..C7</code> (action/readout operators)</li>
+<li>L2: <code>L2-C1..C7</code> (narrative/role operators)</li>
+<li>L3: <code>L3-C1..C7</code> (metric/rule operators)</li>
+</ul>
+<p>Search tips:</p>
+<ul>
+<li>combine scene + topic (<code>S4/T6</code>),</li>
+<li>or jump directly by operator code (<code>L3-C7</code>).</li>
+</ul>
+<h2 id="invariants-and-tests">Invariants and tests</h2>
+<p>This checklist aligns book-level diagnostics with repo-level
+verification.</p>
+<h3 id="invariants">Invariants</h3>
+<ol type="1">
+<li>Causality can be measured (no blind optimization).</li>
+<li>Readout is multi-signal (anti-Goodhart).</li>
+<li>Basis stress is visible before collapse.</li>
+<li>Rule changes preserve rollback path.</li>
+<li>Transition criteria are explicit before regime switch.</li>
+</ol>
+<h3 id="practical-tests">Practical tests</h3>
+<ul>
+<li>reproducible headless runs
+(<code>catalog/metrics/summary/final_state</code>),</li>
+<li>trace/watch linkage (<code>trace_ref</code> continuity),</li>
+<li>metric-countermetric consistency,</li>
+<li>no hidden dependency from core (<code>detm/*</code>) to app UI.</li>
+</ul>
+<p>For current execution status, see
+<code>docs/rus/ROADMAP.md</code>.</p>
+<h2 id="index-keywords">Index (keywords)</h2>
+<ul>
+<li>anti-capture</li>
+<li>anti-goodhart</li>
+<li>axis policy</li>
+<li>basis / L0</li>
+<li>boundary / transition</li>
+<li>causality</li>
+<li>default rate</li>
+<li>invariant</li>
+<li>metric theater</li>
+<li>operator</li>
+<li>readout panel</li>
+<li>regime change</li>
+<li>rollback</li>
+<li>scope reduction</li>
+<li>transition protocol</li>
+</ul>
+<hr />
+<p><em>stats: chars=14686, words=2041, pages=8.2 (rough)</em></p>
+</body>
+</html>

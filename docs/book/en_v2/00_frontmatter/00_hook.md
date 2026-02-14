@@ -2,23 +2,27 @@
 
 Imagine a bridge.
 
-From outside it looks fine: traffic moves, reports are green, dashboard numbers grow.
-But inside, the bridge stands only because load, joints, corrosion, maintenance, and tolerance are still under control.
+From the outside, everything looks healthy: traffic flows, dashboards are green, reports look convincing.
+But bridges do not stand on reports. They stand on load limits, joints, maintenance windows, and the honesty of stress signals.
 
-Complex human systems break in the same way:
-- language keeps working while causality is already broken,
-- metrics keep growing while reality degrades,
-- institutions protect capture rather than stability,
-- the regime crosses a boundary and old optimization no longer converges.
+Human systems fail the same way.
+Usually not because nobody "wants good results", but because the system quietly learns that imitation is cheaper than reality:
 
-This book is not a moral manifesto.
-It is a diagnostic framework:
-1. locate the failing level,
-2. restore causality with a minimal operator,
-3. move back from emergency to controlled adaptation.
+- language still sounds correct while causality is already broken,
+- metrics keep improving while field outcomes degrade,
+- institutions defend capture instead of resilience,
+- the old regime passes its boundary and no longer converges.
 
-Core idea:
+This book is not a moral lecture and not a motivational script.
+It is an operational diagnostic guide:
 
-> Most system conflicts are level-mismatch conflicts.
+1. identify the active failure level,
+2. apply the smallest operator that restores causality,
+3. move from emergency stabilization to controlled adaptation.
 
-One actor talks about basis (L0), another about actions (L1), another about narratives (L2), another about rules (L3), and another about institutional power (L4/L5).
+Core claim:
+
+> Most hard system conflicts are conflicts between levels of description.
+
+One actor speaks L0 (basis), another speaks L1 (actions), another speaks L2 (stories), another speaks L3 (metrics and rules), and another speaks L4/L5 (institutions and boundaries).
+They can all be "right" locally and still produce collective failure globally.
