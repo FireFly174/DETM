@@ -47,13 +47,18 @@ def test_packet_to_layer_frame_decodes_runtime_state_blob():
 
 
 def test_patch_six_meta_path_importer_sets_missing_path():
-    import sys
-    import six  # noqa: F401
+    class _SixMetaPathImporter:
+        pass
 
-    _patch_six_meta_path_importer()
-    for importer in list(sys.meta_path):
-        if type(importer).__name__ == "_SixMetaPathImporter":
-            assert hasattr(importer, "_path")
+    importer = _SixMetaPathImporter()
+    assert not hasattr(importer, "_path")
+    sys.meta_path.insert(0, importer)
+    try:
+        _patch_six_meta_path_importer()
+        assert hasattr(importer, "_path")
+        assert getattr(importer, "_path") == []
+    finally:
+        sys.meta_path = [item for item in list(sys.meta_path) if item is not importer]
 
 
 def test_tcp_subscriber_roundtrip_decodes_canonical_frame():
