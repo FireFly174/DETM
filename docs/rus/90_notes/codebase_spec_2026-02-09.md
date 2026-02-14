@@ -10,7 +10,7 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 
 Единица поставки:
 - пакет `detm` (см. `pyproject.toml`);
-- скриптовые entrypoints через `main.py` и `detm/cli.py`.
+- скриптовые entrypoints через `main.py` и `main.py`.
 
 ---
 
@@ -53,7 +53,7 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 Библиотеки:
 - `numpy` (и тензоры backend через runtime)
 
-### 3.2 Runtime API Layer (`detm/runtime`)
+### 3.2 Runtime API Layer (`detm_app/runtimetime`)
 
 Назначение:
 - канонический публичный API L0;
@@ -62,14 +62,14 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 - diagnostics и `OuterFields`-артефакты.
 
 Ключевые модули:
-- `detm/runtime/api/*`
-- `detm/runtime/state.py`
-- `detm/runtime/config/*`
-- `detm/runtime/influence/*`
-- `detm/runtime/serialization.py`
-- `detm/runtime/signature.py`
-- `detm/runtime/outerfields.py`
-- `detm/runtime/backends/{numpy_backend.py, torch_backend.py}`
+- `detm_app/runtimetime/api/*`
+- `detm_app/runtimetime/state.py`
+- `detm_app/runtimetime/config/*`
+- `detm_app/runtimetime/influence/*`
+- `detm_app/runtimetime/serialization/__init__.py`
+- `detm_app/runtimetime/signature.py`
+- `detm_app/runtimetime/outerfields.py`
+- `detm_app/runtimetime/backends/{numpy_backend.py, torch_backend.py}`
 
 Публичный контракт (`detm/__init__.py`):
 - типы: `DETMConfig`, `DETMInfluence`, `DETMState`, `DETMSignature`, `FieldSummaries`, `Observables`
@@ -78,7 +78,7 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 Библиотеки:
 - `numpy`, `msgpack`, опционально `torch`
 
-### 3.3 Run/Orchestration Layer (`detm/run`)
+### 3.3 Run/Orchestration Layer (`detm_app/runtime`)
 
 Назначение:
 - сессионная обёртка над runtime API;
@@ -88,15 +88,15 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 - подписчики записи артефактов и стриминга.
 
 Ключевые модули:
-- `detm/run/session.py` (`DetmSession`)
-- `detm/run/bus.py` (`EventBus`)
-- `detm/run/scheduler.py` (`TickScheduler`, `TickRunner`)
-- `detm/run/coarsening.py` (`InvariantCoarsener`)
-- `detm/run/subscribers.py`
+- `detm_app/runtime/session.py` (`DetmSession`)
+- `detm_app/runtime/bus.py` (`EventBus`)
+- `detm_app/runtime/scheduler.py` (`TickScheduler`, `TickRunner`)
+- `detm_app/runtime/coarsening.py` (`InvariantCoarsener`)
+- `detm_app/runtime/subscribers/__init__.py`
 
 Примечание по архитектуре:
 - отдельный пакет `detm_app/` отсутствует;
-- orchestration сейчас реализован внутри `detm/run/*`.
+- orchestration сейчас реализован внутри `detm_app/runtime/*`.
 
 ### 3.4 Metrics & Analysis (`detm/metrics`, `detm/analysis`)
 
@@ -118,15 +118,15 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 - `detm/integrations/runtime_bridge.py`
 - `detm/integrations/acgs_backend.py` (`ACGSDetmBackend`)
 
-### 3.6 UI/Viz Layer (`detm/ui`, `detm/viz`)
+### 3.6 UI/Viz Layer (`detm_app/ui`, `detm_app/transport`)
 
 Назначение:
 - локальный UI для запуска;
 - визуализационный daemon/transport/protocol.
 
 Ключевые модули:
-- `detm/ui/tk_runner.py`
-- `detm/viz/{daemon.py, protocol.py, transport.py, tk_panel.py, subscriber.py}`
+- `detm_app/ui/tk_runner.py`
+- `detm_app/transport/{daemon.py, protocol.py, transport.py, tk_panel.py, subscriber.py}`
 
 Библиотеки:
 - stdlib `tkinter`, `socket`, `threading`
@@ -135,10 +135,10 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 
 #### 3.7.1 Реализовано сейчас
 
-- Рабочий UI-контур: `Tk` (`detm/ui/tk_runner.py`).
+- Рабочий UI-контур: `Tk` (`detm_app/ui/tk_runner.py`).
 - Рабочий viz transport:
   - `embedded` рендер (в том же процессе),
-  - `tcp` через headless hub (`detm/viz/daemon.py`, `detm/viz/transport.py`).
+  - `tcp` через headless hub (`detm_app/transport/daemon.py`, `detm_app/transport/transport.py`).
 - `VizStreamer` публикует сериализованные state blobs по подписке.
 
 #### 3.7.2 Прототипы / следы миграции
@@ -174,7 +174,7 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 
 ### 4.2 Headless CLI
 
-- `detm/cli.py`
+- `main.py`
 - поддерживает presets/config overrides, batch runs, traces, viz streaming, invariant streams
 
 ---
@@ -188,7 +188,7 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 - dense arrays через вложенный `npz` payload (compressed)
 
 Модуль:
-- `detm/runtime/serialization.py`
+- `detm_app/runtimetime/serialization/__init__.py`
 
 ### 5.2 Run Artifacts (headless)
 
@@ -263,8 +263,8 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 - GPU-first направление: состояние и шаги динамики стремятся оставаться на GPU.
 
 Это согласовано с текущим runtime и каноном:
-- `detm/runtime/api/*`
-- `detm/runtime/outerfields.py`
+- `detm_app/runtimetime/api/*`
+- `detm_app/runtimetime/outerfields.py`
 - `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
 
 ### 9.2 Что трактуется как target-архитектура (ещё не реализовано)
@@ -323,5 +323,6 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 2. Ввести `PatternCache` в рантайме (LRU по сигнатурам/инвариантам).
 3. Подключить cache lookup в контур coarsening/reaction до полного refinement.
 4. Оставить transport-node/fabric как отдельный этап после стабилизации п.1-3.
+
 
 

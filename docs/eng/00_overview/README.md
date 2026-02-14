@@ -69,3 +69,6 @@ Development flow:
 - active development branch: `dev/main`
 - release branch: `main`
 - policy: `docs/BRANCHING.md`
+
+One-page overview:
+- `docs/eng/00_overview/one_pager.md`

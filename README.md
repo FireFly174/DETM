@@ -40,9 +40,9 @@ python main.py napari --interactive
 
 ## Demo / preview
 
-Для публичного демо зарезервирована папка `docs/assets/`.
+Для публичного демо зарезервирована папка `docs/book/assets/`.
 
-Рекомендуемый файл для README-превью: `docs/assets/napari_demo.gif`.
+Рекомендуемый файл для README-превью: `docs/book/assets/napari_demo.gif`.
 
 ---
 

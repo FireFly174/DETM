@@ -13,6 +13,8 @@ while EN keeps `30_hypotheses/40_experiments/50_limits`).
 Start here:
 - RU: `docs/rus/00_overview/README.md`
 - EN: `docs/eng/00_overview/README.md`
+- One-pager RU: `docs/rus/00_overview/one_pager.md`
+- One-pager EN: `docs/eng/00_overview/one_pager.md`
 
 Key docs:
 - RU integration contract: `docs/rus/integration_contract.md`
@@ -27,6 +29,8 @@ Key docs:
 - Overview
   - RU: `docs/rus/00_overview/README.md`
   - EN: `docs/eng/00_overview/README.md`
+  - One-pager RU: `docs/rus/00_overview/one_pager.md`
+  - One-pager EN: `docs/eng/00_overview/one_pager.md`
 - Architecture (repo structure)
   - RU: `docs/rus/00_overview/architecture.md`
   - EN: `docs/eng/00_overview/architecture.md`
@@ -64,7 +68,9 @@ Key docs:
     - Inertia/mass from locality: RU `docs/rus/40_hypotheses/inertia_mass_locality.md`, EN `docs/eng/30_hypotheses/inertia_mass_locality.md`
     - Vortices as quasiparticles: RU `docs/rus/40_hypotheses/vortices_quasiparticles.md`, EN `docs/eng/30_hypotheses/vortices_quasiparticles.md`
     - Level capacity/phase transitions: RU `docs/rus/40_hypotheses/level_capacity_phase_transitions.md`, EN `docs/eng/30_hypotheses/level_capacity_phase_transitions.md`
-    - e as scale/boundary step and O(1) normalization (RU only): `docs/rus/40_hypotheses/e_scale_boundary_invariants.md`
+    - e as scale/boundary step and O(1) normalization:
+      - RU: `docs/rus/40_hypotheses/e_scale_boundary_invariants.md`
+      - EN: `docs/eng/30_hypotheses/e_scale_boundary_invariants.md`
 - Experiments
   - Golden baseline run (code/config): `experiments/00_baseline/README.md`
   - Research program (RU): `docs/rus/50_experiments/00_research_program.md`
