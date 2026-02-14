@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
 import numpy as np
 
-from detm_app.session import DetmSession
-from detm_app.subscribers import JsonlTraceWriter, WatchContractWriter
+from detm_app.runtime.session import DetmSession
+from detm_app.runtime.subscribers import JsonlTraceWriter, WatchContractWriter
 from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
 from detm.runtime.watch_contract import WatchContractPacket
@@ -110,3 +110,4 @@ def test_watch_contract_storage_policy_prunes_entries_and_artifacts(tmp_path):
     artifact_rows = sorted(outerfields_dir.glob("outerfields_*.npz"), key=lambda p: p.name)
     assert len(artifact_rows) == 3
     assert [int(path.stem.split("_")[-1]) for path in artifact_rows] == [4, 5, 6]
+

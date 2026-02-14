@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
-from detm_app.session import DetmSession
-from detm_app.subscribers import CommitJsonlWriter, FabricHandshakeRecorder
+from detm_app.runtime.session import DetmSession
+from detm_app.runtime.subscribers import CommitJsonlWriter, FabricHandshakeRecorder
 from detm.runtime.config import DETMConfig
-from detm.runtime.fabric_envelope import FabricEnvelope
+from detm.runtime.fabric import FabricEnvelope
 from detm.runtime.level_policy import LevelPolicy
 
 
@@ -56,11 +56,44 @@ def test_fabric_handshake_recorder_emits_ack_artifacts(tmp_path):
     assert int(quorum["epoch_watermark"]["global"]["watermark"]) == 3
     assert dict(quorum["replay_sampling"]) == {
         "enabled": False,
+        "tier": "sampled",
         "sample_stride": 0,
+        "strict_window_size": 128,
         "checks_total": 0,
         "checks_failed": 0,
     }
     assert dead_letters == []
+
+
+def test_fabric_handshake_recorder_publishes_runtime_snapshot_event(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=6,
+        height=6,
+        initial_noise=0.01,
+        level_policy=LevelPolicy(commit_stride=1, microsteps_per_global_tick=1),
+    )
+    session = DetmSession.create(cfg, seed=211)
+    commits_path = tmp_path / "commits.jsonl"
+    snapshots: list[dict] = []
+
+    CommitJsonlWriter.attach(session.bus, commits_path, node_id="node-handshake", mode="realtime")
+    FabricHandshakeRecorder.attach(session.bus, tmp_path, node_id="node-handshake", mode_filter="realtime")
+    session.bus.add_event_listener("fabric_runtime_snapshot", lambda **payload: snapshots.append(dict(payload)))
+
+    session.step(None, 1, rng=session.state.restore_rng())
+    session.close()
+
+    assert len(snapshots) >= 1
+    latest = dict(snapshots[-1].get("snapshot", {}))
+    assert bool(latest.get("enabled")) is True
+    assert int(latest.get("commit_count", 0)) >= 1
+    assert int(latest.get("ack_count", 0)) >= 2
+    quorum = dict(latest.get("quorum", {}))
+    assert int(quorum.get("accepted_count", 0)) >= 1
+    replay = dict(latest.get("replay", {}))
+    assert int(replay.get("checks_total", 0)) >= 0
 
 
 def test_fabric_handshake_recorder_validator_set_enforcement_marks_pending(tmp_path):
@@ -172,7 +205,9 @@ def test_fabric_handshake_recorder_replay_sampling_collects_stats(tmp_path):
     quorum = json.loads((tmp_path / "fabric_quorum_report.json").read_text(encoding="utf-8"))
     replay = dict(quorum["replay_sampling"])
     assert bool(replay["enabled"]) is True
+    assert str(replay["tier"]) == "sampled"
     assert int(replay["sample_stride"]) == 1
+    assert int(replay["strict_window_size"]) == 128
     assert int(replay["checks_total"]) == 3
     assert int(replay["checks_failed"]) == 0
 
@@ -531,3 +566,61 @@ def test_fabric_handshake_recorder_delivery_receipts_reject_on_any_reject(tmp_pa
     assert bool(delivery["reject_on_any_reject"]) is True
     assert int(delivery["accepted_count"]) == 0
     assert int(delivery["rejected_count"]) == 1
+
+
+def test_fabric_handshake_recorder_recovers_pending_delivery_after_restart(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=6,
+        height=6,
+        initial_noise=0.01,
+        level_policy=LevelPolicy(commit_stride=1, microsteps_per_global_tick=1),
+    )
+    state_path = tmp_path / "delivery_tracking_state.json"
+
+    session_a = DetmSession.create(cfg, seed=34)
+    CommitJsonlWriter.attach(session_a.bus, tmp_path / "commits_a.jsonl", node_id="node-handshake", mode="realtime")
+    FabricHandshakeRecorder.attach(
+        session_a.bus,
+        tmp_path,
+        node_id="node-handshake",
+        mode_filter="realtime",
+        delivery_required_receipts=1,
+        delivery_max_attempts=10,
+        delivery_retry_interval_ms=0,
+        delivery_timeout_ms=60_000,
+        delivery_emit_ack=False,
+        delivery_tracking_state_path=str(state_path),
+    )
+    session_a.step(None, 1, rng=session_a.state.restore_rng())
+    session_a.close()
+
+    first_report = json.loads((tmp_path / "fabric_quorum_report.json").read_text(encoding="utf-8"))
+    first_delivery = dict(first_report["delivery_receipts"])
+    assert int(first_delivery["pending_count"]) >= 1
+    assert state_path.exists()
+
+    session_b = DetmSession.create(cfg, seed=35)
+    recorder_b = FabricHandshakeRecorder.attach(
+        session_b.bus,
+        tmp_path,
+        node_id="node-handshake",
+        mode_filter="realtime",
+        delivery_required_receipts=1,
+        delivery_max_attempts=10,
+        delivery_retry_interval_ms=0,
+        delivery_timeout_ms=60_000,
+        delivery_emit_ack=True,
+        delivery_tracking_state_path=str(state_path),
+    )
+    recorder_b._tick_delivery_pending()  # type: ignore[attr-defined]
+    recorder_b._tick_delivery_pending()  # type: ignore[attr-defined]
+    session_b.close()
+
+    second_report = json.loads((tmp_path / "fabric_quorum_report.json").read_text(encoding="utf-8"))
+    second_delivery = dict(second_report["delivery_receipts"])
+    assert int(second_delivery["accepted_count"]) >= 1
+    assert int(second_delivery["pending_count"]) == 0
+
+

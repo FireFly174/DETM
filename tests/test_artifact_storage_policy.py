@@ -1,8 +1,8 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
-from detm_app.cli import run_headless
+from detm_app.runner.headless import run_headless
 from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
 
@@ -287,3 +287,4 @@ def test_fabric_quorum_report_policy_applies_to_history_report(tmp_path):
     assert len(history_rows) == 2
     assert all(isinstance(row, dict) for row in history_rows)
     assert (out_dir / "fabric_quorum_report.json").exists()
+

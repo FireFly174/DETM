@@ -1,7 +1,7 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from detm.runtime.fabric_delivery import JsonlFabricEnvelopeOutbox
-from detm.runtime.fabric_envelope import FabricEnvelope
+from detm.runtime.fabric import JsonlFabricEnvelopeOutbox
+from detm.runtime.fabric import FabricEnvelope
 
 
 def _env(commit_ref: str) -> FabricEnvelope:
@@ -69,3 +69,4 @@ def test_jsonl_outbox_audit_first_preserves_realtime_on_overflow(tmp_path):
     dropped = dict(snap["dropped_by_mode"])
     assert int(dropped["audit"]) == 1
     assert int(dropped["realtime"]) == 0
+

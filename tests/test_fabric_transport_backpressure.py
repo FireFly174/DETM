@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import time
 
 import pytest
 
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_transport import BufferedFabricTransport
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import BufferedFabricTransport
 
 
 def _env(commit_ref: str) -> FabricEnvelope:
@@ -113,3 +113,4 @@ def test_buffered_transport_block_policy_raises_on_timeout_when_queue_full():
         assert int(snap["pending_count"]) == 1
     finally:
         transport.close()
+

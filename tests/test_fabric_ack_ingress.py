@@ -1,8 +1,9 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from detm.runtime.fabric_ack_ingress import FabricAckIngressService
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_transport import InMemoryFabricBus
+from detm.runtime.fabric import FabricAckIngressService
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import InMemoryFabricBus
+from detm.runtime.fabric import FabricQuorumRuntimeService
 
 
 def _ack_env(*, channel: str = "fabric.ack", mode: str = "realtime", sender: str = "validator-1") -> FabricEnvelope:
@@ -72,3 +73,72 @@ def test_ack_ingress_stop_unsubscribes_handlers():
     bus.publish(_ack_env())
 
     assert service.ack_envelopes == []
+
+
+def test_ack_ingress_runtime_consumer_can_drop_inactive_validator_ack():
+    bus = InMemoryFabricBus()
+    runtime = FabricQuorumRuntimeService.from_policy_settings(
+        required_proof_accepts=1,
+        required_trust_accepts=1,
+        required_validator_ids=["validator-1"],
+        enforce_active_validator_membership=True,
+    )
+    runtime.register_commit("node-A:1")
+    service = FabricAckIngressService(transport=bus, consumer=runtime)
+    service.start()
+    bus.publish(_ack_env(sender="validator-unknown"))
+
+    snap = runtime.snapshot()
+    hardening = dict(snap["membership_hardening"])
+    assert int(hardening["dropped_inactive_validator_total"]) == 1
+    assert int(snap["pending_count"]) == 1
+    service.stop()
+
+
+def test_ack_ingress_runtime_consumer_can_drop_ack_by_auth_key_id_binding():
+    bus = InMemoryFabricBus()
+    runtime = FabricQuorumRuntimeService.from_policy_settings(
+        required_proof_accepts=1,
+        required_trust_accepts=1,
+        required_validator_ids=["validator-1"],
+        enforce_active_validator_membership=True,
+        enforce_ack_auth_key_id_binding=True,
+        validator_auth_key_ids={"validator-1": ["kid-1"]},
+    )
+    runtime.register_commit("node-A:1")
+    service = FabricAckIngressService(transport=bus, consumer=runtime)
+    service.start()
+    bad = _ack_env(sender="validator-1").to_dict()
+    bad["auth_key_id"] = "kid-bad"
+    bus.publish(FabricEnvelope.from_dict(bad))
+
+    snap = runtime.snapshot()
+    hardening = dict(snap["membership_hardening"])
+    assert int(hardening["dropped_auth_key_id_mismatch_total"]) == 1
+    assert int(snap["pending_count"]) == 1
+    service.stop()
+
+
+def test_ack_ingress_runtime_consumer_can_drop_ack_by_transport_identity_binding():
+    bus = InMemoryFabricBus()
+    runtime = FabricQuorumRuntimeService.from_policy_settings(
+        required_proof_accepts=1,
+        required_trust_accepts=1,
+        required_validator_ids=["validator-1"],
+        enforce_active_validator_membership=True,
+        enforce_ack_transport_identity_binding=True,
+        validator_transport_identities={"validator-1": ["cn:validator-1"]},
+    )
+    runtime.register_commit("node-A:1")
+    service = FabricAckIngressService(transport=bus, consumer=runtime)
+    service.start()
+    bad = _ack_env(sender="validator-1").to_dict()
+    bad["transport_identity"] = "cn:spoofed"
+    bus.publish(FabricEnvelope.from_dict(bad))
+
+    snap = runtime.snapshot()
+    hardening = dict(snap["membership_hardening"])
+    assert int(hardening["dropped_transport_identity_mismatch_total"]) == 1
+    assert int(snap["pending_count"]) == 1
+    service.stop()
+

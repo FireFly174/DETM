@@ -1,4 +1,4 @@
-# Инженерный паспорт решения: DETM (заполненная версия, черновик)
+﻿# Инженерный паспорт решения: DETM (заполненная версия, черновик)
 
 Статус: живой артефакт / decision map
 
@@ -28,7 +28,7 @@
 ### 1.2 Текущее положение
 
 Что уже есть:
-- `detm/runtime/api.py` как L0 API (`reset/step/digest/serialize/deserialize`).
+- `detm/runtime/api/*` как L0 API (`reset/step/digest/serialize/deserialize`).
 - Torch/Numpy backend.
 - Сериализация state (msgpack + npz).
 - Визуализация/инструменты (Tk + TCP daemon) как первые прототипы.
@@ -197,4 +197,5 @@
 2) `OuterFields` V1 как артефакт.
 3) napari как подписчик артефактов.
 4) `consensus_error` как артефакт согласования уровней.
+
 

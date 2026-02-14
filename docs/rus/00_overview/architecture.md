@@ -4,7 +4,7 @@
 фокус на формальной динамике (локальный перенос, подавление/энтропия, внутреннее время)
 без внешних предметных интерпретаций.
 
-См. также: `docs/integration_contract.md`.
+См. также: `docs/rus/integration_contract.md`.
 Актуальная целевая сводка (north star): `docs/rus/30_architecture/target_architecture_synthesis.md`.
 
 ## Актуализация (2026-02-10)
@@ -14,7 +14,7 @@
 - модульный runtime-стек фиксируется как `Core -> Runtime/Orchestration -> DataBus/Artifacts -> Observers`.
 
 Практический смысл для кода:
-- `detm/run/*` считается переходным контуром и мигрирует в `detm_app` по roadmap;
+- migration `detm.run -> detm_app.runtime` завершена; orchestration закреплён в `detm_app/runtime/*`;
 - граница межуровневого и внешнего чтения остаётся artifact-first (`OuterFields/metrics/events/trace_ref`), без прямого live-state доступа.
 
 ---

@@ -1,12 +1,12 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
 import numpy as np
 
-from detm_app.session import DetmSession
-from detm_app.scheduler import TickRunner, TickScheduler
-from detm_app.subscribers import JsonlTraceWriter
+from detm_app.runtime.session import DetmSession
+from detm_app.runtime.scheduler import TickRunner, TickScheduler
+from detm_app.runtime.subscribers import JsonlTraceWriter
 from detm.core.entropy import DynamicsParameters
 from detm.runtime.backends.numpy_backend import NumpyBackend
 from detm.runtime.config import DETMConfig
@@ -233,12 +233,47 @@ def test_level_policy_controls_trace_commit_and_event_filter(tmp_path):
     assert len(entries) == 2  # commit boundaries crossed on ticks 4 and 6
     assert [entry["tick"] for entry in entries] == [4, 6]
     assert all(entry["n_ticks"] == 2 for entry in entries)
+    assert all(entry["chunk_n_ticks"] == 2 for entry in entries)
     assert all(entry["requested_n_ticks"] == 1 for entry in entries)
+    assert all(entry["step_requested_n_ticks"] == 1 for entry in entries)
+    assert all(entry["step_effective_n_ticks"] == 2 for entry in entries)
     assert all(entry["detail_mode"] == "minimal" for entry in entries)
     assert all(entry["event_count"] == 0 for entry in entries)
     assert all(entry["event_types"] == [] for entry in entries)
     assert all(entry["policy"]["commit_stride"] == 3 for entry in entries)
     assert all(entry["policy"]["effective_n_ticks"] == 2 for entry in entries)
+
+
+def test_level_policy_trace_exposes_chunk_vs_step_tick_counts(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=6,
+        height=6,
+        initial_noise=0.01,
+        level_policy=LevelPolicy(
+            microsteps_per_global_tick=1,
+            batch_size=1,
+            commit_stride=1,
+        ),
+    )
+    session = DetmSession.create(cfg, seed=43)
+    trace_path = tmp_path / "trace.jsonl"
+    JsonlTraceWriter.attach(session.bus, trace_path, metric_plugins=[])
+
+    session.step(None, 3, rng=session.state.restore_rng())
+    session.close()
+
+    lines = [line for line in trace_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    entries = [json.loads(line) for line in lines]
+
+    assert [int(entry["tick"]) for entry in entries] == [1, 2, 3]
+    assert all(int(entry["n_ticks"]) == 1 for entry in entries)
+    assert all(int(entry["chunk_n_ticks"]) == 1 for entry in entries)
+    assert all(int(entry["requested_n_ticks"]) == 3 for entry in entries)
+    assert all(int(entry["step_requested_n_ticks"]) == 3 for entry in entries)
+    assert all(int(entry["step_effective_n_ticks"]) == 3 for entry in entries)
+    assert all(int(dict(entry.get("policy", {})).get("effective_n_ticks", 0)) == 1 for entry in entries)
 
 
 def _seed_overflow_hotspot(session: DetmSession) -> None:
@@ -691,3 +726,4 @@ def test_level_policy_batch_size_wiring_preserves_single_influence_apply():
     influence_events = [event for event in list(obs.events) if str(event.get("type")) == "influence"]
     assert len(influence_events) == 1
     assert float(obs.cost["step_ops_estimate"]) == float(6 * 6 * 5)
+

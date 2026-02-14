@@ -1,8 +1,8 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from detm.runtime.commit_packet import CommitPacket
-from detm.runtime.fabric_ack import ProofAck, TrustAck
-from detm.runtime.fabric_artifact_store import FileFabricArtifactStore
+from detm.runtime.fabric import ProofAck, TrustAck
+from detm.runtime.fabric import FileFabricArtifactStore
 
 
 def _make_commit(commit_id: str, tick: int) -> CommitPacket:
@@ -52,3 +52,4 @@ def test_file_fabric_artifact_store_roundtrip_commit_and_ack(tmp_path):
     assert isinstance(restored_trust, TrustAck)
     assert store.read_commit("artifact://missing/commit") is None
     assert store.read_ack("artifact://missing/ack") is None
+

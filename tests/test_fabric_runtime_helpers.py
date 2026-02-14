@@ -1,6 +1,6 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from detm.runtime.fabric_runtime_helpers import channel_for_mode, mode_channels, start_runtime_bundle
+from detm.runtime.fabric import channel_for_mode, mode_channels, start_runtime_bundle
 
 
 class _Bundle:
@@ -43,3 +43,4 @@ def test_start_runtime_bundle_returns_subscriptions():
     assert bundle.started == 1
     assert ack == [("fabric.ack.realtime", "realtime")]
     assert delivery == [("fabric.delivery.ack.realtime", "realtime")]
+

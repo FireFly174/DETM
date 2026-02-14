@@ -1,16 +1,16 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Dict
 
 from detm.runtime.commit_packet import CommitPacket
-from detm.runtime.fabric_ack import ProofAck, TrustAck
-from detm.runtime.fabric_delivery import JsonlFabricEnvelopeOutbox
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_handshake import FabricHandshakeService, RetryPolicy
-from detm.runtime.fabric_quorum import BasicQuorumPolicy, InMemoryQuorumCoordinator, ValidatorSetQuorumPolicy
-from detm.runtime.fabric_transport import InMemoryFabricBus
-from detm.runtime.fabric_validator import LocalFabricValidator
-from detm.runtime.fabric_validator_registry import StaticValidatorRegistry
+from detm.runtime.fabric import ProofAck, TrustAck
+from detm.runtime.fabric import JsonlFabricEnvelopeOutbox
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import FabricHandshakeService, RetryPolicy
+from detm.runtime.fabric import BasicQuorumPolicy, InMemoryQuorumCoordinator, ValidatorSetQuorumPolicy
+from detm.runtime.fabric import InMemoryFabricBus
+from detm.runtime.fabric import LocalFabricValidator
+from detm.runtime.fabric import StaticValidatorRegistry
 
 
 def _make_commit(commit_id: str, tick: int, parent_ref: str | None = None) -> CommitPacket:
@@ -537,3 +537,4 @@ def test_fabric_handshake_service_emits_delivery_ack_for_commit_envelope():
     assert ack.delivery_id == "delivery-1"
     payload = dict(ack.payload_inline or {})
     assert str(payload.get("delivery_id")) == "delivery-1"
+

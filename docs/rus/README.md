@@ -11,7 +11,8 @@
 - Синтез целевой архитектуры (north star): `docs/rus/30_architecture/target_architecture_synthesis.md`
 - OuterFields и подписки: `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
 - Commit-протокол и межнодовое согласование: `docs/rus/30_architecture/commit_protocol.md`
-- Миграция `detm.run` -> `detm_app`: `docs/rus/30_architecture/detm_run_migration.md`
+- Миграция `detm.run` -> `detm_app` (legacy фасады `detm.*`): `docs/rus/30_architecture/detm_run_migration.md`
+- Strict-режим отключения legacy фасадов (`DETM_DISABLE_LEGACY_FACADES=1`): `docs/rus/30_architecture/detm_run_migration.md`
 - Контракты как инварианты переноса: `docs/rus/20_mechanisms/contracts_as_flow_invariants.md`
 - Карта исходников → канон: `docs/rus/90_notes/source_materials.md`
 - Единый источник концепций из книги: `docs/rus/90_notes/book_concepts_single_source.md`

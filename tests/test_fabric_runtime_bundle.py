@@ -1,6 +1,6 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from detm.runtime.fabric_runtime_bundle import FabricHandshakeRuntimeBundle
+from detm.runtime.fabric import FabricHandshakeRuntimeBundle
 
 
 class _Service:
@@ -101,3 +101,4 @@ def test_runtime_bundle_stop_stops_all_and_closes_transport():
     assert delivery_runtime.stopped == 1
     assert transport.closed == 1
     assert epoch.stopped == 1
+

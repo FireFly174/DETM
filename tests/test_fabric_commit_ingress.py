@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from detm.runtime.commit_packet import CommitPacket
-from detm.runtime.fabric_artifact_resolver import FabricArtifactResolver
-from detm.runtime.fabric_commit_delivery import FabricCommitDeliveryService
-from detm.runtime.fabric_commit_ingress import FabricCommitIngressService
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_transport import InMemoryFabricBus
+from detm.runtime.fabric import FabricArtifactResolver
+from detm.runtime.fabric import FabricCommitDeliveryService
+from detm.runtime.fabric import FabricCommitIngressService
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import InMemoryFabricBus
 
 
 def _packet(*, commit_id: str, mode: str = "realtime") -> CommitPacket:
@@ -132,3 +132,4 @@ def test_commit_ingress_service_without_receipts_omits_delivery_id_and_inline_pa
     envelope = captured[0]
     assert envelope.delivery_id is None
     assert envelope.payload_inline is None
+

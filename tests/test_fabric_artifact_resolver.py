@@ -1,9 +1,9 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from detm.runtime.commit_packet import CommitPacket
-from detm.runtime.fabric_ack import ProofAck
-from detm.runtime.fabric_artifact_resolver import FabricArtifactResolver
-from detm.runtime.fabric_artifact_store import FileFabricArtifactStore
+from detm.runtime.fabric import ProofAck
+from detm.runtime.fabric import FabricArtifactResolver
+from detm.runtime.fabric import FileFabricArtifactStore
 
 
 def _packet(commit_id: str, *, tick: int) -> CommitPacket:
@@ -67,3 +67,4 @@ def test_artifact_resolver_uses_file_artifact_store(tmp_path):
     restored = resolver.resolve_commit(pref)
     assert restored is not None
     assert restored.to_dict() == packet.to_dict()
+

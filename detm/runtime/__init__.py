@@ -1,4 +1,4 @@
-"""Runtime package exposing integration-friendly APIs."""
+﻿"""Runtime package exposing integration-friendly APIs."""
 
 from detm.runtime.api import (
     FieldSummaries,
@@ -14,21 +14,21 @@ from detm.runtime.api import (
 from detm.runtime.config import DETMConfig
 from detm.runtime.commit_chain import CommitChainManager
 from detm.runtime.commit_packet import CommitPacket, CommitTickRef
-from detm.runtime.fabric_ack import ProofAck, TrustAck
-from detm.runtime.fabric_ack_ingress import AckEnvelopeConsumer, FabricAckIngressService
-from detm.runtime.fabric_artifact_resolver import FabricArtifactResolver
-from detm.runtime.fabric_artifact_store import FabricArtifactStore, FileFabricArtifactStore
-from detm.runtime.fabric_commit_delivery import FabricCommitDeliveryService
-from detm.runtime.fabric_commit_ingress import FabricCommitIngressService
-from detm.runtime.fabric_delivery import FabricEnvelopeOutbox, JsonlFabricEnvelopeOutbox
-from detm.runtime.fabric_delivery_receipts import (
+from detm.runtime.fabric import ProofAck, TrustAck
+from detm.runtime.fabric import AckEnvelopeConsumer, FabricAckIngressService
+from detm.runtime.fabric import FabricArtifactResolver
+from detm.runtime.fabric import FabricArtifactStore, FileFabricArtifactStore
+from detm.runtime.fabric import FabricCommitDeliveryService
+from detm.runtime.fabric import FabricCommitIngressService
+from detm.runtime.fabric import FabricEnvelopeOutbox, JsonlFabricEnvelopeOutbox
+from detm.runtime.fabric import (
     CountDeliveryReceiptPolicy,
     DeliveryReceiptPolicy,
     InMemoryDeliveryReceiptCoordinator,
     ValidatorSetDeliveryReceiptPolicy,
 )
-from detm.runtime.fabric_delivery_tracking import DeliveryTrackingCoordinator
-from detm.runtime.fabric_epoch import (
+from detm.runtime.fabric import DeliveryTrackingCoordinator
+from detm.runtime.fabric import (
     EpochDecision,
     FabricEpochCoordinator,
     FileEpochWatermarkCoordinator,
@@ -37,30 +37,30 @@ from detm.runtime.fabric_epoch import (
     commit_epoch,
     commit_watermark,
 )
-from detm.runtime.fabric_epoch_consensus import TransportEpochConsensusCoordinator
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_handshake import FabricHandshakeService, RetryPolicy
-from detm.runtime.fabric_handshake_recorder_config import normalize_fabric_handshake_recorder_attach_kwargs
-from detm.runtime.fabric_quorum import (
+from detm.runtime.fabric import TransportEpochConsensusCoordinator
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import FabricHandshakeService, RetryPolicy
+from detm.runtime.fabric import normalize_fabric_handshake_recorder_attach_kwargs
+from detm.runtime.fabric import (
     BasicQuorumPolicy,
     InMemoryQuorumCoordinator,
     QuorumPolicy,
     ValidatorSetQuorumPolicy,
 )
-from detm.runtime.fabric_quorum_report import FabricQuorumReportBuilder
-from detm.runtime.fabric_quorum_runtime import FabricQuorumRuntimeService
-from detm.runtime.fabric_report_writer import FabricRuntimeReportWriter
-from detm.runtime.fabric_runtime_bundle import FabricHandshakeRuntimeBundle
-from detm.runtime.fabric_runtime_composer import (
+from detm.runtime.fabric import FabricQuorumReportBuilder
+from detm.runtime.fabric import FabricQuorumRuntimeService
+from detm.runtime.fabric import FabricRuntimeReportWriter
+from detm.runtime.fabric import FabricHandshakeRuntimeBundle
+from detm.runtime.fabric import (
     FabricHandshakeRuntimeComposition,
     compose_fabric_handshake_runtime,
 )
-from detm.runtime.fabric_runtime_helpers import channel_for_mode, mode_channels, start_runtime_bundle
-from detm.runtime.fabric_tcp_transport import TcpFabricRelay, TcpFabricTransport, open_fabric_transport
-from detm.runtime.fabric_transport import BACKPRESSURE_POLICIES, BufferedFabricTransport, InMemoryFabricBus
-from detm.runtime.fabric_validator import FabricValidator, LocalFabricValidator, ReplayChecker, ReplaySamplePolicy
-from detm.runtime.fabric_validator_registry import StaticValidatorRegistry, ValidatorRegistry
-from detm.runtime.fabric_validation import validate_commit_paths
+from detm.runtime.fabric import channel_for_mode, mode_channels, start_runtime_bundle
+from detm.runtime.fabric import TcpFabricRelay, TcpFabricTransport, open_fabric_transport
+from detm.runtime.fabric import BACKPRESSURE_POLICIES, BufferedFabricTransport, InMemoryFabricBus
+from detm.runtime.fabric import FabricValidator, LocalFabricValidator, ReplayChecker, ReplaySamplePolicy
+from detm.runtime.fabric import StaticValidatorRegistry, ValidatorRegistry
+from detm.runtime.fabric import validate_commit_paths
 from detm.runtime.influence import DETMInfluence
 from detm.runtime.level_policy import LevelPolicy, ObservabilityProfile, PolicyDecision
 from detm.runtime.pattern_memory import (
@@ -156,3 +156,5 @@ __all__ = [
     "serialize_state",
     "deserialize_state",
 ]
+
+

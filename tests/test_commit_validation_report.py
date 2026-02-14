@@ -1,12 +1,12 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
-from detm_app.session import DetmSession
-from detm_app.subscribers import CommitJsonlWriter, CommitValidationReporter
+from detm_app.runtime.session import DetmSession
+from detm_app.runtime.subscribers import CommitJsonlWriter, CommitValidationReporter
 from detm.runtime.commit_packet import CommitPacket
 from detm.runtime.config import DETMConfig
-from detm.runtime.fabric_validation import validate_commit_paths
+from detm.runtime.fabric import validate_commit_paths
 from detm.runtime.level_policy import LevelPolicy
 from detm.runtime.schemas import DETM_COMMIT_PACKET_V1
 
@@ -89,3 +89,5 @@ def test_validate_commit_paths_detects_broken_parent_chain(tmp_path):
 
     assert report["status"] == "error"
     assert any("broken parent chain" in issue for issue in report["issues"])
+
+

@@ -1,6 +1,6 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from detm.runtime.fabric_quorum_report import FabricQuorumReportBuilder
+from detm.runtime.fabric import FabricQuorumReportBuilder
 
 
 class _QuorumRuntime:
@@ -67,12 +67,17 @@ def test_quorum_report_builder_builds_expected_sections():
         delivery_outbox=_Outbox(),  # type: ignore[arg-type]
         delivery_runtime=_DeliveryRuntime(),  # type: ignore[arg-type]
         delivery_required_receipts=2,
+        delivery_guarantee_mode="at_least_once_idempotent",
         delivery_required_validator_ids=["validator-1"],
         delivery_enforce_required_validator_ids=True,
         delivery_reject_on_any_reject=True,
         delivery_retry_interval_ms=10,
         delivery_max_attempts=5,
         delivery_timeout_ms=300,
+        transport_dedup_ingress_enabled=True,
+        replay_policy_tier="sampled",
+        replay_strict_window_size=32,
+        handshake_profile="production",
         epoch_coordinator=_Epoch(),  # type: ignore[arg-type]
     )
 
@@ -83,6 +88,14 @@ def test_quorum_report_builder_builds_expected_sections():
     assert bool(report["mode_channels"]["split_mode_channels"]) is True
     assert dict(report["transport_backpressure"]) == {"enabled": True, "policy": "drop_newest", "max_pending": 8}
     assert dict(report["delivery_outbox"]) == {"enabled": True, "pending_count": 2}
+    guarantees = dict(report["delivery_guarantees"])
+    assert guarantees == {
+        "configured_mode": "at_least_once_idempotent",
+        "effective_mode": "at_least_once_idempotent",
+        "at_least_once_enabled": True,
+        "idempotent_ingress_enabled": True,
+        "degraded": False,
+    }
     delivery = dict(report["delivery_receipts"])
     assert bool(delivery["enabled"]) is True
     assert int(delivery["accepted_count"]) == 3
@@ -91,8 +104,16 @@ def test_quorum_report_builder_builds_expected_sections():
     assert dict(report["epoch_watermark"]) == {"global": {"epoch": 10, "watermark": 10}}
     replay = dict(report["replay_sampling"])
     assert bool(replay["enabled"]) is True
+    assert str(replay["tier"]) == "sampled"
+    assert int(replay["strict_window_size"]) == 32
     assert int(replay["checks_total"]) == 5
     assert int(replay["checks_failed"]) == 1
+    validator_coord = dict(report["validator_coordination"])
+    assert int(validator_coord["validator_count"]) == 1
+    assert list(validator_coord["validator_ids"]) == ["validator-1"]
+    profile = dict(report["handshake_profile"])
+    assert str(profile["profile"]) == "production"
+    assert bool(profile["strict_runtime_enforcement"]) is True
 
 
 def test_quorum_report_builder_transport_and_epoch_errors_are_reported():
@@ -103,11 +124,31 @@ def test_quorum_report_builder_transport_and_epoch_errors_are_reported():
     builder = FabricQuorumReportBuilder(
         quorum_runtime=_QuorumRuntime(),  # type: ignore[arg-type]
         transport=_FailingTransport(),  # type: ignore[arg-type]
+        replay_policy_tier="strict_window",
+        replay_strict_window_size=9,
         epoch_coordinator=_FailingEpoch(),  # type: ignore[arg-type]
     )
     report = builder.build(replay_sample_stride=0, replay_checks_total=0, replay_checks_failed=0)
     backpressure = dict(report["transport_backpressure"])
     assert bool(backpressure["enabled"]) is True
     assert "transport snapshot failed" in str(backpressure["error"])
+    guarantees = dict(report["delivery_guarantees"])
+    assert guarantees == {
+        "configured_mode": "at_least_once_idempotent",
+        "effective_mode": "best_effort",
+        "at_least_once_enabled": False,
+        "idempotent_ingress_enabled": False,
+        "degraded": True,
+    }
     epoch = dict(report["epoch_watermark"])
     assert "epoch snapshot failed" in str(epoch["error"])
+    replay = dict(report["replay_sampling"])
+    assert replay == {
+        "enabled": True,
+        "tier": "strict_window",
+        "sample_stride": 0,
+        "strict_window_size": 9,
+        "checks_total": 0,
+        "checks_failed": 0,
+    }
+

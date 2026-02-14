@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
-from detm.runtime.fabric_ack import ProofAck, TrustAck
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_quorum_report import FabricQuorumReportBuilder
-from detm.runtime.fabric_report_writer import FabricRuntimeReportWriter
+from detm.runtime.fabric import ProofAck, TrustAck
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import FabricQuorumReportBuilder
+from detm.runtime.fabric import FabricRuntimeReportWriter
 
 
 class _Service:
@@ -92,7 +92,9 @@ def test_fabric_report_writer_writes_expected_files(tmp_path):
     assert int(report["accepted_count"]) == 1
     assert dict(report["replay_sampling"]) == {
         "enabled": True,
+        "tier": "sampled",
         "sample_stride": 1,
+        "strict_window_size": 128,
         "checks_total": 5,
         "checks_failed": 1,
     }
@@ -186,3 +188,4 @@ def test_fabric_report_writer_applies_storage_limits(tmp_path):
     assert [str(row["commit_ref"]) for row in ack_envs] == ["node-A:3", "node-A:4", "node-A:5"]
     assert [str(row["commit_ref"]) for row in delivery_envs] == ["node-A:5"]
     assert [str(row["message_type"]) for row in dead_letters] == ["commit-2", "commit-3"]
+

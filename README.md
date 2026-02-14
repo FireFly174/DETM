@@ -1,4 +1,4 @@
-# DETM — Discrete Entropy-Time Model
+﻿# DETM — Discrete Entropy-Time Model
 
 DETM — исследовательская дискретная модель динамики на решётке,
 предназначенная для изучения возникновения устойчивых локализованных структур
@@ -80,15 +80,23 @@ DETM:
 По умолчанию `python main.py` использует локальный файл `config.example.py` в корне репозитория:
 - если файла нет, он автоматически копируется из `detm/presets/config.default.py`
 - локальный `config.example.py` **не должен** трекаться git (он уже добавлен в `.gitignore`)
+- без аргументов запускается napari interactive mode (`--interactive`)
 
 Файл `config.example.py` — это Python-словарь `CONFIG` с секциями:
 - runtime (поля `DETMConfig`): `backend/device/width/height/boundary/initial_noise/dynamics(a,b,g,k,t=alpha,beta,gamma,kappa,lambda_t)`
 - `ui`: дефолты для UI (`UiRunSettings`)
-- `runner`: дефолты для headless CLI (`detm.cli`)
+- `runner`: дефолты для headless CLI (`detm_app.runner.headless`; `detm.cli` оставлен как deprecated facade)
 
 Также можно передать свой конфиг:
-- UI: `python main.py ui --config config.local.py`
+- UI (napari): `python main.py napari --config config.local.py`
+- UI (napari interactive controls, in-process): `python main.py napari --interactive --config config.local.py`
+  - внутри dock есть режимы `interactive` и `batch` (пакетные прогоны + лог)
 - Headless/batch: `python main.py --config config.local.py --batch 10`
+- Composable shell roles: `python main.py shell --controller local --runner headless --viewer napari -- --seed 7 --steps 200 --fabric-handshake`
+
+Справка по запуску:
+- `python main.py --help` — только launcher-level режимы запуска
+- `python main.py headless --help` — полный список headless параметров (включая расширенные внутренние knobs)
 
 ## Статус
 
@@ -106,3 +114,4 @@ DETM:
 
 Проект открыт для обсуждения и развития.
 Формат вклада и лицензия будут зафиксированы на следующем этапе.
+

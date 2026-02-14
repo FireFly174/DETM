@@ -1,10 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import numpy as np
 
-from detm_app.session import DetmSession
-from detm_app.subscribers import JsonlTraceWriter, WatchTraceWriter
+from detm_app.runtime.session import DetmSession
+from detm_app.runtime.subscribers import JsonlTraceWriter, WatchTraceWriter
 from detm.core.entropy import DynamicsParameters
 from detm.runtime.backends.numpy_backend import NumpyBackend
 from detm.runtime.config import DETMConfig
@@ -115,3 +115,4 @@ def test_watch_trace_runtime_adaptive_telemetry_switches_when_window_active(tmp_
     assert len(watch_entries) >= 3
     assert bool(dict(watch_entries[0].get("policy", {})).get("runtime_adaptive_window_active")) is False
     assert any(bool(dict(entry.get("policy", {})).get("runtime_adaptive_window_active")) for entry in watch_entries[1:])
+
