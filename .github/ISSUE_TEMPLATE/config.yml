@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/FireFly174/DETM/security/advisories
+    about: For vulnerabilities, use private security reporting when available.

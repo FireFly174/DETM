@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: "DETM: Discrete Entropy-Time Model"
+message: "If you use DETM in research, please cite this software repository."
+type: software
+authors:
+  - family-names: "Contributors"
+    given-names: "DETM"
+repository-code: "https://github.com/FireFly174/DETM"
+url: "https://github.com/FireFly174/DETM"
+license: "MIT"
+version: "0.2.0"
+date-released: "2026-02-14"
