@@ -22,7 +22,7 @@ For commercial terms, contact:
 - Email: Andrey.svetliakov@gmail.com
 - GitHub: https://github.com/FireFly174
 
-Support channels are also listed in `SUPPORT.md`.
+Support channels are also listed in `../../SUPPORT.md`.
 
 ## No automatic grant
 

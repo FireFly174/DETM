@@ -1,2 +1,13 @@
-msgpack
-numpy
+# Core runtime
+msgpack>=1.0
+numpy>=1.26
+
+# Default launcher path (main.py with no args -> napari interactive)
+torch
+napari
+qtpy
+pyside6
+
+# Experiment/analysis helpers used by scripts
+PyYAML
+matplotlib
