@@ -20,6 +20,7 @@ Key docs:
 - RU runtime/UI/viz architecture: `docs/rus/architecture.md`
 - EN runtime/UI/viz architecture: `docs/eng/architecture.md`
 - UML diagrams (PlantUML): `docs/uml/README.md`
+- Legal/distribution docs: `docs/legal/README.md`
 
 ## Table of contents
 
@@ -65,6 +66,7 @@ Key docs:
     - Level capacity/phase transitions: RU `docs/rus/40_hypotheses/level_capacity_phase_transitions.md`, EN `docs/eng/30_hypotheses/level_capacity_phase_transitions.md`
     - e as scale/boundary step and O(1) normalization (RU only): `docs/rus/40_hypotheses/e_scale_boundary_invariants.md`
 - Experiments
+  - Golden baseline run (code/config): `experiments/00_baseline/README.md`
   - Research program (RU): `docs/rus/50_experiments/00_research_program.md`
   - Research program (EN): `docs/eng/40_experiments/00_research_program.md`
   - Baseline tests (RU): `docs/rus/50_experiments/01_baseline_tests.md`
