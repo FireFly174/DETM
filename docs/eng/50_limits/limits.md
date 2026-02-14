@@ -1,6 +1,6 @@
-# Limits and forbidden interpretations
+﻿# Limits and forbidden interpretations
 
-Note: first-pass translation of `docs/rus/50_limits/limits.md`.
+Note: first-pass translation of `docs/rus/60_limits/limits.md`.
 
 This section fixes the boundaries of interpretation:
 - DETM is not a physical/cosmological theory
@@ -12,3 +12,4 @@ Interpretations beyond the formal dynamics are treated as external analogies and
 Additional scope constraints captured from the original notes:
 - the model is discrete and does not assume `Δt → 0`
 - stochasticity/noise is not part of the base spec (it is an extension)
+

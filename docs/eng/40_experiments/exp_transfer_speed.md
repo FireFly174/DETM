@@ -1,6 +1,6 @@
-# Transfer speed and lag diagnostics
+﻿# Transfer speed and lag diagnostics
 
-Note: first-pass translation of `docs/rus/40_experiments/exp_transfer_speed.md`.
+Note: first-pass translation of `docs/rus/50_experiments/exp_transfer_speed.md`.
 
 ## Goal
 
@@ -54,4 +54,5 @@ If circulation is present:
 - aggregated metrics: `τ_max` profile, `v_eff`, `J_tail`, `curl_rms`.
 
 Metric summary: `docs/eng/40_experiments/metrics.md`.
+
 

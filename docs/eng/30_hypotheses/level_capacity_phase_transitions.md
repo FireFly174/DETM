@@ -1,6 +1,6 @@
-# Level capacity and phase transitions (hypothesis)
+﻿# Level capacity and phase transitions (hypothesis)
 
-Note: first-pass translation of `docs/rus/30_hypotheses/level_capacity_phase_transitions.md`.
+Note: first-pass translation of `docs/rus/40_hypotheses/level_capacity_phase_transitions.md`.
 
 ## Idea
 
@@ -34,4 +34,5 @@ Detect a transition if within a window `[t, t+W]` metrics move into a different 
 - regime phase maps: `docs/eng/40_experiments/exp_phase_map.md`
 - metrics: `docs/eng/40_experiments/metrics.md`
 - masks/boundaries: `docs/eng/40_experiments/exp_object_masks.md`
+
 

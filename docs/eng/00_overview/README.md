@@ -54,3 +54,14 @@ DETM is not a physical/biological/cognitive theory. Any analogies outside the fo
 
 The project is in an active research stage. Results are preliminary and must be validated by reproducible runs.
 
+Source-of-truth roadmap is maintained in Russian:
+- `docs/rus/ROADMAP.md`
+- `docs/rus/ROADMAP_HUMAN.md`
+
+English snapshot:
+- `docs/eng/00_overview/roadmap_snapshot.md`
+
+Development flow:
+- active development branch: `dev/main`
+- release branch: `main`
+- policy: `docs/BRANCHING.md`

@@ -27,13 +27,13 @@ If you want to locally extract `.canvas` text nodes into markdown “cards”, u
   - internal time/asynchrony: `docs/rus/20_mechanisms/internal_time.md`
   - environment parameters as fields: `docs/rus/20_mechanisms/parameter_fields.md`
   - coarsening/scale: `docs/rus/20_mechanisms/coarsening.md`, `docs/rus/20_mechanisms/scale_axis.md`
-- Hypotheses (list): `docs/rus/30_hypotheses/hypotheses.md`
-- Experiments and metrics: `docs/rus/40_experiments/*`
-  - metrics: `docs/rus/40_experiments/metrics.md`
-  - regime phase maps: `docs/rus/40_experiments/exp_phase_map.md`
-  - object masks/boundaries: `docs/rus/40_experiments/exp_object_masks.md`
-  - transfer speed/lags: `docs/rus/40_experiments/exp_transfer_speed.md`
-- Limits: `docs/rus/50_limits/limits.md`
+- Hypotheses (list): `docs/rus/40_hypotheses/hypotheses.md`
+- Experiments and metrics: `docs/rus/50_experiments/*`
+  - metrics: `docs/rus/50_experiments/metrics.md`
+  - regime phase maps: `docs/rus/50_experiments/exp_phase_map.md`
+  - object masks/boundaries: `docs/rus/50_experiments/exp_object_masks.md`
+  - transfer speed/lags: `docs/rus/50_experiments/exp_transfer_speed.md`
+- Limits: `docs/rus/60_limits/limits.md`
 
 ---
 

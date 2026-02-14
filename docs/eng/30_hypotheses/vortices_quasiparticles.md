@@ -1,6 +1,6 @@
-# Orbits and vortices as quasiparticles (hypothesis)
+﻿# Orbits and vortices as quasiparticles (hypothesis)
 
-Note: first-pass translation of `docs/rus/30_hypotheses/vortices_quasiparticles.md`.
+Note: first-pass translation of `docs/rus/40_hypotheses/vortices_quasiparticles.md`.
 
 ## Idea
 
@@ -40,4 +40,5 @@ Hypothesis: these structures can be treated as **quasiparticles**:
 - masks/boundaries: `docs/eng/40_experiments/exp_object_masks.md`
 - transfer speed/orbit features: `docs/eng/40_experiments/exp_transfer_speed.md`
 - metric summary: `docs/eng/40_experiments/metrics.md`
+
 

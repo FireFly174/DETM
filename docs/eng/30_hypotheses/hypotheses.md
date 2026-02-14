@@ -1,6 +1,6 @@
-# Hypotheses
+﻿# Hypotheses
 
-Note: first-pass translation of `docs/rus/30_hypotheses/hypotheses.md`.
+Note: first-pass translation of `docs/rus/40_hypotheses/hypotheses.md`.
 
 This section lists testable hypotheses about:
 - emergence and stability of invariants
@@ -25,3 +25,4 @@ These pages add operational definitions and experiment sketches:
 - inertia/“mass” from locality: `docs/eng/30_hypotheses/inertia_mass_locality.md`
 - vortices as quasiparticles: `docs/eng/30_hypotheses/vortices_quasiparticles.md`
 - level capacity and phase transitions: `docs/eng/30_hypotheses/level_capacity_phase_transitions.md`
+
