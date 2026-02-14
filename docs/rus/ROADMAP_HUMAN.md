@@ -112,7 +112,7 @@
 
 ### Этап PUB (public packaging, non-blocking)
 
-- [ ] PUB-01: добавить 3-5 demo assets (`docs/assets`) и встроить их в `README.md`
+- [ ] PUB-01: добавить 3-5 demo assets (`docs/book/assets`) и встроить их в `README.md`
 - [ ] PUB-02: зафиксировать 2-3 каноничных визуальных пресета с командами воспроизведения
 - [ ] PUB-03: сделать one-page описание проекта (RU/EN)
 - [ ] QLT-01: усилить docstrings/type hints для ключевых runtime API
