@@ -1,4 +1,4 @@
-# How to read this book
+﻿# How to read this book
 
 The book is organized as L0-L5, but each level should be read in projection to others:
 what this level changes below, and what it looks like from above.
@@ -55,7 +55,7 @@ Examples:
 - L4 as integral of L3: rules outlive individuals as institutions and sanction systems.
 - L5 as integral of all levels: boundary surface where aggregate drift becomes visible.
 
-![Integral intuition of levels](assets/levels_integral.svg)
+![Integral intuition of levels](../assets/levels_integral.svg)
 
 Operational implication:
 if something "suddenly appeared" at Ln, inspect repeated costed patterns at Ln-1.
@@ -105,7 +105,7 @@ The model can be used as one bridge:
 - T1..T7: reusable symptom themes,
 - L5: where boundary crossing becomes visible.
 
-![Diagnostic bridge map](assets/l0_l5_t1_t7_map.svg)
+![Diagnostic bridge map](../assets/l0_l5_t1_t7_map.svg)
 
 ## Reading discipline under uncertainty
 
@@ -118,3 +118,4 @@ When you are unsure how to interpret a chapter, apply this fallback discipline:
 
 This prevents the common failure mode where explanation quality grows while control quality declines.
 If in doubt, prefer a smaller truthful step over a larger elegant theory.
+

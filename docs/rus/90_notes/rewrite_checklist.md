@@ -30,7 +30,7 @@
 - `detm/core/fields.py` — примитивы решётки и скалярных полей (решётка, соседства, контейнер состояния).
 - `detm/core/entropy.py` — параметры динамики и вычисление величин, связанных с подавлением/переносом (в т.ч. шаг динамики в решёточном профиле).
 - `detm/core/invariants.py` — утилиты/проверки для инвариантов (на уровне «наблюдаемого»).
-- `detm/runtime/config/*`, `detm/runtime/state.py`, `detm/runtime/serialization.py` — конфигурации, структура состояния и сериализация/контракты данных для запусков.
+- `detm/runtime/config/*`, `detm/runtime/state.py`, `detm/runtime/serialization/__init__.py` — конфигурации, структура состояния и сериализация/контракты данных для запусков.
 - `detm/runtime/api/*` и соседние модули `detm/runtime/` — обвязка исполнения/интеграции (в т.ч. внешние влияния и диагностика).
 
 Важно: этот чек-лист предназначен для сверки **с канонической спецификацией** (`docs/rus/10_model/model_core.md`)
@@ -53,5 +53,6 @@
 - базовая динамика (reference): `detm/core/entropy.py`
 - backends: `detm/runtime/backends/numpy_backend.py`, `detm/runtime/backends/torch_backend.py`
 - runtime API: `detm/runtime/api/*`
+
 
 

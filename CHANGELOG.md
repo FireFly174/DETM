@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.2] - 2026-02-14
+
+- Completed documentation consistency pass before public release:
+  - local markdown link check across `docs/**/*.md` is clean
+  - fixed stale/broken internal references in notes/source cards
+- Synchronized EN/RU documentation structure for canonical cards:
+  - added EN mirrors for `50_experiments/*` and `80_limits/*`
+  - added missing EN v2 sidecards for `L0..L5` deep chapters
+  - added RU/EN one-pagers and updated docs navigation indexes
+- Updated roadmap path references to the current post-refactor module layout.
+- Release metadata bump to `0.2.2` in `pyproject.toml` and `CITATION.cff`.
+
 ## [0.2.1] - 2026-02-14
 
 - Added explicit branching policy and workflow docs:

@@ -4,6 +4,7 @@
 
 Точка входа:
 - `docs/rus/00_overview/README.md`
+- `docs/rus/00_overview/one_pager.md`
 
 Справочно:
 - Контракт интеграции: `docs/rus/integration_contract.md`

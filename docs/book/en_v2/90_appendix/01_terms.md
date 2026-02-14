@@ -1,4 +1,4 @@
-<a id="terms"></a>
+﻿<a id="terms"></a>
 # Terms
 
 This is the operational dictionary for this book.
@@ -204,7 +204,7 @@ Geometric metaphor of basis with multiple poles kept in dynamic balance.
 Dominance of one pole appears as basis skew;
 upper levels then optimize skew maintenance instead of global stability.
 
-![L0 need octahedron](assets/l0_octahedron.svg)
+![L0 need octahedron](../assets/l0_octahedron.svg)
 
 <a id="term-axis-projection"></a>
 ## Axis / projection
@@ -268,3 +268,4 @@ Visible when measurements repeat and actions add up rather than cancel out.
 
 Economically:
 coherence is when keeping phase is cheaper than losing it.
+
