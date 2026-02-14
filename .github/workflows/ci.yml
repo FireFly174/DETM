@@ -10,60 +10,66 @@ permissions:
 
 jobs:
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+      - name: Checkout repository (shell)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --no-tags --depth=1 origin "${GITHUB_REF}"
+          git checkout --detach FETCH_HEAD
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
+      - name: Show Python version
+        run: python3 --version
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest ruff mypy black
           pip install -e .
 
       - name: Ruff (non-blocking)
         continue-on-error: true
-        run: python -m ruff check .
+        run: python3 -m ruff check .
 
       - name: Black (non-blocking)
         continue-on-error: true
-        run: python -m black --check .
+        run: python3 -m black --check .
 
       - name: Mypy (non-blocking)
         continue-on-error: true
-        run: python -m mypy detm tests
+        run: python3 -m mypy detm tests
 
       - name: Pytest
         run: pytest
 
   torch-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+      - name: Checkout repository (shell)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --no-tags --depth=1 origin "${GITHUB_REF}"
+          git checkout --detach FETCH_HEAD
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
+      - name: Show Python version
+        run: python3 --version
 
       - name: Install dependencies (CPU Torch)
         run: |
-          python -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
           pip install --index-url https://download.pytorch.org/whl/cpu torch

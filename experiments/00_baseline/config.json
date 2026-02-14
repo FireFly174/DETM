@@ -1,0 +1,22 @@
+{
+  "size": 24,
+  "steps": 180,
+  "seeds": [7],
+  "boundary": "periodic",
+  "noise": 0.08,
+  "dynamics": {
+    "equilibrium_energy": 0.5,
+    "beta": 0.1,
+    "gamma": 0.05,
+    "kappa": 0.03,
+    "alpha": 0.0,
+    "lambda_t": 0.02,
+    "activation_threshold": 0.2,
+    "energy_bounds": [0.0, 1.0]
+  },
+  "marker": {
+    "radius": 2,
+    "energy": 0.92
+  },
+  "out": "runs/00_baseline"
+}

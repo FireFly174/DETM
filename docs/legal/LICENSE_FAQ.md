@@ -1,7 +1,7 @@
 # License FAQ
 
 This is a plain-language summary of DETM licensing. It is not legal advice.
-The legally binding text is in `LICENSE` and commercial agreements.
+The legally binding text is in `../../LICENSE` and commercial agreements.
 
 ## What is the model?
 
@@ -47,4 +47,4 @@ By contributing, they agree to contribute under the project licensing model.
 
 ## Where to request commercial terms?
 
-See `COMMERCIAL_LICENSE.md` and `SUPPORT.md`.
+See `COMMERCIAL_LICENSE.md` and `../../SUPPORT.md`.

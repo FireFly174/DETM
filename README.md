@@ -1,11 +1,66 @@
 ﻿# DETM — Discrete Entropy-Time Model
 
+[![CI](https://github.com/FireFly174/DETM/actions/workflows/ci.yml/badge.svg)](https://github.com/FireFly174/DETM/actions/workflows/ci.yml)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
+[![License: PolyForm NC + Commercial](https://img.shields.io/badge/license-PolyForm--NC%20%2B%20Commercial-orange)](LICENSE)
+
 DETM — исследовательская дискретная модель динамики на решётке,
 предназначенная для изучения возникновения устойчивых локализованных структур
 (инвариантов) из строго локальных правил взаимодействия.
 
 Проект фокусируется на механизмах коарсинга, асинхронности и внутреннего времени,
 а не на априорном задании объектов или глобальных законов.
+
+---
+
+## Quickstart (5 минут)
+
+```bash
+python -m venv .venv
+# Windows PowerShell
+. .venv/Scripts/Activate.ps1
+# Linux/macOS
+# source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+python main.py headless --seed 7 --steps 64 --batch 1 --out runs/out/quickstart --no-viz
+```
+
+Ожидаемый результат:
+- в консоли появится `[OK] 1 run(s) complete` и путь к `runs/out/quickstart/catalog.json`;
+- в `runs/out/quickstart/seed_0000/` будут `config.json`, `digest.json`, `state.msgpack`, `trace.jsonl`.
+
+Быстрый запуск UI:
+
+```bash
+python main.py napari --interactive
+```
+
+---
+
+## Demo / preview
+
+Для публичного демо зарезервирована папка `docs/assets/`.
+
+Рекомендуемый файл для README-превью: `docs/assets/napari_demo.gif`.
+
+---
+
+## Golden baseline (reproducible)
+
+Один эталонный прогон с фиксированными параметрами находится в `experiments/00_baseline/`.
+
+Команда запуска:
+
+```bash
+python -m experiments.marker_protocol --config experiments/00_baseline/config.json
+```
+
+Артефакты:
+- `runs/00_baseline/catalog.json`
+- `runs/00_baseline/seed_0007/metrics.csv`
+- `runs/00_baseline/seed_0007/final_state.npz`
+- `runs/00_baseline/seed_0007/summary.json`
 
 ---
 
@@ -59,6 +114,7 @@ DETM:
   - `detm/runtime/` — типизированный L0 API (`reset/step/digest/serialize`)
   - `detm/integrations/` — адаптеры для оркестраторов (ACGS/ComfyUI): `DETMRuntimeBridge`, `ACGSDetmBackend`
 - `experiments/` — экспериментальные сценарии  
+  - `experiments/00_baseline/` — каноничный воспроизводимый smoke-test
 - `runs/`, `data/` — результаты запусков (обычно игнорируются git)
 
 ## Форматы данных и совместимость
@@ -117,11 +173,12 @@ DETM:
 - коммерческая лицензия по отдельному соглашению
 
 - Лицензия: `LICENSE`
-- FAQ по лицензии: `LICENSE_FAQ.md`
-- Коммерческие условия: `COMMERCIAL_LICENSE.md`
-- Notices: `NOTICE`, `THIRD_PARTY_NOTICES.md`
+- FAQ по лицензии: `docs/legal/LICENSE_FAQ.md`
+- Коммерческие условия: `docs/legal/COMMERCIAL_LICENSE.md`
+- Notices: `NOTICE`, `docs/legal/THIRD_PARTY_NOTICES.md`
 - Как вносить вклад: `CONTRIBUTING.md`
 - Кодекс поведения: `CODE_OF_CONDUCT.md`
 - Правила security-репортов: `SECURITY.md`
 - Поддержка и каналы связи: `SUPPORT.md`
 - Чеклист публичного релиза: `PUBLIC_RELEASE_CHECKLIST.md`
+
