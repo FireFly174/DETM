@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.1] - 2026-02-14
+
+- Added explicit branching policy and workflow docs:
+  - `docs/BRANCHING.md`
+  - `CONTRIBUTING.md` updates for `dev/main` -> `main` release flow
+- Clarified public release checklist links and required check names:
+  - `PUBLIC_RELEASE_CHECKLIST.md`
+- Moved legal docs under `docs/legal/*` and synchronized root/docs links.
+- Updated dependency manifest for default launcher and experiment tooling:
+  - `requirements.txt` now includes runtime UI/analysis dependencies used by default paths
+- Updated third-party notices to reflect direct dependencies from both
+  `pyproject.toml` and `requirements.txt`.
+- Adjusted CI workflow to avoid disallowed external marketplace actions
+  under repository ruleset constraints.
+
 ## [0.2.0] - 2026-02-14
 
 - Runtime/app restructuring finalized across `detm` and `detm_app`.
