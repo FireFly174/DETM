@@ -202,7 +202,7 @@ def main(argv: list[str] | None = None) -> int:
     config = build_runtime_config(payload)
     runner_defaults = load_runner_defaults(payload)
 
-    runtime_overrides: Dict[str, Any] = {}
+    runtime_overrides: dict[str, Any] = {}
     if args.backend is not None:
         runtime_overrides["backend"] = args.backend
     if args.device is not None:

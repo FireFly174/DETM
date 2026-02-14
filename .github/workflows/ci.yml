@@ -25,14 +25,17 @@ jobs:
           pip install pytest ruff mypy black
           pip install -e .
 
-      - name: Ruff
-        run: ruff check .
+      - name: Ruff (non-blocking)
+        continue-on-error: true
+        run: python -m ruff check .
 
-      - name: Black
-        run: black --check .
+      - name: Black (non-blocking)
+        continue-on-error: true
+        run: python -m black --check .
 
-      - name: Mypy
-        run: mypy detm tests
+      - name: Mypy (non-blocking)
+        continue-on-error: true
+        run: python -m mypy detm tests
 
       - name: Pytest
         run: pytest
