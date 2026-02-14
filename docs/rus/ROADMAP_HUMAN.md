@@ -29,6 +29,7 @@
 - [x] Есть epoch/watermark + pre-consensus MVP + quorum/reporting
 - [x] Архитектурные docs/cards синхронизированы с текущим layout (`detm_app/runtime/*`, launcher `main.py`, `detm/runtime/fabric/*`)
 - [x] Тестовый snapshot зелёный: `pytest -q -> 348 passed`
+- [x] Веточная политика зафиксирована: разработка через `dev/main`, релизы через `main` (`docs/BRANCHING.md`)
 
 ## Зафиксированные архитектурные решения
 

@@ -58,6 +58,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - Зафиксирован канон DETM и north star (`PROMT.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`).
 - Граница `detm`/`detm_app` очищена; legacy entrypoints удалены.
 - `System Trace`/`Watch Trace` и `watch_contract` в production-контуре.
+- Веточный контур разработки зафиксирован: активная разработка идёт через `dev/main`, `main` используется как release-ветка (`docs/BRANCHING.md`).
 
 ### Runtime/Fabric
 
