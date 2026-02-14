@@ -30,11 +30,10 @@ _RUNTIME_API: "runtime_api_module | None" = None
 
 
 def _patch_six_meta_path_importer() -> None:
-    """Work around PySide/shiboken feature-hook incompatibility with six importer on some envs."""
-    try:
-        import six  # type: ignore  # noqa: F401
-    except Exception:
-        return
+    """Work around PySide/shiboken feature-hook incompatibility with six importer on some envs.
+
+    This helper is intentionally no-op when `six` isn't installed.
+    """
     for importer in list(sys.meta_path):
         if type(importer).__name__ == "_SixMetaPathImporter" and not hasattr(importer, "_path"):
             try:
