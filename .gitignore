@@ -51,6 +51,7 @@ _tmp/
 
 # --- Book build temp (pandoc/chrome profiles, logs, etc.) ---
 docs/book/**/_tmp/
+docs/book/ru/
 # --- Research notes / drafts (not tracked) ---
 /Discrete Emergent Medium with Multilevel Coarsening/
 docs/source/

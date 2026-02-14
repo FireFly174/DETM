@@ -93,7 +93,7 @@ Key docs:
   - Single source of book concepts for DETM (RU only): `docs/rus/90_notes/book_concepts_single_source.md`
   - DETM learning model (RU only): `docs/rus/90_notes/learning_model_detm.md`
   - Readout/anti-Goodhart protocol (RU only): `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
-  - Book / external framing (RU only, non-canon): `docs/book/ru/README.md`
+  - Book / external framing (RU v2, non-canon): `docs/book/ru_v2/_compiled_v2.md`
   - Fallback/subworld: RU `docs/rus/90_notes/fallback_subworld.md`, EN `docs/eng/90_notes/fallback_subworld.md`
   - Storage formats: RU `docs/rus/90_notes/storage_neurons_subworld.md`, EN `docs/eng/90_notes/storage_neurons_subworld.md`
   - Meaning/alphabet/LLM-mode: RU `docs/rus/90_notes/meaning_alphabet_llm_mode.md`, EN `docs/eng/90_notes/meaning_alphabet_llm_mode.md`
