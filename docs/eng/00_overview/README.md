@@ -48,6 +48,10 @@ DETM is not a physical/biological/cognitive theory. Any analogies outside the fo
 - `90_notes`: drafts and archives
 - `architecture.md`: repository and module overview
 
+Current EN parity:
+- core model/mechanisms/hypotheses/experiments/limits cards are mirrored from `docs/rus`.
+- architecture deep-cards and long-form research notes remain canonical in Russian.
+
 ---
 
 ## Project status

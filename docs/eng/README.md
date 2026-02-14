@@ -11,3 +11,7 @@ Start here:
 - Source materials mapping: `docs/eng/90_notes/source_materials.md`
 - Branching policy (shared): `docs/BRANCHING.md`
 - Book (EN v2, non-canon): `docs/book/en_v2/_compiled_v2.md`
+
+Coverage note:
+- `10_model`, `20_mechanisms`, `30_hypotheses`, `40_experiments`, `50_limits` are aligned with the current canonical Russian cards.
+- Architecture deep cards and working notes remain primarily canonical in `docs/rus/*`.
