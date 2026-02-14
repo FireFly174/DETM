@@ -186,6 +186,7 @@ def test_tk_launcher_reuses_runtime_and_batch_services() -> None:
     assert "class TkSettingsFlow:" in tk_settings_flow_source
 
     tk_settings_config_source = _read_text_first_existing(
+        ROOT / "detm_app" / "ui" / "tk" / "runner" / "flow" / "settings" / "runtime_config.py",
         ROOT / "detm_app" / "ui" / "tk" / "runner" / "flow" / "settings" / "config.py",
         ROOT / "detm_app" / "ui" / "tk" / "runner" / "flow" / "settings.py",
     )

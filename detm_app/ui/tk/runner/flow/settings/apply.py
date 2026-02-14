@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from detm_app.ui.tk.runner.flow.controls.model import TkControlVars
-from detm_app.ui.tk.runner.flow.settings.config import build_runtime_config
+from detm_app.ui.tk.runner.flow.settings.runtime_config import build_runtime_config
 
 
 def read_invariant_streams(*, controls: TkControlVars) -> str:
