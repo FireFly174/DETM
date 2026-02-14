@@ -1,28 +1,58 @@
 # Thesis
 
-This book is about how systems hold a regime, and at what price.
+This book is about **how systems hold a regime** and **what price they pay for that stability**.
 
-By "system" we mean any coordinated structure where action and consequence must stay linked:
-person, family, team, organization, institution, state.
-By "regime" we mean the currently active way of operating: action cadence, feedback quality, cost distribution, and boundary handling.
+"System" here can mean person, family, team, organization, institution, or state.
+"Regime" means the currently active way of operating: how actions are selected, how feedback is processed, how cost is distributed, and how boundaries are handled.
 
-The practical thesis is strict:
+L0 (basis) is the minimum existence contract:
+resource, safety, trust, right to stop, and minimal reversibility.
+When basis collapses, causality degrades first, reporting logic replaces reality later.
 
-1. Stability is not produced by good intentions. It is produced by convergent basis contracts.
-2. Learning is not "loss goes down". Learning is invariant retention under perturbation.
-3. Metrics are sensors, not truth.
-4. Rules are cost architecture, not morality.
-5. Institutional quality is anti-capture plus reversibility.
-6. Boundary crossing without transition protocol creates systemic debt.
+This is not a management self-help genre.
+It is operational philosophy of control via invariants, feedback, and boundaries.
 
-Another way to read it:
+Working axiom:
 
-- if report quality is decoupled from pain/cost, systems train reward hacking;
-- if stopping rights are taboo, error debt accumulates invisibly;
-- if axis policy is implicit, metric wars replace control.
+> Human and institutional behavior minimizes current subjective action cost,
+> not abstract global optimum.
 
-Pragmatic consequence:
+That cost includes attention, effort, time, risk, social penalty, conflict price, and hidden future debt.
 
-- diagnose by level (`L0..L5`),
-- act with the smallest operator that restores causality,
-- validate by multi-signal readout, never by one KPI.
+Practical consequences:
+
+- manage action geometry, not slogans,
+- metrics are sensors, not truth,
+- rules are cost architecture, not morality,
+- refusal (stop/exit/silence/sabotage/imitation) is often a convergence signal, not a character flaw.
+
+Core diagnostic check:
+
+> If report quality is decoupled from pain/cost,
+> the system trains reward hacking as a rational strategy.
+
+## What this book gives you
+
+- A level language (`L0..L5`) to separate basis, operations, narratives, rules, institutions, and boundaries.
+- A way to detect what basis is truly served, even when declared values say otherwise.
+- A causal cascade model from basis distortions to visible themes (`T1..T7`).
+- Operator-level routing (`Lx-Cn`) that turns diagnosis into executable action.
+
+## What this book does not promise
+
+- It is not a universal personality theory.
+- It is not a one-size-fits-all recipe collection.
+- It is not moral arbitration about who is "good".
+- It is not medical, legal, or financial advice.
+
+It gives constraints and diagnostics, not ideological certainty.
+If reasoning no longer holds in the current basis, this is not "just missing data".
+It is a signal that regime price increased and you must change description level.
+
+## Minimal usage protocol
+
+1. Fix observable inputs first (facts before interpretation).
+2. Identify active level(s): L0/L1/L2/L3/L4/L5.
+3. Detect basis pole under stress and visible surface themes (`T1..T7`).
+4. Execute one minimal operator (`Lx-Cn`).
+5. Validate with readout. If no effect, go one level deeper.

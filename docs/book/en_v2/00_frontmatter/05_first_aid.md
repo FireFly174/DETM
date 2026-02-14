@@ -1,15 +1,31 @@
-# First aid protocol (when the system is melting)
+<a id="first-aid"></a>
+# First aid: 5-minute diagnostic protocol
 
-Use this in emergency mode before deep analysis.
+When you do not know where to start, run this sequence.
 
-1. Freeze escalation (`L0-C1`): stop adding commitments.
-2. Restore a truthful sensor (`L0-C6`/`L1-C2`): one observable that cannot be faked cheaply.
-3. Remove impossible scope (`L0-C4`): reduce obligations to sustainable capacity.
-4. Isolate toxic coupling (`L0-C5`): quarantine the failure amplifier.
-5. Decide path:
-   - if causality returns -> move to L1/L2 refinement,
-   - if causality does not return -> execute transition logic (L5).
+1. **Choose scene scale (`S1..S5`)**
+   person, family, society/game, organization, state/institutions.
 
-Rule:
+2. **Fix 5-10 observable inputs**
+   facts before explanations: what repeats, what is measured, where cost appears.
 
-> In emergency, survival of causality has priority over optimization of goals.
+3. **Choose mode: depth or breadth**
+   - if readout is unstable and any choice keeps same failure -> depth (`L1 -> L0`),
+   - if readout is stable but goal/axis is unclear -> breadth (`L2-L3`).
+
+4. **Pick one theme and one first operator**
+   route via Quickstart symptoms or `S/T/C` cheat sheet.
+
+5. **Validate readout**
+   what changed after the step, on what horizon.
+   If nothing changed, go one level deeper.
+
+Practical hints:
+
+- Heroic survival mode is usually a price architecture problem, not motivation shortage.
+- Metric theater is fixed by restoring sensors and anti-imitation constraints, not by more reporting.
+- Meaning conflict with no field effect is often an axis-policy conflict (L3), sometimes basis collapse (L0).
+
+Emergency priority rule:
+
+> Preserve causality first, optimize goals second.

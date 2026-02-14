@@ -1,28 +1,39 @@
-# Where to start (short hook)
+# Where to start (short hook, with teeth)
 
 Imagine a bridge.
 
-From the outside, everything looks healthy: traffic flows, dashboards are green, reports look convincing.
-But bridges do not stand on reports. They stand on load limits, joints, maintenance windows, and the honesty of stress signals.
+From the outside it can look healthy: smooth traffic, clean dashboards, green reports, confident speech.
+But a bridge does not stand on speech. It stands on load limits, joints, maintenance windows, corrosion control, and honest stress signals.
 
-Human systems fail the same way.
-Usually not because nobody "wants good results", but because the system quietly learns that imitation is cheaper than reality:
+Complex human systems fail in the same way.
+We usually see words first, and then try to repair reality with more words.
+But the break may be elsewhere:
 
-- language still sounds correct while causality is already broken,
-- metrics keep improving while field outcomes degrade,
-- institutions defend capture instead of resilience,
-- the old regime passes its boundary and no longer converges.
+- people ran out of basis resource and can only imitate participation,
+- actions no longer produce verifiable effects,
+- rules and metrics started training imitation,
+- institutions defend captured interests instead of system resilience,
+- the active regime has crossed a boundary and no longer converges.
 
-This book is not a moral lecture and not a motivational script.
-It is an operational diagnostic guide:
+This is neither a moral sermon nor a motivation script.
+It is a diagnostic and operator handbook:
 
-1. identify the active failure level,
-2. apply the smallest operator that restores causality,
-3. move from emergency stabilization to controlled adaptation.
+1. locate where causality broke,
+2. identify the active description level,
+3. apply the smallest operator that restores control.
 
-Core claim:
+If you keep one idea in mind, keep this one.
+If you keep two ideas, let this be the first:
 
-> Most hard system conflicts are conflicts between levels of description.
+> Most hard conflicts inside systems are conflicts between levels of description.
 
-One actor speaks L0 (basis), another speaks L1 (actions), another speaks L2 (stories), another speaks L3 (metrics and rules), and another speaks L4/L5 (institutions and boundaries).
-They can all be "right" locally and still produce collective failure globally.
+One actor talks about basis (L0), another about operations (L1), another about narratives (L2), another about metrics and rules (L3), another about institutions and power (L4), and another about boundaries (L5).
+They can all be locally correct and still produce global failure together.
+
+Two reading modes for you:
+
+- Fast: open Quickstart, pick the nearest symptom, execute one first operator.
+- Deep: go through L0-L5 and reconstruct the causal cascade end-to-end.
+
+If at any point the text feels abstract, treat that as a signal:
+you have not fixed the observable inputs and the scene scale yet.
