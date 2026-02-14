@@ -10,6 +10,10 @@ This file captures the remaining steps to make the repository public safely.
 - [x] No obvious plaintext credentials detected by basic grep scan.
 - [x] Standard community files added:
   - `LICENSE`
+  - `COMMERCIAL_LICENSE.md`
+  - `LICENSE_FAQ.md`
+  - `NOTICE`
+  - `THIRD_PARTY_NOTICES.md`
   - `CONTRIBUTING.md`
   - `CODE_OF_CONDUCT.md`
   - `SECURITY.md`

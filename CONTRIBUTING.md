@@ -2,6 +2,16 @@
 
 Thanks for considering a contribution to DETM.
 
+## Licensing of Contributions
+
+By submitting a contribution (PR, patch, or commit) you agree that your
+contribution is provided under the project's licensing model:
+
+- source-available non-commercial: `PolyForm-Noncommercial-1.0.0`
+- commercial: additional commercial licensing by the copyright holder
+
+You confirm that you have the right to submit the code/content you contribute.
+
 ## Scope
 
 - `detm/*` is the library core (L0 runtime and model contracts).
