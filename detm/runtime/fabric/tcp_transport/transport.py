@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import socket
 import threading
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 
@@ -112,7 +113,7 @@ class TcpFabricTransport:
             tls_key_file=tls_key_file,
             tls_insecure_skip_verify=bool(tls_insecure_skip_verify),
         )
-        return cls(
+        transport = cls(
             sock,
             dedup_ingress_enabled=bool(dedup_ingress_enabled),
             dedup_ttl_ms=int(dedup_ttl_ms),
@@ -131,6 +132,8 @@ class TcpFabricTransport:
             tls_identity_source=tls_identity_source,
             tls_identity_fallback_to_fingerprint=bool(tls_identity_fallback_to_fingerprint),
         )
+        transport._await_relay_registration()
+        return transport
 
     @classmethod
     def start_local(
@@ -172,7 +175,7 @@ class TcpFabricTransport:
             tls_identity_source=str(tls_identity_source),
             tls_identity_fallback_to_fingerprint=bool(tls_identity_fallback_to_fingerprint),
         )
-        return cls(
+        transport = cls(
             sock,
             _relay=relay,
             _keep_open=bool(keep_open),
@@ -193,6 +196,8 @@ class TcpFabricTransport:
             tls_identity_source=tls_identity_source,
             tls_identity_fallback_to_fingerprint=bool(tls_identity_fallback_to_fingerprint),
         )
+        transport._await_relay_registration()
+        return transport
 
     @property
     def address(self) -> tuple[str, int]:
@@ -249,6 +254,36 @@ class TcpFabricTransport:
 
     def _compute_auth_sig(self, payload: dict[str, object]) -> str:
         return compute_auth_sig(auth_key=self.auth_key, payload=payload)
+
+    def _await_relay_registration(self, *, timeout_s: float = 0.3) -> None:
+        """Best-effort local readiness handshake to reduce first-message races."""
+        channel = "__fabric.transport.ready__"
+        marker = f"transport://ready/{id(self)}:{time.perf_counter_ns()}"
+        ready = threading.Event()
+
+        def _on_ready(envelope: FabricEnvelope) -> None:
+            if str(envelope.payload_ref) == marker:
+                ready.set()
+
+        self.subscribe(channel, _on_ready, mode="realtime")
+        try:
+            self.publish(
+                FabricEnvelope.from_dict(
+                    {
+                        "message_type": "transport_ready",
+                        "channel": channel,
+                        "mode": "realtime",
+                        "sender": "tcp-transport",
+                        "payload_ref": marker,
+                    }
+                )
+            )
+            ready.wait(timeout=max(float(timeout_s), 0.0))
+        except Exception:
+            # Ready handshake is best-effort and must not break connect semantics.
+            pass
+        finally:
+            self.unsubscribe(channel, _on_ready, mode="realtime")
 
     @staticmethod
     def _maybe_wrap_client_tls_socket(
