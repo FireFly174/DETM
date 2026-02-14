@@ -1,9 +1,9 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from fractions import Fraction
 
-from detm_app.coarsening import InvariantCoarsener, InvariantStreamSpec
-from detm_app.session import DetmSession
+from detm_app.runtime.coarsening import InvariantCoarsener, InvariantStreamSpec
+from detm_app.runtime.session import DetmSession
 from detm.runtime.config import DETMConfig
 
 
@@ -43,3 +43,4 @@ def test_invariant_fractional_dt_emits_multiple_per_window():
     assert emitted[-1]["invariant_index"] == 4
     assert emitted[-1]["phase_num"] == 0
     assert emitted[-1]["time_num"] == 25 * 4
+

@@ -1,10 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import pytest
 
-from detm.runtime.fabric_ack import ProofAck, TrustAck
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_transport import InMemoryFabricBus
+from detm.runtime.fabric import ProofAck, TrustAck
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import InMemoryFabricBus
 from detm.runtime.schemas import DETM_FABRIC_ACK_V1, get_schema_versions
 
 
@@ -97,3 +97,32 @@ def test_in_memory_fabric_bus_routes_by_channel_and_mode():
     assert delivered_realtime == 3
     assert delivered_audit == 2
     assert calls == ["channel-any", "realtime", "global", "channel-any", "global"]
+
+
+def test_in_memory_fabric_bus_dedup_ingress_drops_duplicate_delivery_id():
+    bus = InMemoryFabricBus(dedup_ingress_enabled=True, dedup_ttl_ms=60_000, dedup_max_entries=128)
+    calls: list[str] = []
+    bus.subscribe("fabric.commit", lambda _envelope: calls.append("hit"), mode="realtime")
+
+    env = FabricEnvelope.from_dict(
+        {
+            "message_type": "commit",
+            "channel": "fabric.commit",
+            "mode": "realtime",
+            "sender": "node-A",
+            "payload_ref": "artifact://commit/node-A/1",
+            "commit_ref": "node-A:1",
+            "delivery_id": "node-A:1:1",
+        }
+    )
+    delivered_first = bus.publish(env)
+    delivered_second = bus.publish(env)
+
+    assert delivered_first == 1
+    assert delivered_second == 0
+    assert calls == ["hit"]
+    snap = bus.snapshot()
+    dedup = dict(snap.get("dedup", {}))
+    assert bool(dedup.get("enabled")) is True
+    assert int(dedup.get("duplicates_total", 0)) == 1
+

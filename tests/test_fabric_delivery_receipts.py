@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from detm.runtime.fabric_delivery_receipts import (
+from detm.runtime.fabric import (
     CountDeliveryReceiptPolicy,
     InMemoryDeliveryReceiptCoordinator,
     ValidatorSetDeliveryReceiptPolicy,
 )
-from detm.runtime.fabric_envelope import FabricEnvelope
+from detm.runtime.fabric import FabricEnvelope
 
 
 def test_count_delivery_receipt_policy_threshold_and_reject():
@@ -55,3 +55,31 @@ def test_delivery_receipt_coordinator_consumes_delivery_ack_envelopes():
     assert row["status"] == "accepted"
     assert row["commit_ref"] == "node-A:1"
     assert row["status_by_sender"] == {"validator-1": "accepted"}
+
+
+def test_delivery_receipt_coordinator_snapshot_state_roundtrip():
+    coordinator = InMemoryDeliveryReceiptCoordinator(policy=CountDeliveryReceiptPolicy(required_receipts=1))
+    coordinator.register_delivery("d2", commit_ref="node-A:2", created_at_ms=11)
+    coordinator.on_delivery_ack_envelope(
+        FabricEnvelope.from_dict(
+            {
+                "message_type": "delivery_ack",
+                "channel": "fabric.delivery.ack",
+                "mode": "realtime",
+                "sender": "validator-2",
+                "payload_ref": "artifact://delivery_ack/2",
+                "payload_inline": {"delivery_id": "d2", "status": "received"},
+                "delivery_id": "d2",
+                "commit_ref": "node-A:2",
+            }
+        )
+    )
+    snap = coordinator.snapshot_state()
+
+    restored = InMemoryDeliveryReceiptCoordinator(policy=CountDeliveryReceiptPolicy(required_receipts=1))
+    restored.load_snapshot(snap)
+    row = restored.evaluate("d2")
+    assert row["status"] == "accepted"
+    assert row["commit_ref"] == "node-A:2"
+    assert row["status_by_sender"] == {"validator-2": "accepted"}
+

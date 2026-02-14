@@ -1,395 +1,625 @@
-﻿# ROADMAP
+﻿# ROADMAP V2 — DETM
 
-Обновлено: 2026-02-12
+Обновлено: 2026-02-13
 
-## Цель
+Короткая версия для чтения: `docs/rus/ROADMAP_HUMAN.md`.
+Source-of-truth по статусам и зависимостям задач: `docs/rus/ROADMAP.md`.
 
-Зафиксировать фактическое состояние DETM и поэтапный план миграции к целевой архитектуре,
-чтобы между сессиями не терялся контекст: что уже работает, что является переходным контуром,
-и что критично довести до production-уровня.
+## Scope
+
+Этот документ фиксирует:
+
+- фактическое состояние DETM в текущем workspace (`as-is`);
+- целевую архитектуру (`to-be`) и путь миграции;
+- исполнимый PM+engineering контур для открытых задач;
+- критерий контроля: изменение приближает к target-архитектуре или закрепляет transition как финал.
+
+Документ заменяет "общий чеклист" детализированным форматом `ROADMAP Item v2`.
 
 ## Легенда
 
-- `[x]` сделано
-- `[ ]` запланировано или в работе
+- `status`: `todo | in_progress | done | blocked`
+- `priority`: `P0 | P1 | P2`
+- `owner_role`: `runtime | fabric | docs | qa | infra`
 
-## Checkup (снимок состояния)
+## North Star и инварианты
 
-- [x] Канонический L0 runtime API (`reset/step/digest/serialize/deserialize`)
-- [x] Бэкенды `numpy` и `torch` (в т.ч. `device=cuda` при доступности)
-- [x] Слой оркестрации внутри `detm/run`: `Session + EventBus + TickScheduler + TickRunner`
-- [x] Invariant streams/coarsening (`InvariantCoarsener`, `invariants.jsonl`)
-- [x] Сериализация state: `msgpack + npz`
-- [x] Артефакты запуска: `state.msgpack`, `trace.jsonl`, `commits.jsonl`, `commits_audit.jsonl` (policy-driven), `commit_validation.json`, `history.jsonl`, `fields_hist.npz`, `catalog.json`
-- [x] OuterFields V1 вычислитель в коде (`detm/runtime/outerfields.py`)
-- [x] Интеграции: `runtime_bridge`, `ACGSDetmBackend`
-- [x] Рабочая визуализация: `Tk` + `embedded/tcp` transport
-- [x] Тестовый snapshot: `pytest -q -> 214 passed, 1 skipped`
-- [x] Зафиксирован архитектурный вектор: текущий путь переходный, target-архитектура обязательна
-- [x] Выделенный пакет `detm_app` (orchestration перенесён; `detm/run/*` оставлен как compatibility facade)
-- [x] Поднят совместимый `detm_app` shim-пакет (`bus/session/scheduler/coarsening`) как migration-step этапа A без ломки API
-- [x] Entry points (`detm/cli.py`, `detm/ui/tk_runner.py`) переведены на app-layer импорты `detm_app.*` для `session/bus/coarsening`
-- [x] `main.py` и `detm.py` используют канонические entrypoints `detm_app.cli`/`detm_app.tk_runner`; `detm/cli.py`, `detm/ui/tk_runner.py`, `detm/ui/config_hints.py`, `detm/ui/tooltips.py` оставлены как deprecated compatibility facades
-- [x] Рабочий контур кода/тестов переведён на `detm_app.*`; `detm/run/*` остаётся только как compatibility facade
-- [x] `detm/run/*` переведён в lazy/deprecated compatibility facade (`DeprecationWarning` + lazy export resolution), чтобы `detm` оставался библиотечным слоем без eager-зависимости от `detm_app`
-- [x] Зафиксирован deprecation-policy для `detm/run/*` (removal target `0.3.0`, дата `2026-06-30`, миграционный гайд `docs/rus/30_architecture/detm_run_migration.md`)
-- [x] Добавлен CI-guard на новые импорты `detm.run.*` вне compatibility слоя (`tests/test_no_detm_run_imports.py`)
-- [x] Добавлен CI-guard на новые импорты legacy entrypoints `detm.cli`/`detm.ui.*`/`detm.viz.*` вне compatibility слоя (`tests/test_no_legacy_entrypoint_imports.py`)
-- [x] Централизованный runtime-контур `LevelPolicy` (schema + runtime usage + trace policy fields + microsteps/batch/publish wiring + multi-signal runtime adaptive tuning + directional delta-mode + auto profile selection + anti-flap cooldown + sampled/aggregated runtime-adaptive telemetry в trace/watch policy + runtime adaptive guardrails `min/max + reject_unsafe`)
-- [x] Расширены runtime observability профили (`adaptive_signal_event_types`, `adaptive_detail_mode`, `adaptive_hold_ticks`, `adaptive_allowed_event_types`) + signal-driven переключение в session runtime
-- [x] Рабочий `refinement` MVP (detectors `energy_overflow` + `state_nonfinite` + `capacity_pressure` -> локальный ROI/sanitize correction -> trace event; capacity detector policy-driven, multi-signal, temporal/memory-driven, learned/cross-level, operator-driven/cross-node, distributed/signed, cryptographic/consensus-grade, attestation/Byzantine-grade)
-- [x] Контур памяти паттернов MVP (`PatternStore` file-backed stub + `PatternCache` LRU/TTL + lookup before refine + pruning thresholds + quality-gated reuse по `error/deviation` + policy-driven scope `global|portable|strict` для переносимости между уровнями/режимами)
-- [x] Разделение трассировки: `System Trace` (`trace.jsonl`) + `Watch Trace` (`watch_trace.jsonl`) как проекции
-- [x] `trace_ref`-дисциплина в trace/watch/commit проекциях
-- [x] Базовая storage policy для trace (`retention-window`, `compaction-budget`) в runtime/subscribers
-- [x] L0 artifact storage policy расширена на ключевые артефакты (`trace/watch_trace/watch_contract/outerfields/commits/commits_audit/history/invariants/commit_validation/fabric_acks/fabric_ack_envelopes/fabric_delivery_acks/fabric_dead_letters/fabric_quorum_report`)
-- [x] Multi-level fallback для artifact storage policy (`L2 -> L1 -> L0 -> default/*`) + e2e coverage для `active_level=L1/L2`
-- [x] Production watch-contract (`watch_contract.jsonl` + `outerfields/*.npz` + `OuterFieldsRef` linkage с `trace_ref`)
-- [x] Каноническая napari-интеграция (read-only subscriber path через `detm_app/napari_subscriber.py`)
-- [x] Добавлен endpoint-registry для napari auto-discovery (`runs/viz_endpoint.json`) + cleanup stale endpoint при закрытии локального viz-daemon
-- [x] Расширен тестовый napari coverage для read-only path (`endpoint resolution/precedence`, `poll timeout`, `layer presenter update/autoscale`, `multi-level active_level meta`)
-- [x] Для дополнительных runtime-отчётов добавлены policy-driven history контуры (`commit_validation_history.jsonl`, `fabric_quorum_report_history.jsonl`) с multi-level retention
-- [ ] N-мерное обобщение runtime
-- [x] `CommitPacket` schema MVP в runtime (`detm/runtime/commit_packet.py`) + валидация
-- [x] Локальный validator-отчёт для commit-потока (`commit_validation.json`: chain/proof/watermark checks)
-- [x] Проведён обзор transport/packet паттернов из `D:\github\game\references\old_repo\lib` с привязкой к этапу G (`Node/Fabric`)
-- [x] Добавлены MVP-контракты node/fabric: `FabricEnvelope`, `CommitChainManager`, `ProofAck/TrustAck`, `InMemoryFabricBus`
-- [x] Добавлен local handshake wiring в runtime pipeline (`commit_packet -> ProofAck/TrustAck`) как opt-in контур
-- [x] Добавлены quorum/retry policy primitives для fabric (`BasicQuorumPolicy`, `ValidatorSetQuorumPolicy`, `RetryPolicy`, local coordinator report)
-- [x] Добавлен TCP fabric transport adapter (`TcpFabricTransport` + `TcpFabricRelay`) как network MVP
-- [x] Добавлены `StaticValidatorRegistry` и `pending-timeout` окно в quorum coordinator (`fabric_quorum_report.json`)
-- [x] Добавлен distributed handshake bridge по `payload_inline` (`commit/ack`) для network MVP без shared artifact storage
-- [x] Добавлен file-backed shared artifact resolver (`FileFabricArtifactStore`) для commit/ack в node/fabric MVP
-- [x] Добавлен `InMemoryEpochWatermarkCoordinator` и wiring в handshake (`commit -> epoch/watermark gate -> proof/trust ack`)
-- [x] Добавлен replay-check sampling в `LocalFabricValidator` + runtime wiring/reporting (`replay_sampling` в `fabric_quorum_report.json`)
-- [x] Добавлен shared-state `FileEpochWatermarkCoordinator` (межнодовый MVP через общий `epoch_state.json`)
-- [x] Добавлен lock-контур для `FileEpochWatermarkCoordinator` (`lock timeout`, `stale lock cleanup`) для межпроцессной синхронизации
-- [x] Добавлен `ReplicatedFileEpochWatermarkCoordinator` (read/write quorum по нескольким `epoch_state` репликам)
-- [x] Добавлен transport pre-consensus coordinator для `epoch` (`epoch_proposal/epoch_vote`, quorum timeout/policy)
-- [x] Добавлен mode-split routing для node/fabric handshake (`realtime/audit` каналы для `commit/ack`, опционально через policy-флаг)
-- [x] Добавлен file-backed delivery outbox для fabric envelope (`undelivered -> queue -> flush/retry`) и runtime wiring в handshake/recorder
-- [x] Добавлена backpressure overflow policy для delivery outbox (`audit_first|oldest|newest`) с приоритетом сохранения `realtime` при перегрузке
-- [x] Добавлен live transport backpressure adapter (`BufferedFabricTransport`: `block/drop_oldest/drop_newest/fail`) и runtime wiring в fabric handshake
-- [x] Добавлен acknowledged-delivery MVP для `commit` envelope (`delivery_id` + `delivery_ack` channel + retry/timeout receipt tracking + validator-set/reject policy)
-- [x] Commit-delivery wiring вынесен в runtime service (`FabricCommitDeliveryService`), subscriber-слой оставлен как orchestration-boundary
-- [x] Commit-ingress wiring вынесен в runtime service (`FabricCommitIngressService`), subscriber-слой оставлен как orchestration-boundary
-- [x] Ack-ingress wiring вынесен в runtime service (`FabricAckIngressService`), subscriber-слой оставлен как orchestration-boundary
-- [x] Quorum policy/registry composition вынесена в runtime service (`FabricQuorumRuntimeService`), subscriber-слой оставлен как orchestration-boundary
-- [x] Сборка `fabric_quorum_report` вынесена в runtime builder (`FabricQuorumReportBuilder`), subscriber-слой оставлен как orchestration-boundary
-- [x] Запись `fabric_acks/fabric_delivery_acks/fabric_quorum_report/fabric_dead_letters` вынесена в runtime writer (`FabricRuntimeReportWriter`)
-- [x] Lifecycle wiring (`start/stop`) fabric runtime-компонентов вынесен в runtime bundle (`FabricHandshakeRuntimeBundle`)
-- [x] Сборка fabric runtime-компонентов вынесена в composer/factory (`compose_fabric_handshake_runtime`)
-- [x] Commit/ack artifact-resolve + replay-check выведены в runtime adapter (`FabricArtifactResolver`)
-- [x] Mode-channel и runtime-bundle startup helper-функции вынесены в `fabric_runtime_helpers.py`
-- [x] Нормализация `FabricHandshakeRecorder.attach(...)` вынесена в runtime-config helper (`normalize_fabric_handshake_recorder_attach_kwargs`)
+1. `detm` — библиотечное ядро; orchestration/UI живут в `detm_app`.
+2. `L0 runtime` остаётся UI-агностичным и single-writer.
+3. Внешний доступ только artifact-first (`OuterFields/metrics/events/trace_ref`).
+4. `System Trace` канонический; `Watch Trace` — проекция с обязательным `trace_ref`.
+5. Любая работа оценивается по критерию: приближает ли она проект к target-архитектуре.
+6. Целевая delivery-гарантия fabric baseline: `at-least-once + idempotency`.
+7. Базовый deployment-профиль для production-hardening: `single-host multi-process`.
 
-## Зафиксированные архитектурные решения
+## ROADMAP Item v2 (шаблон)
 
-- [x] L0 runtime остаётся UI-агностичным.
-- [x] Внешние потребители должны работать через артефакты/контракты, а не через прямой доступ к живому state.
-- [x] `OuterFields` и подписки являются основным интерфейсом межуровневой/внешней наблюдаемости.
-- [x] `Tk + TCP/embedded` — текущий рабочий контур визуализации; napari — migration track.
-- [x] По умолчанию используется минимальный режим observables; тяжёлые CPU-пути должны оставаться opt-in.
-- [x] Текущая структура кода трактуется как transition, а не как финальная архитектура.
-- [x] Псевдоцели (релятивистская оптика, физический мотив структур, агент навыков) учитываются как источник гипотез, но не как KPI фазы.
-- [x] Целевая модель трассировки: `System Trace` (канонический журнал) + `Watch Trace` (операторские/исследовательские watchpoints как проекции).
-- [x] Любая внешняя проекция/уведомление обязана нести `trace_ref` на committed артефакт.
-- [x] Наблюдаемость управляется policy-driven профилями runtime (`allowed_event_types`, `detail_mode`).
-- [x] Политика хранения артефактов задаётся по уровням `L0..Ln` через `retention-window` и `compaction-budget`.
-- [x] Архитектурные описания “динамика как прямой эфир” и “модульный runtime-стек” зафиксированы как единый north-star: `docs/rus/30_architecture/target_architecture_synthesis.md`.
-- [x] Межнодовая синхронизация фиксируется по `GlobalTick/commit boundary` (epoch/watermark), а не по внутренним microsteps нод.
-- [x] Для node/fabric принят OOP-подход с жёстким разделением ролей: contract classes, chain/lifecycle classes, validators, transport adapters.
-- [x] Введены архитектурные `ARCH-MARKERS` в коде (`LAYER_BAND`, `ABSTRACT_DISTANCE`, `OOP_TECH_DEBT`) для явной фиксации расстояния до абстракций.
+Каждый open-item в этом документе обязан содержать поля:
 
-## Что уже реализовано (по модулям)
+- `id`
+- `status`
+- `priority`
+- `owner_role`
+- `target_date`
+- `depends_on`
+- `scope_in`
+- `scope_out`
+- `deliverables`
+- `api_contract_changes`
+- `tests_required`
+- `readout_artifacts`
+- `risks`
+- `dod`
 
-- [x] `detm/runtime/api.py`: публичный L0 API, выбор backend, digest/observables.
-- [x] `detm/runtime/backends/*`: `NumpyBackend`, `TorchBackend`.
-- [x] `detm/runtime/level_policy.py`: schema + policy decision (`microsteps/commit_stride/observability profile`).
-- [x] `detm/runtime/commit_packet.py`: machine-validatable `CommitPacket/CommitTickRef` (`state|boundary|coarsened|proof`, `realtime|audit`).
-- [x] `detm/runtime/fabric_validation.py`: local commit validation (`chain/proof checks`, `epoch/watermark` report).
-- [x] `detm/runtime/fabric_envelope.py`: transport envelope (`message_type/channel/mode/payload_ref`) + optional `payload_inline` bridge для node/fabric.
-- [x] `detm/runtime/commit_chain.py`: `CommitChainManager` (`sequence/verify/accept`, `tail -> parent_ref`).
-- [x] `detm/runtime/fabric_ack.py`: `ProofAck/TrustAck` contract classes (validator acknowledgements).
-- [x] `detm/runtime/fabric_transport.py`: `InMemoryFabricBus` + `BufferedFabricTransport` (live backpressure adapter).
-- [x] `detm/runtime/fabric_validator.py`: `FabricValidator` protocol + `LocalFabricValidator` (`chain checks + replay sampling policy`).
-- [x] `detm/runtime/fabric_handshake.py`: `FabricHandshakeService` (`commit envelope -> proof/trust ack envelope`, mode-aware channel routing + `delivery_ack` emission).
-- [x] `detm/runtime/fabric_delivery.py`: `FabricEnvelopeOutbox`, `JsonlFabricEnvelopeOutbox` (durable queue + flush/retry).
-- [x] `detm/runtime/fabric_delivery_receipts.py`: `Count/ValidatorSet` delivery policies + `InMemoryDeliveryReceiptCoordinator`.
-- [x] `detm/runtime/fabric_delivery_tracking.py`: retry/timeout state-machine `DeliveryTrackingCoordinator` (runtime-layer extraction from subscribers).
-- [x] `detm/runtime/fabric_commit_delivery.py`: `FabricCommitDeliveryService` (commit publish/retry/outbox + `delivery_ack` subscriptions + delivery tracking wiring).
-- [x] `detm/runtime/fabric_commit_ingress.py`: `FabricCommitIngressService` (commit packet ingress -> artifact resolve -> envelope publish через runtime delivery service).
-- [x] `detm/runtime/fabric_ack_ingress.py`: `FabricAckIngressService` (proof/trust `ack` subscriptions + ingress forwarding в quorum-coordinator).
-- [x] `detm/runtime/fabric_quorum_runtime.py`: `FabricQuorumRuntimeService` (policy selection + validator registry + quorum snapshot composition).
-- [x] `detm/runtime/fabric_quorum_report.py`: `FabricQuorumReportBuilder` (runtime-композиция секций `fabric_quorum_report.json`).
-- [x] `detm/runtime/fabric_report_writer.py`: `FabricRuntimeReportWriter` (запись ack/envelope/dead-letter артефактов и `fabric_quorum_report.json`).
-- [x] `detm/runtime/fabric_runtime_bundle.py`: `FabricHandshakeRuntimeBundle` (lifecycle порядок `start/stop` для handshake/ack/delivery/runtime transport).
-- [x] `detm/runtime/fabric_runtime_composer.py`: `compose_fabric_handshake_runtime` + `FabricHandshakeRuntimeComposition` (factory сборка runtime-контуров для handshake recorder).
-- [x] `detm/runtime/fabric_artifact_resolver.py`: `FabricArtifactResolver` (commit/ack write+resolve + replay-check статистика).
-- [x] `detm/runtime/fabric_runtime_helpers.py`: `mode_channels`, `channel_for_mode`, `start_runtime_bundle`.
-- [x] `detm/runtime/fabric_handshake_recorder_config.py`: нормализация аргументов `FabricHandshakeRecorder.attach(...)` в отдельный runtime-config helper.
-- [x] `detm/runtime/fabric_quorum.py`: `QuorumPolicy`, `BasicQuorumPolicy`, `ValidatorSetQuorumPolicy`, `InMemoryQuorumCoordinator`.
-- [x] `detm/runtime/fabric_validator_registry.py`: `ValidatorRegistry`, `StaticValidatorRegistry` (MVP membership source).
-- [x] `detm/runtime/fabric_artifact_store.py`: `FabricArtifactStore`, `FileFabricArtifactStore` (durable shared resolver MVP).
-- [x] `detm/runtime/fabric_epoch.py`: `FabricEpochCoordinator`, `InMemoryEpochWatermarkCoordinator`, `FileEpochWatermarkCoordinator`, `ReplicatedFileEpochWatermarkCoordinator` (+ lock/quorum policy), `EpochDecision`.
-- [x] `detm/runtime/fabric_epoch_consensus.py`: `TransportEpochConsensusCoordinator` (`epoch_proposal/epoch_vote` pre-consensus layer).
-- [x] `detm/runtime/fabric_tcp_transport.py`: `TcpFabricTransport`, `TcpFabricRelay`, `open_fabric_transport`.
-- [x] `detm/run/subscribers.py`: `FabricHandshakeRecorder` (локальный wiring между `CommitJsonlWriter` и handshake-service, запись `fabric_acks.jsonl`, split-mode channel policy).
-- [x] `detm_app/cli.py`: канонический headless entrypoint; `detm/cli.py` — deprecated facade.
-- [x] `detm_app/tk_runner.py`: канонический Tk entrypoint; `detm/ui/tk_runner.py` — deprecated facade.
-- [x] `detm_app/config_hints.py`, `detm_app/tooltips.py`: канонические UI-helper модули; `detm/ui/config_hints.py`, `detm/ui/tooltips.py` — deprecated facades.
-- [x] `detm_app/tk_panel.py`, `detm_app/napari_subscriber.py`: канонические viz-entrypoint модули; `detm/viz/tk_panel.py`, `detm/viz/napari_subscriber.py` — deprecated facades.
-- [x] `detm_app/protocol.py`, `detm_app/client.py`, `detm_app/daemon.py`, `detm_app/subscriber.py`, `detm_app/transport.py`: канонический runtime-neutral viz-контур; `detm/viz/*` оставлен только как deprecated compatibility facade слой.
-- [x] `detm/runtime/outerfields.py`: `OuterFieldsV1` и базовый вычислитель каналов.
-- [x] `detm/runtime/watch_contract.py`: `OuterFieldsRef`, `WatchContractPacket` (artifact-first watch contract).
-- [x] `detm/runtime/serialization.py`: pack/unpack state, schema-aware digest.
-- [x] `detm/run/session.py`: сессия и event-emission lifecycle.
-- [x] `detm/run/scheduler.py`: deterministic tick scheduler и runner.
-- [x] `detm/run/coarsening.py`: инвариантные time streams.
-- [x] `detm/run/subscribers.py`: writer-ы артефактов, trace, `realtime/audit` commits, invariants, viz streaming.
-- [x] `detm/integrations/acgs_backend.py`: stateful adapter для ACGS-stub.
-- [x] `detm/ui/tk_runner.py`: deprecated compatibility launcher facade.
-- [x] `detm/viz/*`: только deprecated compatibility facades на `detm_app` (без канонической runtime-логики).
-- [x] `detm_app/*`: app-layer orchestration (`EventBus`, `DetmSession`, `TickScheduler`, `TickRunner`, coarsening, subscribers); `detm/run/*` оставлен как re-export compatibility layer.
+## Status Snapshot
 
-## Что уже реализовано (по документации)
+### Канон и архитектура
 
-- [x] Канон и механизмы: `docs/rus/10_model/*`, `docs/rus/20_mechanisms/*`.
-- [x] Runtime/архитектурные контракты: `docs/rus/30_architecture/runtime_api.md`, `global_tick.md`, `OuterFields_and_Subscriptions.md`, `commit_protocol.md`.
-- [x] Гипотезы и эксперименты: `docs/rus/40_hypotheses/*`, `docs/rus/50_experiments/*`.
-- [x] Статус-снимок кодовой базы: `docs/rus/90_notes/codebase_spec_2026-02-09.md`.
-- [x] Архив архитектурных вариантов: `docs/rus/90_notes/architecture_variants_l0_and_fabric_2026-02-09.md`.
-- [x] Инженерный паспорт и target constraints: `docs/rus/90_notes/DETM_solution_passport_filled.md`.
-- [x] Книга как единый источник концепций и модель обучения: `book_concepts_single_source.md`, `learning_model_detm.md`, `readout_protocol_and_antigoodhart.md`.
-- [x] Синтез целевой архитектуры и привязка `as-is -> to-be`: `docs/rus/30_architecture/target_architecture_synthesis.md`.
+- Зафиксирован канон DETM и north star (`PROMT.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`).
+- Граница `detm`/`detm_app` очищена; legacy entrypoints удалены.
+- `System Trace`/`Watch Trace` и `watch_contract` в production-контуре.
 
-## Что уже реализовано (по тестам)
+### Runtime/Fabric
 
-- [x] `tests/test_integration_contract.py`
-- [x] `tests/test_golden_contract.py`
-- [x] `tests/test_numpy_torch_parity.py`
-- [x] `tests/test_energy_invariant.py`
-- [x] `tests/test_entropy_dynamics.py`
-- [x] `tests/test_invariants.py`
-- [x] `tests/test_coarsening.py`
-- [x] `tests/test_influence.py`
-- [x] `tests/test_boundary_pressure.py`
-- [x] `tests/test_marker_passive.py`
-- [x] `tests/test_acgs_backend_adapter.py`
-- [x] `tests/test_level_policy_runtime.py`
-- [x] `tests/test_artifact_storage_policy.py`
-- [x] `tests/test_commit_packet_schema.py`
-- [x] `tests/test_commit_trace_linkage.py`
-- [x] `tests/test_commit_validation_report.py`
-- [x] `tests/test_fabric_envelope_and_chain.py`
-- [x] `tests/test_fabric_ack_and_transport.py`
-- [x] `tests/test_fabric_validator_and_handshake.py`
-- [x] `tests/test_fabric_handshake_recorder.py`
-- [x] `tests/test_fabric_quorum_and_retry.py`
-- [x] `tests/test_fabric_tcp_transport.py`
-- [x] `tests/test_fabric_artifact_store.py`
-- [x] `tests/test_fabric_epoch.py`
-- [x] `tests/test_fabric_epoch_consensus.py`
-- [x] `tests/test_fabric_delivery_outbox.py`
-- [x] `tests/test_fabric_transport_backpressure.py`
-- [x] `tests/test_fabric_delivery_receipts.py`
-- [x] `tests/test_fabric_delivery_tracking.py`
-- [x] `tests/test_fabric_commit_delivery.py`
-- [x] `tests/test_fabric_commit_ingress.py`
-- [x] `tests/test_fabric_ack_ingress.py`
-- [x] `tests/test_fabric_quorum_runtime.py`
-- [x] `tests/test_fabric_quorum_report.py`
-- [x] `tests/test_fabric_report_writer.py`
-- [x] `tests/test_fabric_runtime_bundle.py`
-- [x] `tests/test_fabric_runtime_composer.py`
-- [x] `tests/test_fabric_artifact_resolver.py`
-- [x] `tests/test_fabric_runtime_helpers.py`
-- [x] `tests/test_fabric_handshake_recorder_config.py`
-- [x] `tests/test_detm_app_shim.py`
-- [x] `tests/test_run_compat_facade.py`
-- [x] `tests/test_entrypoint_facades.py`
-- [x] `tests/test_ui_helper_facades.py`
-- [x] `tests/test_no_detm_run_imports.py`
-- [x] `tests/test_no_legacy_entrypoint_imports.py`
-- [x] `tests/test_viz_facades.py`
-- [x] `tests/test_napari_subscriber_path.py`
-- [x] `tests/test_viz_streamer_multilevel.py`
-- [x] `tests/test_watch_contract_writer.py`
-- [x] `tests/test_pattern_memory.py`
-- [x] `tests/test_refinement_mvp.py`
+- `CommitPacket`, `FabricEnvelope`, `CommitChainManager`, `ProofAck/TrustAck` и handshake runtime вынесены в `detm/runtime/fabric/*`.
+- Есть transport/network MVP (`InMemoryFabricBus`, `TcpFabricTransport` + TLS/HMAC + dedup + backpressure).
+- Есть epoch/watermark и pre-consensus MVP, delivery outbox, receipt tracking, quorum reports.
 
-## Текущие пробелы (критично закрыть)
+### Тестовый срез
 
-- [ ] Граница между библиотекой ядра и приложением остаётся неполной: `detm_app` выделен, а в `detm` всё ещё присутствуют compatibility facades (`detm/run/*`, `detm/cli.py`, `detm/ui/*`, `detm/viz/*`).
-- [x] `LevelPolicy` доведён до полного runtime wiring для `microsteps/batch/publish`; multi-signal runtime adaptive contour расширен guardrails-ограничениями (`runtime_adaptive_guard_*`: `min/max`, `reject_unsafe`) и отражается в trace policy telemetry.
-- [x] `refinement` есть как MVP (overflow/nonfinite/capacity detectors + ROI/sanitize correction); базовые temporal/memory-driven, learned/cross-level, operator-driven/cross-node, distributed/signed, cryptographic/consensus-grade и attestation/Byzantine-grade signals для ёмкости уровня добавлены.
-- [x] Контур памяти паттернов расширен policy-driven scope-режимами (`pattern_reuse_scope`: `global|portable|strict`) с переносимостью между уровнями/режимами и тестовым покрытием.
-- [x] Pruning по `error/deviation` реализован как MVP и покрыт расширенной абляционной валидацией на длинных сериях (`tests/test_pattern_memory.py`).
-- [x] Канонический napari subscriber path реализован (`detm_app/napari_subscriber.py`; `detm_napari_viewer.py` как launcher-wrapper).
-- [x] Production watch-contract и расширяющие тесты для watch/read-only проекций реализованы (`watch_contract.jsonl`, `outerfields/*.npz`, `tests/test_watch_contract_writer.py`).
-- [x] Базовый набор runtime-профилей наблюдаемости и переключение профилей от adaptive signals реализованы (MVP).
-- [x] Политика хранения `L0..Ln` покрывает ключевые L0-артефакты, runtime/fabric handshake отчёты, multi-level fallback профили и дополнительные runtime-отчёты (`commit_validation`, `fabric_quorum_report` history).
-- [ ] `CommitPacket` и `realtime/audit` commit-writers разведены в node/fabric MVP (включая split-mode channel routing, `delivery_ack`, receipt retry/timeout, validator-set/reject policy), но нет production-доставки/репликации commit-логов (durable queue + distributed guarantees).
-- [ ] Нет production transport-стека поверх `FabricEnvelope` (network MVP есть: TCP relay/adapter; есть local outbox + live backpressure + delivery receipt tracking, но нет end-to-end exactly-once/at-least-once guarantees, auth/encryption и distributed durable queue/coordination).
-- [ ] Локальный validator (`commit_validation.json`) и distributed MVP wiring (`epoch/watermark gate`, shared artifact resolver, proof/trust acks, replay sampling policy) есть, но нет production replay-check/sampling и replicated validator-coordination между нодами.
-- [ ] Нет production consensus fabric-координатора для `epoch/watermark`-согласования commit-ов между нодами (MVP есть: in-memory + shared file-state + replicated file-quorum + transport pre-consensus, но без replicated log/Byzantine-safe consensus).
-- [ ] Нет production distributed validator handshake поверх `CommitChainManager` и `ProofAck/TrustAck`; network MVP работает через shared artifact resolver + `payload_inline` bridge + validator-set/quorum/retry/timeout/static-registry + transport pre-consensus primitives, но без full consensus/runtime membership.
-- [ ] Нет end-to-end pipeline обучения реакций инвариантов (фаза 5 как code contour).
-- [ ] Нет N-D runtime модели и межуровневой согласованной геометрии.
+- Локальный snapshot (2026-02-13): `pytest -q -> 331 passed, 1 skipped`.
+- Fabric-focused срез в roadmap и status snapshots уже зафиксирован (`docs/rus/90_notes/status_snapshot_2026-02-12_fabric_and_napari.md`, `docs/rus/90_notes/status_snapshot_2026-02-13_napari_phase_profiler.md`).
 
-## План по этапам
+## Workstreams
 
-### Этап A: Приложение и границы слоёв (`detm_app`)
+## WS-A..E — Baseline/Maintenance (закрытые этапы)
 
-- [x] Поднять `detm_app` shim-пакет с зеркальными импортами `bus/session/scheduler/coarsening` для совместимого migration path.
-- [x] Перевести `cli`/`tk_runner` на app-layer импорты (`detm_app.*`) для `Session/Bus/Coarsening`.
-- [x] Вынести `Session/Bus/Scheduler` из `detm/run` в `detm_app`.
-- [x] Зафиксировать deprecation-policy и migration guide для `detm/run/*` до полного удаления facade.
-- [x] Добавить CI-guard, запрещающий новые импорты `detm.run.*` вне compatibility слоя.
-- [x] Добавить CI-guard, запрещающий новые импорты legacy entrypoints `detm.cli`/`detm.ui.*`/`detm.viz.*`.
-- [ ] Оставить в `detm` только библиотечные контракты и вычислительное ядро.
-- [x] Обеспечить совместимость CLI/UI без ломки текущего API.
+Этапы A–E считаются закрытыми как baseline. Открыты только maintenance-пункты, не блокирующие P0 fabric:
 
-Критерий готовности этапа A:
-1. `detm` импортируется как чистая библиотека без app-orchestration допущений.
-2. Все текущие сценарии запуска работают через `detm_app` адаптеры.
+- `E-MNT-01`: финализировать napari-only cutover в canonical entrypoints/docs и закрыть regression/smoke.
+- `E-MNT-02`: decouple `UiRunSettings` contract от `runner`-модуля в отдельный config-model слой.
+- `E-MNT-03`: viewer adapter registry для `detm_app.runner.shell` вместо прямых imports viewer-реализаций.
+- `E-MNT-04`: вынести общий batch-orchestration service из UI frontends.
+- `E-MNT-05`: декомпозиция крупных app-layer модулей (`runner/headless/*`, `napari/interactive/*`, `tk/runner/*`).
 
-### Этап B: LevelPolicy как runtime-объект
+## WS-FAB — Fabric Production Baseline (P0)
 
-- [x] Реализовать schema + runtime application `LevelPolicy` (MVP).
-- [x] Довести связку microsteps/batch/publish до полного runtime wiring (не только commit/microstep).
-- [x] Прозрачно логировать policy decisions в trace/readout (MVP trace fields).
-- [x] Включить в `LevelPolicy` runtime-профили наблюдаемости (`allowed_event_types`, `detail_mode`) (MVP).
-- [x] Добавить multi-signal runtime adaptive tuning (`runtime_adaptive_signal_event_types`, `runtime_adaptive_min_signals`, quality/cost thresholds, directional delta-mode, auto profile selection, anti-flap `runtime_adaptive_cooldown_ticks`, sampled/aggregated runtime-adaptive telemetry в trace/watch policy и/или override для `microsteps/batch/commit_stride`, `runtime_adaptive_hold_ticks`).
-- [x] Добавить policy guardrails для runtime adaptive (`runtime_adaptive_guard_*`: `min/max`, `reject_unsafe`) с trace-видимостью и тестовым покрытием.
+Цель: довести текущий fabric MVP до production-baseline в пределах `single-host multi-process`, без завышенных обещаний exactly-once.
 
-Критерий готовности этапа B:
-1. Политика уровня изменяется данными, а не ad-hoc логикой кода.
-2. Поведение тиков/публикации воспроизводимо и проверяемо тестами.
-3. Профиль наблюдаемости переключается данными и отражается в trace/readout.
+Состав:
 
-### Этап C: Refinement MVP
+- `G-FAB-01` Delivery guarantees (`at-least-once + idempotency`)
+- `G-FAB-02` Durable queue/coordination baseline
+- `G-FAB-03` Validator coordination + replay policy tiers
+- `G-FAB-04` Epoch/watermark consensus hardening
+- `G-FAB-05` Distributed validator handshake production profile
 
-- [x] Добавить детекторы выхода за валидность уровня (MVP: `energy_overflow`, `state_nonfinite`).
-- [x] Добавить базовый detector ёмкости уровня (MVP: `capacity_pressure` по доле overflow-клеток).
-- [x] Вынести порог `capacity_pressure` в `LevelPolicy` (`refinement_capacity_overflow_ratio_threshold`).
-- [x] Расширить `capacity_pressure` до policy-driven multi-signal gating (`overflow_ratio` + `overflow_mean`, `refinement_capacity_min_signals`).
-- [x] Добавить temporal/memory-driven signal в `capacity_pressure` (`refinement_capacity_temporal_ratio_threshold`, `refinement_capacity_temporal_window`, `refinement_capacity_temporal_required_hits`).
-- [x] Добавить learned/cross-level signals в `capacity_pressure` (`refinement_capacity_learned_hits_threshold`, `refinement_capacity_cross_level_window`, `refinement_capacity_cross_level_min_levels`).
-- [x] Добавить operator-driven/cross-node signals в `capacity_pressure` (`refinement_capacity_operator_score_threshold`, `refinement_capacity_cross_node_min_signals`).
-- [x] Добавить distributed/signed signals в `capacity_pressure` (`refinement_capacity_distributed_accepted_min`, `refinement_capacity_signed_acks_min`).
-- [x] Добавить cryptographic/consensus-grade signals в `capacity_pressure` (`refinement_capacity_consensus_accepted_min`, `refinement_capacity_crypto_validator_coverage_min`).
-- [x] Добавить attestation/Byzantine-grade signals в `capacity_pressure` (`refinement_capacity_attestation_validator_ids`, `refinement_capacity_attestation_min_coverage`, `refinement_capacity_byzantine_clean_min`).
-- [x] Реализовать локальный refine ROI на `Ln-1` (MVP: локальная ROI-коррекция вокруг hotspot).
-- [x] Реализовать `correction` и возврат в `Ln` в рамках одного commit-окна.
+## WS-F — Learning Code Contour
 
-Критерий готовности этапа C:
-1. Перегрузки уровня разрешаются локально без глобальной деградации.
-2. Trace фиксирует факт refine и эффект correction.
+Цель: перевести phase F из doc-only в runtime/code контур.
 
-### Этап D: Память паттернов и ускорение реакций
+Состав:
 
-- [x] Ввести `PatternStore` (file-backed stub, версионирование).
-- [x] Ввести `PatternCache` (LRU/TTL в RAM).
-- [x] Подключить lookup/reuse паттерна до дорогого refine.
-- [x] Ввести pruning по абляционным порогам `error/deviation` для `PatternStore/PatternCache`.
-- [x] Добавить policy-driven scope для reuse (`pattern_reuse_scope`: `global|portable|strict`) и переносимость между уровнями/режимами.
+- `F-01` Контур накопления reaction/correction операторов
+- `F-02` Переносимость операторов (`hold_rate`, `operator_reuse`, `transferability`)
+- `F-03` Anti-Goodhart readout + `goodhart_flag`
 
-Критерий готовности этапа D:
-1. Повторяющиеся режимы реже уходят в refine.
-2. Есть измеримое снижение стоимости тика на повторных паттернах.
-3. Pruning воспроизводим политикой порогов и не ломает reuse-path.
+## WS-G-ND — N-D Runtime Migration
 
-### Этап E: Artifact-first наблюдаемость и napari migration
+Цель: убрать 2D-only предпосылки из state/runtime контрактов.
 
-- [x] Зафиксировать production-контракт подписок (`OuterFields/metrics/events`) для L0 artifact-first path.
-- [x] Разделить журнал на `System Trace` и `Watch Trace` (watchpoints как проекции поверх канонического журнала) (MVP).
-- [x] Ввести `trace_ref`-дисциплину для любых проекций/уведомлений (MVP).
-- [x] Зафиксировать policy хранения trace (`retention-window`, `compaction-budget`) (MVP).
-- [x] Расширить L0 artifact storage policy на ключевые артефакты (`trace/watch_trace/watch_contract/outerfields/commits/commits_audit/history/invariants/commit_validation/fabric_acks/fabric_ack_envelopes/fabric_delivery_acks/fabric_dead_letters/fabric_quorum_report`).
-- [x] Реализовать napari как read-only subscriber канонического transport-а.
-- [x] Расширить napari read-only coverage на multi-level сценарии (`active_level` meta propagation + parser/tests).
-- [ ] Оставить `Tk` как fallback/dev path до полной миграции.
+Состав:
 
-Критерий готовности этапа E:
-1. UI не требует прямого доступа к `DETMState`.
-2. napari path функционально покрывает текущие ключевые сценарии наблюдения.
-3. Любая watch-проекция/уведомление содержит валидный `trace_ref` и укладывается в policy хранения.
+- `G-ND-01` Эволюция `DETMState`: `(H,W)` -> `shape[N]` (backward compatible)
+- `G-ND-02` N-D контракты serialization/refinement/outerfields
+- `G-ND-03` UI-compatible projection adapters (napari/readout consumers)
 
-### Этап F: Обучение реакций (фаза 5 roadmap)
+## WS-G-RND — Local-first + Validation-sync
 
-- [ ] Реализовать контур накопления correction/reaction как операторов.
-- [ ] Ввести критерии переносимости операторов между режимами.
-- [ ] Добавить anti-Goodhart readout для оценки качества обучения.
+Цель: оформить отдельный R&D протокол поверх текущих `CommitPacket/FabricEnvelope/epoch/watermark` контрактов, без влияния на канон.
 
-Критерий готовности этапа F:
-1. Реакции устойчиво переиспользуются в новых, но близких режимах.
-2. Улучшение не сводится к росту одной метрики.
+Состав:
 
-### Этап G: N-мерность и node/fabric горизонт
+- `G-RND-01` Спецификация local-first + validation-sync (boundaries, prod-scope vs R&D-scope).
 
-- [ ] Обобщить `DETMState` на N-мерные поля.
-- [ ] Согласовать межуровневые контракты для разных размерностей.
-- [ ] Подготовить отдельный R&D контур `Node/Fabric/Protocol` поверх артефактных интерфейсов.
-- [x] Зафиксировать `CommitPacket`-контракт и типы `StateCommit/BoundaryCommit/CoarsenedCommit/ProofCommit` (MVP schema + tests).
-- [x] Поднять local validator-report (`chain/proof/watermark`) для commit-артефактов.
-- [x] Ввести канонический `FabricEnvelope` (`type`, `channel`, `mode`, `payload_ref`) и topic-based routing для node/fabric сообщений (MVP: `InMemoryFabricBus`).
-- [x] Ввести `CommitChainManager` (`tail`, `parent_ref`, `sequence/verify`) как runtime-слой поверх `CommitPacket` (MVP).
-- [ ] Ввести `ProofAck/TrustAck` контур (подпись, проверка, подтверждение commit-цепочки) для validator/fabric (local + distributed MVP wiring реализованы: validator-set/quorum/retry/timeout, shared artifact resolver, epoch/watermark gate, transport pre-consensus; production-consensus в работе).
-- [ ] Ввести production fabric-контур согласования `epoch/watermark` по commit boundary (MVP реализован: in-memory + shared file-state + replicated file-quorum + transport pre-consensus, без hard-barrier внутри шага ноды).
-- [x] Развести межнодовый транспорт на режимы `realtime` (thin commit) и `audit` (thick commit) на уровне node-to-node fabric (MVP: mode-aware `commit/ack` channels + runtime/CLI wiring).
-- [ ] Подготовить R&D-дизайн `local-first + validation-sync` как pre-distributed трек для `Node/Fabric`.
+## WS-RT-MNT — Runtime Refactoring Completion (`detm/runtime`)
 
-Критерий готовности этапа G:
-1. Базовые контуры работают вне 2D-only предположений.
-2. Node/Fabric не ломает канон L0/runtime контрактов.
-3. `CommitPacket` и epoch/watermark-согласование обеспечивают воспроизводимый межнодовый replay/валидацию.
-4. `local-first + validation-sync` описан как отдельный экспериментальный протокол без влияния на канон.
+Цель: закрыть незавершенный structural-refactor runtime после переноса в namespace-пакеты и снизить риск регрессий при F/N-D треках.
 
-## Ближайшие 5 шагов (приоритет)
+Состав:
 
-- [x] 1. Поднять минимальный `LevelPolicy` в коде (`schema + runtime usage + trace fields + observability profiles`).
-- [x] 2. Выделить `detm_app` и мигрировать туда `Session/Bus/Scheduler`.
-- [x] 3. Сделать `refinement` MVP (детектор + локальный ROI + correction).
-- [x] 4. Добавить `PatternStore` stub + `PatternCache` LRU + lookup до refine + pruning (`error/deviation`).
-- [x] 5. Закрепить artifact-first UI path: довести storage policy для дополнительных runtime-отчётов `L1..Ln`.
+- `RT-MNT-01` Декомпозиция `refinement/runtime.py` (`maybe_apply_refinement`) на pipeline-модули.
+- `RT-MNT-02` Разделение `level_policy/contracts.py` на model/normalize/decision слои.
+- `RT-MNT-03` Разделение `fabric/runtime_composer/composer.py` и handshake-normalize path на более мелкие сервисы.
+- `RT-MNT-04` Завершение schema migration контура в `serialization.py` (убрать placeholder `migrate_state`).
 
-## Псевдоцели (учитывать, но не подменять KPI)
+## PM Registry (open items)
 
-- [x] Исследовать применимость релятивистской геометрии/инвариантов как слоя управления нейросетями.
-- [x] Использовать физический мотив структурообразования (в т.ч. кристаллические паттерны) как источник гипотез.
-- [x] Двигаться к агенту навыков (переносимых операторов), а не к агенту контекста.
-- [x] Не оценивать прогресс этими пунктами как критериями готовности этапов A-G.
+### E-MNT-01 — Napari-only cutover в canonical entrypoints/docs
 
-## Что взято из `D:\github\game` как полезный паттерн
+- `id`: `E-MNT-01`
+- `status`: `done`
+- `priority`: `P1`
+- `owner_role`: `docs`
+- `target_date`: `2026-02-13`
+- `depends_on`: `[]`
+- `scope_in`: удалить `Tk` из canonical entrypoints/shell role matrix, синхронизировать roadmap/human/readme на napari-only путь и перенести runtime-манипуляции UI в napari interactive mode.
+- `scope_out`: удаление/рефактор внутренних `detm_app.ui.tk.*` модулей.
+- `deliverables`: обновлённые `main.py`/`detm_app.runner.shell` routing-контракты, napari interactive controls (`detm_app.ui.napari.interactive`), regression tests, синхронизированные roadmap документы.
+- `api_contract_changes`: нет.
+- `tests_required`: entrypoint routing + shell orchestration + import-guard tests для napari-only матрицы; napari interactive routing/helpers tests.
+- `readout_artifacts`: `docs/rus/ROADMAP.md`, `docs/rus/ROADMAP_HUMAN.md`, target pytest logs (`tests/test_main_entrypoint_routing.py`, `tests/test_shell_orchestrate.py`, `tests/test_entrypoints_use_detm_app.py`, `tests/test_napari_lab_launcher.py`, `tests/test_napari_interactive_controls.py`).
+- `risks`: частичный перенос (код без doc-синхронизации или наоборот).
+- `dod`: canonical `main.py`/`shell` не содержат `runner=ui`/`viewer=tk`; roadmap и тесты подтверждают napari-only execution path.
+- `readout` (2026-02-13): `main.py` переведён на napari-first/napari-only UI entry; `detm_app.runner.shell` ограничен `runner=headless`, `viewer=none|napari`; добавлен `main.py napari --interactive` с in-process манипуляциями (run/step/reset, influence/config/recording controls + quiver overlay) и batch-режимом (Run/Stop batch, queue/log, batch params) в `detm_app.ui.napari.interactive`; обновлены regression tests и human/spec roadmap под завершённый napari cutover.
 
-- [x] Формат roadmap как operational control panel (`Checkup -> Реализовано -> Пробелы -> Этапы -> Ближайшие шаги`).
-- [x] Чеклистная дисциплина `[x]/[ ]` для сохранения контекста между сессиями.
-- [x] Критерии готовности на каждый этап вместо абстрактных намерений.
-- [x] Разделение факта реализации и целевого дизайна в одном документе.
+### E-MNT-02 — Вынести `UiRunSettings` в config-model слой
 
-### Кандидаты на перенос в DETM (из просмотренных `game` docs)
+- `id`: `E-MNT-02`
+- `status`: `done`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-02-18`
+- `depends_on`: `[E-MNT-01]`
+- `scope_in`: убрать coupling `detm_app.config -> detm_app.runner` через перенос контракта `UiRunSettings` в нейтральный config/model модуль (`detm_app/config/ui_models.py` или эквивалент).
+- `scope_out`: изменение runtime semantics и UI feature set.
+- `deliverables`: отдельный dataclass/contract модуль для UI settings + обновлённые импорты `config/runner/ui`.
+- `api_contract_changes`: module-path change для `UiRunSettings` и связанных helper-функций.
+- `tests_required`: import-boundary tests (`config` не импортирует `runner`), smoke tests загрузки preset/override для UI.
+- `readout_artifacts`: `detm_app/config/app_settings.py`, новый config-model модуль, `tests/test_ui_layer_boundaries.py`.
+- `risks`: неполная миграция импортов и скрытые циклы.
+- `dod`: `detm_app.config.*` не содержит импортов `detm_app.runner.*`, контракт `UiRunSettings` доступен из config-model слоя.
+- `readout` (2026-02-13): `UiRunSettings` вынесен в `detm_app/config/ui_models.py`; `detm_app/config/app_settings.py` переведён на `detm_app.config.ui_models.UiRunSettings`; `DetmUiRunner` перенесён в `detm_app/runtime/ui_runtime.py`; обновлены импорты `napari/tk/__init__`; добавлены boundary checks (`tests/test_ui_layer_boundaries.py`).
 
-- [x] Разделить trace на `System Trace` и `Watch Trace` (операторские/исследовательские watchpoints поверх канонического журнала).
-- [x] Добавить `trace_ref`-дисциплину: любая проекция/уведомление должна ссылаться на committed артефакт.
-- [x] Зафиксировать policy хранения по уровням (`L0..Ln`) с retention-окнами и compaction-budget.
-- [x] Довести pruning паттернов до runtime-контура (`PatternStore/PatternCache`) через абляционные пороги `error/deviation`.
-- [x] Ввести явные runtime-профили наблюдаемости (`allowed_event_types`, `detail_mode`) для anti-noise диагностики.
-- [ ] Рассмотреть local-first + validation-sync контур как отдельный трек для будущего distributed/node-fabric этапа.
+### E-MNT-03 — Viewer adapter registry в `detm_app.runner.shell`
 
-Статус на 2026-02-10: первые 5 кандидатов приняты в целевую архитектуру и разнесены по этапам B/D/E; `local-first + validation-sync` оставлен как отдельный R&D трек этапа G.
+- `id`: `E-MNT-03`
+- `status`: `done`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-02-20`
+- `depends_on`: `[E-MNT-02]`
+- `scope_in`: убрать hardcoded viewer entrypoints/imports из `shell.py` и перейти на adapter-registry (`viewer_id -> launcher contract`).
+- `scope_out`: добавление новых viewer-реализаций сверх `none|napari`.
+- `deliverables`: registry module + адаптированный `build_shell_contract/main` + compatibility tests.
+- `api_contract_changes`: shell execution contract фиксирует registry-backed `entrypoint/viewer_options`.
+- `tests_required`: `tests/test_shell_orchestrate.py`, `tests/test_main_entrypoint_routing.py`, negative tests на unknown viewer.
+- `readout_artifacts`: `detm_app/runner/shell.py`, viewer registry module, updated shell tests.
+- `risks`: поломка CLI routing при несовместимых viewer options.
+- `dod`: `shell.py` не импортирует `detm_app.ui.*` напрямую (кроме registry wiring/lookup), контракт сборки роли viewer стабилен.
+- `readout` (2026-02-13): добавлен `detm_app/runner/viewer_registry.py`; `detm_app/runner/shell.py` переведён на registry lookup (`resolve_viewer_adapter`) и launcher adapter (`run_napari_viewer`) без прямого импорта `detm_app.ui.napari.*`; добавлены проверки слоя (`test_runner_shell_uses_viewer_registry_not_direct_ui_imports`) и regression suite зелёная.
 
-### Кандидаты на перенос в DETM (из кода `D:\github\game\references\old_repo\lib`)
+### E-MNT-04 — Unified batch orchestration service для UI
 
-- [x] Паттерн transport-envelope (`type/listener/data`) из `network/ledger/AJWSPackageRequest.py` принят как основа `FabricEnvelope` (`type/channel/mode/payload_ref`).
-- [x] Паттерн commit-цепочки (`tail -> parent`) из `ledger/package/PackageManager.py` принят для `CommitChainManager` node/fabric уровня.
-- [x] Паттерн typed codec (`PackageJSONEncoder/PackageJSONDecoder`) принят для отдельного `CommitCodec` и симметричной сериализации/десериализации payload.
-- [x] Паттерн отдельного trust-пакета (`ledger/package/PackageTrust.py`) принят как основа `ProofAck/TrustAck` в validator/fabric контуре.
-- [x] Паттерн event-pubsub из `publisher/Publisher.py` принят как минимальная модель topic-based dispatch в fabric.
-- [x] Паттерн декомпозиции по классам (контракты/менеджеры/адаптеры) принят как стиль реализации fabric-слоя DETM.
-- [x] Зафиксировано ограничение: `scheduler/*` из `old_repo` не переносится as-is (много заглушек, недетерминированный и незавершённый контур).
+- `id`: `E-MNT-04`
+- `status`: `done`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-02-24`
+- `depends_on`: `[E-MNT-02]`
+- `scope_in`: вынести дублируемую batch-логику из `detm_app/ui/napari/interactive/__init__.py` и `detm_app/ui/tk/runner/launcher.py` в общий app-layer service.
+- `scope_out`: изменение формата batch readout артефактов.
+- `deliverables`: `detm_app/runner/batch_service.py` (или эквивалент), единый API запуска/отмены/логирования batch-run.
+- `api_contract_changes`: общий batch service contract для UI frontends.
+- `tests_required`: перенос/расширение batch tests для napari/tk с общим backend service.
+- `readout_artifacts`: `detm_app/ui/napari/interactive/__init__.py`, `detm_app/ui/tk/runner/launcher.py`, новый batch service module, UI tests.
+- `risks`: race conditions в cancel/poll path после унификации.
+- `dod`: дублируемые batch helper-функции в UI удалены, поведение UI batch-path parity подтверждено тестами.
+- `readout` (2026-02-13): добавлен общий сервис `detm_app/runner/batch_service.py` (`BatchRunRequest`, `BatchRunHandle`, `start_batch_run`, `parse_batch_symbols_csv`); napari/tk UI переведены на общий batch backend и polling contract; сохранён совместимый `_parse_symbol_csv` для napari tests; добавлены unit tests `tests/test_batch_service.py` и boundary checks `tests/test_ui_layer_boundaries.py`.
 
-Статус на 2026-02-10: паттерны зафиксированы в архитектурных документах и разнесены в задачи этапа G; прямой кодовый перенос из `old_repo/lib` не планируется.
+### E-MNT-05 — Декомпозиция крупных app-layer модулей
+
+- `id`: `E-MNT-05`
+- `status`: `in_progress`
+- `priority`: `P2`
+- `owner_role`: `runtime`
+- `target_date`: `2026-02-28`
+- `depends_on`: `[E-MNT-03, E-MNT-04]`
+- `scope_in`: структурная декомпозиция `detm_app/runner/headless/*`, `detm_app/ui/napari/interactive/*`, `detm_app/ui/tk/runner/*` на feature-модули.
+- `scope_out`: функциональное расширение CLI/UI.
+- `deliverables`: module split plan + executed split + compat imports.
+- `api_contract_changes`: internal module-path changes без изменения user-facing CLI flags.
+- `tests_required`: full app-layer regression (`entrypoints/shell/napari interactive/batch`).
+- `readout_artifacts`: module tree diff + updated tests + import-boundary checks.
+- `risks`: регрессии из-за некорректной миграции side-effects.
+- `dod`: крупные модули разбиты на cohesive units; test matrix остаётся зелёной.
+- `readout` (2026-02-13): выделены `detm_app/runner/headless/helpers.py` (default/symbol/steps/list utils), `detm_app/runner/headless/parser.py` (CLI parser factory), `detm_app/ui/napari/interactive/helpers.py` (quiver/policy/parse helpers), `detm_app/ui/tk/runner/launcher.py` (canonical Tk launcher) + `detm_app/ui/tk/runner/__init__.py` как compatibility wrapper; обновлены boundary tests и полный pytest snapshot зелёный.
+- `readout` (2026-02-13): `detm_app/runner/headless/options.py` переведён с tuple-return на типизированный `HeadlessMainOptions`; устранён дрейф fabric-полей при резолве CLI defaults (`fabric_*_validator_ids`, `*_replica_state_paths`), в `detm_app/runner/headless/main.py` убран дублированный single/batch kwargs через `_build_run_headless_kwargs`; добавлены guards `tests/test_headless_options.py`; regression snapshot: `pytest -q -> 331 passed, 1 skipped`.
+- `readout` (2026-02-13): закреплён пакетный формат decomposition: `detm_app/runner/headless/*`, `detm_app/ui/napari/interactive/*`, `detm_app/ui/tk/runner/*`; публичные import paths сохранены (`detm_app.runner.headless`, `detm_app.ui.napari.interactive`, `detm_app.ui.tk.runner`), обновлены import-boundary tests и smoke-routing tests.
+- `readout` (2026-02-13): subscriber wiring для headless-run вынесен в `detm_app/runner/headless/subscribers.py` (`attach_headless_subscribers` + split `core/fabric/streaming` attach paths); `detm_app/runner/headless/main.py` оставлен orchestration-only в `run_headless` при сохранении полного CLI/API контракта.
+- `readout` (2026-02-13): execution loop (`per_symbol|total`) вынесен из `detm_app/runner/headless/main.py` в `detm_app/runner/headless/executor.py` (`execute_headless_steps`); добавлены unit tests `tests/test_headless_executor.py`; полный regression snapshot остаётся зелёным (`pytest -q -> 331 passed, 1 skipped`).
+- `readout` (2026-02-13): введён `RunHeadlessRequest` в `detm_app/runner/headless/request.py` и `run_headless_request(...)` в `detm_app/runner/headless/main.py`; legacy `run_headless(...)` сохранён как facade с поддержкой старого API через `**fabric_kwargs` и нормализацией defaults/unknown-keys guard.
+- `readout` (2026-02-13): `main.py --help` переведён на launcher-level справку (только режимы запуска); для полного списка внутренних headless параметров добавлен явный путь `python main.py headless --help`; покрыто routing/help тестами (`tests/test_main_entrypoint_routing.py`).
+
+### G-FAB-01 — Delivery guarantees baseline (`at-least-once + idempotency`)
+
+- `id`: `G-FAB-01`
+- `status`: `done`
+- `priority`: `P0`
+- `owner_role`: `fabric`
+- `target_date`: `2026-02-20`
+- `depends_on`: `[]`
+- `scope_in`: формализовать и закрыть end-to-end semantics `at-least-once + idempotent ingest` для commit/delivery path.
+- `scope_out`: exactly-once semantics.
+- `deliverables`: policy/profile для delivery guarantees; runtime wiring без двусмысленности.
+- `api_contract_changes`: явная фиксация guarantee mode в runtime config/report contract.
+- `tests_required`: crash/retry/replay scenarios + duplicate ingress tests.
+- `readout_artifacts`: `fabric_quorum_report.json` (`delivery/idempotency` секции), `fabric_delivery_acks.jsonl`.
+- `risks`: ложное чувство exactly-once из-за неполной формализации.
+- `dod`: гарантия и границы описаны и подтверждены тестами/отчётами.
+- `readout` (2026-02-13): добавлен явный `delivery_guarantee_mode` в runtime config path + `delivery_guarantees` секция в `fabric_quorum_report`; добавлены e2e тесты retry/replay/duplicate-ingress (`tests/test_fabric_commit_delivery.py`).
+
+### G-FAB-02 — Durable queue/coordination baseline
+
+- `id`: `G-FAB-02`
+- `status`: `done`
+- `priority`: `P0`
+- `owner_role`: `fabric`
+- `target_date`: `2026-02-23`
+- `depends_on`: `[G-FAB-01]`
+- `scope_in`: transactional durability для outbox/tracking/receipt state в single-host multi-process профиле.
+- `scope_out`: multi-host distributed durable queue.
+- `deliverables`: baseline durable coordination implementation + recovery сценарии.
+- `api_contract_changes`: при необходимости расширение runtime config для durable backend профиля.
+- `tests_required`: restart recovery, pending flush, dead-letter correctness.
+- `readout_artifacts`: `fabric_dead_letters.json`, delivery tracking snapshots, recovery logs.
+- `risks`: race conditions при multi-process доступе.
+- `dod`: после рестарта pending deliveries корректно восстанавливаются и завершаются.
+- `readout` (2026-02-13): добавлено file-backed состояние `delivery_tracking+receipt` (`fabric_delivery_tracking_state.json`) с восстановлением в runtime-composer; подтверждён restart-recovery сценарий на `FabricHandshakeRecorder` (`tests/test_fabric_handshake_recorder.py::test_fabric_handshake_recorder_recovers_pending_delivery_after_restart`).
+
+### G-FAB-03 — Validator coordination + replay policy tiers
+
+- `id`: `G-FAB-03`
+- `status`: `done`
+- `priority`: `P0`
+- `owner_role`: `fabric`
+- `target_date`: `2026-02-26`
+- `depends_on`: `[G-FAB-01, G-FAB-02]`
+- `scope_in`: tiers для replay policy (`off|sampled|strict-window`) и replicated validator coordination state.
+- `scope_out`: Byzantine-grade validator federation.
+- `deliverables`: policy tiers + persisted validator coordination state + coordination snapshot/reporting.
+- `api_contract_changes`: replay policy fields в runtime config/report.
+- `tests_required`: replay mismatch detection, tier transitions, validator coordination regressions.
+- `readout_artifacts`: `commit_validation.json`, `fabric_quorum_report.json` (`replay_sampling`, `validator_coordination_state`), `validator_coordination_state.json`.
+- `risks`: недетерминированный replay sampling при неправильной нормализации.
+- `dod`: tiers reproducible; replay failures наблюдаемы и трассируемы.
+- `readout` (2026-02-13): добавлены replay tiers `off|sampled|strict_window` в config/runtime/report; добавлена строгая window-проверка в `LocalFabricValidator`; в `fabric_quorum_report` добавлен `validator_coordination` с registry/hardening snapshot.
+- `readout` (2026-02-13): добавлено persisted validator coordination state в `FabricQuorumRuntimeService` (single-file + replicated read/write quorum, restore на старте, mismatch guard по validator-set); протянуто через `FabricHandshakeRecorder.attach`, runtime composer, headless CLI/presets; добавлены regression tests на restore/quorum/CLI wiring.
+
+### G-FAB-04 — Epoch/watermark consensus hardening
+
+- `id`: `G-FAB-04`
+- `status`: `done`
+- `priority`: `P0`
+- `owner_role`: `fabric`
+- `target_date`: `2026-03-01`
+- `depends_on`: `[G-FAB-02, G-FAB-03]`
+- `scope_in`: укрепить monotonic/consensus контур для `epoch/watermark` в production profile.
+- `scope_out`: replicated log с Byzantine guarantees.
+- `deliverables`: deterministic decision path + fail-closed rules + consensus retry envelope.
+- `api_contract_changes`: уточнение consensus decision/report contract.
+- `tests_required`: non-monotonic reject tests, timeout/retry consensus tests, recovery tests.
+- `readout_artifacts`: `fabric_quorum_report.json` (`epoch` секция), audit traces.
+- `risks`: split-brain при ошибочной политике quorum.
+- `dod`: нарушения monotonicity детектируются и не проходят commit boundary.
+- `readout` (2026-02-13): добавлены `epoch consensus` retry rounds (`max_attempts`) с явной статистикой `proposals/timeouts/retries`; добавлена fail-closed валидация peer-vote payload (`commit_ref/epoch/watermark/tick`) + reject на conflicting votes; обновлены runtime config/CLI/presets и тесты (`tests/test_fabric_epoch.py`, `tests/test_fabric_epoch_consensus.py`, `tests/test_fabric_runtime_composer.py`, `tests/test_cli_steps_mode.py`).
+
+### G-FAB-05 — Distributed validator handshake production profile
+
+- `id`: `G-FAB-05`
+- `status`: `done`
+- `priority`: `P0`
+- `owner_role`: `fabric`
+- `target_date`: `2026-03-04`
+- `depends_on`: `[G-FAB-03, G-FAB-04]`
+- `scope_in`: production профиль distributed handshake поверх `CommitChainManager` и `ProofAck/TrustAck`.
+- `scope_out`: full dynamic membership governance/PKI lifecycle.
+- `deliverables`: profile presets + runtime enforcement и reject semantics.
+- `api_contract_changes`: уточнение handshake policy contract (profile-level).
+- `tests_required`: membership binding tests, reject-on-spoof tests, quorum accept/reject matrix.
+- `readout_artifacts`: `fabric_acks.jsonl`, `fabric_ack_envelopes.jsonl`, `fabric_quorum_report.json`.
+- `risks`: ложнопозитивные reject из-за слишком жёстких биндингов.
+- `dod`: handshake профиль воспроизводим и покрыт matrix tests.
+- `readout` (2026-02-13): введён profile-level контракт `handshake_profile` (`mvp|production`) с fail-closed rules для `production` (обязательный validator-set, mandatory hardening flags, binding coverage checks по auth/transport identity); профиль протянут через normalize/subscriber/composer/headless CLI/presets и отражается в `fabric_quorum_report.json` (`handshake_profile` секция); добавлены matrix/negative tests (`tests/test_fabric_handshake_recorder_config.py`, `tests/test_fabric_runtime_composer.py`, `tests/test_fabric_quorum_report.py`, `tests/test_cli_steps_mode.py`).
+
+### F-01 — Контур накопления reaction/correction операторов
+
+- `id`: `F-01`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-08`
+- `depends_on`: `[G-FAB-01, G-FAB-02, G-FAB-03]`
+- `scope_in`: runtime pipeline накопления correction/reaction как операторов с контролируемой reuse-политикой.
+- `scope_out`: ML-heavy training pipelines.
+- `deliverables`: operator accumulation contour + persistence/selection rules.
+- `api_contract_changes`: новые operator metadata fields в readout/trace (если нужны).
+- `tests_required`: operator accumulation, replay-safe reuse, regression на refinement.
+- `readout_artifacts`: trace/readout with operator decisions.
+- `risks`: накопление шумовых операторов.
+- `dod`: операторы копятся и переиспользуются в reproducible runtime path.
+
+### F-02 — Переносимость операторов
+
+- `id`: `F-02`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-10`
+- `depends_on`: `[F-01]`
+- `scope_in`: критерии и тест-контур переносимости (`hold_rate`, `operator_reuse`, `transferability`).
+- `scope_out`: глобальный auto-tuning всей политики runtime.
+- `deliverables`: portability criteria + acceptance thresholds.
+- `api_contract_changes`: readout metrics contract для portability.
+- `tests_required`: cross-regime transfer scenarios и baseline comparison.
+- `readout_artifacts`: metrics reports по `hold_rate/operator_reuse/transferability`.
+- `risks`: Goodhart на одном показателе.
+- `dod`: переносимость измерима и не сводится к единичному KPI.
+
+### F-03 — Anti-Goodhart readout и `goodhart_flag`
+
+- `id`: `F-03`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-12`
+- `depends_on`: `[F-01, F-02]`
+- `scope_in`: runtime anti-Goodhart панель, rule-based `goodhart_flag`, policy reaction.
+- `scope_out`: внешние продуктовые KPI.
+- `deliverables`: multi-signal readout protocol в runtime.
+- `api_contract_changes`: `goodhart_flag`/panel fields в readout artifact contract.
+- `tests_required`: degradation detection tests, false-positive/false-negative checks.
+- `readout_artifacts`: readout panel snapshots + trace policy events.
+- `risks`: шумные сигналы и переалертинг.
+- `dod`: flag срабатывает по формализованным правилам и покрыт тестами.
+
+### G-ND-01 — Эволюция `DETMState` к `shape[N]`
+
+- `id`: `G-ND-01`
+- `status`: `todo`
+- `priority`: `P2`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-14`
+- `depends_on`: `[G-FAB-05]`
+- `scope_in`: backward-compatible миграция state/config с `width/height` на `shape`.
+- `scope_out`: удаление 2D compatibility на этом шаге.
+- `deliverables`: state/config migration spec + implementation.
+- `api_contract_changes`: `DETMConfig`/serialization schema extension.
+- `tests_required`: backward compatibility tests + 3D smoke tests.
+- `readout_artifacts`: schema version report + migration test logs.
+- `risks`: поломка существующих 2D сценариев.
+- `dod`: 2D и N-D контуры работают параллельно без регрессий.
+
+### G-ND-02 — N-D контракты serialization/refinement/outerfields
+
+- `id`: `G-ND-02`
+- `status`: `todo`
+- `priority`: `P2`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-16`
+- `depends_on`: `[G-ND-01]`
+- `scope_in`: обобщение runtime контрактов и артефактов на N-D.
+- `scope_out`: оптимизация производительности N-D.
+- `deliverables`: updated contracts + adapters.
+- `api_contract_changes`: N-D serialization/refinement/outerfields contracts.
+- `tests_required`: parity tests (numpy/torch) + ND artifact validation.
+- `readout_artifacts`: ND trace/outerfields artifacts.
+- `risks`: неконсистентность артефактов между backend-ами.
+- `dod`: N-D контракты валидны и совместимы с существующими проверками.
+
+### G-ND-03 — UI projection adapters для N-D
+
+- `id`: `G-ND-03`
+- `status`: `todo`
+- `priority`: `P2`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-18`
+- `depends_on`: `[G-ND-02]`
+- `scope_in`: проекции N-D -> 2D для текущих napari/readout consumers.
+- `scope_out`: новые UI режимы и редакторы.
+- `deliverables`: projection adapters + compatibility notes.
+- `api_contract_changes`: projection metadata в watch/viz payload.
+- `tests_required`: napari projection compatibility tests.
+- `readout_artifacts`: viewer snapshots + projection logs.
+- `risks`: потеря значимых сигналов при проекции.
+- `dod`: текущие UI не ломаются на N-D данных.
+
+### G-RND-01 — Local-first + validation-sync спецификация
+
+- `id`: `G-RND-01`
+- `status`: `todo`
+- `priority`: `P2`
+- `owner_role`: `fabric`
+- `target_date`: `2026-03-08`
+- `depends_on`: `[G-FAB-04, G-FAB-05]`
+- `scope_in`: отдельный R&D spec local-first + validation-sync на базе текущих DETM контрактов.
+- `scope_out`: непосредственное включение в canonical runtime API.
+- `deliverables`: protocol note с границами `prod-scope vs rnd-scope`.
+- `api_contract_changes`: не обязательно (doc-first), только если явно утверждено отдельным RFC.
+- `tests_required`: concept-level scenario matrix, без обязательной кодовой реализации в этой задаче.
+- `readout_artifacts`: R&D спецификация и acceptance matrix.
+- `risks`: смешение R&D и production в одном контуре.
+- `dod`: протокол описан как отдельный экспериментальный трек без влияния на канон.
+
+### RT-MNT-01 — Декомпозиция `detm/runtime/refinement/runtime.py`
+
+- `id`: `RT-MNT-01`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-05`
+- `depends_on`: `[G-FAB-05]`
+- `scope_in`: разрезать `maybe_apply_refinement` на pipeline-level этапы (`detect -> roi -> correction -> metrics`) с явными контрактами.
+- `scope_out`: изменение математической логики refinement.
+- `deliverables`: новые refinement submodules + orchestrator + backward-compatible entrypoint.
+- `api_contract_changes`: internal runtime API split для refinement helper contracts.
+- `tests_required`: existing refinement regression + unit tests на каждый pipeline step.
+- `readout_artifacts`: `detm/runtime/refinement/runtime.py`, новые `detm/runtime/refinement/*.py`, `tests/test_refinement_mvp.py`.
+- `risks`: незаметная смена порядка применения correction operators.
+- `dod`: `maybe_apply_refinement` либо тонкий orchestration-layer, либо полностью заменён модулярным pipeline без регрессий.
+
+### RT-MNT-02 — Разделение `detm/runtime/level_policy/contracts.py`
+
+- `id`: `RT-MNT-02`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-07`
+- `depends_on`: `[RT-MNT-01]`
+- `scope_in`: разделить текущий monolithic `contracts.py` на model/normalization/decision модули с минимизацией cross-field coupling.
+- `scope_out`: изменение внешнего формата policy payload.
+- `deliverables`: `model.py` + `normalization.py` + `decision.py` (или эквивалент) и обновлённые импорты runtime.
+- `api_contract_changes`: internal module-path changes для `LevelPolicy` helper API.
+- `tests_required`: `tests/test_level_policy_runtime.py` + compatibility tests `from_dict/to_dict/decide_runtime_adaptive`.
+- `readout_artifacts`: split modules under `detm/runtime/level_policy/*`, updated tests.
+- `risks`: несовместимость defaults при переносе normalization logic.
+- `dod`: большие методы `from_dict/to_dict/decide_runtime_adaptive` декомпозированы, поведение подтверждено regression suite.
+
+### RT-MNT-03 — Декомпозиция Fabric composer/normalize path
+
+- `id`: `RT-MNT-03`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `fabric`
+- `target_date`: `2026-03-09`
+- `depends_on`: `[G-FAB-05]`
+- `scope_in`: декомпозировать `detm/runtime/fabric/runtime_composer/composer.py` и `detm/runtime/fabric/handshake_recorder_config/normalize.py` в отдельные сервисы/нормализаторы.
+- `scope_out`: изменение fabric handshake policy semantics.
+- `deliverables`: composer wiring modules (`transport/delivery/epoch/handshake`) + normalized config helpers per concern.
+- `api_contract_changes`: internal config-normalization API split.
+- `tests_required`: `tests/test_fabric_runtime_composer.py`, `tests/test_fabric_handshake_recorder_config.py`, CLI wiring tests.
+- `readout_artifacts`: updated fabric composer modules, preserved `fabric_quorum_report` sections.
+- `risks`: частичная миграция и скрытые fallback ветки.
+- `dod`: composer/normalize path разбит на изолированные блоки; покрытие ключевых веток тестами сохранено.
+
+### RT-MNT-04 — Завершить schema migration в `serialization.py`
+
+- `id`: `RT-MNT-04`
+- `status`: `todo`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-12`
+- `depends_on`: `[RT-MNT-02]`
+- `scope_in`: убрать placeholder `migrate_state(...)` и ввести формализованный migration path между schema versions.
+- `scope_out`: полная redesign binary format.
+- `deliverables`: migration registry + versioned adapters + compatibility tests.
+- `api_contract_changes`: explicit migration contract for `serialize_state/deserialize_state`.
+- `tests_required`: forward/backward migration tests across supported schema versions.
+- `readout_artifacts`: `detm/runtime/serialization.py`, schema tests, migration report note.
+- `risks`: silent data corruption при неполной миграции.
+- `dod`: migration path реализован и покрыт тестами; placeholder ветка удалена.
+
+## PM Registry (done doc-items)
+
+### DOC-01 — Полная переработка структуры roadmap
+
+- `id`: `DOC-01`
+- `status`: `done`
+- `priority`: `P0`
+- `owner_role`: `docs`
+- `target_date`: `2026-02-16`
+- `depends_on`: `[]`
+- `scope_in`: `Scope/Status Snapshot/Workstreams/PM Registry/Risks/Readout`.
+- `scope_out`: кодовые изменения runtime.
+- `deliverables`: текущий `ROADMAP V2`.
+- `api_contract_changes`: нет.
+- `tests_required`: структурная проверка документа.
+- `readout_artifacts`: `docs/rus/ROADMAP.md`.
+- `risks`: потеря контекста при переносе старых разделов.
+- `dod`: новый формат принят и закрывает общие пункты.
+- `readout` (2026-02-13): синхронизированы архитектурные и launch-документы после migration `detm.run -> detm_app.runtime`: обновлены `README.md`, `docs/rus/architecture.md`, `docs/eng/architecture.md`, `docs/rus/00_overview/architecture.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`, `docs/rus/30_architecture/commit_protocol.md`, `docs/eng/integration_contract.md`, `docs/rus/integration_contract.md`, `PROMT_SHORT.md`.
+
+## Imported from game: implemented vs pending
+
+### Implemented in DETM
+
+1. `System Trace + Watch Trace + trace_ref`
+- Evidence: `detm_app/runtime/subscribers/trace.py`, `detm_app/runtime/subscribers/watch.py`, `detm/runtime/watch_contract.py`, `tests/test_system_watch_trace.py`.
+
+2. Artifact-first watch contract (`OuterFieldsRef` linkage)
+- Evidence: `detm/runtime/watch_contract.py`, `tests/test_watch_contract_writer.py`, `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`.
+
+3. Pattern pruning/memory contour
+- Evidence: `detm/runtime/pattern_memory/*`, `tests/test_pattern_memory.py`, `docs/rus/ROADMAP.md` history.
+
+4. Commit/envelope/quorum decomposition style
+- Evidence: `detm/runtime/commit_packet.py`, `detm/runtime/fabric/*`, `tests/test_fabric_*.py`.
+
+### Pending / partial (R&D or debt)
+
+1. `local-first + validation-sync` как отдельный protocol track
+- Status: `pending (R&D)`
+- Evidence: open items `G-RND-01`, `docs/rus/ROADMAP.md` historical notes.
+
+2. Full packet triplet parity (`commit/correction/influence`) как единый node/fabric protocol level
+- Status: `partial`
+- Evidence: `CommitPacket` реализован; `Correction/Influence` как отдельные protocol packets в DETM runtime не доведены до parity уровня `game` docs.
+
+3. Runtime anti-Goodhart code contour
+- Status: `pending`
+- Evidence: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md` есть; runtime item `F-03` открыт.
+
+## Risks Register
+
+- `R-01` Переоценка зрелости fabric (MVP трактуется как production).
+- `R-02` Расфокусировка между P0 fabric и P1/P2 треками F/N-D.
+- `R-03` Регрессии 2D runtime при миграции к N-D.
+- `R-04` Goodhart-оптимизация метрик без реального улучшения динамики.
+- `R-05` Смешение R&D (`local-first+validation-sync`) и canonical runtime решений.
+- `R-06` Скрытые циклы зависимостей между `config/runner/ui` при app-layer refactor.
+- `R-07` Functional drift при декомпозиции крупных `detm/runtime` модулей.
+
+## Readout и контроль исполнения
+
+## Обязательные readout артефакты
+
+- `trace.jsonl` (System Trace)
+- `watch_trace.jsonl`
+- `watch_contract.jsonl`
+- `commits.jsonl` / `commits_audit.jsonl`
+- `commit_validation.json`
+- `fabric_quorum_report.json`
+- `fabric_acks.jsonl`
+- `fabric_delivery_acks.jsonl`
+- `fabric_dead_letters.json`
+
+## Обязательные проверки по workstream-ам
+
+1. Структурная проверка roadmap
+- каждый open-item содержит все поля `ROADMAP Item v2`.
+- нет open-item без `owner_role` и `target_date`.
+
+2. Логическая проверка зависимостей
+- у каждого `P0` item заполнен `depends_on`.
+- циклы зависимостей запрещены.
+
+3. Трассируемость
+- каждый item ссылается на конкретные модули/артефакты/тесты.
+- для каждого item указан минимум один readout-файл или test command.
+
+4. Проверка import-claims из `game`
+- claim `implemented` подтверждён ссылкой на DETM code/tests.
+- claim `pending` явно помечен как R&D/debt.
+
+## Календарь weekly checkpoints
+
+- `2026-02-16` — структура roadmap и P0 gate review.
+- `2026-02-23` — delivery+durability gate (`G-FAB-01/02`).
+- `2026-03-02` — validator/epoch gate (`G-FAB-03/04`).
+- `2026-03-09` — handshake profile + старт F (`G-FAB-05`, `F-01`).
+- `2026-03-16` — F metrics/anti-Goodhart + N-D kickoff (`F-02/F-03`, `G-ND-01/02`).
+- `2026-03-23` — app/runtime refactor gate (`E-MNT-02..05`, `RT-MNT-01..04`).
+
+## Принятые допущения
+
+- Объём: полная переработка roadmap.
+- Детализация: engineering spec.
+- PM-поля: включены полностью.
+- Owner: role-based, без персоналий.
+- Даты: абсолютные (`YYYY-MM-DD`).
+- Порядок исполнения: Fabric baseline -> F -> N-D.
+- Delivery target: `at-least-once + idempotency`.
+- Deployment baseline: `single-host multi-process`.
 
 ## Основной контрольный вопрос
 

@@ -1,10 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import pytest
 
 from detm.runtime.commit_chain import CommitChainManager
 from detm.runtime.commit_packet import CommitPacket
-from detm.runtime.fabric_envelope import FabricEnvelope
+from detm.runtime.fabric import FabricEnvelope
 from detm.runtime.schemas import DETM_FABRIC_ENVELOPE_V1, get_schema_versions
 
 
@@ -36,6 +36,8 @@ def test_fabric_envelope_roundtrip_and_schema_registry():
         "payload_inline": {"commit_id": "node-A:42", "meta": {"bridge": True}},
         "trace_ref": "trace://run/42",
         "commit_ref": "node-A:42",
+        "auth_key_id": "kid-42",
+        "transport_identity": "cn:node-A",
     }
     envelope = FabricEnvelope.from_dict(payload)
     restored = FabricEnvelope.from_dict(envelope.to_dict())
@@ -44,6 +46,8 @@ def test_fabric_envelope_roundtrip_and_schema_registry():
     assert restored.payload_ref == "artifact://commit/node-A/42"
     assert isinstance(restored.payload_inline, dict)
     assert dict(restored.payload_inline)["commit_id"] == "node-A:42"
+    assert restored.auth_key_id == "kid-42"
+    assert restored.transport_identity == "cn:node-A"
     assert get_schema_versions()["fabric_envelope"] == DETM_FABRIC_ENVELOPE_V1
 
 
@@ -71,3 +75,4 @@ def test_commit_chain_manager_rejects_non_monotonic_tick():
 
     with pytest.raises(ValueError, match="monotonic"):
         manager.accept(_make_commit("node-A:11", tick=9, parent_ref="node-A:10"))
+

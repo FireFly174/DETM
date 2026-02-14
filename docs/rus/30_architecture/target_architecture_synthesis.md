@@ -106,16 +106,12 @@
 
 ---
 
-## 6. Привязка к текущему репозиторию (`as-is -> to-be`)
+## 6. Привязка к текущему репозиторию (`as-is: 2026-02-13`)
 
-- `as-is`: orchestration живёт в `detm/run/*` (`session`, `scheduler`, `bus`, `subscribers`).
-- `to-be`: orchestration мигрирует в выделенный `detm_app`, а `detm` остаётся библиотечным ядром и контрактами.
-
-- `as-is`: `detm/runtime/*` уже содержит L0 API, backends, state, serialization, `OuterFields`.
-- `to-be`: сохранить этот контур как ядро, не добавляя в него UI/app-ответственности.
-
-- `as-is`: `detm/ui/*`, `detm/viz/*`, интеграции и анализаторы подключены к runtime.
-- `to-be`: оставить их как read-only subscribers к артефактам (`OuterFields/metrics/events/trace_ref`).
+- orchestration закреплён в `detm_app/runtime/*` (`session`, `scheduler`, `bus`, `subscribers`); legacy `detm/run/*` удалён.
+- `detm/runtime/*` остаётся библиотечным ядром (L0 API, backends, state, serialization, `OuterFields`, fabric runtime).
+- UI/viz контур закреплён в `detm_app/ui/*` и `detm_app/transport/*` как read-only consumers артефактов/сериализованного state.
+- launcher-граница единая: `main.py` (`napari`/`headless`/`shell`), с явным разделением launcher-help и full headless help.
 
 ---
 

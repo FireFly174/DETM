@@ -1,4 +1,4 @@
-# DETM Codebase Specification (2026-02-09)
+﻿# DETM Codebase Specification (2026-02-09)
 
 Статус: рабочая техническая спецификация (snapshot).
 
@@ -62,10 +62,10 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 - diagnostics и `OuterFields`-артефакты.
 
 Ключевые модули:
-- `detm/runtime/api.py`
+- `detm/runtime/api/*`
 - `detm/runtime/state.py`
-- `detm/runtime/config.py`
-- `detm/runtime/influence.py`
+- `detm/runtime/config/*`
+- `detm/runtime/influence/*`
 - `detm/runtime/serialization.py`
 - `detm/runtime/signature.py`
 - `detm/runtime/outerfields.py`
@@ -263,7 +263,7 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 - GPU-first направление: состояние и шаги динамики стремятся оставаться на GPU.
 
 Это согласовано с текущим runtime и каноном:
-- `detm/runtime/api.py`
+- `detm/runtime/api/*`
 - `detm/runtime/outerfields.py`
 - `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
 
@@ -323,3 +323,5 @@ DETM в текущем состоянии — Python-пакет `detm` с runtim
 2. Ввести `PatternCache` в рантайме (LRU по сигнатурам/инвариантам).
 3. Подключить cache lookup в контур coarsening/reaction до полного refinement.
 4. Оставить transport-node/fabric как отдельный этап после стабилизации п.1-3.
+
+

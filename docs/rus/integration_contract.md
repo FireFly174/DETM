@@ -123,7 +123,7 @@ DETM не гарантирует:
 - При bump версии — `migrate_state(blob, from_version, to_version)` (пока stub + документация), чтобы сохранять совместимость.
 
 ## Runtime bridge (промты 10.1–10.2)
-- `integrations/runtime_bridge.py` предоставляет `DETMRuntimeBridge`:
+- `detm/integrations/runtime_bridge.py` предоставляет `DETMRuntimeBridge`:
   - `create_session(config, seed) -> session_id`
   - `session_step(session_id, influence, n_ticks) -> SessionStepResult(signature, observables, state_digest)`
   - `session_get_state_blob(session_id)`

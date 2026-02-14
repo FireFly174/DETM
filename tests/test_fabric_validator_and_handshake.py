@@ -1,15 +1,15 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Dict
 
 from detm.runtime.commit_packet import CommitPacket
-from detm.runtime.fabric_ack import ProofAck, TrustAck
-from detm.runtime.fabric_artifact_store import FileFabricArtifactStore
-from detm.runtime.fabric_epoch import InMemoryEpochWatermarkCoordinator
-from detm.runtime.fabric_envelope import FabricEnvelope
-from detm.runtime.fabric_handshake import FabricHandshakeService
-from detm.runtime.fabric_transport import InMemoryFabricBus
-from detm.runtime.fabric_validator import LocalFabricValidator, ReplaySamplePolicy
+from detm.runtime.fabric import ProofAck, TrustAck
+from detm.runtime.fabric import FileFabricArtifactStore
+from detm.runtime.fabric import InMemoryEpochWatermarkCoordinator
+from detm.runtime.fabric import FabricEnvelope
+from detm.runtime.fabric import FabricHandshakeService
+from detm.runtime.fabric import InMemoryFabricBus
+from detm.runtime.fabric import LocalFabricValidator, ReplaySamplePolicy
 
 
 def _make_commit(commit_id: str, tick: int, parent_ref: str | None = None) -> CommitPacket:
@@ -65,6 +65,35 @@ def test_local_fabric_validator_replay_sampling_skips_non_sampled_tick():
     p1, t1 = validator.validate_commit(_make_commit("node-A:1", tick=1))
     assert p1.status == "accepted"
     assert t1.status == "accepted"
+
+
+def test_local_fabric_validator_replay_policy_off_disables_checker():
+    validator = LocalFabricValidator(
+        validator_id="validator-1",
+        replay_policy=ReplaySamplePolicy(tier="off", enabled=True, sample_stride=1, sample_offset=0),
+        replay_checker=lambda _packet: (False, "should not run when tier=off"),
+    )
+    p1, t1 = validator.validate_commit(_make_commit("node-A:1", tick=1))
+    assert p1.status == "accepted"
+    assert t1.status == "accepted"
+
+
+def test_local_fabric_validator_replay_strict_window_rejects_old_tick():
+    validator = LocalFabricValidator(
+        validator_id="validator-1",
+        replay_policy=ReplaySamplePolicy(tier="strict_window", strict_window_size=2),
+        replay_checker=lambda _packet: (True, None),
+    )
+    p1, _t1 = validator.validate_commit(_make_commit("node-A:1", tick=1))
+    p2, _t2 = validator.validate_commit(_make_commit("node-A:2", tick=2, parent_ref="node-A:1"))
+    p3, _t3 = validator.validate_commit(_make_commit("node-A:3", tick=3, parent_ref="node-A:2"))
+    p_old, t_old = validator.validate_commit(_make_commit("node-A:old", tick=1, parent_ref="node-A:3"))
+    assert p1.status == "accepted"
+    assert p2.status == "accepted"
+    assert p3.status == "accepted"
+    assert p_old.status == "rejected"
+    assert t_old.status == "rejected"
+    assert "strict_window violation" in str(p_old.reason)
 
 
 def test_fabric_handshake_service_publishes_acks_for_commit_envelope():
@@ -325,3 +354,4 @@ def test_fabric_handshake_service_rejects_epoch_regression():
     assert len(second_pair) == 2
     assert {ack.status for ack in second_pair} == {"rejected"}
     assert any("epoch regression" in str(ack.reason) for ack in second_pair)
+

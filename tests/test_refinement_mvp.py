@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
@@ -8,8 +8,8 @@ from detm.core.entropy import DynamicsParameters
 from detm.runtime.backends.numpy_backend import NumpyBackend
 from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
-from detm_app.session import DetmSession
-from detm_app.subscribers import JsonlTraceWriter
+from detm_app.runtime.session import DetmSession
+from detm_app.runtime.subscribers import JsonlTraceWriter
 
 
 def _seed_overflow_hotspot(session: DetmSession) -> None:
@@ -800,3 +800,4 @@ def test_refinement_capacity_detector_byzantine_signal_can_trigger():
     signals = dict(event.get("detector_capacity_signals", {}))
     byzantine = dict(signals.get("byzantine_grade", {}))
     assert bool(byzantine.get("passed")) is True
+

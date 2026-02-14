@@ -1,4 +1,4 @@
-# Телепортация и commit-протокол в DETM (канон)
+﻿# Телепортация и commit-протокол в DETM (канон)
 
 ## 1. Назначение документа
 
@@ -199,36 +199,36 @@ Correction-пакеты, возникающие при телепортации:
 Минимальная machine-validatable схема (MVP в коде):
 * `detm/runtime/commit_packet.py` (`CommitPacket`, `CommitTickRef`)
 * `detm/runtime/schemas.py` (`commit_packet` schema registry)
-* `detm/runtime/fabric_envelope.py` (`FabricEnvelope`: `message_type/channel/mode/payload_ref`, optional `payload_inline` bridge)
-* `detm/runtime/fabric_ack.py` (`ProofAck`, `TrustAck`: validator acknowledgements)
+* `detm/runtime/fabric/envelope.py` (`FabricEnvelope`: `message_type/channel/mode/payload_ref`, optional `payload_inline` bridge)
+* `detm/runtime/fabric/ack.py` (`ProofAck`, `TrustAck`: validator acknowledgements)
 * `detm/runtime/commit_chain.py` (`CommitChainManager`: `tail -> parent_ref` sequencing)
-* `detm/runtime/fabric_transport.py` (`InMemoryFabricBus`, `BufferedFabricTransport`: topic routing + live backpressure adapter)
-* `detm/runtime/fabric_validator.py` (`FabricValidator`, `LocalFabricValidator`: chain checks + replay-check sampling policy)
-* `detm/runtime/fabric_handshake.py` (`FabricHandshakeService`: commit envelope -> ack envelopes, mode-aware channel routing + delivery-ack emission)
-* `detm/runtime/fabric_ack_ingress.py` (`FabricAckIngressService`: proof/trust ack subscription + ingress forwarding в quorum)
-* `detm/runtime/fabric_quorum_runtime.py` (`FabricQuorumRuntimeService`: quorum policy selection + validator registry + runtime snapshot composition)
-* `detm/runtime/fabric_quorum_report.py` (`FabricQuorumReportBuilder`: runtime-композиция секций quorum-report, delivery-report, replay-report)
-* `detm/runtime/fabric_report_writer.py` (`FabricRuntimeReportWriter`: runtime-запись ack/delivery-ack/dead-letter и quorum-report артефактов)
-* `detm/runtime/fabric_runtime_bundle.py` (`FabricHandshakeRuntimeBundle`: lifecycle-порядок запуска/остановки runtime-компонентов handshake)
-* `detm/runtime/fabric_runtime_composer.py` (`compose_fabric_handshake_runtime`: factory/composer сборки runtime-компонентов handshake)
-* `detm/runtime/fabric_artifact_resolver.py` (`FabricArtifactResolver`: commit/ack artifact write+resolve + replay-check adapter)
-* `detm/runtime/fabric_handshake_recorder_config.py` (`normalize_fabric_handshake_recorder_attach_kwargs`: вынос нормализации attach-конфига из subscriber)
-* `detm/runtime/fabric_runtime_helpers.py` (`mode_channels/channel_for_mode/start_runtime_bundle`: helper-утилиты runtime wiring)
-* `detm/runtime/fabric_delivery.py` (`JsonlFabricEnvelopeOutbox`: file-backed undelivered envelope queue + flush/retry + overflow backpressure policy)
-* `detm/runtime/fabric_delivery_receipts.py` (`CountDeliveryReceiptPolicy`, `ValidatorSetDeliveryReceiptPolicy`, `InMemoryDeliveryReceiptCoordinator`)
-* `detm/runtime/fabric_delivery_tracking.py` (`DeliveryTrackingCoordinator`: retry/timeout delivery state-machine)
-* `detm/runtime/fabric_commit_delivery.py` (`FabricCommitDeliveryService`: commit publish/retry/outbox + `delivery_ack` subscription wiring)
-* `detm/runtime/fabric_commit_ingress.py` (`FabricCommitIngressService`: commit packet ingress -> artifact resolve -> envelope publish)
-* `detm/runtime/fabric_epoch.py` (`FabricEpochCoordinator`, `InMemoryEpochWatermarkCoordinator`, `FileEpochWatermarkCoordinator`, `ReplicatedFileEpochWatermarkCoordinator`: commit boundary epoch/watermark gate + lock/quorum policy)
-* `detm/runtime/fabric_epoch_consensus.py` (`TransportEpochConsensusCoordinator`: `epoch_proposal/epoch_vote` pre-consensus over transport)
-* `detm/runtime/fabric_quorum.py` (`QuorumPolicy`, `BasicQuorumPolicy`, `ValidatorSetQuorumPolicy`, `InMemoryQuorumCoordinator`)
-* `detm/runtime/fabric_validator_registry.py` (`ValidatorRegistry`, `StaticValidatorRegistry`: membership source for quorum policies)
-* `detm/runtime/fabric_artifact_store.py` (`FabricArtifactStore`, `FileFabricArtifactStore`: durable commit/ack resolver)
-* `detm/runtime/fabric_tcp_transport.py` (`TcpFabricTransport`, `TcpFabricRelay`, `open_fabric_transport`)
-* `detm/run/subscribers.py` (`FabricHandshakeRecorder`: runtime wiring + `fabric_acks.jsonl`, split-mode channel policy)
-* `detm/run/subscribers.py` (`CommitJsonlWriter`, `commits.jsonl`, linkage через `trace_ref`)
-* `detm/runtime/level_policy.py` (`audit_commit_enabled`, `audit_commit_stride`) для policy-driven `commits_audit.jsonl`
-* `detm/runtime/fabric_validation.py` + `commit_validation.json` (local chain/proof/watermark validator report)
+* `detm/runtime/fabric/transport/*` (`InMemoryFabricBus`, `BufferedFabricTransport`: topic routing + live backpressure adapter)
+* `detm/runtime/fabric/validator/*` (`FabricValidator`, `LocalFabricValidator`: chain checks + replay-check sampling policy)
+* `detm/runtime/fabric/handshake/*` (`FabricHandshakeService`: commit envelope -> ack envelopes, mode-aware channel routing + delivery-ack emission)
+* `detm/runtime/fabric/ack_ingress.py` (`FabricAckIngressService`: proof/trust ack subscription + ingress forwarding в quorum)
+* `detm/runtime/fabric/quorum_runtime.py` (`FabricQuorumRuntimeService`: quorum policy selection + validator registry + runtime snapshot composition)
+* `detm/runtime/fabric/quorum_report.py` (`FabricQuorumReportBuilder`: runtime-композиция секций quorum-report, delivery-report, replay-report)
+* `detm/runtime/fabric/report_writer/*` (`FabricRuntimeReportWriter`: runtime-запись ack/delivery-ack/dead-letter и quorum-report артефактов)
+* `detm/runtime/fabric/runtime_bundle.py` (`FabricHandshakeRuntimeBundle`: lifecycle-порядок запуска/остановки runtime-компонентов handshake)
+* `detm/runtime/fabric/runtime_composer/*` (`compose_fabric_handshake_runtime`: factory/composer сборки runtime-компонентов handshake)
+* `detm/runtime/fabric/artifact_resolver.py` (`FabricArtifactResolver`: commit/ack artifact write+resolve + replay-check adapter)
+* `detm/runtime/fabric/handshake_recorder_config/*` (`normalize_fabric_handshake_recorder_attach_kwargs`: вынос нормализации attach-конфига из subscriber)
+* `detm/runtime/fabric/runtime_helpers.py` (`mode_channels/channel_for_mode/start_runtime_bundle`: helper-утилиты runtime wiring)
+* `detm/runtime/fabric/delivery/*` (`JsonlFabricEnvelopeOutbox`: file-backed undelivered envelope queue + flush/retry + overflow backpressure policy)
+* `detm/runtime/fabric/delivery_receipts/*` (`CountDeliveryReceiptPolicy`, `ValidatorSetDeliveryReceiptPolicy`, `InMemoryDeliveryReceiptCoordinator`)
+* `detm/runtime/fabric/delivery_tracking/*` (`DeliveryTrackingCoordinator`: retry/timeout delivery state-machine)
+* `detm/runtime/fabric/commit_delivery/*` (`FabricCommitDeliveryService`: commit publish/retry/outbox + `delivery_ack` subscription wiring)
+* `detm/runtime/fabric/commit_ingress.py` (`FabricCommitIngressService`: commit packet ingress -> artifact resolve -> envelope publish)
+* `detm/runtime/fabric/epoch/*` (`FabricEpochCoordinator`, `InMemoryEpochWatermarkCoordinator`, `FileEpochWatermarkCoordinator`, `ReplicatedFileEpochWatermarkCoordinator`: commit boundary epoch/watermark gate + lock/quorum policy)
+* `detm/runtime/fabric/epoch_consensus/*` (`TransportEpochConsensusCoordinator`: `epoch_proposal/epoch_vote` pre-consensus over transport)
+* `detm/runtime/fabric/quorum/*` (`QuorumPolicy`, `BasicQuorumPolicy`, `ValidatorSetQuorumPolicy`, `InMemoryQuorumCoordinator`)
+* `detm/runtime/fabric/validator_registry.py` (`ValidatorRegistry`, `StaticValidatorRegistry`: membership source for quorum policies)
+* `detm/runtime/fabric/artifact_store.py` (`FabricArtifactStore`, `FileFabricArtifactStore`: durable commit/ack resolver)
+* `detm/runtime/fabric/tcp_transport/*` (`TcpFabricTransport`, `TcpFabricRelay`, `open_fabric_transport`)
+* `detm_app/runtime/subscribers/fabric.py` (`FabricHandshakeRecorder`: runtime wiring + `fabric_acks.jsonl`, split-mode channel policy)
+* `detm_app/runtime/subscribers/commit.py` (`CommitJsonlWriter`, `commits.jsonl`, linkage через `trace_ref`)
+* `detm/runtime/level_policy/*` (`audit_commit_enabled`, `audit_commit_stride`) для policy-driven `commits_audit.jsonl`
+* `detm/runtime/fabric/validation/*` + `commit_validation.json` (local chain/proof/watermark validator report)
 
 ---
 
@@ -385,3 +385,15 @@ legacy-код рассматривается как источник прото�
 * Этот механизм является ключом к масштабированию DETM и node/fabric горизонту.
 
 Данный протокол является каноническим и используется во всех дальнейших архитектурных решениях проекта.
+
+
+
+
+
+
+
+
+
+
+
+

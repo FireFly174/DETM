@@ -1,12 +1,16 @@
 ﻿from __future__ import annotations
 
 import numpy as np
+import sys
+import types
 
 from detm.runtime import api
 from detm.runtime.config import DETMConfig
-from detm_app.client import VizClient
-from detm_app.daemon import VizHub
-from detm_app.napari_subscriber import (
+from detm_app.transport.client import VizClient
+from detm_app.transport.daemon import VizHub
+from detm_app.ui.napari.subscriber import (
+    _format_status_text,
+    _patch_six_meta_path_importer,
     _LayerPresenter,
     NapariFrame,
     packet_to_layer_frame,
@@ -14,7 +18,7 @@ from detm_app.napari_subscriber import (
     run_napari_subscriber,
     wait_latest_packet,
 )
-from detm_app.subscriber import TcpVizSubscriber, VizPacket
+from detm_app.transport.subscriber import TcpVizSubscriber, VizPacket
 from detm_app.transport import (
     clear_viz_endpoint_registry,
     load_viz_endpoint_registry,
@@ -40,6 +44,16 @@ def test_packet_to_layer_frame_decodes_runtime_state_blob():
     assert frame.meta == {}
     for arr in frame.layers.values():
         assert arr.shape == (int(config.height), int(config.width))
+
+
+def test_patch_six_meta_path_importer_sets_missing_path():
+    import sys
+    import six  # noqa: F401
+
+    _patch_six_meta_path_importer()
+    for importer in list(sys.meta_path):
+        if type(importer).__name__ == "_SixMetaPathImporter":
+            assert hasattr(importer, "_path")
 
 
 def test_tcp_subscriber_roundtrip_decodes_canonical_frame():
@@ -281,6 +295,96 @@ def test_run_napari_subscriber_rejects_non_positive_port():
         raise AssertionError("Expected ValueError for non-positive port")
 
 
+def test_run_napari_subscriber_startup_only_collects_phase_profile(monkeypatch):
+    from detm_app.ui.napari import subscriber as napari_subscriber
+
+    captured: dict[str, object] = {"napari_run_called": False, "viewer_closed": False}
+
+    class _FakeSubscriber:
+        def __init__(self, *, host, port, timeout_s):
+            captured["subscriber_host"] = str(host)
+            captured["subscriber_port"] = int(port)
+            captured["subscriber_timeout_s"] = float(timeout_s)
+            self.recv_frames = 0
+
+        def poll_latest(self):
+            return None
+
+        def close(self):
+            captured["subscriber_closed"] = True
+
+    class _FakeLabel:
+        def __init__(self, _text):
+            self._text = _text
+
+        def setWordWrap(self, _value):
+            return None
+
+        def setText(self, text):
+            self._text = str(text)
+
+    class _FakeSignal:
+        def connect(self, callback):
+            captured["timer_callback"] = callback
+
+    class _FakeTimer:
+        def __init__(self):
+            self.timeout = _FakeSignal()
+
+        def setInterval(self, _value):
+            return None
+
+        def start(self):
+            captured["timer_started"] = True
+
+        def stop(self):
+            captured["timer_stopped"] = True
+
+    class _FakeWindow:
+        def add_dock_widget(self, _widget, *, name, area):
+            captured["dock_name"] = str(name)
+            captured["dock_area"] = str(area)
+
+    class _FakeViewer:
+        def __init__(self, *, title):
+            self.layers = {}
+            self.window = _FakeWindow()
+            captured["viewer_title"] = str(title)
+
+        def close(self):
+            captured["viewer_closed"] = True
+
+    fake_napari_module = types.ModuleType("napari")
+    fake_napari_module.Viewer = _FakeViewer
+    fake_napari_module.run = lambda: captured.__setitem__("napari_run_called", True)
+    fake_qtpy_module = types.ModuleType("qtpy")
+    fake_qtpy_module.QtCore = types.SimpleNamespace(QTimer=_FakeTimer)
+    fake_qtpy_module.QtWidgets = types.SimpleNamespace(QLabel=_FakeLabel)
+
+    monkeypatch.setitem(sys.modules, "napari", fake_napari_module)
+    monkeypatch.setitem(sys.modules, "qtpy", fake_qtpy_module)
+    monkeypatch.setattr(napari_subscriber, "TcpVizSubscriber", _FakeSubscriber)
+    monkeypatch.setattr(napari_subscriber, "wait_latest_packet", lambda *_args, **_kwargs: None)
+
+    profile: dict[str, object] = {}
+    rc = napari_subscriber.run_napari_subscriber(
+        host="127.0.0.1",
+        port=5588,
+        timeout_s=0.01,
+        startup_profile=profile,
+        startup_only=True,
+    )
+
+    assert int(rc) == 0
+    assert bool(captured.get("napari_run_called")) is False
+    assert bool(captured.get("viewer_closed")) is True
+    assert bool(captured.get("subscriber_closed")) is True
+    assert profile.get("first_frame_status") == "timeout"
+    assert profile.get("first_frame_s") is None
+    assert isinstance(profile.get("napari_qt_import_s"), float)
+    assert isinstance(profile.get("viewer_create_s"), float)
+
+
 def test_packet_to_layer_frame_extracts_active_level_from_nested_policy():
     config = DETMConfig(width=6, height=4, backend="numpy")
     state = api.reset(config, seed=41)
@@ -294,3 +398,66 @@ def test_packet_to_layer_frame_extracts_active_level_from_nested_policy():
     frame = packet_to_layer_frame(packet)
     assert frame.active_level == "L2"
     assert frame.meta == {"policy": {"active_level": "L2"}, "other": 7}
+
+
+def test_format_status_text_includes_tick_semantics_from_meta():
+    frame = NapariFrame(
+        tick=12,
+        signature=[0.1, 0.2, 0.3],
+        active_level="L1",
+        meta={
+            "active_level": "L1",
+            "chunk_n_ticks": 1,
+            "requested_n_ticks": 200,
+            "step_requested_n_ticks": 200,
+            "step_effective_n_ticks": 200,
+        },
+        layers={},
+    )
+    text = _format_status_text(
+        host="127.0.0.1",
+        port=5588,
+        frame=frame,
+        recv_frames=3,
+        rendered_count=2,
+    )
+    assert "tick=12 recv=3 rendered=2" in text
+    assert "active_level=L1" in text
+    assert "chunk=1 requested=200 step_requested=200 step_effective=200" in text
+    assert "commit_packets: total=0 realtime=0 audit=0" in text
+    assert "fabric: disabled" in text
+
+
+def test_format_status_text_includes_commit_and_fabric_counters():
+    frame = NapariFrame(
+        tick=21,
+        signature=[0.4, 0.5],
+        active_level="L0",
+        meta={
+            "active_level": "L0",
+            "chunk_n_ticks": 1,
+            "requested_n_ticks": 1,
+            "step_requested_n_ticks": 1,
+            "step_effective_n_ticks": 1,
+            "commit_packets_total": 3,
+            "commit_packets_by_mode": {"realtime": 2, "audit": 1},
+            "fabric": {
+                "commit_count": 3,
+                "ack_count": 6,
+                "quorum": {"accepted_count": 3, "pending_count": 0, "rejected_count": 0},
+                "delivery": {"accepted_count": 3, "pending_count": 0, "rejected_count": 0},
+                "replay": {"checks_total": 3, "checks_failed": 0},
+            },
+        },
+        layers={},
+    )
+    text = _format_status_text(
+        host="127.0.0.1",
+        port=5588,
+        frame=frame,
+        recv_frames=10,
+        rendered_count=9,
+    )
+    assert "commit_packets: total=3 realtime=2 audit=1" in text
+    assert "fabric: commits=3 acks=6 quorum=3/0/0 delivery=3/0/0 replay=0/3" in text
+

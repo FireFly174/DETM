@@ -58,4 +58,4 @@ Higher-level topics (L>0 and/or orchestration) are stored as `90_notes`:
 - meaning/alphabet/LLM-mode: `docs/eng/90_notes/meaning_alphabet_llm_mode.md`
 - system architecture sketch: `docs/eng/90_notes/system_architecture_sketch.md`
 
-These notes must not be required by the canonical L0 API (`detm/runtime/api.py`).
+These notes must not be required by the canonical L0 API (`detm/runtime/api/*`).

@@ -1,10 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import time
 
 from detm.runtime.commit_packet import CommitPacket
-from detm.runtime.fabric_epoch import (
+from detm.runtime.fabric import (
     FileEpochWatermarkCoordinator,
     InMemoryEpochWatermarkCoordinator,
     ReplicatedFileEpochWatermarkCoordinator,
@@ -192,3 +192,26 @@ def test_replicated_epoch_snapshot_reports_read_quorum_failure(tmp_path):
     snap = strict.snapshot()
     assert "error" in snap
     assert "read quorum not reached" in str(snap["error"])
+
+
+def test_replicated_epoch_coordinator_rejects_regression_after_restart(tmp_path):
+    paths = [tmp_path / "r1.json", tmp_path / "r2.json", tmp_path / "r3.json"]
+    c1 = ReplicatedFileEpochWatermarkCoordinator(
+        state_paths=paths,
+        read_quorum=2,
+        write_quorum=2,
+    )
+    ok = c1.evaluate_commit(_make_commit("node-A:2", tick=2, node_id="node-A", epoch=2, watermark=2))
+    assert ok.accepted is True
+
+    # New coordinator instance must recover state and reject regressing epoch for the same node.
+    c2 = ReplicatedFileEpochWatermarkCoordinator(
+        state_paths=paths,
+        read_quorum=2,
+        write_quorum=2,
+    )
+    bad = c2.evaluate_commit(_make_commit("node-A:3", tick=3, node_id="node-A", epoch=1, watermark=1))
+    assert bad.accepted is False
+    assert "write quorum not reached" in str(bad.reason)
+    assert "epoch regression" in str(bad.reason)
+

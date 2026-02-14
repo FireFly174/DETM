@@ -212,7 +212,8 @@ CONFIG = {
     "runner": {
         "seed": 1,  # int >= 0  /// seed одиночного запуска
         "seed0": 0,  # int >= 0  /// старт seed для batch
-        "steps": 4,  # int > 0  /// тиков на влияние
+        "steps": 4,  # int > 0  /// бюджет тиков
+        "steps_mode": "total",  # total | per_symbol  /// как применять budget: суммарно или на каждый символ
         # None | list[str] | "a,b"  /// список символов
         "symbols": None,
         "out": None,  # path | None  /// корень выходных данных
@@ -233,7 +234,17 @@ CONFIG = {
         "fabric_required_unique_proof_validators": 1,  # int >= 1  /// уникальные proof validators
         "fabric_required_unique_trust_validators": 1,  # int >= 1  /// уникальные trust validators
         "fabric_required_validator_ids": None,  # None | list[str] | "v1,v2"  /// обязательный набор validator ids
+        "fabric_handshake_profile": "mvp",  # mvp | production  /// profile-level handshake hardening preset
         "fabric_enforce_required_validator_ids": False,  # False | True  /// жёстко требовать validator_set
+        "fabric_enforce_active_validator_membership": False,  # False | True  /// drop ack вне active validator registry
+        # False | True  /// требовать sender==ack.validator_id для inline ack payload
+        "fabric_enforce_ack_sender_validator_match": False,
+        "fabric_enforce_ack_auth_key_id_binding": False,  # False | True  /// bind ack to configured auth_key_id
+        # None | list[str] | "v1=kid1,v2=kid2"  /// validator/auth key-id binding rules
+        "fabric_validator_auth_key_ids": None,
+        "fabric_enforce_ack_transport_identity_binding": False,  # False | True  /// bind ack to transport identity
+        # None | list[str] | "v1=cn:validator1,v2=sha256:..."  /// validator/transport-identity binding rules
+        "fabric_validator_transport_identities": None,
         "fabric_reject_on_any_reject": False,  # False | True  /// reject quorum при любом rejected ack
         "fabric_retry_attempts": 2,  # int >= 1  /// retry publish для ack envelopes
         "fabric_commit_retry_attempts": 2,  # int >= 1  /// retry publish для commit envelopes
@@ -246,9 +257,37 @@ CONFIG = {
         "fabric_transport_backpressure_max_pending": None,  # None | int >= 1  /// live transport queue limit
         "fabric_transport_backpressure_policy": "block",  # block | drop_oldest | drop_newest | fail
         "fabric_transport_backpressure_block_timeout_ms": 200,  # int >= 0  /// block timeout for live queue
+        "fabric_transport_dedup_ingress_enabled": False,  # False | True  /// ingress dedup/idempotency cache
+        "fabric_transport_dedup_ttl_ms": 30000,  # int >= 1  /// dedup cache TTL (ms)
+        "fabric_transport_dedup_max_entries": 10000,  # int >= 1  /// dedup cache capacity
+        "fabric_transport_auth_enabled": False,  # False | True  /// HMAC auth for TCP envelopes
+        "fabric_transport_auth_key": None,  # None | str  /// shared HMAC key
+        "fabric_transport_auth_key_id": None,  # None | str  /// optional key id
+        "fabric_transport_tls_enabled": False,  # False | True  /// enable TLS for TCP transport
+        "fabric_transport_tls_server_hostname": None,  # None | str  /// TLS server hostname override
+        "fabric_transport_tls_ca_file": None,  # None | path  /// CA bundle path
+        "fabric_transport_tls_cert_file": None,  # None | path  /// client cert chain (optional mTLS)
+        "fabric_transport_tls_key_file": None,  # None | path  /// client key (optional mTLS)
+        # False | True  /// require client cert verification for locally started TLS relay
+        "fabric_transport_tls_require_client_cert": False,
+        "fabric_transport_tls_client_ca_file": None,  # None | path  /// CA bundle for client cert verification
+        "fabric_transport_tls_insecure_skip_verify": False,  # False | True  /// disable TLS verification (dev only)
+        # auto | cn | san | fingerprint  /// source for envelope transport_identity extraction on TLS relay
+        "fabric_transport_tls_identity_source": "auto",
+        # False | True  /// fallback to cert fingerprint when selected identity source is missing
+        "fabric_transport_tls_identity_fallback_to_fingerprint": False,
         "fabric_artifact_dir": None,  # None | path  /// shared artifact store directory
         "fabric_inline_bridge": True,  # False | True  /// inline payload bridge fallback
         "fabric_replay_sample_stride": 0,  # int >= 0  /// replay-check sampling stride (0=off)
+        "fabric_replay_policy_tier": "sampled",  # off | sampled | strict_window  /// validator replay policy tier
+        "fabric_replay_strict_window_size": 128,  # int >= 1  /// strict_window replay window size (ticks)
+        "fabric_validator_coordination_state_path": None,  # None | path  /// validator coordination state file
+        # None | list[path] | "a,b,c"  /// replicated validator coordination state files
+        "fabric_validator_coordination_replica_state_paths": None,
+        # None | int >= 1  /// read quorum for replicated validator coordination state
+        "fabric_validator_coordination_replica_read_quorum": None,
+        # None | int >= 1  /// write quorum for replicated validator coordination state
+        "fabric_validator_coordination_replica_write_quorum": None,
         "fabric_epoch_state_path": None,  # None | path  /// shared epoch/watermark state file
         "fabric_epoch_replica_state_paths": None,  # None | list[path] | "a,b,c"  /// replicated epoch state files
         "fabric_epoch_replica_read_quorum": None,  # None | int >= 1  /// read quorum for replicated epoch-state
@@ -259,16 +298,21 @@ CONFIG = {
         "fabric_epoch_consensus_enabled": False,  # False | True  /// transport pre-consensus for epoch decisions
         "fabric_epoch_consensus_required_total_accepts": 1,  # int >= 1  /// total accepts (incl local)
         "fabric_epoch_consensus_timeout_ms": 200,  # int >= 1  /// timeout proposal/vote collection
+        "fabric_epoch_consensus_max_attempts": 1,  # int >= 1  /// max retry rounds for epoch proposal consensus
         "fabric_epoch_consensus_reject_on_any_reject": False,  # False | True  /// reject when any peer rejects
         "fabric_epoch_consensus_channel": "fabric.epoch",  # str  /// channel for epoch consensus envelopes
         "fabric_split_mode_channels": False,  # False | True  /// separate commit/ack channels per mode
         "fabric_delivery_required_receipts": 0,  # int >= 0  /// required delivery_ack receipts (0=off)
+        # best_effort | at_least_once | at_least_once_idempotent  /// explicit delivery guarantee profile for report/config contract
+        "fabric_delivery_guarantee_mode": "at_least_once_idempotent",
         "fabric_delivery_required_validator_ids": None,  # None | list[str] | "v1,v2"  /// required delivery validators
         "fabric_delivery_enforce_required_validator_ids": False,  # False | True  /// require full delivery validator set
         "fabric_delivery_reject_on_any_reject": False,  # False | True  /// reject delivery on any rejected receipt
         "fabric_delivery_retry_interval_ms": 100,  # int >= 0  /// retry interval for pending delivery receipts
         "fabric_delivery_max_attempts": 3,  # int >= 1  /// max publish attempts per tracked delivery
         "fabric_delivery_timeout_ms": 500,  # int >= 1  /// timeout for tracked delivery receipts
+        # None | path  /// persisted delivery tracking/receipt state file (default: <run>/fabric_delivery_tracking_state.json)
+        "fabric_delivery_tracking_state_path": None,
         "fabric_delivery_ack_channel": "fabric.delivery.ack",  # str  /// channel for delivery_ack envelopes
         "fabric_delivery_emit_ack": True,  # False | True  /// emit delivery_ack on commit receive
         "fabric_delivery_outbox_path": None,  # None | path  /// file-backed outbox path for undelivered envelopes

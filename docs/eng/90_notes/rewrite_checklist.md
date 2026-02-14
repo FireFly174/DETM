@@ -31,4 +31,4 @@ Quick pointers:
 - lattice/boundary: `detm/core/fields.py`
 - reference dynamics: `detm/core/entropy.py`
 - backends: `detm/runtime/backends/numpy_backend.py`, `detm/runtime/backends/torch_backend.py`
-- runtime API: `detm/runtime/api.py`
+- runtime API: `detm/runtime/api/*`

@@ -1,28 +1,28 @@
 # DETM Architecture (EN)
 
-This document describes the *current* architecture and integration interfaces of DETM.
-It corresponds to the Russian version: `docs/rus/architecture.md`.
+This document describes the current DETM architecture and the boundary between library-core (`detm/*`) and app-layer (`detm_app/*`).
+Russian version: `docs/rus/architecture.md`.
+North-star synthesis: `docs/rus/30_architecture/target_architecture_synthesis.md`.
 
-DETM is **pure L0 dynamics**. It does not know about Scheduler/ComfyUI/UI.
-External systems interact with it via the runtime API contract and observables.
+DETM remains pure L0 dynamics. UI/CLI/shell/fabric orchestration lives in the app layer and talks to L0 through runtime contracts.
 
 ```mermaid
 flowchart LR
-  UI[UI/CLI] --> Runner[TickRunner]
-  Runner --> Session[DetmSession (L0)]
-  Runner --> Bus[EventBus]
-  Bus --> Sub1[Trace/History subscribers]
-  Bus --> Sub2[Diagnostics/Invariant subscribers]
-  Bus --> Viz[Viz subscriber]
-  Viz -->|embedded| Canvas[Canvas/Panel]
-  Viz -->|tcp| Daemon[TCP daemon] --> Viewer[Viewer/Panel]
+  Launcher[main.py launcher] --> Headless[detm_app.runner.headless]
+  Launcher --> Napari[detm_app.ui.napari.lab]
+  Launcher --> Shell[detm_app.runner.shell]
+  Headless --> Session[detm_app.runtime.session.DetmSession]
+  Session --> Bus[detm_app.runtime.bus.EventBus]
+  Bus --> Sub[detm_app.runtime.subscribers.*]
+  Sub --> Viz[detm_app.transport + napari subscriber]
+  Session --> L0[detm.runtime.api]
 ```
 
 ---
 
 ## 1) Runtime Contract (L0 API)
 
-Canonical API: `detm/runtime/api.py`:
+Canonical API: `detm/runtime/api/*`:
 
 - `reset(config: DETMConfig, seed: int) -> DETMState`
 - `step(state: DETMState, influence: DETMInfluence | None, n_ticks: int, rng: np.random.Generator | None = None) -> (DETMState, Observables)`
@@ -31,87 +31,70 @@ Canonical API: `detm/runtime/api.py`:
 - `deserialize_state(blob: bytes) -> DETMState`
 - `get_schema_versions() -> dict[str, str]`
 
-Notes:
-- `n_ticks` is an **integer tick count** (tick-driven time model).
-- determinism: all stochastic operations use `rng` or `state.rng_state`.
-- `step()` returns **observables** without any UI dependencies.
+Invariants:
+- `n_ticks` is an integer tick count (tick-driven time).
+- stochastic behavior uses `rng`/`state.rng_state` (determinism).
+- `step()` returns observables with no UI dependency.
 
 ---
 
-## 2) Backends (Torch/Numpy) and state representation
+## 2) Runtime/Orchestration (app-layer)
 
-Compute backends: `detm/runtime/backends/`:
-- `TorchBackend` (CPU/CUDA, optional dependency)
-- `NumpyBackend` (reference + fallback)
+Orchestration has moved from legacy `detm.run` into `detm_app/runtime/*`:
 
-Rule: **a backend must not convert the state**.
-It only performs the transition in the representation already present in `DETMState`:
-- tensor-state → tensor-state (TorchBackend)
-- numpy-state → numpy-state (NumpyBackend)
+- `detm_app/runtime/session.py`: `DetmSession` (single-writer loop over L0 API).
+- `detm_app/runtime/scheduler.py`: `TickScheduler`, `TickRunner`.
+- `detm_app/runtime/bus.py`: synchronous `EventBus` for subscribers.
+- `detm_app/runtime/coarsening.py`: invariant tick streams (`InvariantCoarsener`).
+- `detm_app/runtime/subscribers/*`: trace/watch/commit/fabric/viz subscribers and writers.
 
-Any conversion/comparison/transformation is done *outside* the backend (in analyzers / plugins / runtime glue).
-
----
-
-## 3) Influence API (“alphabet”)
-
-`DETMInfluence` is the external port for acting on L0.
-
-Symbol library: `detm/runtime/symbols.py`:
-- `make_symbol(symbol_id, **params) -> DETMInfluence`
-- `list_symbols() -> list[str]`
-
-Influence application: `detm/runtime/influence.py`:
-- `apply_influence(field_state, influence, rng) -> InfluenceApplication`
-
-`external_features` is a generic vector/dict of parameters without binding to the source (mouse/keyboard/sensor).
+`TickRunner` semantics remain:
+1. Apply all due influences without advancing time.
+2. Perform exactly one L0 tick.
 
 ---
 
-## 4) EventBus, subscribers, Scheduler, and invariant ticks
+## 3) Influence API
 
-`detm/run/bus.py`: a minimal synchronous EventBus used to attach:
-- loggers / traces
-- serialization of artifacts
-- viz streaming
-- invariant tick streams (coarsening timekeepers)
-- external listeners (ACGS can plug in its own)
+`DETMInfluence` is the external influence port for L0.
 
-Scheduler: `detm/run/scheduler.py`:
-- `TickScheduler` publishes `tick`/`signal`
-- `TickRunner` binds `DetmSession` and the Scheduler
+- symbols: `detm/runtime/symbols.py` (`make_symbol`, `list_symbols`)
+- application: `detm/runtime/influence/*` (`apply_influence`)
 
-`TickRunner` semantics:
-1) on each global tick, applies all due influences **without advancing time**
-2) performs exactly **1** L0 tick
-
-Invariant ticks: `detm/run/coarsening.py`:
-- streams are defined by a rational dt relative to L0 (e.g. `1/10`, `4/25`)
-- the coarsener **does not accumulate** values; it only emits `invariant_tick`
-- JSON / persistence is handled by separate subscribers
+Input sources (mouse/keyboard/sensors) are normalized into `external_features` and stay outside core physics.
 
 ---
 
-## 5) Entrypoints and a single config
+## 4) Entrypoints and launch model
 
-`python main.py`:
-- opens the UI by default
-- uses a local `config.example.py` (if missing, copies from `detm/presets/config.default.py`)
+Single launcher: `main.py`.
 
-Headless CLI: `detm/cli.py`:
-- single runs and batch runs
-- optional viz streaming
+- `python main.py` starts napari interactive mode by default (`--interactive`).
+- `python main.py napari ...` starts napari lab/subscriber flow.
+- `python main.py headless ...` runs explicit headless CLI.
+- `python main.py shell ...` runs role-based orchestration (`controller/runner/viewer`).
+- `python main.py --help` shows launcher-level modes only.
+- `python main.py headless --help` shows full headless parameter list.
+
+Note: `python main.py ui ...` is kept as a legacy alias for `napari`; canonical command is `napari`.
 
 ---
 
-## 6) Visualization: embedded vs TCP
+## 5) Visualization: in-process and TCP
 
-Visualization is a **subscriber/consumer** of state frames, not part of L0.
+Visualization remains a read-only subscriber/consumer:
 
-Modes:
-1) `embedded`: render in the same process (no sockets)
-2) `tcp`: DETM sends state blobs to a headless daemon, and UI subscribes + renders
+- in-process interactive UI: `detm_app/ui/napari/interactive/*`
+- producer + napari subscriber: `detm_app/ui/napari/lab.py`, `detm_app/ui/napari/subscriber.py`
+- TCP hub/daemon: `detm_app/transport/daemon.py` + `detm_app/transport/*`
 
-TCP daemon: `detm/viz/daemon.py` (headless hub):
-- producer: `{type:"state", ...}`
-- viewer: `{type:"subscribe"}` → stream of `state` messages
+This keeps rendering/networking outside the L0 step.
+
+---
+
+## 6) Fabric in current tree
+
+Fabric runtime is consolidated under `detm/runtime/fabric/*` (delivery/quorum/epoch/validator/transport).
+Subscriber wiring and runtime artifact persistence are attached via `detm_app/runtime/subscribers/fabric.py`.
+
+Canonical protocol details: `docs/rus/30_architecture/commit_protocol.md`.

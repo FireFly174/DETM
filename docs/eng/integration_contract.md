@@ -11,7 +11,7 @@ DETM is **pure L0 dynamics**. It does **not** depend on a scheduler or UI. Exter
 
 ## Core API (L0)
 
-Canonical implementation: `detm/runtime/api.py`.
+Canonical implementation: `detm/runtime/api/*`.
 
 - `reset(config: DETMConfig, seed: int) -> DETMState`
 - `step(state: DETMState, influence: DETMInfluence | None, n_ticks: int, rng: np.random.Generator | None = None) -> (DETMState, Observables)`
@@ -114,7 +114,7 @@ Symbol library:
 ## Headless harness (no UI)
 
 Supported:
-- `detm/cli.py` (single run + batch, optional viz streaming)
+- `main.py` launcher (`python main.py headless ...`) backed by `detm_app.runner.headless`
 - `tools/headless_runner.py` (simple integration harness)
 
 ---
@@ -131,8 +131,7 @@ Implemented modes:
 
 ## Runtime bridge (optional)
 
-For systems that want session management, `integrations/runtime_bridge.py` provides an in-process bridge:
+For systems that want session management, `detm/integrations/runtime_bridge.py` provides an in-process bridge:
 - `create_session(config, seed) -> session_id`
 - `session_step(session_id, influence, n_ticks) -> (signature, observables, state_digest)`
 - `session_get_state_blob(session_id)`
-

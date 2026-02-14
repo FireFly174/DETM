@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
@@ -7,7 +7,7 @@ import numpy as np
 from detm.core.entropy import DynamicsParameters
 from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
-from detm_app.session import DetmSession
+from detm_app.runtime.session import DetmSession
 
 
 def _seed_overflow_hotspot(session: DetmSession, *, center_y: int | None = None, center_x: int | None = None) -> None:
@@ -308,3 +308,4 @@ def test_pattern_reuse_scope_strict_blocks_cross_level_reuse(tmp_path):
     pattern = dict(event.get("pattern", {}))
     assert bool(pattern.get("reused")) is False
     assert int(pattern.get("hits", 0)) == 1
+

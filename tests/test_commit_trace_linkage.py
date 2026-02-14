@@ -1,9 +1,9 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 
-from detm_app.session import DetmSession
-from detm_app.subscribers import CommitJsonlWriter, JsonlTraceWriter
+from detm_app.runtime.session import DetmSession
+from detm_app.runtime.subscribers import CommitJsonlWriter, JsonlTraceWriter
 from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
 
@@ -109,3 +109,4 @@ def test_commit_writer_emits_all_boundaries_within_single_step_call(tmp_path):
     assert [entry["tick"] for entry in trace_entries] == [2, 4]
     assert [entry["tick_ref"]["tick"] for entry in commit_entries] == [2, 4]
     assert [entry["trace_ref"] for entry in commit_entries] == [entry["trace_ref"] for entry in trace_entries]
+

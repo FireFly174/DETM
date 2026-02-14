@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """Compatibility wrapper for the headless CLI runner.
@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import sys
 
-from detm_app.cli import main
+from detm_app.runner.headless import main
 
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv[1:]))
+

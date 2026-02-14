@@ -1,8 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from detm.runtime.fabric_delivery_receipts import CountDeliveryReceiptPolicy, InMemoryDeliveryReceiptCoordinator
-from detm.runtime.fabric_delivery_tracking import DeliveryTrackingCoordinator
-from detm.runtime.fabric_envelope import FabricEnvelope
+import json
+
+from detm.runtime.fabric import CountDeliveryReceiptPolicy, InMemoryDeliveryReceiptCoordinator
+from detm.runtime.fabric import DeliveryTrackingCoordinator
+from detm.runtime.fabric import FabricEnvelope
 
 
 def _commit_env(delivery_id: str) -> FabricEnvelope:
@@ -92,3 +94,50 @@ def test_delivery_tracking_rejects_by_timeout():
     snap = tracker.snapshot()
     assert int(snap["rejected_count"]) == 1
     assert int(snap["pending_count"]) == 0
+
+
+def test_delivery_tracking_persists_and_restores_pending_state(tmp_path):
+    state_path = tmp_path / "delivery_tracking_state.json"
+    receipt_a = InMemoryDeliveryReceiptCoordinator(policy=CountDeliveryReceiptPolicy(required_receipts=1))
+    tracker_a = DeliveryTrackingCoordinator(
+        receipt_coordinator=receipt_a,
+        required_receipts=1,
+        tracking_enabled=True,
+        retry_interval_ms=0,
+        max_attempts=4,
+        timeout_ms=1000,
+        state_path=str(state_path),
+    )
+    env = _commit_env("d4")
+    tracker_a.register_delivery(env, now_ms=1)
+    tracker_a.mark_publish_attempt("d4", now_ms=2)
+    assert state_path.exists()
+
+    receipt_b = InMemoryDeliveryReceiptCoordinator(policy=CountDeliveryReceiptPolicy(required_receipts=1))
+    tracker_b = DeliveryTrackingCoordinator(
+        receipt_coordinator=receipt_b,
+        required_receipts=1,
+        tracking_enabled=True,
+        retry_interval_ms=0,
+        max_attempts=4,
+        timeout_ms=1000,
+        state_path=str(state_path),
+    )
+    snap_before = tracker_b.snapshot()
+    assert int(snap_before["pending_count"]) == 1
+    assert str(snap_before["pending"][0]["delivery_id"]) == "d4"
+    assert int(snap_before["pending"][0]["attempts"]) == 1
+
+    retried: list[str] = []
+    tracker_b.tick(lambda row: retried.append(str(row.delivery_id)) or True, now_ms=3)
+    assert retried == ["d4"]
+
+    tracker_b.on_delivery_ack_envelope(_delivery_ack_env("d4", status="received"))
+    tracker_b.tick(lambda _row: True, now_ms=4)
+    snap_after = tracker_b.snapshot()
+    assert int(snap_after["accepted_count"]) == 1
+    assert int(snap_after["pending_count"]) == 0
+
+    persisted = json.loads(state_path.read_text(encoding="utf-8"))
+    assert str(persisted["schema_version"]) == "detm.fabric.delivery_tracking_state.v1"
+    assert int(persisted["accepted_count"]) == 1
