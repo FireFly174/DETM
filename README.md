@@ -112,12 +112,16 @@ DETM:
 
 ## Лицензия и вклад
 
-Проект распространяется под лицензией MIT.
+Проект распространяется по dual-модели:
+- `PolyForm-Noncommercial-1.0.0` (source-available, non-commercial use)
+- коммерческая лицензия по отдельному соглашению
 
 - Лицензия: `LICENSE`
+- FAQ по лицензии: `LICENSE_FAQ.md`
+- Коммерческие условия: `COMMERCIAL_LICENSE.md`
+- Notices: `NOTICE`, `THIRD_PARTY_NOTICES.md`
 - Как вносить вклад: `CONTRIBUTING.md`
 - Кодекс поведения: `CODE_OF_CONDUCT.md`
 - Правила security-репортов: `SECURITY.md`
 - Поддержка и каналы связи: `SUPPORT.md`
 - Чеклист публичного релиза: `PUBLIC_RELEASE_CHECKLIST.md`
-

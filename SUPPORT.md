@@ -1,5 +1,11 @@
 # Support
 
+## Contact
+
+- Maintainer: Andrey Svetliakov
+- GitHub: https://github.com/FireFly174
+- Email: Andrey.svetliakov@gmail.com
+
 ## Questions and Usage Help
 
 - Open a GitHub Issue for reproducible bugs or documentation gaps.
@@ -19,6 +25,11 @@ Use the issue template and include:
 
 For vulnerabilities or sensitive reports, use `SECURITY.md` guidance and avoid
 public disclosure before triage.
+
+## Commercial Licensing
+
+For commercial licensing requests, contact the maintainer directly by email
+with subject `DETM commercial license`.
 
 ## Project Status
 
