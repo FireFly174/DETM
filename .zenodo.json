@@ -1,0 +1,21 @@
+{
+  "title": "DETM: Discrete Entropy-Time Model",
+  "description": "DETM is a research-oriented discrete lattice dynamics model for studying the emergence of stable localized structures (invariants) from strictly local interaction rules. The project focuses on asynchronous dynamics, coarsening, transfer constraints, and reproducible experiment workflows.",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "Svetliakov, Andrey",
+      "affiliation": "DETM Project",
+      "orcid": "0009-0000-1335-2281"
+    }
+  ],
+  "keywords": [
+    "discrete dynamics",
+    "simulation",
+    "runtime",
+    "emergence"
+  ],
+  "language": "eng",
+  "license": "other-open",
+  "access_right": "open"
+}
