@@ -140,7 +140,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 
 Состав:
 
-- `PUB-01` Demo assets в `docs/book/assets` (визуальный baseline для README).
+- `PUB-01` Demo assets в `docs/media` (визуальный baseline для README).
 - `PUB-02` Каноничный пакет визуальных пресетов.
 - `PUB-03` One-page overview (RU/EN) для быстрого входа.
 - `QLT-01` Code-level docstrings/type hints для ключевых runtime-модулей.
@@ -568,12 +568,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `owner_role`: `docs`
 - `target_date`: `2026-02-28`
 - `depends_on`: `[]`
-- `scope_in`: добавить 3-5 наглядных GIF/MP4 демо (рост структуры, коарсинг, устойчивый объект) и встроить в `README.md`/`docs/book/assets`.
+- `scope_in`: добавить 3-5 наглядных GIF/MP4 демо (рост структуры, коарсинг, устойчивый объект) и встроить в `README.md`/`docs/media`.
 - `scope_out`: изменение runtime-логики, новые алгоритмы.
 - `deliverables`: curated demo assets + обновлённый блок preview в `README.md`.
 - `api_contract_changes`: нет.
 - `tests_required`: smoke-check ссылок/путей в docs, ручной sanity просмотр.
-- `readout_artifacts`: `docs/book/assets/*`, `README.md`.
+- `readout_artifacts`: `docs/media/*`, `README.md`.
 - `risks`: визуализации не отражают каноничный режим (маркетинг вместо факта).
 - `dod`: минимум 3 воспроизводимых демо-артефакта с подписью параметров запуска и ссылкой на сценарий.
 

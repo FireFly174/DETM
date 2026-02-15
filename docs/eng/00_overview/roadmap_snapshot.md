@@ -27,7 +27,7 @@ Canonical planning and statuses are maintained in:
 
 The following tasks are planned as public-facing quality improvements:
 
-- `PUB-01`: add 3-5 curated demo assets to `docs/book/assets` and wire them into `README.md`
+- `PUB-01`: add 3-5 curated demo assets to `docs/media` and wire them into `README.md`
 - `PUB-02`: define 2-3 canonical visual presets with reproducible commands
 - `PUB-03`: create one-page project overview (RU/EN)
 - `QLT-01`: improve runtime code-level docstrings and type hints
