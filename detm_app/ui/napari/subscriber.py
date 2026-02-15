@@ -123,7 +123,7 @@ def run_napari_subscriber(
     port: int,
     poll_ms: int = 40,
     timeout_s: float = 2.0,
-    autoscale: bool = False,
+    autoscale: bool = True,
     title: str = "DETM napari subscriber (read-only)",
     startup_profile: MutableMapping[str, Any] | None = None,
     startup_only: bool = False,
@@ -262,10 +262,18 @@ def _build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--port", type=int, default=None, help="Viz daemon port (must be > 0)")
     ap.add_argument("--poll-ms", type=int, default=40, help="Polling interval in ms")
     ap.add_argument("--timeout-s", type=float, default=2.0, help="TCP connect timeout in seconds")
+    ap.set_defaults(autoscale=True)
     ap.add_argument(
         "--autoscale",
+        dest="autoscale",
         action="store_true",
-        help="Autoscale contrast limits after each frame update",
+        help="Autoscale contrast limits after each frame update (default: on)",
+    )
+    ap.add_argument(
+        "--no-autoscale",
+        dest="autoscale",
+        action="store_false",
+        help="Disable autoscale contrast updates",
     )
     ap.add_argument(
         "--title",

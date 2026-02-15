@@ -106,6 +106,7 @@ def test_napari_lab_main_forwards_fabric_args_to_producer(monkeypatch):
     subscriber_kwargs = dict(captured.get("subscriber_kwargs", {}))
     assert subscriber_kwargs.get("host") == "127.0.0.1"
     assert int(subscriber_kwargs.get("port", 0)) == 5589
+    assert subscriber_kwargs.get("autoscale") is True
     assert subscriber_kwargs.get("startup_only") is False
     startup_profile = dict(subscriber_kwargs.get("startup_profile", {}))
     assert isinstance(startup_profile, dict)
@@ -197,6 +198,7 @@ def test_napari_lab_main_viewer_only_skips_producer(monkeypatch):
     subscriber_kwargs = dict(captured.get("subscriber_kwargs", {}))
     assert subscriber_kwargs.get("host") == "127.0.0.1"
     assert int(subscriber_kwargs.get("port", 0)) == 5590
+    assert subscriber_kwargs.get("autoscale") is True
     assert subscriber_kwargs.get("startup_only") is False
     startup_profile = dict(subscriber_kwargs.get("startup_profile", {}))
     assert startup_profile.get("viewer_only") is True
@@ -281,6 +283,45 @@ def test_napari_lab_main_interactive_routes_to_interactive_runner(monkeypatch):
     assert captured.get("preset") == "default"
     assert captured.get("override_path") == "config.example.py"
     assert captured.get("autoscale") is True
+    assert captured.get("title") == "DETM interactive"
+
+
+def test_napari_lab_main_interactive_allows_disabling_autoscale(monkeypatch):
+    captured: dict[str, object] = {}
+
+    class _FailPopen:
+        def __init__(self, _cmd):
+            raise AssertionError("Popen must not be called in --interactive mode")
+
+    def _fake_run_napari_interactive(*, preset, override_path, autoscale, title):
+        captured["preset"] = str(preset)
+        captured["override_path"] = override_path
+        captured["autoscale"] = bool(autoscale)
+        captured["title"] = str(title)
+        return 0
+
+    fake_interactive_module = types.ModuleType("detm_app.ui.napari.interactive")
+    fake_interactive_module.run_napari_interactive = _fake_run_napari_interactive
+    monkeypatch.setitem(sys.modules, "detm_app.ui.napari.interactive", fake_interactive_module)
+    monkeypatch.setattr(napari_lab.subprocess, "Popen", _FailPopen)
+
+    rc = napari_lab.main(
+        [
+            "--interactive",
+            "--preset",
+            "default",
+            "--config",
+            "config.example.py",
+            "--no-autoscale",
+            "--title",
+            "DETM interactive",
+        ]
+    )
+
+    assert int(rc) == 0
+    assert captured.get("preset") == "default"
+    assert captured.get("override_path") == "config.example.py"
+    assert captured.get("autoscale") is False
     assert captured.get("title") == "DETM interactive"
 
 

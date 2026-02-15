@@ -39,11 +39,12 @@ def add_view_page(controller: Any, *, QtWidgets: Any, settings: Any) -> None:
     lay_view.addLayout(row_cmap)
 
     self._quiver_enabled = QtWidgets.QCheckBox("quiver")
-    self._quiver_enabled.setChecked(True)
+    # Default-off keeps first render less cluttered; can be enabled on demand.
+    self._quiver_enabled.setChecked(False)
     lay_view.addWidget(self._quiver_enabled)
     self._quiver_step = QtWidgets.QSpinBox()
     self._quiver_step.setRange(1, 32)
-    self._quiver_step.setValue(2)
+    self._quiver_step.setValue(3)
     row_qs = QtWidgets.QHBoxLayout()
     row_qs.addWidget(QtWidgets.QLabel("quiver_step"))
     row_qs.addWidget(self._quiver_step)
@@ -51,7 +52,7 @@ def add_view_page(controller: Any, *, QtWidgets: Any, settings: Any) -> None:
     self._quiver_scale = QtWidgets.QDoubleSpinBox()
     self._quiver_scale.setRange(0.0, 2.0)
     self._quiver_scale.setSingleStep(0.05)
-    self._quiver_scale.setValue(0.8)
+    self._quiver_scale.setValue(0.65)
     row_qc = QtWidgets.QHBoxLayout()
     row_qc.addWidget(QtWidgets.QLabel("quiver_scale"))
     row_qc.addWidget(self._quiver_scale)
