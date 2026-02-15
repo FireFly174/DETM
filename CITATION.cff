@@ -7,6 +7,7 @@ authors:
     given-names: "Andrey"
     email: "Andrey.svetliakov@gmail.com"
     affiliation: "DETM Project"
+    orcid: "https://orcid.org/0009-0000-1335-2281"
 repository-code: "https://github.com/FireFly174/DETM"
 url: "https://github.com/FireFly174/DETM"
 license: "PolyForm-Noncommercial-1.0.0"
