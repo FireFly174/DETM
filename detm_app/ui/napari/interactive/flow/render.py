@@ -99,14 +99,26 @@ class NapariRenderFlow:
             field_layer = self._viewer.add_image(field, name=self._field_layer_name)
         else:
             field_layer.data = field
+        # Preserve lattice-cell readability on startup (avoid blurred interpolation).
+        try:
+            field_layer.interpolation2d = "nearest"
+        except Exception:
+            pass
         cmap = self._colormap_map.get(str(cmap_name).strip().lower(), "inferno")
         try:
             field_layer.colormap = cmap
         except Exception:
             pass
         if bool(autoscale):
-            vmin = float(np.nanmin(field)) if field.size else 0.0
-            vmax = float(np.nanmax(field)) if field.size else 0.0
+            finite = np.asarray(field[np.isfinite(field)], dtype=np.float32)
+            if finite.size <= 0:
+                return
+            # Robust autoscale stabilizes first-look contrast under occasional outliers.
+            vmin = float(np.nanpercentile(finite, 1.0))
+            vmax = float(np.nanpercentile(finite, 99.0))
+            if not (np.isfinite(vmin) and np.isfinite(vmax) and vmin < vmax):
+                vmin = float(np.nanmin(finite))
+                vmax = float(np.nanmax(finite))
             if np.isfinite(vmin) and np.isfinite(vmax) and vmin < vmax:
                 field_layer.contrast_limits = (vmin, vmax)
 

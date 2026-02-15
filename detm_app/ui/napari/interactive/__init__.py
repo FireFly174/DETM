@@ -60,7 +60,7 @@ def run_napari_interactive(
     *,
     preset: str = "default",
     override_path: str | None = None,
-    autoscale: bool = False,
+    autoscale: bool = True,
     title: str = "DETM napari interactive (in-process)",
 ) -> int:
     os.environ.setdefault("QT_API", "pyside6")

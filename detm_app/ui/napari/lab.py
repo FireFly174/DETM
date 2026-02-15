@@ -88,7 +88,19 @@ def _build_parser() -> argparse.ArgumentParser:
         default=15.0,
         help="Max wait for producer TCP endpoint before opening viewer",
     )
-    ap.add_argument("--autoscale", action="store_true", help="Enable napari autoscale")
+    ap.set_defaults(autoscale=True)
+    ap.add_argument(
+        "--autoscale",
+        dest="autoscale",
+        action="store_true",
+        help="Enable napari autoscale (default: on)",
+    )
+    ap.add_argument(
+        "--no-autoscale",
+        dest="autoscale",
+        action="store_false",
+        help="Disable napari autoscale",
+    )
     ap.add_argument(
         "--title",
         default="DETM napari lab (producer + subscriber)",
