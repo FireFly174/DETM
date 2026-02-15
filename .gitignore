@@ -45,7 +45,7 @@ Prev_proj.txt
 config.py
 config.local.py
 config.example.py
-media*
+
 TO_DO*.md
 _tmp/
 
@@ -63,6 +63,7 @@ docs/source/
 *.mov
 *.avi
 *.zip
+!docs/media/source/
 
 # --- Obsidian (если решишь хранить vault внутри repo) ---
 .obsidian/
