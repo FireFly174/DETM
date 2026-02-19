@@ -18,6 +18,7 @@ from detm_app.runtime.bus import EventBus
 from detm_app.runtime.session.adaptive import (
     adaptive_profile_for_window as _adaptive_profile_for_window_flow,
     reset_runtime_adaptive_state as _reset_runtime_adaptive_state_flow,
+    runtime_anti_goodhart_snapshot as _runtime_anti_goodhart_snapshot_flow,
     runtime_adaptive_decision_for_window as _runtime_adaptive_decision_for_window_flow,
     runtime_adaptive_telemetry_snapshot as _runtime_adaptive_telemetry_snapshot_flow,
     update_runtime_adaptive_window_from_events as _update_runtime_adaptive_window_from_events_flow,
@@ -38,6 +39,7 @@ class DetmSession:
     _runtime_adaptive_cooldown_until_step: int = 0
     _runtime_adaptive_profile: str = "manual"
     _runtime_adaptive_telemetry_recent: deque[dict[str, object]] = None  # type: ignore[assignment]
+    _anti_goodhart_runtime: dict[str, object] | None = None
 
     @classmethod
     def create(cls, config: DETMConfig, seed: int, *, bus: Optional[EventBus] = None) -> "DetmSession":
@@ -113,6 +115,9 @@ class DetmSession:
             profile=profile,
             window_active=window_active,
         )
+
+    def _runtime_anti_goodhart_snapshot(self) -> dict[str, object]:
+        return _runtime_anti_goodhart_snapshot_flow(self)
 
     def _update_runtime_adaptive_window_from_events(
         self,

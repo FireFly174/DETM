@@ -54,6 +54,16 @@ def _seed_capacity_mild_overflow(session: DetmSession) -> None:
     state.field_state.entropy = NumpyBackend._compute_entropy(energy, session.config.dynamics, boundary=state.lattice.boundary)
 
 
+def _seed_capacity_near_cap(session: DetmSession, *, value: float = 0.97) -> None:
+    state = session.state
+    h = int(state.lattice.height)
+    w = int(state.lattice.width)
+    energy = np.full((h, w), float(value), dtype=float)
+    state.field_state.energy = energy
+    state.field_state.internal_time = np.zeros_like(energy)
+    state.field_state.entropy = NumpyBackend._compute_entropy(energy, session.config.dynamics, boundary=state.lattice.boundary)
+
+
 def test_refinement_emits_event_and_reports_correction():
     cfg = DETMConfig(
         backend="numpy",
@@ -211,6 +221,37 @@ def test_refinement_capacity_detector_respects_policy_threshold():
     assert bool(event.get("detector_capacity_triggered")) is False
 
 
+def test_refinement_capacity_saturation_band_triggers_without_hard_overflow():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=11,
+        height=11,
+        initial_noise=0.0,
+        # default clamped dynamics emulate interactive UI behaviour
+        level_policy=LevelPolicy(
+            allow_refinement=True,
+            commit_stride=1,
+            refinement_capacity_overflow_ratio_threshold=0.15,
+            refinement_capacity_overflow_mean_threshold=0.5,
+            refinement_capacity_min_signals=1,
+            refinement_capacity_saturation_band=0.05,
+        ),
+    )
+    session = DetmSession.create(cfg, seed=121)
+    _seed_capacity_near_cap(session, value=0.97)
+
+    obs = session.step(None, 0, rng=session.state.restore_rng())
+    session.close()
+
+    refinement_events = [event for event in list(obs.events) if str(event.get("type")) == "refinement"]
+    assert len(refinement_events) == 1
+    event = refinement_events[0]
+    assert str(event.get("detector")) == "capacity_pressure"
+    assert bool(event.get("detector_capacity_triggered")) is True
+    assert float(event.get("detector_overflow_ratio", 0.0)) > 0.0
+
+
 def test_refinement_capacity_detector_multisignal_policy_gate():
     cfg = DETMConfig(
         backend="numpy",
@@ -241,6 +282,58 @@ def test_refinement_capacity_detector_multisignal_policy_gate():
     assert int(event.get("detector_capacity_min_signals", 0)) == 2
     assert int(event.get("detector_capacity_secondary_required", 0)) == 1
     assert int(event.get("detector_capacity_secondary_hits", 0)) == 0
+
+
+def test_refinement_capacity_detector_autoclamp_limits_unreachable_secondary_threshold():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=11,
+        height=11,
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        level_policy=LevelPolicy(
+            allow_refinement=True,
+            commit_stride=1,
+            refinement_capacity_overflow_ratio_threshold=0.0,
+            refinement_capacity_overflow_mean_threshold=0.5,
+            refinement_capacity_min_signals=11,
+            refinement_capacity_autoclamp_enabled=True,
+            refinement_capacity_temporal_ratio_threshold=0.15,
+            refinement_capacity_temporal_window=3,
+            refinement_capacity_temporal_required_hits=3,
+            refinement_capacity_learned_hits_threshold=0,
+            refinement_capacity_cross_level_window=2,
+            refinement_capacity_cross_level_min_levels=2,
+            refinement_capacity_operator_score_threshold=1.0,
+            refinement_capacity_cross_node_min_signals=1,
+            refinement_capacity_distributed_accepted_min=0,
+            refinement_capacity_signed_acks_min=0,
+            refinement_capacity_consensus_accepted_min=0,
+            refinement_capacity_crypto_validator_coverage_min=0.0,
+            refinement_capacity_attestation_min_coverage=0.0,
+            refinement_capacity_byzantine_clean_min=0,
+        ),
+    )
+    session = DetmSession.create(cfg, seed=130)
+    _seed_capacity_mild_overflow(session)
+
+    obs = session.step(None, 1, rng=session.state.restore_rng())
+    session.close()
+
+    refinement_events = [event for event in list(obs.events) if str(event.get("type")) == "refinement"]
+    assert len(refinement_events) == 1
+    event = refinement_events[0]
+    assert bool(event.get("detector_capacity_autoclamp_enabled")) is True
+    assert bool(event.get("detector_capacity_secondary_clamped")) is True
+    assert int(event.get("detector_capacity_secondary_required_raw", 0)) == 10
+    assert int(event.get("detector_capacity_secondary_possible", 0)) == 2
+    assert int(event.get("detector_capacity_secondary_required", 0)) == 2
+    signals = dict(event.get("detector_capacity_signals", {}))
+    assert bool(dict(signals.get("overflow_mean", {})).get("enabled")) is True
+    assert bool(dict(signals.get("temporal_sustained", {})).get("enabled")) is True
+    assert bool(dict(signals.get("learned_reuse", {})).get("enabled")) is False
+    assert bool(dict(signals.get("cross_level", {})).get("enabled")) is False
 
 
 def test_refinement_capacity_detector_temporal_signal_can_trigger():
@@ -417,6 +510,181 @@ def test_refinement_capacity_detector_operator_signal_can_trigger():
     signals = dict(event.get("detector_capacity_signals", {}))
     operator_signal = dict(signals.get("operator_signal", {}))
     assert bool(operator_signal.get("passed")) is True
+
+
+def test_refinement_capacity_operator_signal_derived_from_operator_hits():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=11,
+        height=11,
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        pattern_reuse_enabled=True,
+        pattern_prune_error_threshold=1.0,
+        pattern_prune_deviation_threshold=10.0,
+        level_policy=LevelPolicy(
+            allow_refinement=True,
+            commit_stride=1,
+            refinement_capacity_overflow_ratio_threshold=0.15,
+            refinement_capacity_overflow_mean_threshold=1.0,
+            refinement_capacity_min_signals=2,
+            refinement_capacity_temporal_ratio_threshold=2.0,
+            refinement_capacity_temporal_window=2,
+            refinement_capacity_temporal_required_hits=2,
+            refinement_capacity_learned_hits_threshold=999,
+            refinement_capacity_cross_level_window=2,
+            refinement_capacity_cross_level_min_levels=3,
+            refinement_capacity_operator_score_threshold=1.0,
+            refinement_capacity_cross_node_min_signals=3,
+        ),
+    )
+    session = DetmSession.create(cfg, seed=171)
+    detectors: list[str] = []
+    operator_passed: list[bool] = []
+    operator_sources: list[str] = []
+
+    for _ in range(3):
+        _seed_capacity_mild_overflow(session)
+        obs = session.step(None, 1, rng=session.state.restore_rng())
+        events = [event for event in list(obs.events) if str(event.get("type")) == "refinement"]
+        assert len(events) == 1
+        event = events[0]
+        detectors.append(str(event.get("detector")))
+        signals = dict(event.get("detector_capacity_signals", {}))
+        operator_signal = dict(signals.get("operator_signal", {}))
+        operator_passed.append(bool(operator_signal.get("passed")))
+        operator_sources.append(str(dict(event.get("operator", {})).get("source", "")))
+
+    session.close()
+
+    assert detectors[:2] == ["energy_overflow", "energy_overflow"]
+    assert detectors[2] == "capacity_pressure"
+    assert operator_passed == [False, False, True]
+    assert operator_sources == ["search", "reuse", "reuse"]
+    final_events = [event for event in list(obs.events) if str(event.get("type")) == "refinement"]
+    assert len(final_events) == 1
+    final_operator = dict(final_events[0].get("operator", {}))
+    final_contract = dict(final_operator.get("contract", {}))
+    assert str(final_contract.get("type")) == "discrete_torsion_v1"
+    assert "torsion_flag" in final_contract
+    assert "torsion_score" in final_contract
+
+
+def test_refinement_operator_selection_guard_blocks_reuse_after_torsion_flag():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=11,
+        height=11,
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        pattern_reuse_enabled=True,
+        pattern_prune_error_threshold=1.0,
+        pattern_prune_deviation_threshold=10.0,
+        level_policy=LevelPolicy(allow_refinement=True, commit_stride=1, active_level="L0"),
+    )
+    session = DetmSession.create(cfg, seed=172)
+
+    _seed_capacity_mild_overflow(session)
+    first_obs = session.step(None, 1, rng=session.state.restore_rng())
+    first_events = [event for event in list(first_obs.events) if str(event.get("type")) == "refinement"]
+    assert len(first_events) == 1
+    first_event = dict(first_events[0])
+    assert str(dict(first_event.get("operator", {})).get("source", "")) == "search"
+
+    runtime_memory = getattr(session.state, "_refinement_runtime", None)
+    assert isinstance(runtime_memory, dict)
+    runtime_memory["operator_contract_last"] = {
+        "level": "L0",
+        "mode": "minimal",
+        "torsion_flag": True,
+    }
+
+    _seed_capacity_mild_overflow(session)
+    second_obs = session.step(None, 1, rng=session.state.restore_rng())
+    second_events = [event for event in list(second_obs.events) if str(event.get("type")) == "refinement"]
+    assert len(second_events) == 1
+    second_event = dict(second_events[0])
+    second_operator = dict(second_event.get("operator", {}))
+    second_selection = dict(second_operator.get("selection", {}))
+    assert str(second_operator.get("source", "")) == "search"
+    assert str(second_selection.get("reason", "")) == "torsion_guard_blocked"
+    history = list(runtime_memory.get("operator_decision_history", []))
+    assert len(history) >= 2
+
+    session.close()
+
+
+def test_refinement_operator_selection_guard_can_be_disabled_by_policy():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=11,
+        height=11,
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        pattern_reuse_enabled=True,
+        pattern_prune_error_threshold=1.0,
+        pattern_prune_deviation_threshold=10.0,
+        level_policy=LevelPolicy(
+            allow_refinement=True,
+            commit_stride=1,
+            active_level="L0",
+            refinement_operator_torsion_guard_enabled=False,
+        ),
+    )
+    session = DetmSession.create(cfg, seed=173)
+
+    _seed_capacity_mild_overflow(session)
+    session.step(None, 1, rng=session.state.restore_rng())
+    runtime_memory = getattr(session.state, "_refinement_runtime", None)
+    assert isinstance(runtime_memory, dict)
+    runtime_memory["operator_contract_last"] = {
+        "level": "L0",
+        "mode": "minimal",
+        "torsion_flag": True,
+    }
+
+    _seed_capacity_mild_overflow(session)
+    second_obs = session.step(None, 1, rng=session.state.restore_rng())
+    second_events = [event for event in list(second_obs.events) if str(event.get("type")) == "refinement"]
+    assert len(second_events) == 1
+    second_operator = dict(dict(second_events[0]).get("operator", {}))
+    second_selection = dict(second_operator.get("selection", {}))
+    assert str(second_operator.get("source", "")) == "reuse"
+    assert str(second_selection.get("reason", "")) == "reuse_candidate"
+
+    session.close()
+
+
+def test_refinement_operator_history_limit_respects_policy_bound():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=11,
+        height=11,
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        pattern_reuse_enabled=True,
+        pattern_prune_error_threshold=1.0,
+        pattern_prune_deviation_threshold=10.0,
+        level_policy=LevelPolicy(
+            allow_refinement=True,
+            commit_stride=1,
+            refinement_operator_history_limit=2,
+        ),
+    )
+    session = DetmSession.create(cfg, seed=174)
+    for _ in range(5):
+        _seed_capacity_mild_overflow(session)
+        session.step(None, 1, rng=session.state.restore_rng())
+
+    runtime_memory = getattr(session.state, "_refinement_runtime", None)
+    assert isinstance(runtime_memory, dict)
+    history = list(runtime_memory.get("operator_decision_history", []))
+    assert len(history) == 2
+    session.close()
 
 
 def test_refinement_capacity_detector_cross_node_signal_can_trigger():

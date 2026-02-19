@@ -59,9 +59,22 @@ def test_watch_contract_trace_ref_and_outerfields_linkage(tmp_path):
         assert "runtime_adaptive_window_active" in policy
         assert "runtime_adaptive_profile" in policy
         assert "runtime_adaptive_signal_triggered" in policy
+        assert "anti_goodhart" in policy
         assert "runtime_adaptive_window_active" in watchpoints
         assert "runtime_adaptive_profile" in watchpoints
         assert "runtime_adaptive_signal_triggered" in watchpoints
+        assert "anti_goodhart_flag" in watchpoints
+        assert "anti_goodhart_degraded_signal_count" in watchpoints
+        assert "anti_goodhart_policy_reaction_applied" in watchpoints
+        assert "anti_goodhart_runtime_profile_applied" in watchpoints
+        assert "anti_goodhart" in watchpoints
+        assert "operator_decision_count" in watchpoints
+        assert "operator_reuse_count" in watchpoints
+        assert "operator_search_count" in watchpoints
+        assert "operator_reuse_rate" in watchpoints
+        assert "operator_torsion_guard_block_count" in watchpoints
+        assert "operator_torsion_flag_count" in watchpoints
+        assert "operator_torsion_score_mean" in watchpoints
         artifact_path = contract_path.parent / ref.uri
         assert artifact_path.exists()
         with np.load(artifact_path) as data:
@@ -106,6 +119,12 @@ def test_watch_contract_storage_policy_prunes_entries_and_artifacts(tmp_path):
 
     contract_entries = _read_jsonl(contract_path)
     assert [entry["tick"] for entry in contract_entries] == [4, 5, 6]
+    for entry in contract_entries:
+        watchpoints = dict(dict(entry.get("metrics", {})).get("watchpoints", {}))
+        assert "operator_decision_count" in watchpoints
+        assert "operator_search_count" in watchpoints
+        assert "operator_torsion_flag_count" in watchpoints
+        assert "anti_goodhart" in watchpoints
 
     artifact_rows = sorted(outerfields_dir.glob("outerfields_*.npz"), key=lambda p: p.name)
     assert len(artifact_rows) == 3

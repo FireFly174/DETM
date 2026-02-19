@@ -58,7 +58,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
     )
 
     buttons = ttk.Frame(layout.controls_frame)
-    buttons.grid(row=13, column=0, columnspan=4, sticky="w", pady=(6, 0))
+    buttons.grid(row=15, column=0, columnspan=4, sticky="w", pady=(6, 0))
 
     def _log(message: str) -> None:
         layout.log_text.insert("end", message.rstrip() + "\n")
@@ -75,7 +75,7 @@ def launch_tk_ui(settings: UiRunSettings) -> None:  # pragma: no cover
         tk=tk,
         ttk=ttk,
         parent=layout.controls_frame,
-        row=14,
+        row=16,
         build_config_from_widgets=settings_flow.build_config,
         read_invariant_streams=settings_flow.read_invariant_streams,
         log=_log,

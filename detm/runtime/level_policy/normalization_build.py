@@ -57,9 +57,16 @@ def build_level_policy(payload: dict[str, Any] | None, *, level_policy_cls: Any,
             data.get("refinement_capacity_overflow_mean_threshold", 0.5),
             default=0.5,
         ),
+        refinement_capacity_saturation_band=as_non_negative_float(
+            data.get("refinement_capacity_saturation_band", 0.0),
+            default=0.0,
+        ),
         refinement_capacity_min_signals=as_positive_int(
             data.get("refinement_capacity_min_signals", 1),
             default=1,
+        ),
+        refinement_capacity_autoclamp_enabled=bool(
+            data.get("refinement_capacity_autoclamp_enabled", False)
         ),
         refinement_capacity_temporal_ratio_threshold=as_non_negative_float(
             data.get("refinement_capacity_temporal_ratio_threshold", 0.1),
@@ -119,6 +126,33 @@ def build_level_policy(payload: dict[str, Any] | None, *, level_policy_cls: Any,
         refinement_capacity_byzantine_clean_min=as_non_negative_int(
             data.get("refinement_capacity_byzantine_clean_min", 0),
             default=0,
+        ),
+        refinement_operator_torsion_threshold=as_non_negative_float(
+            data.get("refinement_operator_torsion_threshold", 1.0),
+            default=1.0,
+        ),
+        refinement_operator_torsion_guard_enabled=bool(data.get("refinement_operator_torsion_guard_enabled", True)),
+        refinement_operator_history_limit=as_positive_int(
+            data.get("refinement_operator_history_limit", 256),
+            default=256,
+        ),
+        anti_goodhart_enabled=bool(data.get("anti_goodhart_enabled", True)),
+        anti_goodhart_target_signal=str(data.get("anti_goodhart_target_signal", "operator_reuse")),
+        anti_goodhart_min_target_delta=as_non_negative_float(
+            data.get("anti_goodhart_min_target_delta", 0.0),
+            default=0.0,
+        ),
+        anti_goodhart_min_degraded_signals=as_positive_int(
+            data.get("anti_goodhart_min_degraded_signals", 2),
+            default=2,
+        ),
+        anti_goodhart_degradation_epsilon=as_non_negative_float(
+            data.get("anti_goodhart_degradation_epsilon", 0.0),
+            default=0.0,
+        ),
+        anti_goodhart_policy_reaction_enabled=bool(data.get("anti_goodhart_policy_reaction_enabled", True)),
+        anti_goodhart_prefer_runtime_profile=str(
+            data.get("anti_goodhart_prefer_runtime_profile", "stability")
         ),
         runtime_adaptive_signal_event_types=normalize_allowed_event_types(
             data.get("runtime_adaptive_signal_event_types", []),

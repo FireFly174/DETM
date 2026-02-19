@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from detm.runtime.config import DETMConfig
 from detm.runtime.symbols import list_symbols
 from detm_app.config.app_settings import build_runtime_config, build_ui_overrides, load_merged_payload
 from detm_app.config.ui_models import UiRunSettings
@@ -36,7 +37,27 @@ def _sanitize_ui_overrides(overrides: dict[str, Any]) -> dict[str, Any]:
 
 def _build_interactive_settings(*, preset: str, override_path: str | None) -> UiRunSettings:
     payload = load_merged_payload(preset=str(preset), override_path=override_path)
+    level_policy_payload_raw = payload.get("level_policy", {}) if isinstance(payload.get("level_policy"), dict) else {}
     config = build_runtime_config(payload)
+    cfg_payload: dict[str, Any] | None = None
+    if float(getattr(config.level_policy, "refinement_capacity_saturation_band", 0.0)) <= 0.0:
+        # Interactive mode uses clamped dynamics by default; add a soft-cap band
+        # so refinement/capacity-pressure is visible without manual bootstrap.
+        if cfg_payload is None:
+            cfg_payload = dict(config.to_dict())
+        level_policy_payload = dict(cfg_payload.get("level_policy", {}))
+        level_policy_payload["refinement_capacity_saturation_band"] = 0.05
+        cfg_payload["level_policy"] = level_policy_payload
+    if "refinement_capacity_autoclamp_enabled" not in level_policy_payload_raw:
+        # Keep interactive defaults robust for old presets: clamp unreachable
+        # multisignal thresholds unless user explicitly disables it.
+        if cfg_payload is None:
+            cfg_payload = dict(config.to_dict())
+        level_policy_payload = dict(cfg_payload.get("level_policy", {}))
+        level_policy_payload["refinement_capacity_autoclamp_enabled"] = True
+        cfg_payload["level_policy"] = level_policy_payload
+    if cfg_payload is not None:
+        config = DETMConfig.from_dict(cfg_payload)
     ui_payload = payload.get("ui", {}) if isinstance(payload.get("ui"), dict) else {}
     overrides = _sanitize_ui_overrides(build_ui_overrides(ui_payload))
 

@@ -14,7 +14,11 @@ from detm_app.runtime.subscribers.trace import (
     TraceRecorder,
 )
 from detm_app.runtime.subscribers.viz import VizStreamer
-from detm_app.runtime.subscribers.watch import WatchContractWriter, WatchTraceWriter
+from detm_app.runtime.subscribers.watch import (
+    OperatorDecisionWriter,
+    WatchContractWriter,
+    WatchTraceWriter,
+)
 
 __all__ = [
     "ArtifactWriter",
@@ -24,6 +28,7 @@ __all__ = [
     "FieldHistoryRecorder",
     "InvariantTickJsonlWriter",
     "JsonlTraceWriter",
+    "OperatorDecisionWriter",
     "SystemTraceWriter",
     "TraceRecorder",
     "VizStreamer",

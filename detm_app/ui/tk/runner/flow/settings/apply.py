@@ -42,12 +42,15 @@ def apply_runtime_settings(*, settings: Any, runner: Any, controls: TkControlVar
     settings.viz_port = int(controls.viz_port_var.get())
     settings.viz_connect = bool(controls.viz_connect_var.get()) and settings.viz_port > 0
     settings.viz_every_steps = int(controls.viz_every_var.get())
+    settings.learning_view_enabled = bool(controls.learning_view_var.get())
+    settings.learning_window_steps = max(1, int(controls.learning_window_var.get()))
     runner.settings = settings
     if reset:
         runner.reset()
     runner._configure_recording()
     runner._configure_invariants()
     runner._configure_viz()
+    runner._configure_learning()
 
 
 __all__ = ["apply_runtime_settings", "read_invariant_streams"]

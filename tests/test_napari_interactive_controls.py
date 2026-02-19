@@ -34,7 +34,10 @@ def test_build_interactive_settings_applies_ui_overrides_and_forces_local_viz_of
         override_path="config.example.py",
     )
 
-    assert settings.config is cfg
+    assert isinstance(settings.config, DETMConfig)
+    assert int(settings.config.width) == int(cfg.width)
+    assert int(settings.config.height) == int(cfg.height)
+    assert float(settings.config.level_policy.refinement_capacity_saturation_band) == 0.05
     assert int(settings.seed) == 7
     assert int(settings.ticks_per_step) == 11
     assert settings.record_dir == Path("runs/out/ui_demo")

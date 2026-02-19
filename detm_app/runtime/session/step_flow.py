@@ -115,6 +115,10 @@ def run_step(
             profile=str(runtime_profile),
             window_active=bool(runtime_window_active),
         )
+        guard_meta = dict(base_decision.runtime_adaptive_guard)
+        anti_snapshot = session._runtime_anti_goodhart_snapshot()
+        if len(dict(anti_snapshot)) > 0:
+            guard_meta["anti_goodhart"] = dict(anti_snapshot)
         return replace(
             base_decision,
             runtime_adaptive_window_active=bool(runtime_window_active),
@@ -123,6 +127,7 @@ def run_step(
             runtime_adaptive_signal_hits={str(k): bool(v) for k, v in dict(sampled_hits).items()},
             runtime_adaptive_signal_hits_sampled=bool(sampled),
             runtime_adaptive_aggregate=dict(aggregate),
+            runtime_adaptive_guard=dict(guard_meta),
         )
 
     def publish_step_event(
@@ -165,6 +170,12 @@ def run_step(
             policy_decision = replace(policy_decision, observability_profile=adaptive_override)
             hold = max(0, int(base_observability_profile.adaptive_hold_ticks))
             session._adaptive_until_step = max(session._adaptive_until_step, int(session.state.step_count) + hold)
+        session._update_runtime_adaptive_window_from_events(
+            events=list(obs.events),
+            quality=dict(obs.quality),
+            cost=dict(obs.cost),
+            step_after=int(session.state.step_count),
+        )
         publish_step_event(
             publish_influence=influence,
             publish_n_ticks=effective_n_ticks,
@@ -173,12 +184,6 @@ def run_step(
                 base_decision=policy_decision,
                 observables=obs,
             ),
-        )
-        session._update_runtime_adaptive_window_from_events(
-            events=list(obs.events),
-            quality=dict(obs.quality),
-            cost=dict(obs.cost),
-            step_after=int(session.state.step_count),
         )
         return obs
 
@@ -199,6 +204,12 @@ def run_step(
             policy_decision = replace(policy_decision, observability_profile=adaptive_override)
             hold = max(0, int(base_observability_profile.adaptive_hold_ticks))
             session._adaptive_until_step = max(session._adaptive_until_step, int(session.state.step_count) + hold)
+        session._update_runtime_adaptive_window_from_events(
+            events=list(obs.events),
+            quality=dict(obs.quality),
+            cost=dict(obs.cost),
+            step_after=int(session.state.step_count),
+        )
         publish_step_event(
             publish_influence=influence,
             publish_n_ticks=effective_n_ticks,
@@ -207,12 +218,6 @@ def run_step(
                 base_decision=policy_decision,
                 observables=obs,
             ),
-        )
-        session._update_runtime_adaptive_window_from_events(
-            events=list(obs.events),
-            quality=dict(obs.quality),
-            cost=dict(obs.cost),
-            step_after=int(session.state.step_count),
         )
         return obs
 
@@ -239,6 +244,12 @@ def run_step(
             commit_boundary_crossed=bool(chunk_commit_boundary),
             observability_profile=adaptive_profile_active,
         )
+        session._update_runtime_adaptive_window_from_events(
+            events=list(chunk_obs.events),
+            quality=dict(chunk_obs.quality),
+            cost=dict(chunk_obs.cost),
+            step_after=int(step_after),
+        )
         publish_step_event(
             publish_influence=chunk_influence,
             publish_n_ticks=chunk_n_ticks,
@@ -256,12 +267,6 @@ def run_step(
         hold = max(0, int(base_observability_profile.adaptive_hold_ticks))
         session._adaptive_until_step = max(session._adaptive_until_step, int(session.state.step_count) + hold)
     obs = merge_observables(chunked_observables)
-    session._update_runtime_adaptive_window_from_events(
-        events=list(obs.events),
-        quality=dict(obs.quality),
-        cost=dict(obs.cost),
-        step_after=int(session.state.step_count),
-    )
     return obs
 
 

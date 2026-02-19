@@ -35,11 +35,22 @@ class TkRuntimeActionFlow:
         state = self._runner.state
         signature = self._runner.last_observables
         dynamics = self._settings.config.dynamics
+        learning = self._runner.learning_status_compact(max_len=120)
+        requested_backend = f"{self._settings.config.backend}/{self._settings.config.device}"
+        runtime_backend = (
+            str(self._runner.runtime_backend_label())
+            if hasattr(self._runner, "runtime_backend_label")
+            else str(requested_backend)
+        )
+        backend_text = runtime_backend
+        if runtime_backend != requested_backend:
+            backend_text = f"{runtime_backend} (requested={requested_backend})"
         self._status_var.set(
             f"tick={state.step_count}  sig0..3={signature[:4]}  "
-            f"backend={self._settings.config.backend}/{self._settings.config.device}  "
+            f"backend={backend_text}  "
             f"boundary={self._settings.config.boundary}  a,b,k,g,t="
             f"[{dynamics.alpha:.3g},{dynamics.beta:.3g},{dynamics.kappa:.3g},{dynamics.gamma:.3g},{dynamics.lambda_t:.3g}]"
+            f"  {learning}"
         )
 
     def _tick(self) -> None:

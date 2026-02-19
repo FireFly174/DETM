@@ -135,3 +135,39 @@ For systems that want session management, `detm/integrations/runtime_bridge.py` 
 - `create_session(config, seed) -> session_id`
 - `session_step(session_id, influence, n_ticks) -> (signature, observables, state_digest)`
 - `session_get_state_blob(session_id)`
+
+---
+
+## Watch Contract (artifact-first)
+
+`watch_contract.jsonl` is the canonical read-only projection packet (see `detm/runtime/watch_contract.py`):
+- `trace_ref` linkage to System Trace
+- `outerfields_ref` artifact reference
+- `metrics.watchpoints` and `policy` projections
+
+`anti_goodhart` is now a formalized sub-contract in both:
+- `policy.anti_goodhart`
+- `metrics.watchpoints.anti_goodhart`
+
+Normalized fields:
+- `goodhart_flag: bool`
+- `target_signal: str`
+- `target_delta: float`
+- `degraded_signals: list[str]`
+- `degraded_signal_count: int`
+- `thresholds.target_signal: str`
+- `thresholds.min_target_delta: float`
+- `thresholds.min_degraded_signals: int`
+- `thresholds.degradation_epsilon: float`
+- `policy_reaction.apply: bool`
+- `policy_reaction.actions: list[str]`
+- `policy_reaction_enabled: bool`
+- `preferred_runtime_profile: str`
+- `runtime_profile_applied: bool`
+- `applicability: str`
+
+Flattened watchpoint mirrors (for quick consumers):
+- `anti_goodhart_flag`
+- `anti_goodhart_degraded_signal_count`
+- `anti_goodhart_policy_reaction_applied`
+- `anti_goodhart_runtime_profile_applied`

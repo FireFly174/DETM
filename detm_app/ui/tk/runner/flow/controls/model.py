@@ -46,6 +46,12 @@ class TkControlVars:
     viz_port_var: Any
     viz_connect_var: Any
     viz_every_var: Any
+    learn_refinement_var: Any
+    learn_runtime_events_var: Any
+    learn_adaptive_hold_var: Any
+    learn_anti_goodhart_var: Any
+    learning_view_var: Any
+    learning_window_var: Any
     ui_mode_var: Any
     status_var: Any
 

@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from detm_app.ui.napari.interactive.flow.graph import available_graph_series_ids
+
 
 def add_view_page(controller: Any, *, QtWidgets: Any, settings: Any) -> None:
     self = controller
@@ -85,6 +87,77 @@ def add_view_page(controller: Any, *, QtWidgets: Any, settings: Any) -> None:
     self._autoscale_check = QtWidgets.QCheckBox("autoscale")
     self._autoscale_check.setChecked(bool(self._autoscale))
     lay_view.addWidget(self._autoscale_check)
+
+    self._graph_enabled = QtWidgets.QCheckBox("graphs_enabled")
+    self._graph_enabled.setChecked(bool(getattr(settings, "graph_enabled", True)))
+    lay_view.addWidget(self._graph_enabled)
+
+    known_series = ",".join(available_graph_series_ids())
+    graph_tooltip = (
+        f"Available: {known_series}\n"
+        "Preset runtime: event_count,influence_count,cpu_time_ms,energy_mean,tau_mean\n"
+        "Preset refinement: refinement_count,decision_count,operator_reuse,transferability\n"
+        "Preset stability: energy_var,energy_std,energy_range,oscillation_score\n"
+        "Preset legacy: A_t,P_t,T_t,n_peaks\n"
+        "Preset freeze+A3: freeze_mean,locked_frac,a3_plv_mean,a3_var_mean"
+    )
+    _, self._graph_series = self._line(
+        label="graph_series(csv)",
+        value=str(getattr(settings, "graph_series", "")),
+        parent_layout=lay_view,
+        tooltip=graph_tooltip,
+    )
+
+    self._graph_window = QtWidgets.QSpinBox()
+    self._graph_window.setRange(16, 100000)
+    self._graph_window.setValue(int(getattr(settings, "graph_window_steps", 256)))
+    row_graph_window = QtWidgets.QHBoxLayout()
+    row_graph_window.addWidget(QtWidgets.QLabel("graph_window_steps"))
+    row_graph_window.addWidget(self._graph_window)
+    lay_view.addLayout(row_graph_window)
+
+    self._graph_hist_enabled = QtWidgets.QCheckBox("graph_hist_enabled")
+    self._graph_hist_enabled.setChecked(bool(getattr(settings, "graph_hist_enabled", True)))
+    lay_view.addWidget(self._graph_hist_enabled)
+
+    self._graph_hist_bins = QtWidgets.QSpinBox()
+    self._graph_hist_bins.setRange(4, 512)
+    self._graph_hist_bins.setValue(int(getattr(settings, "graph_hist_bins", 48)))
+    row_graph_bins = QtWidgets.QHBoxLayout()
+    row_graph_bins.addWidget(QtWidgets.QLabel("graph_hist_bins"))
+    row_graph_bins.addWidget(self._graph_hist_bins)
+    lay_view.addLayout(row_graph_bins)
+
+    self._anchor_overlay_enabled = QtWidgets.QCheckBox("anchor_overlay_enabled")
+    self._anchor_overlay_enabled.setChecked(bool(getattr(settings, "anchor_overlay_enabled", True)))
+    lay_view.addWidget(self._anchor_overlay_enabled)
+
+    self._anchor_top_k = QtWidgets.QSpinBox()
+    self._anchor_top_k.setRange(1, 256)
+    self._anchor_top_k.setValue(int(getattr(settings, "anchor_top_k", 8)))
+    row_anchor_top_k = QtWidgets.QHBoxLayout()
+    row_anchor_top_k.addWidget(QtWidgets.QLabel("anchor_top_k"))
+    row_anchor_top_k.addWidget(self._anchor_top_k)
+    lay_view.addLayout(row_anchor_top_k)
+
+    self._anchor_threshold = QtWidgets.QDoubleSpinBox()
+    self._anchor_threshold.setRange(0.0, 10.0)
+    self._anchor_threshold.setDecimals(3)
+    self._anchor_threshold.setSingleStep(0.05)
+    self._anchor_threshold.setValue(float(getattr(settings, "anchor_threshold", 0.8)))
+    row_anchor_threshold = QtWidgets.QHBoxLayout()
+    row_anchor_threshold.addWidget(QtWidgets.QLabel("anchor_threshold"))
+    row_anchor_threshold.addWidget(self._anchor_threshold)
+    lay_view.addLayout(row_anchor_threshold)
+
+    self._anchor_capture_ticks = QtWidgets.QSpinBox()
+    self._anchor_capture_ticks.setRange(1, 1000)
+    self._anchor_capture_ticks.setValue(int(getattr(settings, "anchor_capture_ticks", 4)))
+    row_anchor_capture = QtWidgets.QHBoxLayout()
+    row_anchor_capture.addWidget(QtWidgets.QLabel("anchor_capture_ticks"))
+    row_anchor_capture.addWidget(self._anchor_capture_ticks)
+    lay_view.addLayout(row_anchor_capture)
+
     lay_view.addStretch(1)
     self._toolbox.addItem(page_view, "View & Run")
 

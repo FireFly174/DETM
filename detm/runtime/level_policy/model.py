@@ -108,7 +108,9 @@ class LevelPolicy:
     allow_refinement: bool = True
     refinement_capacity_overflow_ratio_threshold: float = 0.15
     refinement_capacity_overflow_mean_threshold: float = 0.5
+    refinement_capacity_saturation_band: float = 0.0
     refinement_capacity_min_signals: int = 1
+    refinement_capacity_autoclamp_enabled: bool = False
     refinement_capacity_temporal_ratio_threshold: float = 0.1
     refinement_capacity_temporal_window: int = 4
     refinement_capacity_temporal_required_hits: int = 3
@@ -124,6 +126,16 @@ class LevelPolicy:
     refinement_capacity_attestation_validator_ids: Tuple[str, ...] = tuple()
     refinement_capacity_attestation_min_coverage: float = 0.0
     refinement_capacity_byzantine_clean_min: int = 0
+    refinement_operator_torsion_threshold: float = 1.0
+    refinement_operator_torsion_guard_enabled: bool = True
+    refinement_operator_history_limit: int = 256
+    anti_goodhart_enabled: bool = True
+    anti_goodhart_target_signal: str = "operator_reuse"
+    anti_goodhart_min_target_delta: float = 0.0
+    anti_goodhart_min_degraded_signals: int = 2
+    anti_goodhart_degradation_epsilon: float = 0.0
+    anti_goodhart_policy_reaction_enabled: bool = True
+    anti_goodhart_prefer_runtime_profile: str = "stability"
     runtime_adaptive_signal_event_types: Tuple[str, ...] = tuple()
     runtime_adaptive_min_signals: int = 1
     runtime_adaptive_quality_oscillation_threshold: float = 0.0

@@ -7,6 +7,7 @@ from detm_app import (
     DetmSession,
     EventBus,
     JsonlTraceWriter,
+    OperatorDecisionWriter,
     TickRunner,
     TickScheduler,
     parse_invariant_streams,
@@ -41,3 +42,4 @@ def test_detm_app_shim_exports_parse_invariant_streams():
 def test_detm_app_shim_exports_subscribers():
     assert JsonlTraceWriter is not None
     assert CommitJsonlWriter is not None
+    assert OperatorDecisionWriter is not None

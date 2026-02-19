@@ -54,21 +54,49 @@ def build_overflow_event(
 ) -> Dict[str, object]:
     capacity_signal_ratio = bool(context.overflow_ratio >= float(context.capacity_ratio_threshold))
     capacity_signal_mean = bool(context.overflow_mean >= float(context.capacity_mean_threshold))
-    secondary_required = max(0, int(max(1, int(context.capacity_min_signals)) - 1))
-    secondary_hits = (
-        int(1 if capacity_signal_mean else 0)
-        + int(1 if context.temporal_signal else 0)
-        + int(1 if correction.capacity_signal_learned else 0)
-        + int(1 if context.cross_level_signal else 0)
-        + int(1 if context.operator_signal else 0)
-        + int(1 if context.cross_node_signal else 0)
-        + int(1 if context.distributed_signal else 0)
-        + int(1 if context.signed_signal else 0)
-        + int(1 if context.consensus_signal else 0)
-        + int(1 if context.cryptographic_signal else 0)
-        + int(1 if context.attestation_signal else 0)
-        + int(1 if context.byzantine_signal else 0)
-    )
+    secondary_signal_passed: Dict[str, bool] = {
+        "overflow_mean": bool(capacity_signal_mean),
+        "temporal_sustained": bool(context.temporal_signal),
+        "learned_reuse": bool(correction.capacity_signal_learned),
+        "cross_level": bool(context.cross_level_signal),
+        "operator_signal": bool(context.operator_signal),
+        "cross_node": bool(context.cross_node_signal),
+        "distributed_quorum": bool(context.distributed_signal),
+        "signed_ack_evidence": bool(context.signed_signal),
+        "consensus_grade": bool(context.consensus_signal),
+        "cryptographic_grade": bool(context.cryptographic_signal),
+        "attestation_grade": bool(context.attestation_signal),
+        "byzantine_grade": bool(context.byzantine_signal),
+    }
+    secondary_signal_enabled: Dict[str, bool] = {
+        "overflow_mean": True,
+        "temporal_sustained": True,
+        "learned_reuse": bool(int(correction.learned_hits_threshold) > 0),
+        "cross_level": bool(
+            int(context.cross_level_min_levels) <= 1 or int(context.cross_level_unique_count) > 1
+        ),
+        "operator_signal": bool(float(context.operator_score_threshold) <= 0.0 or float(context.operator_score) > 0.0),
+        "cross_node": bool(
+            int(context.cross_node_hits) > 0
+            or bool(context.cross_node_replay_failed)
+            or bool(context.cross_node_delivery_rejected)
+            or bool(context.cross_node_delivery_pending)
+        ),
+        "distributed_quorum": bool(int(context.distributed_accepted_min) > 0),
+        "signed_ack_evidence": bool(int(context.signed_acks_min) > 0),
+        "consensus_grade": bool(int(context.consensus_accepted_min) > 0),
+        "cryptographic_grade": bool(float(context.crypto_validator_coverage_min) > 0.0),
+        "attestation_grade": bool(
+            float(context.attestation_min_coverage) > 0.0 and len(list(context.attestation_required_ids)) > 0
+        ),
+        "byzantine_grade": bool(int(context.byzantine_clean_min) > 0),
+    }
+    secondary_required_raw = max(0, int(max(1, int(context.capacity_min_signals)) - 1))
+    secondary_possible = int(sum(1 for _name, enabled in secondary_signal_enabled.items() if bool(enabled)))
+    secondary_required = int(secondary_required_raw)
+    if bool(context.capacity_autoclamp_enabled):
+        secondary_required = int(min(secondary_required_raw, secondary_possible))
+    secondary_hits = int(sum(1 for _name, passed in secondary_signal_passed.items() if bool(passed)))
     capacity_triggered = bool(capacity_signal_ratio and secondary_hits >= secondary_required)
 
     event: Dict[str, object] = {
@@ -86,8 +114,13 @@ def build_overflow_event(
         "detector_capacity_ratio_threshold": float(context.capacity_ratio_threshold),
         "detector_overflow_mean": float(context.overflow_mean),
         "detector_capacity_mean_threshold": float(context.capacity_mean_threshold),
+        "detector_capacity_saturation_band": float(context.capacity_saturation_band),
         "detector_capacity_min_signals": int(context.capacity_min_signals),
+        "detector_capacity_autoclamp_enabled": bool(context.capacity_autoclamp_enabled),
+        "detector_capacity_secondary_possible": int(secondary_possible),
+        "detector_capacity_secondary_required_raw": int(secondary_required_raw),
         "detector_capacity_secondary_required": int(secondary_required),
+        "detector_capacity_secondary_clamped": bool(secondary_required != secondary_required_raw),
         "detector_capacity_secondary_hits": int(secondary_hits),
         "detector_capacity_learned_hits_threshold": int(correction.learned_hits_threshold),
         "detector_capacity_learned_hits": int(correction.learned_hits),
@@ -122,6 +155,7 @@ def build_overflow_event(
             "overflow_mean": {
                 "value": float(context.overflow_mean),
                 "threshold": float(context.capacity_mean_threshold),
+                "enabled": bool(secondary_signal_enabled["overflow_mean"]),
                 "passed": bool(capacity_signal_mean),
             },
             "temporal_sustained": {
@@ -130,11 +164,13 @@ def build_overflow_event(
                 "window": int(context.temporal_window),
                 "history_length": int(context.temporal_history_len),
                 "ratio_threshold": float(context.temporal_ratio_threshold),
+                "enabled": bool(secondary_signal_enabled["temporal_sustained"]),
                 "passed": bool(context.temporal_signal),
             },
             "learned_reuse": {
                 "value": int(correction.learned_hits),
                 "threshold": int(correction.learned_hits_threshold),
+                "enabled": bool(secondary_signal_enabled["learned_reuse"]),
                 "passed": bool(correction.capacity_signal_learned),
                 "reused": bool(correction.reused),
             },
@@ -143,11 +179,13 @@ def build_overflow_event(
                 "threshold": int(context.cross_level_min_levels),
                 "window": int(context.cross_level_window),
                 "levels": list(context.cross_level_unique),
+                "enabled": bool(secondary_signal_enabled["cross_level"]),
                 "passed": bool(context.cross_level_signal),
             },
             "operator_signal": {
                 "value": float(context.operator_score),
                 "threshold": float(context.operator_score_threshold),
+                "enabled": bool(secondary_signal_enabled["operator_signal"]),
                 "passed": bool(context.operator_signal),
             },
             "cross_node": {
@@ -156,16 +194,19 @@ def build_overflow_event(
                 "replay_failed": bool(context.cross_node_replay_failed),
                 "delivery_rejected": bool(context.cross_node_delivery_rejected),
                 "delivery_pending": bool(context.cross_node_delivery_pending),
+                "enabled": bool(secondary_signal_enabled["cross_node"]),
                 "passed": bool(context.cross_node_signal),
             },
             "distributed_quorum": {
                 "value": int(context.distributed_accepted),
                 "threshold": int(context.distributed_accepted_min),
+                "enabled": bool(secondary_signal_enabled["distributed_quorum"]),
                 "passed": bool(context.distributed_signal),
             },
             "signed_ack_evidence": {
                 "value": int(context.signed_acks),
                 "threshold": int(context.signed_acks_min),
+                "enabled": bool(secondary_signal_enabled["signed_ack_evidence"]),
                 "passed": bool(context.signed_signal),
             },
             "consensus_grade": {
@@ -173,17 +214,20 @@ def build_overflow_event(
                 "threshold": int(context.consensus_accepted_min),
                 "pending_count": int(context.consensus_pending),
                 "rejected_count": int(context.consensus_rejected),
+                "enabled": bool(secondary_signal_enabled["consensus_grade"]),
                 "passed": bool(context.consensus_signal),
             },
             "cryptographic_grade": {
                 "value": float(context.crypto_validator_coverage),
                 "threshold": float(context.crypto_validator_coverage_min),
+                "enabled": bool(secondary_signal_enabled["cryptographic_grade"]),
                 "passed": bool(context.cryptographic_signal),
             },
             "attestation_grade": {
                 "value": float(context.attestation_coverage),
                 "threshold": float(context.attestation_min_coverage),
                 "validator_ids": list(context.attestation_required_ids),
+                "enabled": bool(secondary_signal_enabled["attestation_grade"]),
                 "passed": bool(context.attestation_signal),
             },
             "byzantine_grade": {
@@ -193,6 +237,7 @@ def build_overflow_event(
                 "rejected_count": int(context.consensus_rejected),
                 "replay_failed": bool(context.cross_node_replay_failed),
                 "delivery_rejected": bool(context.cross_node_delivery_rejected),
+                "enabled": bool(secondary_signal_enabled["byzantine_grade"]),
                 "passed": bool(context.byzantine_signal),
             },
         },
@@ -205,6 +250,32 @@ def build_overflow_event(
             "energy_l2_delta": float(correction.energy_l2_delta),
             "overflow_count_before": int(correction.overflow_count_before),
             "overflow_count_after": int(correction.overflow_count_after),
+        },
+        "operator": {
+            "id": str(correction.operator_id),
+            "source": str(correction.operator_source),
+            "selection": {
+                "rule": str(correction.operator_selection_rule),
+                "reason": str(correction.operator_selection_reason),
+            },
+            "scope": {
+                "level": str(context.active_level_name),
+                "mode": str(context.pattern_mode_name),
+            },
+            "hits_before": int(correction.operator_hits_before),
+            "hits_after": int(correction.operator_hits_after),
+            "score": float(correction.operator_score),
+            "accepted": True,
+            "blend": float(correction.blend),
+            "contract": {
+                "type": "discrete_torsion_v1",
+                "commutator_proxy": float(correction.operator_commutator_proxy),
+                "torsion_score": float(correction.operator_torsion_score),
+                "torsion_threshold": float(correction.operator_torsion_threshold),
+                "torsion_flag": bool(correction.operator_torsion_flag),
+                "compatible": bool(correction.operator_contract_compatible),
+                "scope_changed": bool(correction.operator_scope_changed),
+            },
         },
     }
 

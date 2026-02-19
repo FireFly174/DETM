@@ -14,6 +14,7 @@ from detm_app.runtime.subscribers import (
     CommitValidationReporter,
     InvariantTickJsonlWriter,
     JsonlTraceWriter,
+    OperatorDecisionWriter,
     TraceRecorder,
     WatchContractWriter,
     WatchTraceWriter,
@@ -59,6 +60,7 @@ def attach_core_subscribers(
     if bool(config.watch_trace_enabled):
         watch_policy = storage_policy(config=config, level_name=level_name, artifact="watch_trace")
         watch_contract_policy = storage_policy(config=config, level_name=level_name, artifact="watch_contract")
+        operator_decisions_policy = storage_policy(config=config, level_name=level_name, artifact="operator_decisions")
         outerfields_policy = storage_policy(config=config, level_name=level_name, artifact="outerfields")
         WatchTraceWriter.attach(
             session.bus,
@@ -76,6 +78,12 @@ def attach_core_subscribers(
             compaction_budget=int(watch_contract_policy.get("compaction_budget", 0)),
             outerfields_retention_window=int(outerfields_policy.get("retention_window", 0)),
             outerfields_compaction_budget=int(outerfields_policy.get("compaction_budget", 0)),
+        )
+        OperatorDecisionWriter.attach(
+            session.bus,
+            out_dir / "operator_decisions.jsonl",
+            retention_window=int(operator_decisions_policy.get("retention_window", 0)),
+            compaction_budget=int(operator_decisions_policy.get("compaction_budget", 0)),
         )
 
     commits_policy = storage_policy(config=config, level_name=level_name, artifact="commits")

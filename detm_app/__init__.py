@@ -56,6 +56,7 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "FieldHistoryRecorder": ("detm_app.runtime.subscribers", "FieldHistoryRecorder"),
     "InvariantTickJsonlWriter": ("detm_app.runtime.subscribers", "InvariantTickJsonlWriter"),
     "JsonlTraceWriter": ("detm_app.runtime.subscribers", "JsonlTraceWriter"),
+    "OperatorDecisionWriter": ("detm_app.runtime.subscribers", "OperatorDecisionWriter"),
     "SystemTraceWriter": ("detm_app.runtime.subscribers", "SystemTraceWriter"),
     "TraceRecorder": ("detm_app.runtime.subscribers", "TraceRecorder"),
     "VizStreamer": ("detm_app.runtime.subscribers", "VizStreamer"),
