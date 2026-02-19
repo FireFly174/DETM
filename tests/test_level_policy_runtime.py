@@ -56,7 +56,9 @@ def test_level_policy_roundtrip_and_schema_registry():
             allow_refinement=True,
             refinement_capacity_overflow_ratio_threshold=0.2,
             refinement_capacity_overflow_mean_threshold=0.35,
+            refinement_capacity_saturation_band=0.05,
             refinement_capacity_min_signals=2,
+            refinement_capacity_autoclamp_enabled=True,
             refinement_capacity_temporal_ratio_threshold=0.12,
             refinement_capacity_temporal_window=5,
             refinement_capacity_temporal_required_hits=3,
@@ -72,6 +74,16 @@ def test_level_policy_roundtrip_and_schema_registry():
             refinement_capacity_attestation_validator_ids=("validator-1", "validator-2"),
             refinement_capacity_attestation_min_coverage=1.0,
             refinement_capacity_byzantine_clean_min=2,
+            refinement_operator_torsion_threshold=1.5,
+            refinement_operator_torsion_guard_enabled=False,
+            refinement_operator_history_limit=64,
+            anti_goodhart_enabled=False,
+            anti_goodhart_target_signal="hold_rate",
+            anti_goodhart_min_target_delta=0.05,
+            anti_goodhart_min_degraded_signals=3,
+            anti_goodhart_degradation_epsilon=0.01,
+            anti_goodhart_policy_reaction_enabled=False,
+            anti_goodhart_prefer_runtime_profile="throughput",
             runtime_adaptive_signal_event_types=("refinement",),
             runtime_adaptive_min_signals=2,
             runtime_adaptive_quality_oscillation_threshold=0.2,
@@ -122,7 +134,9 @@ def test_level_policy_roundtrip_and_schema_registry():
     assert restored.level_policy.audit_commit_stride == 9
     assert restored.level_policy.refinement_capacity_overflow_ratio_threshold == 0.2
     assert restored.level_policy.refinement_capacity_overflow_mean_threshold == 0.35
+    assert restored.level_policy.refinement_capacity_saturation_band == 0.05
     assert restored.level_policy.refinement_capacity_min_signals == 2
+    assert restored.level_policy.refinement_capacity_autoclamp_enabled is True
     assert restored.level_policy.refinement_capacity_temporal_ratio_threshold == 0.12
     assert restored.level_policy.refinement_capacity_temporal_window == 5
     assert restored.level_policy.refinement_capacity_temporal_required_hits == 3
@@ -138,6 +152,16 @@ def test_level_policy_roundtrip_and_schema_registry():
     assert restored.level_policy.refinement_capacity_attestation_validator_ids == ("validator-1", "validator-2")
     assert restored.level_policy.refinement_capacity_attestation_min_coverage == 1.0
     assert restored.level_policy.refinement_capacity_byzantine_clean_min == 2
+    assert restored.level_policy.refinement_operator_torsion_threshold == 1.5
+    assert restored.level_policy.refinement_operator_torsion_guard_enabled is False
+    assert restored.level_policy.refinement_operator_history_limit == 64
+    assert restored.level_policy.anti_goodhart_enabled is False
+    assert restored.level_policy.anti_goodhart_target_signal == "hold_rate"
+    assert restored.level_policy.anti_goodhart_min_target_delta == 0.05
+    assert restored.level_policy.anti_goodhart_min_degraded_signals == 3
+    assert restored.level_policy.anti_goodhart_degradation_epsilon == 0.01
+    assert restored.level_policy.anti_goodhart_policy_reaction_enabled is False
+    assert restored.level_policy.anti_goodhart_prefer_runtime_profile == "throughput"
     assert restored.level_policy.runtime_adaptive_signal_event_types == ("refinement",)
     assert restored.level_policy.runtime_adaptive_min_signals == 2
     assert restored.level_policy.runtime_adaptive_quality_oscillation_threshold == 0.2
@@ -191,12 +215,14 @@ def test_level_policy_roundtrip_and_schema_registry():
     commits_l2_policy = restored.resolve_artifact_storage_policy(artifact="commits", level="L2")
     default_policy = restored.resolve_artifact_storage_policy(artifact="fabric_acks", level="L3")
     fallback_policy = restored.resolve_artifact_storage_policy(artifact="watch_trace", level="L0")
+    operator_decisions_policy = restored.resolve_artifact_storage_policy(artifact="operator_decisions", level="L0")
     assert trace_policy == {"retention_window": 5, "compaction_budget": 3}
     assert commits_policy == {"retention_window": 7, "compaction_budget": 0}
     assert trace_l2_policy == {"retention_window": 9, "compaction_budget": 1}
     assert commits_l2_policy == {"retention_window": 7, "compaction_budget": 0}
     assert default_policy == {"retention_window": 4, "compaction_budget": 2}
     assert fallback_policy == {"retention_window": 16, "compaction_budget": 8}
+    assert operator_decisions_policy == {"retention_window": 16, "compaction_budget": 8}
     assert get_schema_versions()["level_policy"] == DETM_LEVEL_POLICY_V1
 
 
@@ -450,6 +476,64 @@ def test_level_policy_runtime_adaptive_telemetry_sampling_and_aggregation(tmp_pa
     assert dict(second_policy.get("runtime_adaptive_signal_hits", {})) == {}
     second_agg = dict(second_policy.get("runtime_adaptive_aggregate", {}))
     assert int(second_agg.get("window_size", 0)) >= 2
+
+
+def test_level_policy_anti_goodhart_reaction_applies_runtime_profile_hint(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=11,
+        height=11,
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        level_policy=LevelPolicy(
+            allow_refinement=True,
+            microsteps_per_global_tick=1,
+            batch_size=1,
+            commit_stride=1,
+            refinement_operator_torsion_threshold=0.0,
+            refinement_operator_torsion_guard_enabled=False,
+            anti_goodhart_enabled=True,
+            anti_goodhart_target_signal="operator_reuse",
+            anti_goodhart_min_target_delta=0.0,
+            anti_goodhart_min_degraded_signals=2,
+            anti_goodhart_policy_reaction_enabled=True,
+            anti_goodhart_prefer_runtime_profile="throughput",
+            runtime_adaptive_signal_event_types=("attractor",),
+            runtime_adaptive_auto_profile=True,
+            runtime_adaptive_stability_microsteps_delta=2,
+            runtime_adaptive_stability_batch_size_delta=0,
+            runtime_adaptive_stability_commit_stride_delta=0,
+            runtime_adaptive_throughput_microsteps_delta=1,
+            runtime_adaptive_throughput_batch_size_delta=0,
+            runtime_adaptive_throughput_commit_stride_delta=0,
+            runtime_adaptive_hold_ticks=1,
+        ),
+    )
+    session = DetmSession.create(cfg, seed=62)
+    trace_path = tmp_path / "trace.jsonl"
+    JsonlTraceWriter.attach(session.bus, trace_path, metric_plugins=[])
+
+    _seed_overflow_hotspot(session)
+    session.step(None, 1, rng=session.state.restore_rng())  # seed operator history
+    _seed_overflow_hotspot(session)
+    session.step(None, 1, rng=session.state.restore_rng())  # reuse + torsion pressure -> anti-goodhart
+    session.step(None, 1, rng=session.state.restore_rng())  # runtime profile hint should apply
+    session.close()
+
+    assert int(session.state.step_count) == 4
+    entries = [json.loads(line) for line in trace_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    anti_rows = [
+        dict(dict(dict(entry.get("policy", {})).get("runtime_adaptive_guard", {})).get("anti_goodhart", {}))
+        for entry in entries
+    ]
+    assert any(bool(row.get("goodhart_flag")) for row in anti_rows)
+    assert any(bool(row.get("runtime_profile_applied")) for row in anti_rows)
+    assert any(str(row.get("preferred_runtime_profile", "")) == "throughput" for row in anti_rows)
+
+    adaptive_entries = [dict(entry.get("policy", {})) for entry in entries if int(entry.get("tick", 0)) >= 3]
+    assert any(bool(policy.get("runtime_adaptive_window_active")) for policy in adaptive_entries)
+    assert any(str(policy.get("runtime_adaptive_profile", "")) == "throughput" for policy in adaptive_entries)
 
 
 def test_level_policy_runtime_adaptive_respects_min_signal_threshold():

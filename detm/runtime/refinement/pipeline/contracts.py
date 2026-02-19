@@ -21,7 +21,9 @@ class DetectionContext:
     overflow_score: np.ndarray
     capacity_ratio_threshold: float
     capacity_mean_threshold: float
+    capacity_saturation_band: float
     capacity_min_signals: int
+    capacity_autoclamp_enabled: bool
     temporal_ratio_threshold: float
     temporal_window: int
     temporal_required_hits: int
@@ -101,6 +103,19 @@ class OverflowCorrectionResult:
     overflow_count_before: int
     overflow_count_after: int
     pattern_key: str | None
+    operator_id: str
+    operator_source: str
+    operator_hits_before: int
+    operator_hits_after: int
+    operator_score: float
+    operator_commutator_proxy: float
+    operator_torsion_score: float
+    operator_torsion_threshold: float
+    operator_torsion_flag: bool
+    operator_contract_compatible: bool
+    operator_scope_changed: bool
+    operator_selection_rule: str
+    operator_selection_reason: str
     reused: bool
     learned_hits: int
     learned_hits_threshold: int

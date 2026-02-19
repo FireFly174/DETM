@@ -133,8 +133,11 @@ class DetmVizPanel:
         self.canvas = tk.Canvas(tab_field, bg="#000000", highlightthickness=1)
         self.canvas.grid(row=0, column=0, sticky="nsew")
 
-        # --- Graph tab (пока просто заглушка, но место готово) ---
-        ttk.Label(tab_plot, text="(Graph view: TODO) ").grid(row=0, column=0, sticky="nw", padx=8, pady=8)
+        # Graph tab: show runtime learning/readout summary.
+        tab_plot.rowconfigure(0, weight=1)
+        tab_plot.columnconfigure(0, weight=1)
+        self.learning_text = tk.Text(tab_plot, height=14, wrap="word", state="disabled")
+        self.learning_text.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
 
         self.canvas.bind("<Configure>", self._on_canvas_configure, add=True)
 
@@ -163,6 +166,18 @@ class DetmVizPanel:
 
     def _draw_quiver(self, arr: np.ndarray) -> None:
         _flow.draw_quiver(self, arr)
+
+    def update_learning_text(self, text: str) -> None:
+        payload = str(text or "")
+        if not hasattr(self, "learning_text"):
+            return
+        try:
+            self.learning_text.configure(state="normal")
+            self.learning_text.delete("1.0", "end")
+            self.learning_text.insert("1.0", payload.rstrip() + "\n")
+            self.learning_text.configure(state="disabled")
+        except Exception:
+            return
 
     def update_from_state_blob(self, *, state_blob: bytes, tick: int, signature: Optional[list[float]] = None) -> None:
         state = deserialize_state(state_blob)

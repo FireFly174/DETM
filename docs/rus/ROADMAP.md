@@ -385,6 +385,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: trace/readout with operator decisions.
 - `risks`: накопление шумовых операторов.
 - `dod`: операторы копятся и переиспользуются в reproducible runtime path.
+- `readout` (2026-02-16): введён явный operator-decision contract в refinement event (`operator.id/source/selection/scope/hits/score/accepted`) и baseline совместимости `discrete_torsion_v1` (`commutator_proxy`, `torsion_score`, `torsion_flag`, `compatible`); `operator_capacity_signal_score` теперь вычисляется из фактических `hits/reuse` runtime-пути, а не только из внешнего override; добавлено rule-based selection (`torsion_guard_v1`, причина выбора в event) и bounded runtime persistence (`operator_decision_history`, max 256) для replay/analysis; параметры selection/persistence вынесены в `LevelPolicy` (`refinement_operator_torsion_threshold`, `refinement_operator_torsion_guard_enabled`, `refinement_operator_history_limit`) и протянуты в runtime; добавлен отдельный artifact-first поток `operator_decisions.jsonl` (`trace_ref`, `decision_count/summary`, policy-aware retention через `artifact_storage_policy.operator_decisions`); в `watch_contract` добавлены агрегаты `operator_decision_count/operator_reuse_count/operator_search_count/operator_reuse_rate/operator_torsion_guard_block_count/operator_torsion_flag_count/operator_torsion_score_mean`; покрыто тестами `tests/test_operator_decision_writer.py`, `tests/test_artifact_storage_policy.py`, `tests/test_level_policy_runtime.py`, `tests/test_pattern_memory.py`, `tests/test_refinement_mvp.py`, `tests/test_refinement_operator_contract.py`, `tests/test_watch_contract_writer.py`.
 
 ### F-02 — Переносимость операторов
 
@@ -402,11 +403,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: metrics reports по `hold_rate/operator_reuse/transferability`.
 - `risks`: Goodhart на одном показателе.
 - `dod`: переносимость измерима и не сводится к единичному KPI.
+- `readout` (2026-02-16): в `operator_decisions.jsonl` добавлена portability-панель (`hold_rate`, `operator_reuse`, `transferability` + counts) с накоплением по runtime-потоку; для панели введён формальный acceptance-gate (`thresholds` + `acceptance.passed/failed_signals`), где baseline cross-regime сценарий (`portable` vs `strict`) покрыт в `tests/test_operator_portability_panel.py`; поток подключён в headless/UI subscribers и подчиняется `artifact_storage_policy.operator_decisions`.
 
 ### F-03 — Anti-Goodhart readout и `goodhart_flag`
 
 - `id`: `F-03`
-- `status`: `todo`
+- `status`: `in_progress`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-12`
@@ -419,6 +421,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: readout panel snapshots + trace policy events.
 - `risks`: шумные сигналы и переалертинг.
 - `dod`: flag срабатывает по формализованным правилам и покрыт тестами.
+- `readout` (2026-02-16): в portability-панель `operator_decisions.jsonl` добавлен multi-signal anti-Goodhart блок (`anti_goodhart`) с формализованным правилом `goodhart_flag=(d_target>0) and (degraded_signals>=2)` для `target=operator_reuse`; учитываются деградации `hold_rate/transferability/torsion_health`, публикуются `target_delta`, `degraded_signals`, `policy_reaction` (`downweight_target_signal`, `enable_extended_outerfields_audit`, profile-hint) и applicability (`cold_start|runtime_panel|disabled`); anti-Goodhart поведение стало policy-driven через `LevelPolicy` knobs (`anti_goodhart_enabled`, `anti_goodhart_target_signal`, `anti_goodhart_min_target_delta`, `anti_goodhart_min_degraded_signals`, `anti_goodhart_degradation_epsilon`, `anti_goodhart_policy_reaction_enabled`, `anti_goodhart_prefer_runtime_profile`) и теперь реакция реально влияет на runtime-adaptive контур (`session._runtime_adaptive_profile/window`) при `policy_reaction.apply=true`; anti-Goodhart snapshot также экспортируется в `watch_trace/watch_contract` (`policy.anti_goodhart` + `watchpoints.anti_goodhart*`) и формализован typed readout-контрактом `AntiGoodhartSnapshot/AntiGoodhartReaction` в `detm/runtime/watch_contract.py`; добавлены тесты детекции/ложных срабатываний `tests/test_operator_anti_goodhart.py`, policy wiring `tests/test_operator_decision_writer.py`, runtime reaction scenario `tests/test_level_policy_runtime.py`, watch trace/contract checks `tests/test_system_watch_trace.py`, `tests/test_watch_contract_writer.py`, typed contract checks `tests/test_watch_contract_anti_goodhart.py` и интеграционный smoke `tests/test_operator_portability_panel.py`.
 
 ### G-ND-01 — Эволюция `DETMState` к `shape[N]`
 

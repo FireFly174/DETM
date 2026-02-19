@@ -28,6 +28,7 @@ def test_l0_artifact_storage_policy_applies_to_streaming_artifacts(tmp_path):
                 "history": {"retention_window": 3, "compaction_budget": 0},
                 "watch_trace": {"retention_window": 5, "compaction_budget": 3},
                 "watch_contract": {"retention_window": 5, "compaction_budget": 3},
+                "operator_decisions": {"retention_window": 5, "compaction_budget": 3},
                 "outerfields": {"retention_window": 4, "compaction_budget": 2},
                 "commits": {"retention_window": 2, "compaction_budget": 0},
                 "commits_audit": {"retention_window": 1, "compaction_budget": 0},
@@ -57,6 +58,7 @@ def test_l0_artifact_storage_policy_applies_to_streaming_artifacts(tmp_path):
     history_entries = _read_jsonl(out_dir / "history.jsonl")
     watch_entries = _read_jsonl(out_dir / "watch_trace.jsonl")
     watch_contract_entries = _read_jsonl(out_dir / "watch_contract.jsonl")
+    operator_decision_entries = _read_jsonl(out_dir / "operator_decisions.jsonl")
     commits_entries = _read_jsonl(out_dir / "commits.jsonl")
     commits_audit_entries = _read_jsonl(out_dir / "commits_audit.jsonl")
     invariant_entries = _read_jsonl(out_dir / "invariants.jsonl")
@@ -65,6 +67,7 @@ def test_l0_artifact_storage_policy_applies_to_streaming_artifacts(tmp_path):
     assert len(history_entries) == 3
     assert [entry["tick"] for entry in watch_entries] == [4, 5, 6]
     assert [entry["tick"] for entry in watch_contract_entries] == [4, 5, 6]
+    assert [entry["tick"] for entry in operator_decision_entries] == [4, 5, 6]
     assert [int(entry["tick_ref"]["tick"]) for entry in commits_entries] == [5, 6]
     assert [int(entry["tick_ref"]["tick"]) for entry in commits_audit_entries] == [6]
     assert len(invariant_entries) == 2
@@ -132,6 +135,7 @@ def test_l1_profile_applies_for_active_level_and_watch_contract_level_src(tmp_pa
                 "trace": {"retention_window": 6, "compaction_budget": 0},
                 "watch_trace": {"retention_window": 6, "compaction_budget": 0},
                 "watch_contract": {"retention_window": 6, "compaction_budget": 0},
+                "operator_decisions": {"retention_window": 6, "compaction_budget": 0},
                 "outerfields": {"retention_window": 6, "compaction_budget": 0},
                 "commits": {"retention_window": 4, "compaction_budget": 0},
             },
@@ -139,6 +143,7 @@ def test_l1_profile_applies_for_active_level_and_watch_contract_level_src(tmp_pa
                 "trace": {"retention_window": 3, "compaction_budget": 0},
                 "watch_trace": {"retention_window": 2, "compaction_budget": 0},
                 "watch_contract": {"retention_window": 2, "compaction_budget": 0},
+                "operator_decisions": {"retention_window": 2, "compaction_budget": 0},
                 "outerfields": {"retention_window": 2, "compaction_budget": 0},
                 "commits": {"retention_window": 1, "compaction_budget": 0},
             },
@@ -163,11 +168,13 @@ def test_l1_profile_applies_for_active_level_and_watch_contract_level_src(tmp_pa
     trace_entries = _read_jsonl(out_dir / "trace.jsonl")
     watch_entries = _read_jsonl(out_dir / "watch_trace.jsonl")
     watch_contract_entries = _read_jsonl(out_dir / "watch_contract.jsonl")
+    operator_decision_entries = _read_jsonl(out_dir / "operator_decisions.jsonl")
     commits_entries = _read_jsonl(out_dir / "commits.jsonl")
 
     assert [entry["tick"] for entry in trace_entries] == [2, 3, 4]
     assert [entry["tick"] for entry in watch_entries] == [3, 4]
     assert [entry["tick"] for entry in watch_contract_entries] == [3, 4]
+    assert [entry["tick"] for entry in operator_decision_entries] == [3, 4]
     assert [int(entry["tick_ref"]["tick"]) for entry in commits_entries] == [4]
     assert {str(entry["outerfields_ref"]["level_src"]) for entry in watch_contract_entries} == {"L1"}
 

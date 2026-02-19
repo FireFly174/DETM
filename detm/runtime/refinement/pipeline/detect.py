@@ -16,6 +16,7 @@ def detect_refinement_context(
     field_state: DETMFieldState,
     capacity_overflow_ratio_threshold: float,
     capacity_overflow_mean_threshold: float,
+    capacity_saturation_band: float = 0.0,
     capacity_min_signals: int,
     capacity_temporal_ratio_threshold: float,
     capacity_temporal_window: int,
@@ -35,6 +36,7 @@ def detect_refinement_context(
     active_level: str,
     pattern_mode: str,
     runtime_memory: Dict[str, object] | None,
+    capacity_autoclamp_enabled: bool = False,
 ) -> DetectionContext:
     lattice = field_state.lattice
     boundary = str(lattice.boundary)
@@ -43,15 +45,25 @@ def detect_refinement_context(
     internal_time = _to_numpy(field_state.internal_time).astype(float, copy=False).reshape(lattice.height, lattice.width)
 
     lo, hi = (0.0, 1.0)
-    overflow = (energy < float(lo)) | (energy > float(hi))
-    overflow_count = int(overflow.sum())
     overflow_score = np.maximum(np.maximum(float(lo) - energy, 0.0), np.maximum(energy - float(hi), 0.0))
+    overflow = overflow_score > 0.0
+    saturation_band = max(0.0, float(capacity_saturation_band))
+    if saturation_band > 0.0:
+        # Soft-cap pressure enables refinement under clamped dynamics where hard
+        # overflow may remain zero but field mass accumulates near bounds.
+        distance_to_bound = np.minimum(energy - float(lo), float(hi) - energy)
+        saturation_score = np.maximum(0.0, saturation_band - distance_to_bound) / float(saturation_band)
+        saturation_score = np.where(np.isfinite(saturation_score), saturation_score, 0.0)
+        overflow_score = np.maximum(overflow_score, saturation_score)
+        overflow = overflow | (saturation_score > 0.0)
+    overflow_count = int(overflow.sum())
     overflow_ratio = float(overflow_count) / float(max(1, lattice.height * lattice.width))
     overflow_mean = float(overflow_score[overflow].mean()) if overflow_count > 0 else 0.0
 
     capacity_ratio_threshold = max(0.0, float(capacity_overflow_ratio_threshold))
     capacity_mean_threshold = max(0.0, float(capacity_overflow_mean_threshold))
     capacity_min_signals_value = max(1, int(capacity_min_signals))
+    capacity_autoclamp_enabled_value = bool(capacity_autoclamp_enabled)
     temporal_ratio_threshold = max(0.0, float(capacity_temporal_ratio_threshold))
     temporal_window = max(1, int(capacity_temporal_window))
     temporal_required_hits = max(1, int(capacity_temporal_required_hits))
@@ -244,7 +256,9 @@ def detect_refinement_context(
         overflow_score=overflow_score,
         capacity_ratio_threshold=float(capacity_ratio_threshold),
         capacity_mean_threshold=float(capacity_mean_threshold),
+        capacity_saturation_band=float(saturation_band),
         capacity_min_signals=int(capacity_min_signals_value),
+        capacity_autoclamp_enabled=bool(capacity_autoclamp_enabled_value),
         temporal_ratio_threshold=float(temporal_ratio_threshold),
         temporal_window=int(temporal_window),
         temporal_required_hits=int(temporal_required_hits),

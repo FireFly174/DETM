@@ -12,6 +12,14 @@ from detm_app.runtime.bus import EventBus
 from detm_app.runtime.coarsening import InvariantCoarsener, parse_invariant_streams
 from detm_app.runtime.session import DetmSession
 from detm_app.runtime.ui_runtime.influence import resolve_influence_for_settings
+from detm_app.runtime.ui_runtime.learning import (
+    configure_learning_runtime,
+    init_learning_runtime,
+    learning_status_compact,
+    learning_status_multiline,
+    reset_learning_runtime,
+    update_learning_snapshot,
+)
 from detm_app.runtime.ui_runtime.recording import (
     configure_invariant_recording as _configure_invariant_recording_flow,
     configure_recording as _configure_recording_flow,
@@ -23,6 +31,7 @@ from detm_app.runtime.subscribers import (
     FieldHistoryRecorder,
     InvariantTickJsonlWriter,
     JsonlTraceWriter,
+    OperatorDecisionWriter,
     WatchContractWriter,
     WatchTraceWriter,
     VizStreamer,
@@ -44,6 +53,7 @@ class DetmUiRunner:
         self._trace_writer: JsonlTraceWriter | None = None
         self._watch_trace_writer: WatchTraceWriter | None = None
         self._watch_contract_writer: WatchContractWriter | None = None
+        self._operator_decision_writer: OperatorDecisionWriter | None = None
         self._commit_writer: CommitJsonlWriter | None = None
         self._audit_commit_writer: CommitJsonlWriter | None = None
         self._commit_validation_reporter: CommitValidationReporter | None = None
@@ -54,10 +64,16 @@ class DetmUiRunner:
         self._invariant_key: str | None = None
         self._last_influence_key: tuple | None = None
         self._influence_remaining: int = 0
+        self._learning_runtime: dict[str, object] = init_learning_runtime(
+            window_steps=int(getattr(self.settings, "learning_window_steps", 64))
+        )
+        self._learning_snapshot: dict[str, object] = {}
+        self._learning_unsub_step = self._bus.add_event_listener_unsub("step", self._on_learning_step)
 
         self._configure_recording()
         self._configure_viz()
         self._configure_invariants()
+        self._configure_learning()
 
     @property
     def state(self):
@@ -67,9 +83,40 @@ class DetmUiRunner:
     def last_observables(self):
         return self._last_signature
 
+    @property
+    def learning_snapshot(self) -> dict[str, object]:
+        return dict(self._learning_snapshot)
+
+    def runtime_backend_label(self) -> str:
+        """Return actual backend/device used by the current state arrays."""
+        energy = self._session.state.field_state.energy
+        try:
+            import torch  # type: ignore
+        except ModuleNotFoundError:
+            torch = None
+        if torch is not None and isinstance(energy, torch.Tensor):
+            return f"torch/{str(energy.device)}"
+        return "numpy/cpu"
+
+    def learning_status_compact(self, *, max_len: int = 160) -> str:
+        return learning_status_compact(
+            self._learning_snapshot,
+            enabled=bool(getattr(self.settings, "learning_view_enabled", True)),
+            max_len=int(max_len),
+        )
+
+    def learning_status_multiline(self) -> str:
+        return learning_status_multiline(
+            self._learning_snapshot,
+            enabled=bool(getattr(self.settings, "learning_view_enabled", True)),
+        )
+
     def close(self) -> None:
         self._running = False
         self._session.close()
+        if self._learning_unsub_step is not None:
+            self._learning_unsub_step()
+            self._learning_unsub_step = None
         self._disable_viz()
         self._disable_recording()
         self._disable_invariants()
@@ -78,6 +125,11 @@ class DetmUiRunner:
         self._session.config = self.settings.config
         self._session.reset(seed=self.settings.seed)
         self._last_signature = self._session.digest().vector
+        reset_learning_runtime(
+            self._learning_runtime,
+            window_steps=int(getattr(self.settings, "learning_window_steps", 64)),
+        )
+        self._learning_snapshot = {}
 
     def set_viz_enabled(self, enabled: bool) -> None:
         self.settings.viz_enabled = bool(enabled)
@@ -167,6 +219,9 @@ class DetmUiRunner:
         if self._watch_contract_writer is not None:
             self._watch_contract_writer.on_close()
             self._watch_contract_writer = None
+        if self._operator_decision_writer is not None:
+            self._operator_decision_writer.on_close()
+            self._operator_decision_writer = None
         if self._commit_writer is not None:
             self._commit_writer.on_close()
             self._commit_writer = None
@@ -212,6 +267,34 @@ class DetmUiRunner:
 
     def _configure_recording(self) -> None:
         _configure_recording_flow(self)
+
+    def _configure_learning(self) -> None:
+        configure_learning_runtime(
+            self._learning_runtime,
+            window_steps=int(getattr(self.settings, "learning_window_steps", 64)),
+        )
+
+    def _on_learning_step(
+        self,
+        *,
+        state,
+        n_ticks: int,
+        requested_n_ticks: int = 0,
+        observables,
+        level_policy=None,
+        policy_decision=None,
+        **_rest,
+    ) -> None:
+        self._configure_learning()
+        self._learning_snapshot = update_learning_snapshot(
+            self._learning_runtime,
+            state=state,
+            n_ticks=int(n_ticks),
+            requested_n_ticks=int(requested_n_ticks),
+            observables=observables,
+            level_policy=level_policy,
+            policy_decision=policy_decision,
+        )
 
 DetmTkRunner = DetmUiRunner
 

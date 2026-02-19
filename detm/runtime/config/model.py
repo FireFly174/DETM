@@ -90,7 +90,7 @@ class DETMConfig:
                 "retention_window": max(0, int(self.trace_system_retention_window)),
                 "compaction_budget": 0,
             }
-        if artifact_name in {"watch_trace", "watch_contract", "outerfields"}:
+        if artifact_name in {"watch_trace", "watch_contract", "outerfields", "operator_decisions"}:
             return {
                 "retention_window": max(0, int(self.trace_watch_retention_window)),
                 "compaction_budget": max(0, int(self.trace_watch_compaction_budget)),

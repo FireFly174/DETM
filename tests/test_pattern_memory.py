@@ -51,11 +51,30 @@ def test_pattern_reuse_hits_cache_and_store(tmp_path):
     first = _first_refinement_event(session.step(None, 1, rng=session.state.restore_rng()))
     _seed_overflow_hotspot(session)
     second = _first_refinement_event(session.step(None, 1, rng=session.state.restore_rng()))
+    runtime_memory = dict(getattr(session.state, "_refinement_runtime", {}))
     session.close()
 
     assert bool(dict(first.get("pattern", {})).get("reused")) is False
     assert bool(dict(second.get("pattern", {})).get("reused")) is True
     assert int(dict(second.get("pattern", {})).get("hits", 0)) >= 2
+    first_operator = dict(first.get("operator", {}))
+    second_operator = dict(second.get("operator", {}))
+    assert str(first_operator.get("source")) == "search"
+    assert str(second_operator.get("source")) == "reuse"
+    assert int(first_operator.get("hits_after", 0)) == 1
+    assert int(second_operator.get("hits_after", 0)) >= 2
+    assert str(first_operator.get("id", "")).strip() != ""
+    assert str(second_operator.get("id", "")).strip() != ""
+    assert str(dict(first_operator.get("selection", {})).get("rule")) == "torsion_guard_v1"
+    assert str(dict(second_operator.get("selection", {})).get("rule")) == "torsion_guard_v1"
+    first_contract = dict(first_operator.get("contract", {}))
+    second_contract = dict(second_operator.get("contract", {}))
+    assert str(first_contract.get("type")) == "discrete_torsion_v1"
+    assert bool(first_contract.get("compatible")) is True
+    assert bool(second_contract.get("compatible")) is True
+    history = list(runtime_memory.get("operator_decision_history", []))
+    assert len(history) >= 2
+    assert str(dict(history[-1]).get("selection_rule", "")) == "torsion_guard_v1"
 
     payload = json.loads(store_path.read_text(encoding="utf-8"))
     assert isinstance(payload, dict)

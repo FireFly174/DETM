@@ -39,6 +39,7 @@ from detm_app.ui.napari.interactive.flow.widget_io import (
     read_text as _read_text_flow,
 )
 from detm_app.ui.napari.interactive.flow.render import NapariRenderFlow
+from detm_app.ui.napari.interactive.flow.graph import NapariGraphDock
 
 
 class _InteractiveDockController:
@@ -79,6 +80,8 @@ class _InteractiveDockController:
         self._autoscale_check: Any = None
         self._btn_batch: Any = None
         self._batch_log: Any = None
+        self._graph_dock: Any = None
+        self._last_render_meta: dict[str, Any] = {}
 
         self._root = QtWidgets.QWidget()
         self._layout = QtWidgets.QVBoxLayout(self._root)
@@ -101,6 +104,15 @@ class _InteractiveDockController:
         self._on_mode_change()
         self._render(force_autoscale=True)
         self._viewer.window.add_dock_widget(self._root, name=str(title), area="right")
+        try:
+            self._graph_dock = NapariGraphDock(viewer=self._viewer, title="DETM Graphs")
+            self._configure_graph_dock()
+            self._update_graph_dock()
+        except Exception as exc:
+            self._graph_dock = None
+            self._status.setText(
+                f"status: ready (graphs disabled: {type(exc).__name__})"
+            )
 
     def close(self) -> None:
         if self._closed:
@@ -108,6 +120,9 @@ class _InteractiveDockController:
         self._closing = True
         self._timer.stop()
         self._batch_state.close()
+        if self._graph_dock is not None and hasattr(self._graph_dock, "close"):
+            self._graph_dock.close()
+            self._graph_dock = None
         self._runner.close()
         self._closed = True
 
@@ -157,7 +172,7 @@ class _InteractiveDockController:
     def _render(self, *, force_autoscale: bool = False) -> None:
         if force_autoscale:
             self._autoscale = True
-        self._render_flow.render(
+        render_meta = self._render_flow.render(
             runner=self._runner,
             settings=self._settings,
             status_widget=self._status,
@@ -167,9 +182,41 @@ class _InteractiveDockController:
             quiver_step=max(1, self._read_int(self._quiver_step, 2)),
             quiver_scale=max(0.0, self._read_float(self._quiver_scale, 0.8)),
             autoscale=bool(self._autoscale),
+            anchors_enabled=bool(getattr(self._settings, "anchor_overlay_enabled", True)),
+            anchors_top_k=max(1, int(getattr(self._settings, "anchor_top_k", 8))),
+            anchors_threshold=max(0.0, float(getattr(self._settings, "anchor_threshold", 0.8))),
+            anchors_capture_ticks=max(1, int(getattr(self._settings, "anchor_capture_ticks", 4))),
         )
+        self._last_render_meta = dict(render_meta) if isinstance(render_meta, dict) else {}
+        self._update_graph_dock()
         if force_autoscale:
             self._autoscale = bool(self._autoscale_check.isChecked())
+
+    def _configure_graph_dock(self) -> None:
+        if self._graph_dock is None:
+            return
+        self._graph_dock.configure(
+            enabled=bool(getattr(self._settings, "graph_enabled", True)),
+            series_csv=str(getattr(self._settings, "graph_series", "")),
+            window_steps=max(16, int(getattr(self._settings, "graph_window_steps", 256))),
+            histogram_enabled=bool(getattr(self._settings, "graph_hist_enabled", True)),
+            histogram_bins=max(4, int(getattr(self._settings, "graph_hist_bins", 48))),
+        )
+
+    def _update_graph_dock(self) -> None:
+        if self._graph_dock is None:
+            return
+        self._configure_graph_dock()
+        meta = dict(self._last_render_meta or {})
+        snapshot = dict(getattr(self._runner, "learning_snapshot", {}))
+        legacy_metrics = dict(meta.get("legacy_metrics", {}))
+        if len(legacy_metrics) > 0:
+            snapshot["legacy_metrics"] = legacy_metrics
+        self._graph_dock.update(
+            snapshot=snapshot,
+            energy_field=meta.get("energy_field"),
+            anchor_summary=dict(meta.get("anchor_summary", {})),
+        )
 
     def _on_tick(self) -> None:
         if self._closing or (not bool(self._running)):

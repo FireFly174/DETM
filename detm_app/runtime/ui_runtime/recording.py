@@ -12,6 +12,7 @@ from detm_app.runtime.subscribers import (
     FieldHistoryRecorder,
     InvariantTickJsonlWriter,
     JsonlTraceWriter,
+    OperatorDecisionWriter,
     WatchContractWriter,
     WatchTraceWriter,
 )
@@ -24,6 +25,7 @@ def _attach_recording_stack(
     trace_policy: dict[str, int],
     watch_policy: dict[str, int],
     watch_contract_policy: dict[str, int],
+    operator_decisions_policy: dict[str, int],
     outerfields_policy: dict[str, int],
     commits_policy: dict[str, int],
     commits_audit_policy: dict[str, int],
@@ -52,6 +54,12 @@ def _attach_recording_stack(
             compaction_budget=int(watch_contract_policy.get("compaction_budget", 0)),
             outerfields_retention_window=int(outerfields_policy.get("retention_window", 0)),
             outerfields_compaction_budget=int(outerfields_policy.get("compaction_budget", 0)),
+        )
+        runner._operator_decision_writer = OperatorDecisionWriter.attach(
+            runner._session.bus,
+            record_dir / "operator_decisions.jsonl",
+            retention_window=int(operator_decisions_policy.get("retention_window", 0)),
+            compaction_budget=int(operator_decisions_policy.get("compaction_budget", 0)),
         )
     runner._commit_writer = CommitJsonlWriter.attach(
         runner._session.bus,
@@ -123,6 +131,7 @@ def configure_recording(runner: Any) -> None:
     trace_policy = runner._storage_policy("trace")
     watch_policy = runner._storage_policy("watch_trace")
     watch_contract_policy = runner._storage_policy("watch_contract")
+    operator_decisions_policy = runner._storage_policy("operator_decisions")
     outerfields_policy = runner._storage_policy("outerfields")
     commits_policy = runner._storage_policy("commits")
     commits_audit_policy = runner._storage_policy("commits_audit")
@@ -135,6 +144,7 @@ def configure_recording(runner: Any) -> None:
             trace_policy=trace_policy,
             watch_policy=watch_policy,
             watch_contract_policy=watch_contract_policy,
+            operator_decisions_policy=operator_decisions_policy,
             outerfields_policy=outerfields_policy,
             commits_policy=commits_policy,
             commits_audit_policy=commits_audit_policy,
@@ -150,6 +160,7 @@ def configure_recording(runner: Any) -> None:
             trace_policy=trace_policy,
             watch_policy=watch_policy,
             watch_contract_policy=watch_contract_policy,
+            operator_decisions_policy=operator_decisions_policy,
             outerfields_policy=outerfields_policy,
             commits_policy=commits_policy,
             commits_audit_policy=commits_audit_policy,
@@ -177,12 +188,22 @@ def configure_recording(runner: Any) -> None:
             outerfields_retention_window=int(outerfields_policy.get("retention_window", 0)),
             outerfields_compaction_budget=int(outerfields_policy.get("compaction_budget", 0)),
         )
+    if watch_enabled and runner._operator_decision_writer is None:
+        runner._operator_decision_writer = OperatorDecisionWriter.attach(
+            runner._session.bus,
+            record_dir / "operator_decisions.jsonl",
+            retention_window=int(operator_decisions_policy.get("retention_window", 0)),
+            compaction_budget=int(operator_decisions_policy.get("compaction_budget", 0)),
+        )
     if (not watch_enabled) and runner._watch_trace_writer is not None:
         runner._watch_trace_writer.on_close()
         runner._watch_trace_writer = None
     if (not watch_enabled) and runner._watch_contract_writer is not None:
         runner._watch_contract_writer.on_close()
         runner._watch_contract_writer = None
+    if (not watch_enabled) and runner._operator_decision_writer is not None:
+        runner._operator_decision_writer.on_close()
+        runner._operator_decision_writer = None
     # Toggle field recorder without changing directory.
     if bool(runner.settings.record_fields) and runner._fields_recorder is None:
         runner._fields_recorder = FieldHistoryRecorder.attach(runner._session.bus, record_dir / "fields_hist.npz")

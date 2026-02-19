@@ -52,6 +52,13 @@ _tmp/
 # --- Book build temp (pandoc/chrome profiles, logs, etc.) ---
 docs/book/**/_tmp/
 docs/book/ru/
+
+# --- Local book prompts / notes (keep private to local workspace) ---
+docs/book/PROMT.md
+docs/book/SYSTEM_PROMT.md
+docs/book/README_BUILD.md
+docs/book/ru_v2/README.md
+docs/book/ru_v2/BUILD_CHECKLIST.md
 # --- Research notes / drafts (not tracked) ---
 /Discrete Emergent Medium with Multilevel Coarsening/
 docs/source/

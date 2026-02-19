@@ -56,7 +56,10 @@ def test_system_and_watch_trace_linkage(tmp_path):
     assert all("runtime_adaptive_window_active" in dict(entry.get("watchpoints", {})) for entry in watch_entries)
     assert all("runtime_adaptive_profile" in dict(entry.get("watchpoints", {})) for entry in watch_entries)
     assert all("runtime_adaptive_signal_triggered" in dict(entry.get("watchpoints", {})) for entry in watch_entries)
+    assert all("anti_goodhart" in dict(entry.get("watchpoints", {})) for entry in watch_entries)
+    assert all("anti_goodhart_flag" in dict(entry.get("watchpoints", {})) for entry in watch_entries)
     assert all("runtime_adaptive_window_active" in dict(entry.get("policy", {})) for entry in watch_entries)
+    assert all("anti_goodhart" in dict(entry.get("policy", {})) for entry in watch_entries)
 
 
 def test_trace_storage_policy_limits(tmp_path):

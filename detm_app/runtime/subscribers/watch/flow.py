@@ -6,7 +6,7 @@ from typing import Any
 
 from detm.runtime import api
 from detm.runtime.level_policy import LevelPolicy, PolicyDecision
-from detm.runtime.watch_contract import OuterFieldsRef, WatchContractPacket
+from detm.runtime.watch_contract import AntiGoodhartSnapshot, OuterFieldsRef, WatchContractPacket
 
 from detm_app.runtime.subscribers.common import _trace_ref_for_tick
 
@@ -44,6 +44,35 @@ def event_types(events: list[dict[str, Any]]) -> list[str]:
     return [str(event.get("type", "")) for event in events]
 
 
+def anti_goodhart_projection(policy_decision: PolicyDecision) -> dict[str, Any]:
+    guard = dict(policy_decision.runtime_adaptive_guard)
+    raw = guard.get("anti_goodhart", {})
+    payload = dict(raw) if isinstance(raw, dict) else {}
+    return AntiGoodhartSnapshot.from_dict(payload).to_dict()
+
+
+def operator_decision_rows(*, events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for event in events:
+        if str(event.get("type", "")) != "refinement":
+            continue
+        operator = event.get("operator")
+        if not isinstance(operator, dict):
+            continue
+        row = dict(operator)
+        row["id"] = str(row.get("id", ""))
+        row["source"] = str(row.get("source", ""))
+        row["accepted"] = bool(row.get("accepted", False))
+        selection = row.get("selection", {})
+        row["selection"] = dict(selection) if isinstance(selection, dict) else {}
+        scope = row.get("scope", {})
+        row["scope"] = dict(scope) if isinstance(scope, dict) else {}
+        contract = row.get("contract", {})
+        row["contract"] = dict(contract) if isinstance(contract, dict) else {}
+        rows.append(row)
+    return rows
+
+
 def runtime_watchpoints(
     *,
     events: list[dict[str, Any]],
@@ -51,16 +80,69 @@ def runtime_watchpoints(
     observables: api.Observables,
     include_telemetry: bool,
 ) -> dict[str, Any]:
+    operator_events = [
+        dict(event.get("operator", {}))
+        for event in events
+        if str(event.get("type", "")) == "refinement" and isinstance(event.get("operator", None), dict)
+    ]
+    operator_decision_count = int(len(operator_events))
+    operator_reuse_count = int(sum(1 for op in operator_events if str(op.get("source", "")) == "reuse"))
+    operator_search_count = int(sum(1 for op in operator_events if str(op.get("source", "")) == "search"))
+    operator_torsion_guard_block_count = int(
+        sum(
+            1
+            for op in operator_events
+            if str(dict(op.get("selection", {})).get("reason", "")) == "torsion_guard_blocked"
+        )
+    )
+    torsion_flags = [
+        bool(dict(op.get("contract", {})).get("torsion_flag"))
+        for op in operator_events
+        if isinstance(op.get("contract", None), dict)
+    ]
+    torsion_scores = [
+        float(dict(op.get("contract", {})).get("torsion_score", 0.0))
+        for op in operator_events
+        if isinstance(op.get("contract", None), dict)
+    ]
+    operator_torsion_flag_count = int(sum(1 for flag in torsion_flags if bool(flag)))
+    operator_reuse_rate = (
+        float(operator_reuse_count) / float(operator_decision_count)
+        if operator_decision_count > 0
+        else 0.0
+    )
+    operator_torsion_mean = (
+        float(sum(torsion_scores) / len(torsion_scores))
+        if len(torsion_scores) > 0
+        else 0.0
+    )
+    anti_goodhart = anti_goodhart_projection(policy_decision)
     out = {
         "refinement_count": int(sum(1 for event in events if str(event.get("type", "")) == "refinement")),
         "influence_count": int(sum(1 for event in events if str(event.get("type", "")) == "influence")),
         "attractor_count": int(sum(1 for event in events if str(event.get("type", "")) == "attractor")),
+        "operator_decision_count": int(operator_decision_count),
+        "operator_reuse_count": int(operator_reuse_count),
+        "operator_search_count": int(operator_search_count),
+        "operator_reuse_rate": float(operator_reuse_rate),
+        "operator_torsion_guard_block_count": int(operator_torsion_guard_block_count),
+        "operator_torsion_flag_count": int(operator_torsion_flag_count),
+        "operator_torsion_score_mean": float(operator_torsion_mean),
         "runtime_adaptive_window_active": bool(policy_decision.runtime_adaptive_window_active),
         "runtime_adaptive_signal_triggered": bool(policy_decision.runtime_adaptive_signal_triggered),
         "runtime_adaptive_profile": str(policy_decision.runtime_adaptive_profile),
         "runtime_adaptive_signal_hits": {
             str(k): bool(v) for k, v in dict(policy_decision.runtime_adaptive_signal_hits).items()
         },
+        "anti_goodhart_flag": bool(anti_goodhart.get("goodhart_flag", False)),
+        "anti_goodhart_degraded_signal_count": int(anti_goodhart.get("degraded_signal_count", 0)),
+        "anti_goodhart_policy_reaction_applied": bool(
+            dict(anti_goodhart.get("policy_reaction", {})).get("apply", False)
+        ),
+        "anti_goodhart_runtime_profile_applied": bool(
+            anti_goodhart.get("runtime_profile_applied", False)
+        ),
+        "anti_goodhart": anti_goodhart,
     }
     if bool(include_telemetry):
         out["cpu_time_ms"] = float(observables.cost.get("cpu_time_ms", 0.0))
@@ -70,6 +152,7 @@ def runtime_watchpoints(
 
 
 def runtime_policy_projection(policy_decision: PolicyDecision) -> dict[str, Any]:
+    anti_goodhart = anti_goodhart_projection(policy_decision)
     return {
         "active_level": str(policy_decision.active_level),
         "detail_mode": policy_decision.observability_profile.normalized_detail_mode(),
@@ -77,6 +160,7 @@ def runtime_policy_projection(policy_decision: PolicyDecision) -> dict[str, Any]
         "runtime_adaptive_window_active": bool(policy_decision.runtime_adaptive_window_active),
         "runtime_adaptive_profile": str(policy_decision.runtime_adaptive_profile),
         "runtime_adaptive_signal_triggered": bool(policy_decision.runtime_adaptive_signal_triggered),
+        "anti_goodhart": anti_goodhart,
     }
 
 
@@ -152,10 +236,52 @@ def build_watch_contract_packet(
     )
 
 
+def build_operator_decisions_entry(
+    *,
+    state: Any,
+    observables: api.Observables,
+    policy_decision: PolicyDecision,
+) -> dict[str, Any]:
+    tick = int(state.step_count)
+    events = filter_events(observables=observables, policy_decision=policy_decision)
+    decisions = operator_decision_rows(events=events)
+    decision_count = int(len(decisions))
+    reuse_count = int(sum(1 for row in decisions if str(row.get("source", "")) == "reuse"))
+    search_count = int(sum(1 for row in decisions if str(row.get("source", "")) == "search"))
+    guard_block_count = int(
+        sum(
+            1
+            for row in decisions
+            if str(dict(row.get("selection", {})).get("reason", "")) == "torsion_guard_blocked"
+        )
+    )
+    torsion_flag_count = int(
+        sum(1 for row in decisions if bool(dict(row.get("contract", {})).get("torsion_flag", False)))
+    )
+    return {
+        "type": "operator_decisions_step",
+        "tick": tick,
+        "trace_ref": _trace_ref_for_tick(tick),
+        "decision_count": decision_count,
+        "decisions": decisions,
+        "summary": {
+            "reuse_count": reuse_count,
+            "search_count": search_count,
+            "torsion_guard_block_count": guard_block_count,
+            "torsion_flag_count": torsion_flag_count,
+            "reuse_rate": (float(reuse_count) / float(decision_count)) if decision_count > 0 else 0.0,
+        },
+        "policy": runtime_policy_projection(policy_decision),
+    }
+
+
 __all__ = [
+    "build_operator_decisions_entry",
     "build_watch_contract_packet",
     "build_watch_trace_entry",
+    "anti_goodhart_projection",
     "filter_events",
+    "operator_decision_rows",
     "resolve_policy_decision",
     "runtime_policy_projection",
     "runtime_watchpoints",

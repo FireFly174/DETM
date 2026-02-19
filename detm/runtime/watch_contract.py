@@ -26,6 +26,140 @@ def _require_int_at_least(value: Any, *, field_name: str, min_value: int) -> int
     return out
 
 
+def _coerce_bool(value: Any, *, default: bool = False) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    text = str(value or "").strip().lower()
+    if text in {"true", "1", "yes", "on"}:
+        return True
+    if text in {"false", "0", "no", "off"}:
+        return False
+    return bool(default)
+
+
+def _coerce_float(value: Any, *, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def _coerce_int(value: Any, *, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        try:
+            return int(float(value))
+        except (TypeError, ValueError):
+            return int(default)
+
+
+def _coerce_str_list(value: Any) -> List[str]:
+    if isinstance(value, list):
+        return [str(x) for x in value]
+    if isinstance(value, tuple):
+        return [str(x) for x in list(value)]
+    return []
+
+
+@dataclass(frozen=True)
+class AntiGoodhartReaction:
+    apply: bool = False
+    actions: List[str] = field(default_factory=list)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any] | None) -> "AntiGoodhartReaction":
+        payload = dict(data or {})
+        return cls(
+            apply=_coerce_bool(payload.get("apply", False), default=False),
+            actions=_coerce_str_list(payload.get("actions", [])),
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "apply": bool(self.apply),
+            "actions": [str(x) for x in list(self.actions)],
+        }
+
+
+@dataclass(frozen=True)
+class AntiGoodhartSnapshot:
+    goodhart_flag: bool = False
+    target_signal: str = ""
+    target_delta: float = 0.0
+    degraded_signals: List[str] = field(default_factory=list)
+    degraded_signal_count: int = 0
+    thresholds: Dict[str, Any] = field(default_factory=dict)
+    policy_reaction: AntiGoodhartReaction = field(default_factory=AntiGoodhartReaction)
+    policy_reaction_enabled: bool = False
+    preferred_runtime_profile: str = ""
+    runtime_profile_applied: bool = False
+    applicability: str = "unavailable"
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any] | None) -> "AntiGoodhartSnapshot":
+        payload = dict(data or {})
+        degraded_signals = _coerce_str_list(payload.get("degraded_signals", []))
+        degraded_count = _require_int_at_least(
+            payload.get("degraded_signal_count", len(degraded_signals)),
+            field_name="degraded_signal_count",
+            min_value=0,
+        )
+        thresholds_raw = payload.get("thresholds", {})
+        thresholds_dict = dict(thresholds_raw) if isinstance(thresholds_raw, dict) else {}
+        target_signal = str(payload.get("target_signal", ""))
+        thresholds = {
+            "target_signal": str(thresholds_dict.get("target_signal", target_signal)),
+            "min_target_delta": _coerce_float(thresholds_dict.get("min_target_delta", 0.0), default=0.0),
+            "min_degraded_signals": max(0, _coerce_int(thresholds_dict.get("min_degraded_signals", 0), default=0)),
+            "degradation_epsilon": _coerce_float(
+                thresholds_dict.get("degradation_epsilon", 0.0),
+                default=0.0,
+            ),
+        }
+        return cls(
+            goodhart_flag=_coerce_bool(payload.get("goodhart_flag", False), default=False),
+            target_signal=target_signal,
+            target_delta=_coerce_float(payload.get("target_delta", 0.0), default=0.0),
+            degraded_signals=degraded_signals,
+            degraded_signal_count=max(int(degraded_count), len(degraded_signals)),
+            thresholds=thresholds,
+            policy_reaction=AntiGoodhartReaction.from_dict(dict(payload.get("policy_reaction", {}))),
+            policy_reaction_enabled=_coerce_bool(payload.get("policy_reaction_enabled", False), default=False),
+            preferred_runtime_profile=str(payload.get("preferred_runtime_profile", "")),
+            runtime_profile_applied=_coerce_bool(payload.get("runtime_profile_applied", False), default=False),
+            applicability=str(payload.get("applicability", "unavailable")),
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "goodhart_flag": bool(self.goodhart_flag),
+            "target_signal": str(self.target_signal),
+            "target_delta": float(self.target_delta),
+            "degraded_signals": [str(x) for x in list(self.degraded_signals)],
+            "degraded_signal_count": int(max(int(self.degraded_signal_count), len(self.degraded_signals))),
+            "thresholds": {
+                "target_signal": str(dict(self.thresholds).get("target_signal", "")),
+                "min_target_delta": _coerce_float(dict(self.thresholds).get("min_target_delta", 0.0), default=0.0),
+                "min_degraded_signals": max(
+                    0,
+                    _coerce_int(dict(self.thresholds).get("min_degraded_signals", 0), default=0),
+                ),
+                "degradation_epsilon": _coerce_float(
+                    dict(self.thresholds).get("degradation_epsilon", 0.0),
+                    default=0.0,
+                ),
+            },
+            "policy_reaction": self.policy_reaction.to_dict(),
+            "policy_reaction_enabled": bool(self.policy_reaction_enabled),
+            "preferred_runtime_profile": str(self.preferred_runtime_profile),
+            "runtime_profile_applied": bool(self.runtime_profile_applied),
+            "applicability": str(self.applicability),
+        }
+
+
 @dataclass(frozen=True)
 class OuterFieldsRef:
     """Reference to an OuterFields artifact."""
@@ -104,12 +238,27 @@ class WatchContractPacket:
         if not isinstance(event_types_raw, list):
             raise ValueError("event_types must be a list")
         event_types = [str(x) for x in event_types_raw]
+        metrics = dict(data.get("metrics", {}))
+        watchpoints = dict(metrics.get("watchpoints", {}))
+        watch_anti = AntiGoodhartSnapshot.from_dict(dict(watchpoints.get("anti_goodhart", {})))
+        watchpoints["anti_goodhart"] = watch_anti.to_dict()
+        watchpoints["anti_goodhart_flag"] = bool(watch_anti.goodhart_flag)
+        watchpoints["anti_goodhart_degraded_signal_count"] = int(watch_anti.degraded_signal_count)
+        watchpoints["anti_goodhart_policy_reaction_applied"] = bool(
+            watch_anti.policy_reaction.apply
+        )
+        watchpoints["anti_goodhart_runtime_profile_applied"] = bool(watch_anti.runtime_profile_applied)
+        metrics["watchpoints"] = watchpoints
+
+        policy = dict(data.get("policy", {}))
+        policy_anti = AntiGoodhartSnapshot.from_dict(dict(policy.get("anti_goodhart", {})))
+        policy["anti_goodhart"] = policy_anti.to_dict()
         return cls(
             tick=_require_int_at_least(data.get("tick", 0), field_name="tick", min_value=0),
             trace_ref=_require_non_empty_str(data.get("trace_ref"), field_name="trace_ref"),
             outerfields_ref=OuterFieldsRef.from_dict(dict(data.get("outerfields_ref", {}))),
             signature=dict(data.get("signature", {})),
-            metrics=dict(data.get("metrics", {})),
+            metrics=metrics,
             events=events,
             event_types=event_types,
             event_count=_require_int_at_least(
@@ -117,7 +266,7 @@ class WatchContractPacket:
                 field_name="event_count",
                 min_value=0,
             ),
-            policy=dict(data.get("policy", {})),
+            policy=policy,
             schema=_require_non_empty_str(
                 data.get("schema", "WATCH_CONTRACT_V1"),
                 field_name="schema",
@@ -140,4 +289,9 @@ class WatchContractPacket:
         }
 
 
-__all__ = ["OuterFieldsRef", "WatchContractPacket"]
+__all__ = [
+    "AntiGoodhartReaction",
+    "AntiGoodhartSnapshot",
+    "OuterFieldsRef",
+    "WatchContractPacket",
+]

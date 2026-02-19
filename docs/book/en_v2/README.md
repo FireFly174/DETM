@@ -7,6 +7,11 @@ Status:
 - Terminology aligned with canonical docs (`docs/eng/*`, `docs/rus/ROADMAP.md`).
 - Designed for fast reading and practical navigation.
 
+Important:
+- `_compiled_v2*.md`, `_compiled_v2*.html`, `_compiled_v2*.pdf` are generated artifacts.
+- Do not edit compiled files directly; edit source chapters/manifests and rebuild.
+- Shared build notes: `docs/book/README_BUILD.md`.
+
 Build:
 - Full: `tools\\compile_book_en_v2.cmd`
 - Quick: `tools\\compile_book_en_v2.cmd draft quick`

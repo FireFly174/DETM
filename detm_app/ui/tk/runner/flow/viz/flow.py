@@ -90,6 +90,8 @@ class TkVizFlow:
         try:
             signature = list(self._runner.last_observables) if self._runner.last_observables is not None else None
             self._viz_panel.update_from_state(state=self._runner.state, tick=step, signature=signature)
+            if hasattr(self._viz_panel, "update_learning_text"):
+                self._viz_panel.update_learning_text(self._runner.learning_status_multiline())
             self._embedded_draws += 1
             now = time.perf_counter()
             if self._embedded_window_start <= 0.0:
@@ -131,6 +133,8 @@ class TkVizFlow:
                 tick=int(packet.tick),
                 signature=packet.signature,
             )
+            if hasattr(self._viz_panel, "update_learning_text"):
+                self._viz_panel.update_learning_text(self._runner.learning_status_multiline())
             self._tcp_rendered_frames += 1
             sent_frames = None
             viz_transport = getattr(self._runner, "_viz_transport", None)

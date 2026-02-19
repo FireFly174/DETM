@@ -8,6 +8,7 @@ from detm_app.ui.tk.tooltips import attach_tooltip
 
 
 def add_recording_and_viz_controls(*, frame: Any, tk: Any, ttk: Any, settings: Any, tips: dict[str, str]) -> dict[str, Any]:
+    level_policy = settings.config.level_policy
     record_enabled_var = tk.BooleanVar(value=settings.record_dir is not None)
     ttk.Checkbutton(frame, text="Record trace", variable=record_enabled_var).grid(row=7, column=0, sticky="w")
     out_var = tk.StringVar(value=str(settings.record_dir) if settings.record_dir else "runs/out/ui_run")
@@ -54,15 +55,44 @@ def add_recording_and_viz_controls(*, frame: Any, tk: Any, ttk: Any, settings: A
     attach_tooltip(viz_every_entry, tips.get("ui.viz_every_steps", tips.get("viz_every_steps", "")))
     ttk.Label(frame, text="every_steps").grid(row=10, column=2, sticky="w")
 
-    ttk.Label(frame, text="Mode").grid(row=11, column=0, sticky="w")
+    learn_refinement_var = tk.BooleanVar(value=bool(level_policy.allow_refinement))
+    ttk.Checkbutton(frame, text="refinement", variable=learn_refinement_var).grid(row=11, column=0, sticky="w")
+
+    learn_runtime_events_var = tk.StringVar(value=",".join(level_policy.runtime_adaptive_signal_event_types))
+    ttk.Label(frame, text="rt events").grid(row=11, column=1, sticky="e")
+    learn_runtime_events_entry = ttk.Entry(frame, textvariable=learn_runtime_events_var, width=18)
+    learn_runtime_events_entry.grid(row=11, column=2, sticky="w", padx=(6, 6))
+    attach_tooltip(
+        learn_runtime_events_entry,
+        "Comma-separated event types for runtime-adaptive trigger (for example: refinement,influence).",
+    )
+
+    learn_adaptive_hold_var = tk.IntVar(value=int(level_policy.runtime_adaptive_hold_ticks))
+    hold_frame = ttk.Frame(frame)
+    hold_frame.grid(row=11, column=3, sticky="e")
+    ttk.Label(hold_frame, text="hold").grid(row=0, column=0, sticky="w")
+    learn_adaptive_hold_entry = ttk.Entry(hold_frame, textvariable=learn_adaptive_hold_var, width=6)
+    learn_adaptive_hold_entry.grid(row=0, column=1, sticky="w", padx=(4, 0))
+
+    learn_anti_goodhart_var = tk.BooleanVar(value=bool(level_policy.anti_goodhart_enabled))
+    ttk.Checkbutton(frame, text="anti-goodhart", variable=learn_anti_goodhart_var).grid(row=12, column=0, sticky="w")
+    learning_view_var = tk.BooleanVar(value=bool(getattr(settings, "learning_view_enabled", True)))
+    ttk.Checkbutton(frame, text="learning panel", variable=learning_view_var).grid(row=12, column=1, sticky="w")
+    learning_window_var = tk.IntVar(value=int(getattr(settings, "learning_window_steps", 64)))
+    ttk.Label(frame, text="window").grid(row=12, column=2, sticky="e")
+    learning_window_entry = ttk.Entry(frame, textvariable=learning_window_var, width=8)
+    learning_window_entry.grid(row=12, column=3, sticky="w")
+    attach_tooltip(learning_window_entry, "Rolling window length (in commit steps) for learning readout.")
+
+    ttk.Label(frame, text="Mode").grid(row=13, column=0, sticky="w")
     ui_mode_var = tk.StringVar(value="interactive")
     ui_mode_box = ttk.Combobox(
         frame, textvariable=ui_mode_var, values=["interactive", "batch"], width=12, state="readonly"
     )
-    ui_mode_box.grid(row=11, column=1, sticky="w", padx=(6, 0))
+    ui_mode_box.grid(row=13, column=1, sticky="w", padx=(6, 0))
 
     status_var = tk.StringVar(value="Ready")
-    ttk.Label(frame, textvariable=status_var).grid(row=12, column=0, columnspan=4, sticky="w")
+    ttk.Label(frame, textvariable=status_var).grid(row=14, column=0, columnspan=4, sticky="w")
 
     return {
         "record_enabled_var": record_enabled_var,
@@ -75,6 +105,12 @@ def add_recording_and_viz_controls(*, frame: Any, tk: Any, ttk: Any, settings: A
         "viz_port_var": viz_port_var,
         "viz_connect_var": viz_connect_var,
         "viz_every_var": viz_every_var,
+        "learn_refinement_var": learn_refinement_var,
+        "learn_runtime_events_var": learn_runtime_events_var,
+        "learn_adaptive_hold_var": learn_adaptive_hold_var,
+        "learn_anti_goodhart_var": learn_anti_goodhart_var,
+        "learning_view_var": learning_view_var,
+        "learning_window_var": learning_window_var,
         "ui_mode_var": ui_mode_var,
         "status_var": status_var,
     }

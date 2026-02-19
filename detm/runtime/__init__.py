@@ -73,7 +73,12 @@ from detm.runtime.pattern_memory import (
 )
 from detm.runtime.schemas import get_schema_versions
 from detm.runtime.state import DETMState
-from detm.runtime.watch_contract import OuterFieldsRef, WatchContractPacket
+from detm.runtime.watch_contract import (
+    AntiGoodhartReaction,
+    AntiGoodhartSnapshot,
+    OuterFieldsRef,
+    WatchContractPacket,
+)
 
 __all__ = [
     "Observables",
@@ -146,6 +151,8 @@ __all__ = [
     "get_pattern_runtime_for_state",
     "DETMInfluence",
     "DETMState",
+    "AntiGoodhartReaction",
+    "AntiGoodhartSnapshot",
     "OuterFieldsRef",
     "WatchContractPacket",
     "get_schema_versions",

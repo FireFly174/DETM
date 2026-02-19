@@ -39,6 +39,17 @@ class UiRunSettings:
     viz_connect: bool = False
     viz_keep_open: bool = False
     viz_every_steps: int = 1
+    graph_enabled: bool = True
+    graph_series: str = "event_count,refinement_count,influence_count,cpu_time_ms,energy_mean,tau_mean"
+    graph_window_steps: int = 256
+    graph_hist_enabled: bool = True
+    graph_hist_bins: int = 48
+    anchor_overlay_enabled: bool = True
+    anchor_top_k: int = 8
+    anchor_threshold: float = 0.8
+    anchor_capture_ticks: int = 4
+    learning_view_enabled: bool = True
+    learning_window_steps: int = 64
 
 
 __all__ = ["UiRunSettings"]

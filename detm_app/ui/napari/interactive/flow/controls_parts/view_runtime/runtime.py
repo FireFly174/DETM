@@ -10,6 +10,7 @@ from typing import Any
 
 def add_runtime_page(controller: Any, *, QtWidgets: Any, cfg: Any, tips: dict[str, str]) -> None:
     self = controller
+    level_policy = cfg.level_policy
     page_runtime = QtWidgets.QWidget()
     lay_runtime = QtWidgets.QVBoxLayout(page_runtime)
     lay_runtime.setContentsMargins(6, 6, 6, 6)
@@ -78,6 +79,89 @@ def add_runtime_page(controller: Any, *, QtWidgets: Any, cfg: Any, tips: dict[st
         row.addWidget(lbl)
         row.addWidget(widget)
         lay_runtime.addLayout(row)
+
+    self._learn_refinement = QtWidgets.QCheckBox("allow_refinement")
+    self._learn_refinement.setChecked(bool(level_policy.allow_refinement))
+    lay_runtime.addWidget(self._learn_refinement)
+
+    self._learn_refine_ratio = QtWidgets.QDoubleSpinBox()
+    self._learn_refine_ratio.setRange(0.0, 10.0)
+    self._learn_refine_ratio.setDecimals(4)
+    self._learn_refine_ratio.setSingleStep(0.01)
+    self._learn_refine_ratio.setValue(float(level_policy.refinement_capacity_overflow_ratio_threshold))
+    row_refine_ratio = QtWidgets.QHBoxLayout()
+    row_refine_ratio.addWidget(QtWidgets.QLabel("refine_ratio_threshold"))
+    row_refine_ratio.addWidget(self._learn_refine_ratio)
+    lay_runtime.addLayout(row_refine_ratio)
+
+    self._learn_refine_mean = QtWidgets.QDoubleSpinBox()
+    self._learn_refine_mean.setRange(0.0, 10.0)
+    self._learn_refine_mean.setDecimals(4)
+    self._learn_refine_mean.setSingleStep(0.01)
+    self._learn_refine_mean.setValue(float(level_policy.refinement_capacity_overflow_mean_threshold))
+    row_refine_mean = QtWidgets.QHBoxLayout()
+    row_refine_mean.addWidget(QtWidgets.QLabel("refine_mean_threshold"))
+    row_refine_mean.addWidget(self._learn_refine_mean)
+    lay_runtime.addLayout(row_refine_mean)
+
+    self._learn_refine_saturation = QtWidgets.QDoubleSpinBox()
+    self._learn_refine_saturation.setRange(0.0, 1.0)
+    self._learn_refine_saturation.setDecimals(4)
+    self._learn_refine_saturation.setSingleStep(0.005)
+    saturation_band = float(getattr(level_policy, "refinement_capacity_saturation_band", 0.0))
+    if saturation_band <= 0.0:
+        saturation_band = 0.05
+    self._learn_refine_saturation.setValue(float(saturation_band))
+    row_refine_sat = QtWidgets.QHBoxLayout()
+    row_refine_sat.addWidget(QtWidgets.QLabel("refine_saturation_band"))
+    row_refine_sat.addWidget(self._learn_refine_saturation)
+    lay_runtime.addLayout(row_refine_sat)
+
+    self._learn_refine_min_signals = QtWidgets.QSpinBox()
+    self._learn_refine_min_signals.setRange(1, 32)
+    self._learn_refine_min_signals.setValue(int(level_policy.refinement_capacity_min_signals))
+    row_refine_min = QtWidgets.QHBoxLayout()
+    row_refine_min.addWidget(QtWidgets.QLabel("refine_min_signals"))
+    row_refine_min.addWidget(self._learn_refine_min_signals)
+    lay_runtime.addLayout(row_refine_min)
+
+    self._learn_refine_autoclamp = QtWidgets.QCheckBox("refine_autoclamp")
+    self._learn_refine_autoclamp.setChecked(
+        bool(getattr(level_policy, "refinement_capacity_autoclamp_enabled", False))
+    )
+    lay_runtime.addWidget(self._learn_refine_autoclamp)
+
+    _, self._learn_runtime_events = self._line(
+        label="runtime_adaptive_events",
+        value=",".join(level_policy.runtime_adaptive_signal_event_types),
+        parent_layout=lay_runtime,
+        tooltip="Comma-separated event types for runtime-adaptive trigger.",
+    )
+
+    self._learn_adaptive_hold = QtWidgets.QSpinBox()
+    self._learn_adaptive_hold.setRange(0, 100000)
+    self._learn_adaptive_hold.setValue(int(level_policy.runtime_adaptive_hold_ticks))
+    row_hold = QtWidgets.QHBoxLayout()
+    row_hold.addWidget(QtWidgets.QLabel("runtime_adaptive_hold_ticks"))
+    row_hold.addWidget(self._learn_adaptive_hold)
+    lay_runtime.addLayout(row_hold)
+
+    self._learn_anti_goodhart = QtWidgets.QCheckBox("anti_goodhart_enabled")
+    self._learn_anti_goodhart.setChecked(bool(level_policy.anti_goodhart_enabled))
+    lay_runtime.addWidget(self._learn_anti_goodhart)
+
+    self._learning_view = QtWidgets.QCheckBox("learning_view_enabled")
+    self._learning_view.setChecked(bool(getattr(self._settings, "learning_view_enabled", True)))
+    lay_runtime.addWidget(self._learning_view)
+
+    self._learning_window = QtWidgets.QSpinBox()
+    self._learning_window.setRange(1, 100000)
+    self._learning_window.setValue(int(getattr(self._settings, "learning_window_steps", 64)))
+    row_window = QtWidgets.QHBoxLayout()
+    row_window.addWidget(QtWidgets.QLabel("learning_window_steps"))
+    row_window.addWidget(self._learning_window)
+    lay_runtime.addLayout(row_window)
+
     lay_runtime.addStretch(1)
     self._toolbox.addItem(page_runtime, "Runtime")
 
