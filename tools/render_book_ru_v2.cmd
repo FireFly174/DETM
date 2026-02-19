@@ -43,7 +43,7 @@ rem Note: on Windows pandoc uses ';' as the path separator for --resource-path.
 set "BOOK_TITLE=DETM - RU v2"
 if /I "%VARIANT%"=="quick" set "BOOK_TITLE=DETM - RU v2 (quick)"
 if /I "%MODE%"=="draft" set "BOOK_TITLE=%BOOK_TITLE% (draft)"
-"%PANDOC%" "%IN%" --from gfm --to html5 --standalone --embed-resources --metadata title="%BOOK_TITLE%" --metadata lang=ru --resource-path="docs/book/ru_v2;docs/book/ru_v2/assets;." --output "%OUT_HTML%"
+"%PANDOC%" "%IN%" --from gfm --to html5 --standalone --embed-resources --metadata pagetitle="%BOOK_TITLE%" --metadata lang=ru --resource-path="docs/book/ru_v2;docs/book/ru_v2/assets;." --output "%OUT_HTML%"
 if errorlevel 1 goto :fail
 
 echo.

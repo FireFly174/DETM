@@ -137,7 +137,8 @@ def normalize_chapter(
     mode: str,
     heading_delta: int,
 ) -> Chapter:
-    raw_lines = path.read_text(encoding="utf-8").splitlines()
+    # Guard against UTF-8 BOM in source chapters: it can break H1 detection.
+    raw_lines = path.read_text(encoding="utf-8").lstrip("\ufeff").splitlines()
     lines = strip_pad(raw_lines)
 
     if mode == "print":
@@ -227,6 +228,11 @@ def render(
     include_stats: bool,
 ) -> str:
     out: List[str] = []
+    out.append(
+        "<!-- AUTO-GENERATED FILE: do not edit any _compiled*.md directly. "
+        "Edit source chapters/manifests and rerun tools/compile_book_* scripts. -->"
+    )
+    out.append("")
     out.append(f"# {title}")
     out.append("")
     out.append(f"_mode: {mode}_")
@@ -257,7 +263,9 @@ def render(
     return text
 
 
-def postprocess_compiled_markdown(text: str, manifest_path: pathlib.Path) -> str:
+def postprocess_compiled_markdown(
+    text: str, manifest_path: pathlib.Path, mode: str, icon_mode: str
+) -> str:
     # Keep the source Markdown simple and do small readability tweaks at compile time.
     # Currently this is only used for RU v2.
     if "ru_v2" not in manifest_path.as_posix():
@@ -300,6 +308,32 @@ def postprocess_compiled_markdown(text: str, manifest_path: pathlib.Path) -> str
     # Keep these in source files, but do not ship them in compiled artifacts.
     text = re.sub(r"(?m)^- Статус: черновик\.\s*$\n?", "", text)
 
+    if mode == "print":
+        # Old PDF.js viewers can crash on Type3/pattern glyphs produced by emoji icons
+        # in browser-generated PDFs. Keep configurable icon normalization for print artifacts.
+        if icon_mode == "ascii":
+            replacements = {
+                "⏸": "[||]",
+                "🚪": "[->]",
+                "⚡": "[!]",
+                "✂": "[cut]",
+                "🧱": "[#]",
+                "🔁": "[<>]",
+                "🧭": "[axis]",
+                "🧍": "[S1]",
+                "👪": "[S2]",
+                "🎭": "[S3]",
+                "🏢": "[S4]",
+                "🏛": "[S5]",
+            }
+            for src, dst in replacements.items():
+                text = text.replace(src, dst)
+        elif icon_mode == "strip":
+            text = re.sub(r"[⏸🚪⚡✂🧱🔁🧭🧍👪🎭🏢🏛]", "", text)
+            text = re.sub(r"`((?:T|S)\d)\s+`", r"`\1`", text)
+        # Clean up spacing after icon normalization.
+        text = re.sub(r"[ \t]{2,}", " ", text)
+
     return text
 
 
@@ -327,6 +361,16 @@ def main(argv: Sequence[str]) -> int:
         choices=("draft", "print"),
         default="draft",
         help="draft: keep author notes; print: strip notes/admonitions and @draft blocks.",
+    )
+    parser.add_argument(
+        "--icon-mode",
+        choices=("auto", "keep", "ascii", "strip"),
+        default="auto",
+        help=(
+            "How to process decorative emoji icons. "
+            "auto: keep for draft, ascii for print; keep: no change; "
+            "ascii: replace with ASCII markers; strip: remove icons."
+        ),
     )
     parser.add_argument("--title", default="Книга (черновик сборки)", help="Book title for compiled output.")
     parser.add_argument("--no-toc", action="store_true", help="Do not include a simple table of contents.")
@@ -371,7 +415,15 @@ def main(argv: Sequence[str]) -> int:
         include_toc=not args.no_toc,
         include_stats=not args.no_stats,
     )
-    compiled = postprocess_compiled_markdown(compiled, manifest_path=manifest_path)
+    effective_icon_mode = args.icon_mode
+    if args.icon_mode == "auto":
+        effective_icon_mode = "ascii" if args.mode == "print" else "keep"
+    compiled = postprocess_compiled_markdown(
+        compiled,
+        manifest_path=manifest_path,
+        mode=args.mode,
+        icon_mode=effective_icon_mode,
+    )
 
     if warnings:
         print("Warnings:", file=sys.stderr)

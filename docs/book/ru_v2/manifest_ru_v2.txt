@@ -4,6 +4,8 @@
 00_frontmatter/01_levels_map.md
 00_frontmatter/00_quickstart.md
 00_frontmatter/05_first_aid.md
+00_frontmatter/06_human_system.md
+00_frontmatter/07_human_system_deep_dive.md
 00_frontmatter/01_thesis.md
 00_frontmatter/02_reader_map.md
 00_frontmatter/03_how_to_read.md

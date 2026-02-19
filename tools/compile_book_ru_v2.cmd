@@ -28,7 +28,9 @@ pushd "%~dp0\.."
 rem Use stdout redirection so compilation works in sandboxed environments.
 set "TITLE=DETM - RU v2"
 if /I "%VARIANT%"=="quick" set "TITLE=DETM - RU v2 (quick)"
-python tools\compile_book_ru.py --manifest "%MANIFEST%" --mode "%MODE%" --title "%TITLE%" --out - --report > "%OUT%"
+set "ICON_MODE=%RU_V2_ICON_MODE%"
+if not defined ICON_MODE set "ICON_MODE=auto"
+python tools\compile_book_ru.py --manifest "%MANIFEST%" --mode "%MODE%" --icon-mode "%ICON_MODE%" --title "%TITLE%" --out - --report > "%OUT%"
 if errorlevel 1 (
   popd
   exit /b 1
