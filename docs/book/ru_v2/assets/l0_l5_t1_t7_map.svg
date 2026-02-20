@@ -1,136 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1060" viewBox="0 0 1600 1060">
   <defs>
     <style>
       .bg { fill: #ffffff; }
-      .title { font: 800 30px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .sub { font: 500 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #334155; }
-      .h { font: 800 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .t { font: 500 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .muted { font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #334155; }
+      .title { font-family: Arial, sans-serif; font-size: 40px; font-weight: 700; fill: #0f172a; }
+      .sub { font-family: Arial, sans-serif; font-size: 20px; font-weight: 400; fill: #334155; }
+      .h { font-family: Arial, sans-serif; font-size: 19px; font-weight: 700; fill: #0f172a; }
+      .t { font-family: Arial, sans-serif; font-size: 17px; font-weight: 400; fill: #0f172a; }
+      .muted { font-family: Arial, sans-serif; font-size: 15px; font-weight: 400; fill: #475569; }
       .col { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 14; }
       .row { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 12; }
       .tag { fill: #0f172a; rx: 10; }
-      .tagtext { font: 800 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #ffffff; }
+      .tagtext { font-family: Arial, sans-serif; font-size: 15px; font-weight: 700; fill: #ffffff; }
       .pill { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.25; rx: 999; }
-      .pilltext { font: 700 13px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .pilltext { font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #0f172a; }
       .arrow { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#m); }
     </style>
-    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
     </marker>
   </defs>
 
-  <rect class="bg" x="0" y="0" width="1600" height="980"/>
+  <rect class="bg" x="0" y="0" width="1600" height="1060"/>
 
-  <text class="title" x="70" y="70">Диагностическая связка: L0 ↔ T1–T7 ↔ L5</text>
-  <text class="sub" x="70" y="105">Идея: «перекос/дефицит в базисе (L0) → типовой режим (T) → наблюдаемый симптом на поверхности (L5) → первый оператор для стабилизации».</text>
+  <text class="title" x="70" y="70">Диагностическая связка: L0 ↔ T1-T7 ↔ L5</text>
+  <text class="sub" x="70" y="104">Перекос в базисе (L0) дает типовой режим (T), а на поверхности (L5) виден симптом и первый оператор.</text>
 
-  <!-- Column headers -->
-  <rect class="col" x="70" y="150" width="470" height="64"/>
-  <rect class="col" x="565" y="150" width="420" height="64"/>
-  <rect class="col" x="1010" y="150" width="520" height="64"/>
-  <text class="h" x="95" y="191">L0: что «не тянет» (перекос)</text>
-  <text class="h" x="590" y="191">Тема (T)</text>
-  <text class="h" x="1035" y="191">L5: что видно «сверху» (симптом) + первый оператор</text>
+  <rect class="col" x="70" y="146" width="470" height="68"/>
+  <rect class="col" x="565" y="146" width="420" height="68"/>
+  <rect class="col" x="1010" y="146" width="520" height="68"/>
+  <text class="h" x="95" y="188">L0: что не тянет (перекос)</text>
+  <text class="h" x="590" y="188">Тема (T)</text>
+  <text class="h" x="1035" y="188">L5: что видно сверху + первый оператор</text>
 
-  <!-- Row template settings -->
-  <!-- Rows y: 240, 330, 420, 510, 600, 690, 780 -->
+  <rect class="row" x="70" y="234" width="1460" height="96"/>
+  <rect class="row" x="70" y="340" width="1460" height="96"/>
+  <rect class="row" x="70" y="446" width="1460" height="96"/>
+  <rect class="row" x="70" y="552" width="1460" height="96"/>
+  <rect class="row" x="70" y="658" width="1460" height="96"/>
+  <rect class="row" x="70" y="764" width="1460" height="96"/>
+  <rect class="row" x="70" y="870" width="1460" height="96"/>
 
-  <!-- T1 -->
-  <rect class="row" x="70" y="240" width="1460" height="76"/>
-  <rect class="tag" x="585" y="262" width="54" height="32"/>
-  <text class="tagtext" x="600" y="284">T1</text>
-  <text class="t" x="95" y="270">Перегрев контура / нет окна остановки</text>
-  <text class="muted" x="95" y="295">ускорение > проверяемость, цена ошибки растёт быстрее буфера</text>
-  <text class="t" x="655" y="270">Остановка / пауза как защита причинности</text>
-  <text class="t" x="1035" y="270">Срывы, аварийность, «всё срочно», каскад ошибок</text>
-  <rect class="pill" x="1035" y="286" width="172" height="24"/>
-  <text class="pilltext" x="1050" y="303">старт: L0-C1</text>
+  <rect class="tag" x="585" y="266" width="54" height="32"/><text class="tagtext" x="600" y="288">T1</text>
+  <text class="t" x="95" y="266">Перегрев контура, нет окна остановки.</text>
+  <text class="muted" x="95" y="292">Ускорение выше проверяемости.</text>
+  <text class="t" x="655" y="266">Остановка/пауза как защита причинности.</text>
+  <text class="t" x="1035" y="266">Срывы, «всё срочно», каскад ошибок.</text>
+  <rect class="pill" x="1035" y="288" width="176" height="26"/><text class="pilltext" x="1050" y="306">старт: L0-C1</text>
 
-  <!-- T2 -->
-  <rect class="row" x="70" y="330" width="1460" height="76"/>
-  <rect class="tag" x="585" y="352" width="54" height="32"/>
-  <text class="tagtext" x="600" y="374">T2</text>
-  <text class="t" x="95" y="360">Цена участия не сходится / правду держать слишком дорого</text>
-  <text class="muted" x="95" y="385">выход/молчание/саботаж становится рациональным</text>
-  <text class="t" x="655" y="360">Отказ участвовать / разрыв связи с ложью</text>
-  <text class="t" x="1035" y="360">Уход в тень, имитация, «делаем вид», массовые отказы</text>
-  <rect class="pill" x="1035" y="376" width="172" height="24"/>
-  <text class="pilltext" x="1050" y="393">старт: L0-C2</text>
+  <rect class="tag" x="585" y="372" width="54" height="32"/><text class="tagtext" x="600" y="394">T2</text>
+  <text class="t" x="95" y="372">Цена участия не сходится, правда дорогая.</text>
+  <text class="muted" x="95" y="398">Выход/молчание становятся рациональными.</text>
+  <text class="t" x="655" y="372">Отказ участвовать, разрыв связи с ложью.</text>
+  <text class="t" x="1035" y="372">Имитация, уход в тень, массовые отказы.</text>
+  <rect class="pill" x="1035" y="394" width="176" height="26"/><text class="pilltext" x="1050" y="412">старт: L0-C2</text>
 
-  <!-- T3 -->
-  <rect class="row" x="70" y="420" width="1460" height="76"/>
-  <rect class="tag" x="585" y="442" width="54" height="32"/>
-  <text class="tagtext" x="600" y="464">T3</text>
-  <text class="t" x="95" y="450">Нет буфера/ресурса → спасаемся перерасходом</text>
-  <text class="muted" x="95" y="475">«дотянем на героизме» вместо управления и пересборки нагрузки</text>
-  <text class="t" x="655" y="450">Героический режим (перерасход ресурса вместо управления)</text>
-  <text class="t" x="1035" y="450">Выгорание, пожары как норма, зависимость от героев, обрыв</text>
-  <rect class="pill" x="1035" y="466" width="172" height="24"/>
-  <text class="pilltext" x="1050" y="483">старт: L0-C3</text>
+  <rect class="tag" x="585" y="478" width="54" height="32"/><text class="tagtext" x="600" y="500">T3</text>
+  <text class="t" x="95" y="478">Нет буфера/ресурса, спасаемся перерасходом.</text>
+  <text class="muted" x="95" y="504">«Дотянем героизмом» вместо управления.</text>
+  <text class="t" x="655" y="478">Героический режим вместо пересборки нагрузки.</text>
+  <text class="t" x="1035" y="478">Выгорание, пожары как норма, обрыв.</text>
+  <rect class="pill" x="1035" y="500" width="176" height="26"/><text class="pilltext" x="1050" y="518">старт: L0-C3</text>
 
-  <!-- T4 -->
-  <rect class="row" x="70" y="510" width="1460" height="76"/>
-  <rect class="tag" x="585" y="532" width="54" height="32"/>
-  <text class="tagtext" x="600" y="554">T4</text>
-  <text class="t" x="95" y="540">Обязательства > мощность / долг растёт быстрее выполнения</text>
-  <text class="muted" x="95" y="565">нужно снижать обещания до базиса, иначе дефолт</text>
-  <text class="t" x="655" y="540">Снижение обязательств до базиса (заморозка/урезание)</text>
-  <text class="t" x="1035" y="540">Невыполнимость, вечные переносы, деградация качества, кризис</text>
-  <rect class="pill" x="1035" y="556" width="172" height="24"/>
-  <text class="pilltext" x="1050" y="573">старт: L0-C4</text>
+  <rect class="tag" x="585" y="584" width="54" height="32"/><text class="tagtext" x="600" y="606">T4</text>
+  <text class="t" x="95" y="584">Обязательства больше мощности, долг растет.</text>
+  <text class="muted" x="95" y="610">Нужно резать обещания до базиса.</text>
+  <text class="t" x="655" y="584">Снижение обязательств и заморозка лишнего.</text>
+  <text class="t" x="1035" y="584">Вечные переносы, деградация качества.</text>
+  <rect class="pill" x="1035" y="606" width="176" height="26"/><text class="pilltext" x="1050" y="624">старт: L0-C4</text>
 
-  <!-- T5 -->
-  <rect class="row" x="70" y="600" width="1460" height="76"/>
-  <rect class="tag" x="585" y="622" width="54" height="32"/>
-  <text class="tagtext" x="600" y="644">T5</text>
-  <text class="t" x="95" y="630">Токсичный узел/контур заражает остальное</text>
-  <text class="muted" x="95" y="655">риск распространяется, нужен барьер/изоляция</text>
-  <text class="t" x="655" y="630">Карантин разрыва (изоляция токсичного узла/контура)</text>
-  <text class="t" x="1035" y="630">Каскад, заражение, расползание конфликтов/инцидентов</text>
-  <rect class="pill" x="1035" y="646" width="172" height="24"/>
-  <text class="pilltext" x="1050" y="663">старт: L0-C5</text>
+  <rect class="tag" x="585" y="690" width="54" height="32"/><text class="tagtext" x="600" y="712">T5</text>
+  <text class="t" x="95" y="690">Токсичный узел заражает остальное.</text>
+  <text class="muted" x="95" y="716">Риск расползается, нужен барьер.</text>
+  <text class="t" x="655" y="690">Карантин разрыва, изоляция токсичного контура.</text>
+  <text class="t" x="1035" y="690">Каскад конфликтов и инцидентов.</text>
+  <rect class="pill" x="1035" y="712" width="176" height="26"/><text class="pilltext" x="1050" y="730">старт: L0-C5</text>
 
-  <!-- T6 -->
-  <rect class="row" x="70" y="690" width="1460" height="76"/>
-  <rect class="tag" x="585" y="712" width="54" height="32"/>
-  <text class="tagtext" x="600" y="734">T6</text>
-  <text class="t" x="95" y="720">Нет датчиков/правды → нельзя разложить причину на шаги</text>
-  <text class="muted" x="95" y="745">readout ломается, система оптимизирует отчёт</text>
-  <text class="t" x="655" y="720">Восстановление обратной связи (сделать правду дешёвой)</text>
-  <text class="t" x="1035" y="720">Рост имитации, метрики без эффекта, «непонятно что работает»</text>
-  <rect class="pill" x="1035" y="736" width="172" height="24"/>
-  <text class="pilltext" x="1050" y="753">старт: L0-C6</text>
+  <rect class="tag" x="585" y="796" width="54" height="32"/><text class="tagtext" x="600" y="818">T6</text>
+  <text class="t" x="95" y="796">Нет датчиков правды, readout сломан.</text>
+  <text class="muted" x="95" y="822">Система оптимизирует отчет, не реальность.</text>
+  <text class="t" x="655" y="796">Восстановление обратной связи и проверки.</text>
+  <text class="t" x="1035" y="796">Метрики есть, эффекта нет.</text>
+  <rect class="pill" x="1035" y="818" width="176" height="26"/><text class="pilltext" x="1050" y="836">старт: L0-C6</text>
 
-  <!-- T7 -->
-  <rect class="row" x="70" y="780" width="1460" height="76"/>
-  <rect class="tag" x="585" y="802" width="54" height="32"/>
-  <text class="tagtext" x="600" y="824">T7</text>
-  <text class="t" x="95" y="810">Конфликт осей / дрейф референса / «что считать реальностью»</text>
-  <text class="muted" x="95" y="835">политика метрик и интерпретаций становится полем боя</text>
-  <text class="t" x="655" y="810">Контроль интерпретации (какие оси считаются реальностью)</text>
-  <text class="t" x="1035" y="810">Война метрик, Гудхарт как норма, спор не проверяем</text>
-  <rect class="pill" x="1035" y="826" width="172" height="24"/>
-  <text class="pilltext" x="1050" y="843">старт: L3-C7</text>
+  <rect class="tag" x="585" y="902" width="54" height="32"/><text class="tagtext" x="600" y="924">T7</text>
+  <text class="t" x="95" y="902">Конфликт осей: что считать реальностью.</text>
+  <text class="muted" x="95" y="928">Политика интерпретаций становится полем боя.</text>
+  <text class="t" x="655" y="902">Контроль интерпретации и правил счета.</text>
+  <text class="t" x="1035" y="902">Война метрик, спор непроверяем.</text>
+  <rect class="pill" x="1035" y="924" width="176" height="26"/><text class="pilltext" x="1050" y="942">старт: L3-C7</text>
 
-  <!-- Arrows between columns -->
-  <path class="arrow" d="M 540 278 L 565 278"/>
-  <path class="arrow" d="M 540 368 L 565 368"/>
-  <path class="arrow" d="M 540 458 L 565 458"/>
-  <path class="arrow" d="M 540 548 L 565 548"/>
-  <path class="arrow" d="M 540 638 L 565 638"/>
-  <path class="arrow" d="M 540 728 L 565 728"/>
-  <path class="arrow" d="M 540 818 L 565 818"/>
+  <path class="arrow" d="M 540 282 L 565 282"/>
+  <path class="arrow" d="M 540 388 L 565 388"/>
+  <path class="arrow" d="M 540 494 L 565 494"/>
+  <path class="arrow" d="M 540 600 L 565 600"/>
+  <path class="arrow" d="M 540 706 L 565 706"/>
+  <path class="arrow" d="M 540 812 L 565 812"/>
+  <path class="arrow" d="M 540 918 L 565 918"/>
 
-  <path class="arrow" d="M 985 278 L 1010 278"/>
-  <path class="arrow" d="M 985 368 L 1010 368"/>
-  <path class="arrow" d="M 985 458 L 1010 458"/>
-  <path class="arrow" d="M 985 548 L 1010 548"/>
-  <path class="arrow" d="M 985 638 L 1010 638"/>
-  <path class="arrow" d="M 985 728 L 1010 728"/>
-  <path class="arrow" d="M 985 818 L 1010 818"/>
+  <path class="arrow" d="M 985 282 L 1010 282"/>
+  <path class="arrow" d="M 985 388 L 1010 388"/>
+  <path class="arrow" d="M 985 494 L 1010 494"/>
+  <path class="arrow" d="M 985 600 L 1010 600"/>
+  <path class="arrow" d="M 985 706 L 1010 706"/>
+  <path class="arrow" d="M 985 812 L 1010 812"/>
+  <path class="arrow" d="M 985 918 L 1010 918"/>
 
-  <text class="muted" x="70" y="940">Подсказка: если «любой выбор не меняет траекторию», сначала делай шаг вглубь (readout/базис), и только потом перебирай варианты вширь.</text>
+  <text class="muted" x="70" y="1028">Подсказка: если выбор не меняет траекторию, сначала иди вглубь (readout/базис), потом перебирай варианты вширь.</text>
 </svg>
-

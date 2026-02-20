@@ -175,16 +175,21 @@ vertical-align: middle;
 <h2 id="содержание">Содержание</h2>
 <ol type="1">
 <li>С чего начать (короткий крючок)</li>
+<li>Тезис</li>
+<li>Карта читателя</li>
+<li>Как читать</li>
 <li>Карта уровней L0–L5 (одна страница)</li>
 <li>Быстрый старт (10 минут)</li>
 <li>Первая помощь: диагностика за 5 минут</li>
 <li>Человек как система (применение модели L0-L5)</li>
 <li>Человек как система: deep dive</li>
-<li>Карта читателя</li>
-<li>Как читать</li>
 <li>Итоги уровней (L0–L5) — кратко</li>
+<li>Сквозной кейс L0→L5: проектная команда (практический проход)</li>
 <li>Навигационная шпаргалка (S–T–C)</li>
+<li>Диагностический бланк (24h/72h)</li>
+<li>Операционные карточки (1 страница)</li>
 <li>Инварианты и тесты</li>
+<li>Заключение (короткий итог книги)</li>
 <li>Термины</li>
 <li>Индекс (термины и паттерны)</li>
 <li>Реестр ситуаций</li>
@@ -202,6 +207,15 @@ vertical-align: middle;
 <li>Проверка качества хода → <a href="#invariants-and-tests">«Инварианты
 и тесты»</a>.</li>
 </ol>
+<p>Коды в книге:</p>
+<ul>
+<li><code>L0-L5</code> — уровни анализа (от базиса до границ
+режима).</li>
+<li><code>S1-S5</code> — сцены (масштаб: человек, семья, общество,
+организация, государство).</li>
+<li><code>T1-T7</code> — типовые темы/паттерны проблем.</li>
+<li><code>Lx-Cn</code> — конкретный оператор действия на уровне.</li>
+</ul>
 <p>Представьте мост.</p>
 <p>Снаружи он выглядит нормально: асфальт, ограждения, фонари. Люди
 ездят, отчёты «зелёные», графики «растут». Но внутри у моста есть то,
@@ -242,9 +256,345 @@ vertical-align: middle;
 сигнал: вы ещё не зафиксировали <strong>наблюдаемые входы</strong> и
 <strong>сцену</strong> (масштаб), в которой вы пытаетесь поставить
 диагноз.</p>
+<h2 id="тезис">Тезис</h2>
+<p>Эта книга — про то, <strong>как системы удерживают режим</strong> и
+какой ценой. Под «режимом» здесь — текущий способ работы системы: как
+устроены её шаги, обратная связь и цена ошибок. Под «системой» здесь
+можно понимать человека, семью, команду, организацию или общество: везде
+есть базис, действия, объяснения, правила, институты и границы
+применимости. Базис (L0) — минимальные условия существования системы
+(ресурс/буфер/доверие и т. п.), без которых причинность распадается, а
+отчёт вытесняет реальность.</p>
+<p>По жанру это не «менеджмент-книга» и не мотивационный текст. Это
+<strong>операционная философия управления через инварианты и
+границы</strong>: попытка говорить о человеческих системах инженерно —
+через причинность, обратную связь и архитектуру цены.</p>
+<p>Канва книги (рабочая аксиома):</p>
+<p><strong>Человек — оптимизатор собственного минимального
+действия.</strong> В каждый момент он выбирает не «лучшее», а то, на что
+готов потратить энергию сейчас (внимание/усилие/риск/время/социальную
+цену). То же справедливо для групп и организаций: они выбирают не
+«оптимум», а то, что дешевле удерживать в текущем режиме.</p>
+<p>Отсюда практический фокус книги:</p>
+<ul>
+<li>управлять нужно не «результатами», а <strong>геометрией
+действий</strong> — тем, какие шаги становятся дешёвыми/дорогими;</li>
+<li>метрики — это датчики, а не цель;</li>
+<li>правила — это архитектура цены, а не мораль;</li>
+<li>отказ (стоп/выход/молчание/саботаж/имитация) — это не «ошибка», а
+<strong>сигнал несходимости</strong> цены удержания режима.</li>
+</ul>
+<p>Одна базовая проверка, которая много где сработает дальше: если
+<strong>отчёт не связан с ценой/болью</strong>, система начинает обучать
+обман (reward hacking) как оптимальную стратегию.</p>
+<h3 id="связи-с-известными-концепциями">Связи с известными
+концепциями</h3>
+<ul>
+<li>Формула «метрика как цель ломает управление» согласуется с законом
+Гудхарта.</li>
+<li>Логика «сначала держится базис, потом появляются верхние цели»
+пересекается с идеей иерархии потребностей (Маслоу).</li>
+<li>Отличие этой книги: акцент на операторах и readout, а не на
+классификации людей.</li>
+</ul>
+<h3 id="что-эта-книга-даёт">Что эта книга даёт</h3>
+<ul>
+<li>Язык уровней L0–L5, который помогает различать: «мы обсуждаем
+поведение» или «мы уже про границы режима».</li>
+<li>Способ видеть, <strong>какой базис (L0) реально
+обслуживается</strong> системой, даже если на словах декларируется
+другое.</li>
+<li>Модель причинных каскадов: как перекос внизу превращается наверху в
+типовые темы (T1–T7): остановка, отказ, героизм, снижение обязательств,
+карантин, обратная связь, оси/проекции.</li>
+</ul>
+<h3 id="что-эта-книга-не-обещает-границы">Что эта книга не обещает
+(границы)</h3>
+<ul>
+<li>Это не «правильная теория личности», не тест и не
+психотипология.</li>
+<li>Это не набор универсальных рецептов и не мотивационный текст.</li>
+<li>Это не моральная философия «как правильно жить» и не оправдание
+насилия/контроля.</li>
+<li>Это не медицинская/юридическая/финансовая консультация.</li>
+</ul>
+<p>Книга даёт не выводы, а базис: <strong>в каком описании рассуждение
+держится, а в каком — нет</strong>. Если рассуждение не держится в
+текущем базисе — это не «недостаток данных», а сигнал: цена удержания
+режима растёт, нужна смена уровня описания (try/except).</p>
+<h3 id="минимальная-инструкция-по-применению">Минимальная инструкция по
+применению</h3>
+<ol type="1">
+<li>Зафиксируй наблюдаемые входы (что реально видно), не выбирая заранее
+«что важно».</li>
+<li>Определи, где сейчас система: L0 (есть/нет), L1 (шаг→эффект), L2
+(истории/роли), L3 (правила/метрики), L4 (институты/власть), L5
+(границы/переходы).</li>
+<li>Проверь, какой полюс базиса (L0) «тянет» оптимизацию, и какие темы
+T1–T7 уже проявились на поверхности (L5).</li>
+</ol>
+<h2 id="карта-читателя">Карта читателя</h2>
+<p><a id="reader-map"></a></p>
+<p>Эта книга устроена как лестница уровней L0–L5, но читать её лучше не
+«сверху вниз», а <strong>из своей задачи</strong>. Ниже — краткая карта:
+кому что брать и где ставить акцент.</p>
+<p>Перед выбором маршрута держи две опоры:</p>
+<ol type="1">
+<li>Если ты в «пожаре», иди от симптома к коду: <a href="#nav-cheatsheet">S–T–C шпаргалка</a> → <a href="#case-registry">реестр ситуаций</a>.</li>
+<li>Чтобы не уйти в лозунги, держи <a href="#invariants-and-tests">5
+главных тестов</a> (цель+цена, readout, функция оптимизации,
+анти-имитация, границы предсказания).</li>
+</ol>
+<h3 id="если-ты-инженерпрактик">Если ты инженер/практик</h3>
+<p>Цель: вернуть причинность и управляемость, снизить цену ошибок и
+имитации.</p>
+<ul>
+<li>Смотри на: L0 (базис), L1 (минимальная операция + readout), L3
+(метрики/контракты), L5 (границы).</li>
+<li>Читай кейсы через сцены S4 (команда/корпорация) и S1 (человек).</li>
+<li>Главный вопрос: «что сделать, чтобы шаг снова давал проверяемый
+эффект, а ложь стала дорогой?»</li>
+</ul>
+<p>Маршрут: L0 → L1 → L3 → L5 (и точечно L2/L4, если упёрся в
+легитимность или табу).</p>
+<h3 id="если-ты-менеджерруководитель">Если ты менеджер/руководитель</h3>
+<p>Цель: перестроить цену участия, чтобы система держалась без героизма
+и принуждения.</p>
+<ul>
+<li>Смотри на: L0 (готовность базиса участвовать), L3 (правила/оси), L4
+(институты/права), L5 (переходы).</li>
+<li>Читай кейсы через сцены S4 и S5.</li>
+<li>Главный вопрос: «кто платит цену решений, и где она всплывёт через
+месяц/квартал?»</li>
+</ul>
+<p>Маршрут: L0 → L3 → L4 → L5 (и точечно L1, чтобы укоротить контуры
+обратной связи).</p>
+<h3 id="если-ты-исследовательаналитик">Если ты
+исследователь/аналитик</h3>
+<p>Цель: описывать системы без преждевременного выбора «единственной
+причины» и видеть границы применимости моделей.</p>
+<ul>
+<li>Смотри на: L2 (модели/язык), L3 (оси/проекции), L5 (границы), и
+постоянно сверяйся с L0.</li>
+<li>Читай кейсы через сцены S3–S5.</li>
+<li>Главный вопрос: «какие входы мы не фиксируем, и какую ось мы тайно
+считаем реальностью?»</li>
+</ul>
+<p>Маршрут: L0 → L2 → L3 → L5 (и L4, когда речь о
+власти/институтах).</p>
+<h3 id="если-ты-читатель-без-контекста">Если ты читатель без
+контекста</h3>
+<p>Цель: получить карту «почему люди и системы ведут себя странно» без
+морализации и без попытки всё объяснить одним словом.</p>
+<ul>
+<li>Начни с: <strong>«Быстрый старт (10 минут)»</strong> (если хочешь
+начать “от симптома”), затем Тезис и «Как читать».</li>
+<li>Или начни с: Тезиса и «Как читать» (если хочешь сначала понять
+логику), затем L0, L1, потом L2 и L3.</li>
+<li>Читай через сцены S1–S3, не пытаясь сразу охватить S5.</li>
+<li>Главный вопрос: «какой базис сейчас не тянет, и какая тема T уже
+проявилась?»</li>
+</ul>
+<p>Маршрут: Тезис → Как читать → L0 → L1 → (L2 или L3) → L5.</p>
+<h3 id="если-ты-студент--любознательный-непрофессионал">Если ты студент
+/ любознательный непрофессионал</h3>
+<p>Цель: получить понятную карту без давления «быть умным».</p>
+<ul>
+<li>Начни с: <strong>«Быстрый старт (10 минут)»</strong>, затем «Как
+читать».</li>
+<li>Держи в голове 3 вещи: L0 (держится ли базис), L1 (есть ли
+шаг→эффект), L5 (где граница).</li>
+<li>Если стало абстрактно — открывай <a href="#nav-cheatsheet">«Навигационную шпаргалку»</a> и иди от симптома к
+коду.</li>
+</ul>
+<p>Маршрут: Быстрый старт → Как читать → L0 → L1 → L5 (и точечно L2/L3
+по интересу).</p>
+<p>Маршруты чтения (быстро/инженерно/через смыслы) даны в разделе
+<strong>«Как читать»</strong> — здесь они намеренно не повторяются.</p>
+<p>Если в тексте появляется ощущение «это абстрактно», почти всегда это
+сигнал: не выбран базис сцены (S1–S5) или пропущены наблюдаемые
+входы.</p>
+<h2 id="как-читать">Как читать</h2>
+<p>Эта книга устроена как лестница уровней L0–L5, но каждая глава
+рассматривает свой уровень <strong>в проекциях на остальные</strong>:
+что делает действие на уровне Ln с другими уровнями, и как Ln выглядит
+глазами этих уровней.</p>
+<p>Правило чтения: <strong>не переносить выводы вне базиса</strong>.
+Если рассуждение не держится в текущем базисе — это не «ошибка данных»,
+а сигнал отказа/несходимости цены удержания режима.</p>
+<p>Маршруты чтения:</p>
+<ul>
+<li>Быстро: L0 → L3 → L5 (базис → управление → границы).</li>
+<li>Инженерно: L0 → L1 → L3 → L4 → L5.</li>
+<li>Через смыслы: L0 → L2 → L3 → L4 → L5.</li>
+</ul>
+<p>Если нужен только практический слой: прочитай раздел «Два режима
+навигации», затем открой <a href="#nav-cheatsheet">шпаргалку S–T–C</a> и
+<a href="#invariants-and-tests">«Инварианты и тесты»</a>. Разделы про
+интегральную и полевую интуицию ниже можно читать как факультатив.</p>
+<h3 id="два-режима-навигации-цель-и-путь-вглубь--вширь">Два режима
+навигации: цель и путь (вглубь / вширь)</h3>
+<p>В сложных системах полезно различать два ортогональных режима
+навигации. Их часто путают с «типами людей» или даже с «мужским/женским
+мышлением», но это не свойства пола — это <strong>функции
+системы</strong>, которые могут переключаться у одного и того же
+человека/команды.</p>
+<p>Коротко: вглубь — когда система &quot;не отвечает&quot;; вширь — когда система
+отвечает, но нужно выбрать лучший ход.</p>
+<h4 id="вглубь-проверка-механики-достижимости">Вглубь (проверка механики
+достижимости)</h4>
+<p>Это движение по причинности: L3 → L1 → L0. Задача — проверить,
+<em>можем ли мы вообще идти</em> (держится ли базис и readout) и где
+находятся границы режима. Это поиск инварианта/ограничений: что должно
+быть истинно, чтобы «цель» имела смысл и была достижима.</p>
+<h4 id="вширь-перебор-вариантов-внутри-текущих-границ">Вширь (перебор
+вариантов внутри текущих границ)</h4>
+<p>Это перебор допустимых вариантов в текущем базисе (обычно L2–L3):
+оси/проекции, роли/истории, тактики и малые эксперименты. Задача — найти
+путь/вариант действия внутри того, что уже является возможным и не
+ломает контур.</p>
+<p>Практическое правило переключения:</p>
+<ul>
+<li>если readout нестабилен или «любой выбор не меняет траекторию» —
+идти <strong>вглубь</strong>;</li>
+<li>если readout держится — искать <strong>вширь</strong>.</li>
+</ul>
+<h3 id="интегральная-интуиция-уровней-модель">Интегральная интуиция
+уровней (модель)</h3>
+<p>Если упростить: каждый следующий уровень — это накопленный след
+предыдущего уровня.</p>
+<p>Уровни можно читать как «интегрирование» по времени (в человеческом
+смысле, не как математику):</p>
+<ul>
+<li><strong>Ln = накопленный след Ln-1</strong>, который повторялся
+достаточно долго, чтобы стать дешёвой нормой.</li>
+<li>То, что на Ln выглядит как структура/правило/институт, на Ln-1 было
+множеством локальных шагов, которые <em>сходились по цене</em>.</li>
+</ul>
+<p><img role="img" aria-label="Интегральная интуиция уровней: Ln как интеграл Ln-1 (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9Ijg0MCIgdmlld0JveD0iMCAwIDE0MDAgODQwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAudGl0bGUgeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMzhweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuc3ViIHsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDIwcHg7IGZvbnQtd2VpZ2h0OiA0MDA7IGZpbGw6ICMzMzQxNTU7IH0KICAgICAgLmJveCB7IGZpbGw6ICNmOGZhZmM7IHN0cm9rZTogIzBmMTcyYTsgc3Ryb2tlLXdpZHRoOiAyOyByeDogMTQ7IH0KICAgICAgLmggeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMjJweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxOHB4OyBmb250LXdlaWdodDogNDAwOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5jYXJkaCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAzMHB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5jYXJkdCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAyMHB4OyBmb250LXdlaWdodDogNDAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5tdXRlZCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxOHB4OyBmb250LXdlaWdodDogNDAwOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5waWxsIHsgZmlsbDogI2UyZThmMDsgc3Ryb2tlOiAjNDc1NTY5OyBzdHJva2Utd2lkdGg6IDEuNTsgcng6IDk5OTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyBtYXJrZXItZW5kOiB1cmwoI20pOyB9CiAgICA8L3N0eWxlPgogICAgPG1hcmtlciBpZD0ibSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iOSIgbWFya2VySGVpZ2h0PSI5IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzBmMTcyYSIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgoKICA8cmVjdCBjbGFzcz0iYmciIHg9IjAiIHk9IjAiIHdpZHRoPSIxNDAwIiBoZWlnaHQ9Ijg0MCIvPgoKICA8dGV4dCBjbGFzcz0idGl0bGUiIHg9IjU2IiB5PSI2NiI+0JjQvdGC0LXQs9GA0LDQu9GM0L3QsNGPINC40L3RgtGD0LjRhtC40Y8g0YPRgNC+0LLQvdC10Lk6IExuINC60LDQuiDQuNC90YLQtdCz0YDQsNC7IExuLTE8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iNTYiIHk9Ijk4Ij7Qn9C+0LLRgtC+0YDRj9GO0YnQuNC10YHRjyDRiNCw0LPQuCDQuCDQuNGFINGG0LXQvdCwINGB0L4g0LLRgNC10LzQtdC90LXQvCDQutGA0LjRgdGC0LDQu9C70LjQt9GD0Y7RgtGB0Y8g0LIg0YHRgtGA0YPQutGC0YPRgNGDINGB0LvQtdC00YPRjtGJ0LXQs9C+INGD0YDQvtCy0L3Rjy48L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjU2IiB5PSIxMzYiIHdpZHRoPSI2MTAiIGhlaWdodD0iMTAyIi8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iNTYiIHk9IjI1MiIgd2lkdGg9IjYxMCIgaGVpZ2h0PSIxMDIiLz4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI1NiIgeT0iMzY4IiB3aWR0aD0iNjEwIiBoZWlnaHQ9IjEwMiIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjU2IiB5PSI0ODQiIHdpZHRoPSI2MTAiIGhlaWdodD0iMTAyIi8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iNTYiIHk9IjYwMCIgd2lkdGg9IjYxMCIgaGVpZ2h0PSIxMDIiLz4KCiAgPHRleHQgY2xhc3M9ImgiIHg9Ijg0IiB5PSIxNzAiPkwxICDQqNCw0LPQuCDQuCByZWFkb3V0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI4NCIgeT0iMTk2Ij7QnNC40L3QuNC80LDQu9GM0L3QsNGPINC+0L/QtdGA0LDRhtC40Y8sINC60L7RgNC+0YLQutC40Lkg0YbQuNC60LssINC/0YDQvtCy0LXRgNGP0LXQvNGL0Lkg0Y3RhNGE0LXQutGCLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9Ijg0IiB5PSIyODYiPkwyICDQmNGB0YLQvtGA0LjQuCDQuCDRgNC+0LvQuDwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iODQiIHk9IjMxMiI+0JvQtdCz0LjRgtC40LzQsNGG0LjRjywg0YTRgNC10LnQvNGLLCDCq9C60YLQviDQvNGLIC8g0LLQviDRh9GC0L4g0LjQs9GA0LDQtdC8wrsuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iODQiIHk9IjQwMiI+TDMgINCe0YHQuCwg0LzQtdGC0YDQuNC60LgsINC60L7QvdGC0YDQsNC60YLRizwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iODQiIHk9IjQyOCI+0J/RgNCw0LLQuNC70LAg0LrQsNC6INCw0YDRhdC40YLQtdC60YLRg9GA0LAg0YbQtdC90YssINC00LDRgtGH0LjQutC4LCDRgdCw0L3QutGG0LjQuC48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI4NCIgeT0iNTE4Ij5MNCAg0JjQvdGB0YLQuNGC0YPRgtGLINC4INCy0LvQsNGB0YLRjDwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iODQiIHk9IjU0NCI+0J/RgNCw0LLQsCwg0LvQtdCz0LjRgtC40LzQvdC+0YHRgtGMLCDQutGC0L4g0LzQvtC20LXRgiDQvNC10L3Rj9GC0Ywg0L/RgNCw0LLQuNC70LAuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iODQiIHk9IjYzNCI+TDUgINCT0YDQsNC90LjRhtGLINC4INC/0LXRgNC10YXQvtC00Ys8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9Ijg0IiB5PSI2NjAiPtCf0L7QstC10YDRhdC90L7RgdGC0L3Ri9C1INGB0LjQvNC/0YLQvtC80Ysg0Lgg0YLQvtGH0LrQuCDRgdC80LXQvdGLINGA0LXQttC40LzQsC48L3RleHQ+CgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNjAgMjM4IEwgMzYwIDI1MiIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNjAgMzU0IEwgMzYwIDM2OCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNjAgNDcwIEwgMzYwIDQ4NCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNjAgNTg2IEwgMzYwIDYwMCIvPgoKICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iNzAwIiB5PSIxNTQiIHdpZHRoPSI2NDAiIGhlaWdodD0iNzgiLz4KICA8dGV4dCBjbGFzcz0iY2FyZHQiIHg9IjcyNCIgeT0iMTg0Ij7QmNC90YLQtdCz0YDQsNC7INC/0L4g0LLRgNC10LzQtdC90Lg6PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjYXJkdCIgeD0iNzI0IiB5PSIyMTAiPtC/0L7QstGC0L7RgNGP0LXQvNC+0YHRgtGMINGI0LDQs9CwICsg0YbQtdC90LAgLT4g0L3QvtGA0LzQsC/RgdGC0YDRg9C60YLRg9GA0LAg0YHQu9C10LTRg9GO0YnQtdCz0L4g0YPRgNC+0LLQvdGPLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImNhcmRoIiB4PSI3MDAiIHk9IjMwMCI+0JrQsNC6INGH0LjRgtCw0YLRjCDRgdGC0YDQtdC70LrRgzwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY2FyZHQiIHg9IjcwMCIgeT0iMzM2Ij7QldGB0LvQuCDQvdCwIExuIMKr0LLQtNGA0YPQsyDQv9C+0Y/QstC40LvQvtGB0YzCuywg0YLQvjo8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNhcmR0IiB4PSI3MTgiIHk9IjM2NiI+MSkg0LjRidC4INC90LAgTG4tMSDQv9C+0LLRgtC+0YDRj9C10LzRi9C1INGI0LDQs9C4OzwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY2FyZHQiIHg9IjcxOCIgeT0iMzk2Ij4yKSDQv9GA0L7QstC10YDRjCwg0LrQsNC60LDRjyDRhtC10L3QsCDQtNC10LvQsNC70LAg0LjRhSDCq9C00LXRiNC10LLRi9C80LjCuzs8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNhcmR0IiB4PSI3MTgiIHk9IjQyNiI+Mykg0Y3RgtC+INC80LDRgtC10YDQuNCw0LssINC40Lcg0LrQvtGC0L7RgNC+0LPQviDQstGL0YDQvtGB0LvQsCDRgdGC0YDRg9C60YLRg9GA0LAgTG4uPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iY2FyZGgiIHg9IjcwMCIgeT0iNTAwIj7Qn9GA0LjQvNC10YAgKNCz0YDRg9Cx0L4pPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzAwIiB5PSI1MzIiPkwyID0g4oirTDE6INC/0L7QstGC0L7RgNGP0LXQvNGL0LUg0YjQsNCz0LggKyDQuNGFINGG0LXQvdCwIC0+INGA0L7Qu9GML9C40YHRgtC+0YDQuNGPLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjcwMCIgeT0iNTYwIj5MMyA9IOKIq0wyOiDQuNGB0YLQvtGA0LjQuCDQt9Cw0LrRgNC10L/Qu9GP0Y7RgtGB0Y8gLT4g0L7RgdC4L9C80LXRgtGA0LjQutC4L9C60L7QvdGC0YDQsNC60YLRiy48L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI3MDAiIHk9IjU4OCI+TDQgPSDiiKtMMzog0L/RgNCw0LLQuNC70LAg0LbQuNCy0YPRgiDQtNC+0LvRjNGI0LUg0LvRjtC00LXQuSAtPiDQuNC90YHRgtC40YLRg9GC0YsuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzAwIiB5PSI2MTYiPkw1ID0g4oirKNCy0YHQtdCz0L4pOiDQstC40LTQuNC8INCz0YDQsNC90LjRhtGLINGA0LXQttC40LzQsCDQuCDQv9C10YDQtdGF0L7QtNGLLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI1NiIgeT0iODEyIj5ERVRNIC8gUlUgdjIgLSDRgdGF0LXQvNCwINC00LvRjyDRh9GC0LXQvdC40Y8gKNC40L3RgtGD0LjRhtC40Y8sINC90LUg0YTQvtGA0LzQsNC70YzQvdC+0LUg0LTQvtC60LDQt9Cw0YLQtdC70YzRgdGC0LLQvikuPC90ZXh0Pgo8L3N2Zz4K" alt="Интегральная интуиция уровней: Ln как интеграл Ln-1 (схема)" /></p>
+<p>Текстовый fallback (если схема не рендерится):</p>
+<ul>
+<li>каждый следующий уровень — накопленный след предыдущего;</li>
+<li>структуры L2–L5 возникают из повторяющихся шагов и цены на L1;</li>
+<li>если на уровне <code>Ln</code> «вдруг» появилась новая норма, ищи в
+<code>Ln-1</code> повтор и цену, которая долго сходилась.</li>
+</ul>
+<p>Примеры (очень грубо):</p>
+<ul>
+<li>L2 можно читать как интеграл L1: повторяемые шаги + их цена
+превращаются в историю и роль.</li>
+<li>L3 можно читать как интеграл L2: истории кристаллизуются в оси,
+метрики и контракты.</li>
+<li>L4 можно читать как интеграл L3: правила начинают жить дольше людей
+(легитимность, санкции, права).</li>
+<li>L5 можно читать как интеграл всего: поверхность, где видно суммарный
+сдвиг и границы режима.</li>
+</ul>
+<p>Это полезно как правило чтения: если на Ln «вдруг появилось», ищи в
+Ln-1 повторяющиеся шаги и их цену.</p>
+<h3 id="опционально-полевая-интуиция-континуум--поля">Опционально:
+полевая интуиция («континуум + поля»)</h3>
+<p>На практике этот раздел нужен, когда хочется проверить метафоры на
+внутреннюю согласованность. Если нужна только операционная часть, этот
+блок можно пропустить.</p>
+<p>Иногда модель проще держать не как «этажи», а как одну и ту же
+систему, на которую действуют разные поля.</p>
+<ul>
+<li>L0 можно читать как <em>метрику существования</em>: держится ли
+причинность во времени (есть ли «завтра связано с сегодня», есть ли
+локальность шага, есть ли допустимые траектории). Когда L0 падает,
+«пространство шагов» схлопывается: остаётся «сейчас или смерть» (или
+«сейчас или дефолт» — для организаций).</li>
+<li>L1–L4 тогда читаются не как «выше/ниже», а как разные типы
+взаимодействий, которые искривляют траектории (меняют цену направлений)
+на одном и том же континууме.</li>
+</ul>
+<p>Если хочется совсем на пальцах (как рабочую физику, не как истину),
+можно примерить такую аналогию:</p>
+<ul>
+<li>L1 — «сильное»: сцепление шага и эффекта на коротком радиусе (если
+не работает — всё распадается в шум).</li>
+<li>L2 — «слабое»: превращения состояний (роль/идентичность/история: кем
+был → кем стал).</li>
+<li>L3 — «электромагнитное»: сигналы и измерения (оси, метрики, правила;
+здесь же живёт Гудхарт).</li>
+<li>L4 — «гравитация»: институты и инерция (слабое локально, но
+неизбежное глобально; определяет «орбиты» остальных уровней).</li>
+<li>L5 — не «сила», а поверхность наблюдения/граница применимости:
+фазовые переходы, бифуркации, места, где старые поля перестают
+сходиться.</li>
+</ul>
+<p>Эта логика рекурсивна: на любом масштабе можно переименовать текущий
+базис в L0, а остальное читать как поля L1–L5 над ним. Тогда модель
+становится не «картой всего», а способом искать условия существования
+причинности и появления устойчивых паттернов.</p>
+<p>Важная оговорка: это не попытка «объяснить человека физикой». Это
+способ держать <strong>физику описания</strong>: где именно причинно то,
+что мы делаем и говорим.</p>
+<p>Практическое следствие из этого (и оно потом много раз всплывёт в
+главах): почти любой конфликт — это спор на разных уровнях. И часто все
+правы — <em>на своём поле</em>. Отсюда же ограничение: «лечить L0 через
+L3» нельзя; «лечить гравитацию словами» бессмысленно.</p>
+<p>И ещё один полезный инвариант про наблюдение (readout): пока
+измерение/отчёт влияет на траекторию, наблюдатель неотделим от системы.
+Когда же «производная по наблюдению» близка к нулю (проверяем — и ничего
+не меняется), возникает объект/норма/институт как устойчивый инвариант:
+система умеет быть «сама собой» без постоянного контроля.</p>
+<h4 id="ещё-глубже-опционально-поверхность-фаза-и-знак-потока">Ещё
+глубже (опционально): поверхность, фаза и знак потока</h4>
+<p>Коротко: это язык для обсуждения устойчивости и обмена ценой через
+границы режима.</p>
+<p>Если продолжать держать эту картину как «геометрию траекторий», то
+полезно добавить ещё одну связку:</p>
+<ul>
+<li><strong>«Степень уравнения движения» → поверхность объекта.</strong>
+Не буквально «степень полинома», а структурно: сколько независимых
+условий должны выполняться одновременно, чтобы траектория оставалась
+устойчивой. Чем больше таких условий — тем жёстче поверхность инварианта
+(меньше свободы «уплывать»), тем «реальнее» объект как режим.</li>
+<li><strong>Мнимая часть → фазовый вектор устойчивости.</strong> Не
+«нереальная», а <em>фазовая</em>: она не обязана быть наблюдаемой
+напрямую, но задаёт направление и скорость релаксации к «центру массы»
+объекта — к состоянию минимальной цены существования/минимальной
+фазы.</li>
+<li><strong>Смена знака мнимой части → смена направления передачи
+энергии.</strong> Если знак меняется, это не «событие», а смена режима:
+объект становится источником энергии для среды или стоком энергии из
+среды. Это и есть термодинамический баланс по поверхности (обмен идёт
+через границу).</li>
+</ul>
+<p>В этом языке «устойчивость» — это нулевой поток через поверхность
+(вход = выход). «Рост» и «распад» — это просто разные стороны одного и
+того же баланса.</p>
+<p>Короткая формула уровня L4 в этом языке: С гравитацией можно не
+считаться — но тогда она посчитает тебя.</p>
+<h3 id="диагностическая-связка-l0--t1t7--l5-схема">Диагностическая
+связка: L0 ↔︎ T1–T7 ↔︎ L5 (схема)</h3>
+<p><img role="img" aria-label="Диагностическая связка: L0 ↔ T1–T7 ↔ L5 (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAwIiBoZWlnaHQ9IjEwNjAiIHZpZXdCb3g9IjAgMCAxNjAwIDEwNjAiPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuYmcgeyBmaWxsOiAjZmZmZmZmOyB9CiAgICAgIC50aXRsZSB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiA0MHB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zdWIgeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMjBweDsgZm9udC13ZWlnaHQ6IDQwMDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAuaCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxOXB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC50IHsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDE3cHg7IGZvbnQtd2VpZ2h0OiA0MDA7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLm11dGVkIHsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDE1cHg7IGZvbnQtd2VpZ2h0OiA0MDA7IGZpbGw6ICM0NzU1Njk7IH0KICAgICAgLmNvbCB7IGZpbGw6ICNmOGZhZmM7IHN0cm9rZTogIzBmMTcyYTsgc3Ryb2tlLXdpZHRoOiAyOyByeDogMTQ7IH0KICAgICAgLnJvdyB7IGZpbGw6ICNmZmZmZmY7IHN0cm9rZTogI2NiZDVlMTsgc3Ryb2tlLXdpZHRoOiAxLjU7IHJ4OiAxMjsgfQogICAgICAudGFnIHsgZmlsbDogIzBmMTcyYTsgcng6IDEwOyB9CiAgICAgIC50YWd0ZXh0IHsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDE1cHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGZpbGw6ICNmZmZmZmY7IH0KICAgICAgLnBpbGwgeyBmaWxsOiAjZTJlOGYwOyBzdHJva2U6ICM2NDc0OGI7IHN0cm9rZS13aWR0aDogMS4yNTsgcng6IDk5OTsgfQogICAgICAucGlsbHRleHQgeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTRweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICM2NDc0OGI7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyBtYXJrZXItZW5kOiB1cmwoI20pOyB9CiAgICA8L3N0eWxlPgogICAgPG1hcmtlciBpZD0ibSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iOSIgbWFya2VySGVpZ2h0PSI5IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzY0NzQ4YiIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgoKICA8cmVjdCBjbGFzcz0iYmciIHg9IjAiIHk9IjAiIHdpZHRoPSIxNjAwIiBoZWlnaHQ9IjEwNjAiLz4KCiAgPHRleHQgY2xhc3M9InRpdGxlIiB4PSI3MCIgeT0iNzAiPtCU0LjQsNCz0L3QvtGB0YLQuNGH0LXRgdC60LDRjyDRgdCy0Y/Qt9C60LA6IEwwIOKGlCBUMS1UNyDihpQgTDU8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iNzAiIHk9IjEwNCI+0J/QtdGA0LXQutC+0YEg0LIg0LHQsNC30LjRgdC1IChMMCkg0LTQsNC10YIg0YLQuNC/0L7QstC+0Lkg0YDQtdC20LjQvCAoVCksINCwINC90LAg0L/QvtCy0LXRgNGF0L3QvtGB0YLQuCAoTDUpINCy0LjQtNC10L0g0YHQuNC80L/RgtC+0Lwg0Lgg0L/QtdGA0LLRi9C5INC+0L/QtdGA0LDRgtC+0YAuPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iY29sIiB4PSI3MCIgeT0iMTQ2IiB3aWR0aD0iNDcwIiBoZWlnaHQ9IjY4Ii8+CiAgPHJlY3QgY2xhc3M9ImNvbCIgeD0iNTY1IiB5PSIxNDYiIHdpZHRoPSI0MjAiIGhlaWdodD0iNjgiLz4KICA8cmVjdCBjbGFzcz0iY29sIiB4PSIxMDEwIiB5PSIxNDYiIHdpZHRoPSI1MjAiIGhlaWdodD0iNjgiLz4KICA8dGV4dCBjbGFzcz0iaCIgeD0iOTUiIHk9IjE4OCI+TDA6INGH0YLQviDQvdC1INGC0Y/QvdC10YIgKNC/0LXRgNC10LrQvtGBKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0iaCIgeD0iNTkwIiB5PSIxODgiPtCi0LXQvNCwIChUKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0iaCIgeD0iMTAzNSIgeT0iMTg4Ij5MNTog0YfRgtC+INCy0LjQtNC90L4g0YHQstC10YDRhdGDICsg0L/QtdGA0LLRi9C5INC+0L/QtdGA0LDRgtC+0YA8L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJyb3ciIHg9IjcwIiB5PSIyMzQiIHdpZHRoPSIxNDYwIiBoZWlnaHQ9Ijk2Ii8+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjM0MCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iOTYiLz4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNDQ2IiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI5NiIvPgogIDxyZWN0IGNsYXNzPSJyb3ciIHg9IjcwIiB5PSI1NTIiIHdpZHRoPSIxNDYwIiBoZWlnaHQ9Ijk2Ii8+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjY1OCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iOTYiLz4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNzY0IiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI5NiIvPgogIDxyZWN0IGNsYXNzPSJyb3ciIHg9IjcwIiB5PSI4NzAiIHdpZHRoPSIxNDYwIiBoZWlnaHQ9Ijk2Ii8+CgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iMjY2IiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz48dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSIyODgiPlQxPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iMjY2Ij7Qn9C10YDQtdCz0YDQtdCyINC60L7QvdGC0YPRgNCwLCDQvdC10YIg0L7QutC90LAg0L7RgdGC0LDQvdC+0LLQutC4LjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSIyOTIiPtCj0YHQutC+0YDQtdC90LjQtSDQstGL0YjQtSDQv9GA0L7QstC10YDRj9C10LzQvtGB0YLQuC48L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iMjY2Ij7QntGB0YLQsNC90L7QstC60LAv0L/QsNGD0LfQsCDQutCw0Log0LfQsNGJ0LjRgtCwINC/0YDQuNGH0LjQvdC90L7RgdGC0LguPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSIxMDM1IiB5PSIyNjYiPtCh0YDRi9Cy0YssIMKr0LLRgdGRINGB0YDQvtGH0L3QvsK7LCDQutCw0YHQutCw0LQg0L7RiNC40LHQvtC6LjwvdGV4dD4KICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iMTAzNSIgeT0iMjg4IiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjI2Ii8+PHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxMDUwIiB5PSIzMDYiPtGB0YLQsNGA0YI6IEwwLUMxPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjM3MiIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+PHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iMzk0Ij5UMjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjM3MiI+0KbQtdC90LAg0YPRh9Cw0YHRgtC40Y8g0L3QtSDRgdGF0L7QtNC40YLRgdGPLCDQv9GA0LDQstC00LAg0LTQvtGA0L7Qs9Cw0Y8uPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iOTUiIHk9IjM5OCI+0JLRi9GF0L7QtC/QvNC+0LvRh9Cw0L3QuNC1INGB0YLQsNC90L7QstGP0YLRgdGPINGA0LDRhtC40L7QvdCw0LvRjNC90YvQvNC4LjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNjU1IiB5PSIzNzIiPtCe0YLQutCw0Lcg0YPRh9Cw0YHRgtCy0L7QstCw0YLRjCwg0YDQsNC30YDRi9CyINGB0LLRj9C30Lgg0YEg0LvQvtC20YzRji48L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjEwMzUiIHk9IjM3MiI+0JjQvNC40YLQsNGG0LjRjywg0YPRhdC+0LQg0LIg0YLQtdC90YwsINC80LDRgdGB0L7QstGL0LUg0L7RgtC60LDQt9GLLjwvdGV4dD4KICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iMTAzNSIgeT0iMzk0IiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjI2Ii8+PHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxMDUwIiB5PSI0MTIiPtGB0YLQsNGA0YI6IEwwLUMyPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjQ3OCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+PHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iNTAwIj5UMzwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjQ3OCI+0J3QtdGCINCx0YPRhNC10YDQsC/RgNC10YHRg9GA0YHQsCwg0YHQv9Cw0YHQsNC10LzRgdGPINC/0LXRgNC10YDQsNGB0YXQvtC00L7QvC48L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iNTA0Ij7Cq9CU0L7RgtGP0L3QtdC8INCz0LXRgNC+0LjQt9C80L7QvMK7INCy0LzQtdGB0YLQviDRg9C/0YDQsNCy0LvQtdC90LjRjy48L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iNDc4Ij7Qk9C10YDQvtC40YfQtdGB0LrQuNC5INGA0LXQttC40Lwg0LLQvNC10YHRgtC+INC/0LXRgNC10YHQsdC+0YDQutC4INC90LDQs9GA0YPQt9C60LguPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSIxMDM1IiB5PSI0NzgiPtCS0YvQs9C+0YDQsNC90LjQtSwg0L/QvtC20LDRgNGLINC60LDQuiDQvdC+0YDQvNCwLCDQvtCx0YDRi9CyLjwvdGV4dD4KICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iMTAzNSIgeT0iNTAwIiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjI2Ii8+PHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxMDUwIiB5PSI1MTgiPtGB0YLQsNGA0YI6IEwwLUMzPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjU4NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+PHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iNjA2Ij5UNDwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjU4NCI+0J7QsdGP0LfQsNGC0LXQu9GM0YHRgtCy0LAg0LHQvtC70YzRiNC1INC80L7RidC90L7RgdGC0LgsINC00L7Qu9CzINGA0LDRgdGC0LXRgi48L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iNjEwIj7QndGD0LbQvdC+INGA0LXQt9Cw0YLRjCDQvtCx0LXRidCw0L3QuNGPINC00L4g0LHQsNC30LjRgdCwLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNjU1IiB5PSI1ODQiPtCh0L3QuNC20LXQvdC40LUg0L7QsdGP0LfQsNGC0LXQu9GM0YHRgtCyINC4INC30LDQvNC+0YDQvtC30LrQsCDQu9C40YjQvdC10LPQvi48L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjEwMzUiIHk9IjU4NCI+0JLQtdGH0L3Ri9C1INC/0LXRgNC10L3QvtGB0YssINC00LXQs9GA0LDQtNCw0YbQuNGPINC60LDRh9C10YHRgtCy0LAuPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSI2MDYiIHdpZHRoPSIxNzYiIGhlaWdodD0iMjYiLz48dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9IjYyNCI+0YHRgtCw0YDRgjogTDAtQzQ8L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iNjkwIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz48dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI3MTIiPlQ1PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iNjkwIj7QotC+0LrRgdC40YfQvdGL0Lkg0YPQt9C10Lsg0LfQsNGA0LDQttCw0LXRgiDQvtGB0YLQsNC70YzQvdC+0LUuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iOTUiIHk9IjcxNiI+0KDQuNGB0Log0YDQsNGB0L/QvtC70LfQsNC10YLRgdGPLCDQvdGD0LbQtdC9INCx0LDRgNGM0LXRgC48L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iNjkwIj7QmtCw0YDQsNC90YLQuNC9INGA0LDQt9GA0YvQstCwLCDQuNC30L7Qu9GP0YbQuNGPINGC0L7QutGB0LjRh9C90L7Qs9C+INC60L7QvdGC0YPRgNCwLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iNjkwIj7QmtCw0YHQutCw0LQg0LrQvtC90YTQu9C40LrRgtC+0LIg0Lgg0LjQvdGG0LjQtNC10L3RgtC+0LIuPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSI3MTIiIHdpZHRoPSIxNzYiIGhlaWdodD0iMjYiLz48dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9IjczMCI+0YHRgtCw0YDRgjogTDAtQzU8L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iNzk2IiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz48dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI4MTgiPlQ2PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iNzk2Ij7QndC10YIg0LTQsNGC0YfQuNC60L7QsiDQv9GA0LDQstC00YssIHJlYWRvdXQg0YHQu9C+0LzQsNC9LjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSI4MjIiPtCh0LjRgdGC0LXQvNCwINC+0L/RgtC40LzQuNC30LjRgNGD0LXRgiDQvtGC0YfQtdGCLCDQvdC1INGA0LXQsNC70YzQvdC+0YHRgtGMLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNjU1IiB5PSI3OTYiPtCS0L7RgdGB0YLQsNC90L7QstC70LXQvdC40LUg0L7QsdGA0LDRgtC90L7QuSDRgdCy0Y/Qt9C4INC4INC/0YDQvtCy0LXRgNC60LguPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSIxMDM1IiB5PSI3OTYiPtCc0LXRgtGA0LjQutC4INC10YHRgtGMLCDRjdGE0YTQtdC60YLQsCDQvdC10YIuPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSI4MTgiIHdpZHRoPSIxNzYiIGhlaWdodD0iMjYiLz48dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9IjgzNiI+0YHRgtCw0YDRgjogTDAtQzY8L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iOTAyIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz48dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI5MjQiPlQ3PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iOTAyIj7QmtC+0L3RhNC70LjQutGCINC+0YHQtdC5OiDRh9GC0L4g0YHRh9C40YLQsNGC0Ywg0YDQtdCw0LvRjNC90L7RgdGC0YzRji48L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iOTI4Ij7Qn9C+0LvQuNGC0LjQutCwINC40L3RgtC10YDQv9GA0LXRgtCw0YbQuNC5INGB0YLQsNC90L7QstC40YLRgdGPINC/0L7Qu9C10Lwg0LHQvtGPLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNjU1IiB5PSI5MDIiPtCa0L7QvdGC0YDQvtC70Ywg0LjQvdGC0LXRgNC/0YDQtdGC0LDRhtC40Lgg0Lgg0L/RgNCw0LLQuNC7INGB0YfQtdGC0LAuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSIxMDM1IiB5PSI5MDIiPtCS0L7QudC90LAg0LzQtdGC0YDQuNC6LCDRgdC/0L7RgCDQvdC10L/RgNC+0LLQtdGA0Y/QtdC8LjwvdGV4dD4KICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iMTAzNSIgeT0iOTI0IiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjI2Ii8+PHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxMDUwIiB5PSI5NDIiPtGB0YLQsNGA0YI6IEwzLUM3PC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDI4MiBMIDU2NSAyODIiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDM4OCBMIDU2NSAzODgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDQ5NCBMIDU2NSA0OTQiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDYwMCBMIDU2NSA2MDAiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDcwNiBMIDU2NSA3MDYiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDgxMiBMIDU2NSA4MTIiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDkxOCBMIDU2NSA5MTgiLz4KCiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSAyODIgTCAxMDEwIDI4MiIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSA5ODUgMzg4IEwgMTAxMCAzODgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gOTg1IDQ5NCBMIDEwMTAgNDk0Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSA2MDAgTCAxMDEwIDYwMCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSA5ODUgNzA2IEwgMTAxMCA3MDYiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gOTg1IDgxMiBMIDEwMTAgODEyIi8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSA5MTggTCAxMDEwIDkxOCIvPgoKICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjcwIiB5PSIxMDI4Ij7Qn9C+0LTRgdC60LDQt9C60LA6INC10YHQu9C4INCy0YvQsdC+0YAg0L3QtSDQvNC10L3Rj9C10YIg0YLRgNCw0LXQutGC0L7RgNC40Y4sINGB0L3QsNGH0LDQu9CwINC40LTQuCDQstCz0LvRg9Cx0YwgKHJlYWRvdXQv0LHQsNC30LjRgSksINC/0L7RgtC+0Lwg0L/QtdGA0LXQsdC40YDQsNC5INCy0LDRgNC40LDQvdGC0Ysg0LLRiNC40YDRjC48L3RleHQ+Cjwvc3ZnPgo=" alt="Диагностическая связка: L0 ↔ T1–T7 ↔ L5 (схема)" /></p>
+<p>Текстовый fallback (если схема не рендерится):</p>
+<ul>
+<li><code>L0</code> задает базис: что система фактически удерживает как
+«выживание»;</li>
+<li>темы <code>T1..T7</code> показывают типовой режим сбоя/реакции;</li>
+<li><code>L5</code> показывает суммарный сдвиг и границу режима;</li>
+<li>практический маршрут:
+<code>сигнал -&gt; тема T -&gt; оператор Lx-Cn -&gt; readout</code>.</li>
+</ul>
 <h2 id="карта-уровней-l0l5-одна-страница">Карта уровней L0–L5 (одна
 страница)</h2>
-<p><img role="img" aria-label="Карта уровней L0–L5 (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9Ijk0MCIgdmlld0JveD0iMCAwIDE0MDAgOTQwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAuYm94IHsgZmlsbDogI2Y4ZmFmYzsgc3Ryb2tlOiAjMGYxNzJhOyBzdHJva2Utd2lkdGg6IDI7IHJ4OiAxODsgfQogICAgICAudGl0bGUgeyBmb250OiA3MDAgMzBweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5tdXRlZCB7IGZvbnQ6IDUwMCAxNnB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMzMzQxNTU7IH0KICAgICAgLmggeyBmb250OiA3MDAgMjJweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC50IHsgZm9udDogNjAwIDE4cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMzsgZmlsbDogbm9uZTsgbWFya2VyLWVuZDogdXJsKCNtKTsgfQogICAgICAucGlsbCB7IGZpbGw6ICNlMmU4ZjA7IHN0cm9rZTogIzQ3NTU2OTsgc3Ryb2tlLXdpZHRoOiAxLjU7IHJ4OiA5OTk7IH0KICAgICAgLnBpbGx0ZXh0IHsgZm9udDogNjAwIDE2cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgPC9zdHlsZT4KICAgIDxtYXJrZXIgaWQ9Im0iIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjEwIiBtYXJrZXJIZWlnaHQ9IjEwIiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzBmMTcyYSIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgoKICA8cmVjdCBjbGFzcz0iYmciIHg9IjAiIHk9IjAiIHdpZHRoPSIxNDAwIiBoZWlnaHQ9Ijk0MCIvPgoKICA8dGV4dCBjbGFzcz0idGl0bGUiIHg9IjYwIiB5PSI3MCI+0JrQsNGA0YLQsCDRg9GA0L7QstC90LXQuSBMMOKAk0w1ICjQsiDQvtC00L3QvtC5INGB0YLRgNCw0L3QuNGG0LUpPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNjAiIHk9IjEwNSI+0J7QtNC40L0g0YPRgNC+0LLQtdC90YwgPSDQvtC00LjQvSDRgtC40L8g0LfQsNC00LDRh9C4LiDQmtC+0L3RhNC70LjQutGC0Ysg0YfQsNGJ0LUg0LLRgdC10LPQviDQstC+0LfQvdC40LrQsNGO0YIsINC60L7Qs9C00LAg0LPQvtCy0L7RgNGP0YIg0L/RgNC+INGA0LDQt9C90YvQtSDRg9GA0L7QstC90LguPC90ZXh0PgoKICA8IS0tIEJveGVzIC0tPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSIxNTAiIHdpZHRoPSI1NjAiIGhlaWdodD0iMTA1Ii8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iOTAiIHk9IjI3MCIgd2lkdGg9IjU2MCIgaGVpZ2h0PSIxMDUiLz4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI5MCIgeT0iMzkwIiB3aWR0aD0iNTYwIiBoZWlnaHQ9IjEwNSIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSI1MTAiIHdpZHRoPSI1NjAiIGhlaWdodD0iMTA1Ii8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iOTAiIHk9IjYzMCIgd2lkdGg9IjU2MCIgaGVpZ2h0PSIxMDUiLz4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI5MCIgeT0iNzUwIiB3aWR0aD0iNTYwIiBoZWlnaHQ9IjEwNSIvPgoKICA8IS0tIEJveCB0ZXh0IC0tPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSIxMjAiIHk9IjE5MiI+TDA8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjE3MCIgeT0iMTkyIj7QkdCw0LfQuNGBICjRgNC10YHRg9GA0YEsINCx0LXQt9C+0L/QsNGB0L3QvtGB0YLRjCwg0L/RgNCw0LLQviDQvdCwINC/0YDQsNCy0LTRgy/QstGL0YXQvtC0KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iMjIyIj7QldGB0LvQuCDQsdCw0LfQuNGBINC90LUg0LTQtdGA0LbQuNGC0YHRjyDigJQg0LLQtdGA0YXQvdC40LUg0YPRgNC+0LLQvdC4INC90LDRh9C40L3QsNGO0YIg0L7QsdGB0LvRg9C20LjQstCw0YLRjCDQv9C10YDQtdC60L7RgSDQuCDQstGL0YDQsNGJ0LjQstCw0Y7RgiDQuNC80LjRgtCw0YbQuNGOLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9IjEyMCIgeT0iMzEyIj5MMTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTcwIiB5PSIzMTIiPtCo0LDQsyDihpIg0Y3RhNGE0LXQutGCICjQvNC40L3QuNC80LDQu9GM0L3QsNGPINC+0L/QtdGA0LDRhtC40Y8g0Lgg0L/RgNC+0LLQtdGA0LrQsCk8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSIxMjAiIHk9IjM0MiI+0JXRgdC70Lgg0L3QtdGCIHJlYWRvdXQg4oCUINGB0LjRgdGC0LXQvNCwINGB0YLQsNC90L7QstC40YLRgdGPINGI0YPQvNC+0Lw6IOKAnNC00LXQu9Cw0LXQvOKAnSwg0L3QviDQv9GA0LjRh9C40L3QvdC+0YHRgtGMINC90LUg0L3QsNCx0LvRjtC00LDQtdGC0YHRjy48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSIxMjAiIHk9IjQzMiI+TDI8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjE3MCIgeT0iNDMyIj7QmNGB0YLQvtGA0LjQuCDQuCDRgNC+0LvQuCAo0YfRgtC+IOKAnNC80L7QttC90L4v0L3QtdC70YzQt9GP4oCdLCDQutGC0L4g4oCc0LzRi+KAnSk8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSIxMjAiIHk9IjQ2MiI+0JvQtdCz0LjRgtC40LzQsNGG0LjRjyDQtNC10LnRgdGC0LLQuNC5INC4INGC0LDQsdGDINC90LAg0L3QsNCx0LvRjtC00LXQvdC40LUuINCc0L7QttC10YIg0YPRgdC40LvQuNCy0LDRgtGMINC40YHRgtC40L3RgyDQuNC70Lgg0LfQsNGJ0LjRidCw0YLRjCDQu9C10LPQtdC90LTRgy48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSIxMjAiIHk9IjU1MiI+TDM8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjE3MCIgeT0iNTUyIj7Qn9GA0LDQstC40LvQsCDQuCDQvNC10YLRgNC40LrQuCAo0L7RgdC4LCDRgdGC0LjQvNGD0LvRiywg0YbQtdC90LAsINC60L7QvdGC0YDQsNC60YLRiyk8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSIxMjAiIHk9IjU4MiI+0J/RgNCw0LLQuNC70LAg0L/RgNC+0LXQutGC0LjRgNGD0Y7RgiDRhtC10L3Rgzog0YfRgtC+INGB0YLQsNC90L7QstC40YLRgdGPINC00LXRiNGR0LLRi9C8L9C00L7RgNC+0LPQuNC8INC4INC60YLQviDQv9C70LDRgtC40YIg0YHRh9GR0YIuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iMTIwIiB5PSI2NzIiPkw0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSIxNzAiIHk9IjY3MiI+0JjQvdGB0YLQuNGC0YPRgtGLINC4INCy0LvQsNGB0YLRjCAo0LrRgtC+INC80L7QttC10YIg0LzQtdC90Y/RgtGMINC/0YDQsNCy0LjQu9CwKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iNzAyIj7Qm9C10LPQuNGC0LjQvNC90L7RgdGC0Ywg0Lgg0L/RgNCw0LLQviDQstC80LXRiNCw0YLQtdC70YzRgdGC0LLQsC4g0JfQsNGF0LLQsNGCID0g0LjQvdGB0YLQuNGC0YPRgtGLINC90LDRh9C40L3QsNGO0YIg0YHQu9GD0LbQuNGC0Ywg0YfQsNGB0YLQvdC+0LzRgyDQuNC90YLQtdGA0LXRgdGDLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9IjEyMCIgeT0iNzkyIj5MNTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTcwIiB5PSI3OTIiPtCT0YDQsNC90LjRhtGLINGA0LXQttC40LzQsCAo0LPQtNC1IOKAnNC/0L4t0YHRgtCw0YDQvtC80YPigJ0g0L3QtSDRgdGF0L7QtNC40YLRgdGPKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iODIyIj7Qn9C+0LLQtdGA0YXQvdC+0YHRgtC90YvQtSDRgdC40LzQv9GC0L7QvNGLLiDQldGB0LvQuCDQs9GA0LDQvdC40YbQsCDQsdC70LjQt9C60L4g4oCUINC90YPQttC90Ysg0L/QtdGA0LXRhdC+0LTRiywg0LAg0L3QtSDigJzQtdGJ0ZEg0YHQuNC70YzQvdC10LUg0L7Qv9GC0LjQvNC40LfQuNGA0L7QstCw0YLRjOKAnS48L3RleHQ+CgogIDwhLS0gQXJyb3dzIC0tPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNzAgMjU1IEwgMzcwIDI3MCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNzAgMzc1IEwgMzcwIDM5MCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNzAgNDk1IEwgMzcwIDUxMCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNzAgNjE1IEwgMzcwIDYzMCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNzAgNzM1IEwgMzcwIDc1MCIvPgoKICA8IS0tIFJpZ2h0IGhpbnRzIC0tPgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSI3MDUiIHk9IjE2NSIgd2lkdGg9IjYzMCIgaGVpZ2h0PSI1NiIvPgogIDx0ZXh0IGNsYXNzPSJwaWxsdGV4dCIgeD0iNzMwIiB5PSIyMDAiPtCf0YDQsNCy0LjQu9C+INC/0LXRgNC10LrQu9GO0YfQtdC90LjRjzog0LXRgdC70LggcmVhZG91dCDQvdC1INC00LXRgNC20LjRgtGB0Y8g4oaSINC40LTQuCDQstCz0LvRg9Cx0YwgKEwx4oaSTDApLiDQldGB0LvQuCDQtNC10YDQttC40YLRgdGPIOKGkiDQuNGJ0Lgg0LLRiNC40YDRjCAoTDLigJNMMykuPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iYm94IiB4PSI3MDUiIHk9IjI1NSIgd2lkdGg9IjYzMCIgaGVpZ2h0PSIzMTAiLz4KICA8dGV4dCBjbGFzcz0iaCIgeD0iNzM1IiB5PSIyOTUiPtCa0LDQuiDQv9C+0LvRjNC30L7QstCw0YLRjNGB0Y8gKNCx0YvRgdGC0YDQvik8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI3MzUiIHk9IjMzMCI+MSkg0JfQsNGE0LjQutGB0LjRgNGD0Lkg0L3QsNCx0LvRjtC00LDQtdC80YvQtSDQstGF0L7QtNGLICjRh9GC0L4g0YDQtdCw0LvRjNC90L4g0LLQuNC00L3QvikuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzM1IiB5PSIzNTYiPjIpINCe0L/RgNC10LTQtdC70Lgg0YPRgNC+0LLQtdC90Yw6INCx0LDQt9C40YEgLyDRiNCw0LPihpLRjdGE0YTQtdC60YIgLyDRgNC+0LvQuCAvINC80LXRgtGA0LjQutC4IC8g0LjQvdGB0YLQuNGC0YPRgtGLIC8g0LPRgNCw0L3QuNGG0LAuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzM1IiB5PSIzODIiPjMpINCS0YvQsdC10YDQuCDQvNC40L3QuNC80LDQu9GM0L3Ri9C5INC+0L/QtdGA0LDRgtC+0YAgKEx4LUN5KSDQuCDQt9Cw0YDQsNC90LXQtSDQv9C+0YHQvNC+0YLRgNC4IOKAnNGG0LXQvdGDL9C/0LXRgNC10L3QvtGBINGG0LXQvdGL4oCdLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjczNSIgeT0iNDA4Ij40KSDQn9GA0L7QstC10YDRjCByZWFkb3V0OiDQuNC30LzQtdC90LjQu9Cw0YHRjCDQu9C4INGB0LjRgdGC0LXQvNCwINC/0L7RgdC70LUg0YjQsNCz0LA/PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzM1IiB5PSI0MzQiPjUpINCV0YHQu9C4INC90LXRgiDigJQg0L3QtSDRgdC/0L7RgNGMINC+0LEg0L7QsdGK0Y/RgdC90LXQvdC40Y/RhSwg0YHQv9GD0YHQutCw0LnRgdGPINCz0LvRg9Cx0LbQtS48L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI3MzUiIHk9IjQ3MCI+0J/QvtC00YHQutCw0LfQutCwOiDigJzQstGB0ZEg0YHRgNC+0YfQvdC+L9Cz0LXRgNC+0LjQt9C8L9C+0YLQutCw0LfRiy/QstC+0LnQvdGLINC80LXRgtGA0LjQuuKAnSDigJQg0Y3RgtC+INC+0LHRi9GH0L3QviDRgdC40LzQv9GC0L7QvNGLIEw1LDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjczNSIgeT0iNDk2Ij7QsCDRh9C40L3QuNGC0YHRjyDQstGL0LHQvtGA0L7QvCDRg9GA0L7QstC90Y8g0Lgg0LLQvtC30LLRgNCw0YnQtdC90LjQtdC8INC/0YDQuNGH0LjQvdC90L7RgdGC0Lgg0L3QsCBMMOKAk0wzLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI2MCIgeT0iOTE1Ij5ERVRNIC8gUlUgdjIg4oCUINC60LDRgNGC0LAg0LTQu9GPINGH0YLQtdC90LjRjyDQuCDQtNC40LDQs9C90L7RgdGC0LjQutC4ICjQvdC1IOKAnNC00L7QutCw0LfQsNGC0LXQu9GM0YHRgtCy0L7igJ0sINCwINC90LDQstC40LPQsNGG0LjRjykuPC90ZXh0Pgo8L3N2Zz4KCg==" alt="Карта уровней L0–L5 (схема)" /></p>
+<p><img role="img" aria-label="Карта уровней L0–L5 (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9Ijk2MCIgdmlld0JveD0iMCAwIDE0MDAgOTYwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAudGl0bGUgeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogNDBweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuc3ViIHsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDIwcHg7IGZvbnQtd2VpZ2h0OiA0MDA7IGZpbGw6ICMzMzQxNTU7IH0KICAgICAgLmJveCB7IGZpbGw6ICNmOGZhZmM7IHN0cm9rZTogIzBmMTcyYTsgc3Ryb2tlLXdpZHRoOiAyOyByeDogMTQ7IH0KICAgICAgLmggeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMjJweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxNnB4OyBmb250LXdlaWdodDogNDAwOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5jYXJkaCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAyOHB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5jYXJkdCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAyMHB4OyBmb250LXdlaWdodDogNDAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5tdXRlZCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxOHB4OyBmb250LXdlaWdodDogNDAwOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5waWxsIHsgZmlsbDogI2UyZThmMDsgc3Ryb2tlOiAjNDc1NTY5OyBzdHJva2Utd2lkdGg6IDEuNTsgcng6IDk5OTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyBtYXJrZXItZW5kOiB1cmwoI20pOyB9CiAgICA8L3N0eWxlPgogICAgPG1hcmtlciBpZD0ibSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iOSIgbWFya2VySGVpZ2h0PSI5IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzBmMTcyYSIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgoKICA8cmVjdCBjbGFzcz0iYmciIHg9IjAiIHk9IjAiIHdpZHRoPSIxNDAwIiBoZWlnaHQ9Ijk2MCIvPgoKICA8dGV4dCBjbGFzcz0idGl0bGUiIHg9IjU2IiB5PSI2NiI+0JrQsNGA0YLQsCDRg9GA0L7QstC90LXQuSBMMC1MNSAo0LIg0L7QtNC90L7QuSDRgdGC0YDQsNC90LjRhtC1KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI1NiIgeT0iOTgiPtCe0LTQuNC9INGD0YDQvtCy0LXQvdGMID0g0L7QtNC40L0g0YLQuNC/INC30LDQtNCw0YfQuC4g0JrQvtC90YTQu9C40LrRgiDRh9Cw0YHRgtC+INCy0L7Qt9C90LjQutCw0LXRgiwg0LrQvtCz0LTQsCDQs9C+0LLQvtGA0Y/RgiDQviDRgNCw0LfQvdGL0YUg0YPRgNC+0LLQvdGP0YUuPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iYm94IiB4PSI1NiIgeT0iMTM2IiB3aWR0aD0iNjQwIiBoZWlnaHQ9Ijk0Ii8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iNTYiIHk9IjI0NiIgd2lkdGg9IjY0MCIgaGVpZ2h0PSI5NCIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjU2IiB5PSIzNTYiIHdpZHRoPSI2NDAiIGhlaWdodD0iOTQiLz4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI1NiIgeT0iNDY2IiB3aWR0aD0iNjQwIiBoZWlnaHQ9Ijk0Ii8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iNTYiIHk9IjU3NiIgd2lkdGg9IjY0MCIgaGVpZ2h0PSI5NCIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjU2IiB5PSI2ODYiIHdpZHRoPSI2NDAiIGhlaWdodD0iOTQiLz4KCiAgPHRleHQgY2xhc3M9ImgiIHg9Ijc4IiB5PSIxNjgiPkwwICDQkdCw0LfQuNGBICjRgNC10YHRg9GA0YEsINCx0LXQt9C+0L/QsNGB0L3QvtGB0YLRjCwg0L/RgNCw0LLQviDQvdCwINC/0YDQsNCy0LTRgy/QstGL0YXQvtC0KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNzgiIHk9IjE5NiI+0JXRgdC70Lgg0LHQsNC30LjRgSDQvdC1INC00LXRgNC20LjRgtGB0Y8sINCy0LXRgNGF0L3QuNC1INGD0YDQvtCy0L3QuCDQvdCw0YfQuNC90LDRjtGCINC+0LHRgdC70YPQttC40LLQsNGC0Ywg0L/QtdGA0LXQutC+0YEuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iNzgiIHk9IjI3OCI+TDEgINCo0LDQsyAtPiDRjdGE0YTQtdC60YIgKNC80LjQvdC40LzQsNC70YzQvdCw0Y8g0L7Qv9C10YDQsNGG0LjRjyDQuCDQv9GA0L7QstC10YDQutCwKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNzgiIHk9IjMwNiI+0J3QtdGCIHJlYWRvdXQgLT4g0L/QvtGP0LLQu9GP0LXRgtGB0Y8g0YjRg9C8OiDCq9C00LXQu9Cw0LXQvMK7LCDQvdC+INC/0YDQuNGH0LjQvdC90L7RgdGC0Ywg0L3QtSDQstC40LTQvdCwLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9Ijc4IiB5PSIzODgiPkwyICDQmNGB0YLQvtGA0LjQuCDQuCDRgNC+0LvQuCAo0YfRgtC+IMKr0LzQvtC20L3Qvi/QvdC10LvRjNC30Y/Cuywg0LrRgtC+IMKr0LzRi8K7KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNzgiIHk9IjQxNiI+0JvQtdCz0LjRgtC40LzQsNGG0LjRjyDQuCDRgtCw0LHRgyDQvdCwINC90LDQsdC70Y7QtNC10L3QuNC1OiDRg9GB0LjQu9C40LLQsNGO0YIg0LjRgdGC0LjQvdGDINC40LvQuCDQt9Cw0LrRgNGL0LLQsNGO0YIg0LXQtS48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI3OCIgeT0iNDk4Ij5MMyAg0J/RgNCw0LLQuNC70LAg0Lgg0LzQtdGC0YDQuNC60LggKNC+0YHQuCwg0YHRgtC40LzRg9C70YssINGG0LXQvdCwLCDQutC+0L3RgtGA0LDQutGC0YspPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI3OCIgeT0iNTI2Ij7Qn9GA0LDQstC40LvQsCDQv9GA0L7QtdC60YLQuNGA0YPRjtGCINGG0LXQvdGDOiDRh9GC0L4g0LTQtdGI0LXQstC+L9C00L7RgNC+0LPQviDQuCDQutGC0L4g0L/Qu9Cw0YLQuNGCINGB0YfQtdGCLjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9Ijc4IiB5PSI2MDgiPkw0ICDQmNC90YHRgtC40YLRg9GC0Ysg0Lgg0LLQu9Cw0YHRgtGMICjQutGC0L4g0LzQvtC20LXRgiDQvNC10L3Rj9GC0Ywg0L/RgNCw0LLQuNC70LApPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI3OCIgeT0iNjM2Ij7Qm9C10LPQuNGC0LjQvNC90L7RgdGC0Ywg0Lgg0L/RgNCw0LLQviDQstC80LXRiNCw0YLQtdC70YzRgdGC0LLQsC4g0JfQsNGF0LLQsNGCID0g0YHQu9GD0LbQtdC90LjQtSDRh9Cw0YHRgtC90L7QvNGDINC40L3RgtC10YDQtdGB0YMuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iNzgiIHk9IjcxOCI+TDUgINCT0YDQsNC90LjRhtGLINGA0LXQttC40LzQsCAo0LPQtNC1IMKr0L/Qvi3RgdGC0LDRgNC+0LzRg8K7INGD0LbQtSDQvdC1INGB0YXQvtC00LjRgtGB0Y8pPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI3OCIgeT0iNzQ2Ij7Qn9C+0LLQtdGA0YXQvdC+0YHRgtC90YvQtSDRgdC40LzQv9GC0L7QvNGLOiDRgNGP0LTQvtC8INCz0YDQsNC90LjRhtCwLCDQvdGD0LbQtdC9INC/0LXRgNC10YXQvtC0LCDQsCDQvdC1IMKr0LXRidC1INGD0YHQuNC70LjQtcK7LjwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDM3NiAyMzAgTCAzNzYgMjQ2Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDM3NiAzNDAgTCAzNzYgMzU2Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDM3NiA0NTAgTCAzNzYgNDY2Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDM3NiA1NjAgTCAzNzYgNTc2Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDM3NiA2NzAgTCAzNzYgNjg2Ii8+CgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSI3MzAiIHk9IjEzNiIgd2lkdGg9IjYxNCIgaGVpZ2h0PSI4NCIvPgogIDx0ZXh0IGNsYXNzPSJjYXJkdCIgeD0iNzUyIiB5PSIxNzAiPtCf0YDQsNCy0LjQu9C+INC/0LXRgNC10LrQu9GO0YfQtdC90LjRjzo8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNhcmR0IiB4PSI3NTIiIHk9IjE5NCI+0LXRgdC70LggcmVhZG91dCDQvdC1INC00LXRgNC20LjRgtGB0Y8gLSDQuNC00Lgg0LLQs9C70YPQsdGMIChMMSAtPiBMMCk7PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjYXJkdCIgeD0iNzUyIiB5PSIyMTYiPtC10YHQu9C4INC00LXRgNC20LjRgtGB0Y8gLSDRgNC10YjQsNC5INCy0YjQuNGA0YwgKEwyLUwzKS48L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjczMCIgeT0iMjM4IiB3aWR0aD0iNjE0IiBoZWlnaHQ9IjQzMCIvPgogIDx0ZXh0IGNsYXNzPSJjYXJkaCIgeD0iNzUyIiB5PSIyODIiPtCa0LDQuiDQv9C+0LvRjNC30L7QstCw0YLRjNGB0Y8gKNCx0YvRgdGC0YDQvik8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJjYXJkdCIgeD0iNzUyIiB5PSIzMjAiPjEpINCX0LDRhNC40LrRgdC40YDRg9C5IDUtMTAg0L3QsNCx0LvRjtC00LDQtdC80YvRhSDRhNCw0LrRgtC+0LIuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjYXJkdCIgeD0iNzUyIiB5PSIzNTQiPjIpINCe0L/RgNC10LTQtdC70Lgg0YPRgNC+0LLQtdC90Yw6INCx0LDQt9C40YEgLyDRiNCw0LMgLyDRgNC+0LvQuCAvINC80LXRgtGA0LjQutC4IC8g0LjQvdGB0YLQuNGC0YPRgtGLIC8g0LPRgNCw0L3QuNGG0LAuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjYXJkdCIgeD0iNzUyIiB5PSIzODgiPjMpINCS0YvQsdC10YDQuCDQvtC00LjQvSDQvtC/0LXRgNCw0YLQvtGAIEx4LUN5INC4INC30LDRgNCw0L3QtdC1INC90LDQt9C+0LLQuCDRhtC10L3RgyDRiNCw0LPQsC48L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNhcmR0IiB4PSI3NTIiIHk9IjQyMiI+NCkg0J/RgNC+0LLQtdGA0YwgcmVhZG91dDog0YfRgtC+INGA0LXQsNC70YzQvdC+INC40LfQvNC10L3QuNC70L7RgdGMINC/0L7RgdC70LUg0YjQsNCz0LA/PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjYXJkdCIgeD0iNzUyIiB5PSI0NTYiPjUpINCV0YHQu9C4INGN0YTRhNC10LrRgtCwINC90LXRgiwg0L3QtSDRgdC/0L7RgNGMINC+0LEg0L7QsdGK0Y/RgdC90LXQvdC40Y/RhSAtINGB0L/Rg9GB0LrQsNC50YHRjyDQs9C70YPQsdC20LUuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijc1MiIgeT0iNTEyIj7Qn9C+0LTRgdC60LDQt9C60LA6PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzUyIiB5PSI1MzgiPsKr0LLRgdC1INGB0YDQvtGH0L3QviAvINCz0LXRgNC+0LjQt9C8IC8g0LzQsNGB0YHQvtCy0YvQtSDQvtGC0LrQsNC30YsgLyDQstC+0LnQvdCwINC80LXRgtGA0LjQusK7PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzUyIiB5PSI1NjQiPtGH0LDRidC1INCy0YHQtdCz0L4g0LLRi9Cz0LvRj9C00Y/RgiDQutCw0LogTDUt0YHQuNC80L/RgtC+0LzRiyw8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI3NTIiIHk9IjU5MCI+0LAg0YfQuNC90Y/RgtGB0Y8g0LLQvtC30LLRgNCw0YLQvtC8INC/0YDQuNGH0LjQvdC90L7RgdGC0Lgg0L3QsCBMMC1MMy48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNTYiIHk9IjkyOCI+REVUTSAvIFJVIHYyIC0g0LrQsNGA0YLQsCDQtNC70Y8g0YfRgtC10L3QuNGPINC4INC00LjQsNCz0L3QvtGB0YLQuNC60LguPC90ZXh0Pgo8L3N2Zz4K" alt="Карта уровней L0–L5 (схема)" /></p>
+<p>Текстовый fallback (если схема не рендерится):</p>
+<ul>
+<li><code>L0</code>: базис (ресурс/безопасность/доверие/право
+остановки).</li>
+<li><code>L1</code>: шаг -&gt; эффект и короткий
+<code>readout</code>.</li>
+<li><code>L2</code>: роли и истории, которые легитимируют
+поведение.</li>
+<li><code>L3</code>: оси, метрики, правила, цена ошибки.</li>
+<li><code>L4</code>: институты и легитимность изменения правил.</li>
+<li><code>L5</code>: границы режима и переходы.</li>
+</ul>
 <p>Если нужно объяснить модель за минуту — достаточно этой страницы.</p>
 <h2 id="быстрый-старт-10-минут">Быстрый старт (10 минут)</h2>
 <p><a id="quickstart"></a></p>
@@ -259,7 +609,12 @@ vertical-align: middle;
 ситуаций</a> и один первый шаг.</li>
 <li>Проверка качества хода → <a href="#invariants-and-tests">5 главных
 тестов</a>, чтобы не уйти в отчёт.</li>
+<li>Зафиксируй ход в <a href="#diagnostic-blank">диагностическом
+бланке</a>: входы, <code>Sx/Ty</code>, первый оператор,
+<code>readout</code> на <code>24h/72h</code>.</li>
 </ol>
+<p>Легенда кодов: <code>S</code> — сцена, <code>T</code> — тема,
+<code>L</code> — уровень, <code>C</code> — оператор действия.</p>
 <h3 id="1-о-чём-эта-книга-в-одной-фразе">1) О чём эта книга в одной
 фразе</h3>
 <p>Системы (люди, семьи, команды, государства) делают то, что
@@ -326,6 +681,7 @@ vertical-align: middle;
 кодами: <a href="#nav-cheatsheet">S–T–C</a>.</li>
 <li>Затем иди в главы L0→L1→L3→L5 (если ты практик) или L0→L2→L3→L5
 (если ты больше про смыслы/язык).</li>
+<li>Для работы «в полях» используй <a href="#diagnostic-blank">диагностический бланк</a>.</li>
 </ol>
 <h3 id="6-пять-главных-тестов-держать-под-рукой">6) Пять главных тестов
 (держать под рукой)</h3>
@@ -336,7 +692,10 @@ vertical-align: middle;
 <li>Не подменили ли мы результат «присутствием по графику»?</li>
 <li>Предсказываем ли мы режимы, а не «характер людей»?</li>
 </ol>
-<p>Полная версия с чек-листами: <a href="#invariants-and-tests">«Инварианты и тесты»</a>.</p>
+<p>Полная версия с чек-листами: <a href="#invariants-and-tests">«Инварианты и тесты»</a>. Printable-версия:
+<a href="#printable-tests-checklist">чек-лист тестов на 1 страницу</a>.
+Карточки для работы в «пожаре»: <a href="#field-cards">операционные
+карточки</a>.</p>
 <h2 id="первая-помощь-диагностика-за-5-минут">Первая помощь: диагностика
 за 5 минут</h2>
 <p><a id="first-aid"></a></p>
@@ -363,6 +722,7 @@ vertical-align: middle;
 старте»</a> или в <a href="#nav-cheatsheet">шпаргалке S–T–C</a>.</li>
 <li><strong>Проверь readout</strong>: что <em>изменилось после шага</em>
 и на каком горизонте. Если ничего — спускайся на уровень ниже.</li>
+<li><strong>Зафиксируй цикл в бланке</strong>: <a href="#diagnostic-blank">диагностический бланк</a> + проверка по <a href="#printable-tests-checklist">printable-чек-листу</a>.</li>
 </ol>
 <p>Подсказка (почти всегда верная):</p>
 <ul>
@@ -599,7 +959,9 @@ dive</h2>
 <h3 id="зачем-отдельная-глава">Зачем отдельная глава</h3>
 <p><code>06_human_system</code> — это быстрый мост от карты к практике.
 Эта глава — углубление: как мыслить человека как систему строго и
-операционно, не теряя &quot;человеческий&quot; слой.</p>
+операционно, не теряя &quot;человеческий&quot; слой. Это опциональный формальный
+слой: практику можно делать по <code>06_human_system</code> и вернуться
+сюда позже.</p>
 <p>Базовый тезис: человек — не сумма черт, а система удержания
 причинности во времени. Если причинность держится, возможны обучение,
 смысл, ценности и вклад. Если не держится — верхние уровни начинают
@@ -636,6 +998,8 @@ dive</h2>
 операторно?&quot;.</p>
 <h3 id="3-формальный-слой-state-space-transitions-attractors">3)
 Формальный слой: state space, transitions, attractors</h3>
+<p>Коротко: ниже — компактный формализм, который нужен для проверки
+непротиворечивости операторов, а не для усложнения практики.</p>
 <p>Если переписать модель в компактном вычислительном виде:</p>
 <ul>
 <li>состояние системы во времени <code>t</code>: <code>x_t</code>;</li>
@@ -845,228 +1209,6 @@ dive</h2>
 фундамент, а не приговор. Пока фундамент держится, верхние уровни могут
 быть источником развития. Когда фундамент проседает, верхние уровни без
 оператора становятся языком имитации.</p>
-<h2 id="карта-читателя">Карта читателя</h2>
-<p><a id="reader-map"></a></p>
-<p>Эта книга устроена как лестница уровней L0–L5, но читать её лучше не
-«сверху вниз», а <strong>из своей задачи</strong>. Ниже — краткая карта:
-кому что брать и где ставить акцент.</p>
-<p>Перед выбором маршрута держи две опоры:</p>
-<ol type="1">
-<li>Если ты в «пожаре», иди от симптома к коду: <a href="#nav-cheatsheet">S–T–C шпаргалка</a> → <a href="#case-registry">реестр ситуаций</a>.</li>
-<li>Чтобы не уйти в лозунги, держи <a href="#invariants-and-tests">5
-главных тестов</a> (цель+цена, readout, функция оптимизации,
-анти-имитация, границы предсказания).</li>
-</ol>
-<h3 id="если-ты-инженерпрактик">Если ты инженер/практик</h3>
-<p>Цель: вернуть причинность и управляемость, снизить цену ошибок и
-имитации.</p>
-<ul>
-<li>Смотри на: L0 (базис), L1 (минимальная операция + readout), L3
-(метрики/контракты), L5 (границы).</li>
-<li>Читай кейсы через сцены S4 (команда/корпорация) и S1 (человек).</li>
-<li>Главный вопрос: «что сделать, чтобы шаг снова давал проверяемый
-эффект, а ложь стала дорогой?»</li>
-</ul>
-<p>Маршрут: L0 → L1 → L3 → L5 (и точечно L2/L4, если упёрся в
-легитимность или табу).</p>
-<h3 id="если-ты-менеджерруководитель">Если ты менеджер/руководитель</h3>
-<p>Цель: перестроить цену участия, чтобы система держалась без героизма
-и принуждения.</p>
-<ul>
-<li>Смотри на: L0 (готовность базиса участвовать), L3 (правила/оси), L4
-(институты/права), L5 (переходы).</li>
-<li>Читай кейсы через сцены S4 и S5.</li>
-<li>Главный вопрос: «кто платит цену решений, и где она всплывёт через
-месяц/квартал?»</li>
-</ul>
-<p>Маршрут: L0 → L3 → L4 → L5 (и точечно L1, чтобы укоротить контуры
-обратной связи).</p>
-<h3 id="если-ты-исследовательаналитик">Если ты
-исследователь/аналитик</h3>
-<p>Цель: описывать системы без преждевременного выбора «единственной
-причины» и видеть границы применимости моделей.</p>
-<ul>
-<li>Смотри на: L2 (модели/язык), L3 (оси/проекции), L5 (границы), и
-постоянно сверяйся с L0.</li>
-<li>Читай кейсы через сцены S3–S5.</li>
-<li>Главный вопрос: «какие входы мы не фиксируем, и какую ось мы тайно
-считаем реальностью?»</li>
-</ul>
-<p>Маршрут: L0 → L2 → L3 → L5 (и L4, когда речь о
-власти/институтах).</p>
-<h3 id="если-ты-читатель-без-контекста">Если ты читатель без
-контекста</h3>
-<p>Цель: получить карту «почему люди и системы ведут себя странно» без
-морализации и без попытки всё объяснить одним словом.</p>
-<ul>
-<li>Начни с: <strong>«Быстрый старт (10 минут)»</strong> (если хочешь
-начать “от симптома”), затем Тезис и «Как читать».</li>
-<li>Или начни с: Тезиса и «Как читать» (если хочешь сначала понять
-логику), затем L0, L1, потом L2 и L3.</li>
-<li>Читай через сцены S1–S3, не пытаясь сразу охватить S5.</li>
-<li>Главный вопрос: «какой базис сейчас не тянет, и какая тема T уже
-проявилась?»</li>
-</ul>
-<p>Маршрут: Тезис → Как читать → L0 → L1 → (L2 или L3) → L5.</p>
-<h3 id="если-ты-студент--любознательный-непрофессионал">Если ты студент
-/ любознательный непрофессионал</h3>
-<p>Цель: получить понятную карту без давления «быть умным».</p>
-<ul>
-<li>Начни с: <strong>«Быстрый старт (10 минут)»</strong>, затем «Как
-читать».</li>
-<li>Держи в голове 3 вещи: L0 (держится ли базис), L1 (есть ли
-шаг→эффект), L5 (где граница).</li>
-<li>Если стало абстрактно — открывай <a href="#nav-cheatsheet">«Навигационную шпаргалку»</a> и иди от симптома к
-коду.</li>
-</ul>
-<p>Маршрут: Быстрый старт → Как читать → L0 → L1 → L5 (и точечно L2/L3
-по интересу).</p>
-<p>Маршруты чтения (быстро/инженерно/через смыслы) даны в разделе
-<strong>«Как читать»</strong> — здесь они намеренно не повторяются.</p>
-<p>Если в тексте появляется ощущение «это абстрактно», почти всегда это
-сигнал: не выбран базис сцены (S1–S5) или пропущены наблюдаемые
-входы.</p>
-<h2 id="как-читать">Как читать</h2>
-<p>Эта книга устроена как лестница уровней L0–L5, но каждая глава
-рассматривает свой уровень <strong>в проекциях на остальные</strong>:
-что делает действие на уровне Ln с другими уровнями, и как Ln выглядит
-глазами этих уровней.</p>
-<p>Правило чтения: <strong>не переносить выводы вне базиса</strong>.
-Если рассуждение не держится в текущем базисе — это не «ошибка данных»,
-а сигнал отказа/несходимости цены удержания режима.</p>
-<p>Маршруты чтения:</p>
-<ul>
-<li>Быстро: L0 → L3 → L5 (базис → управление → границы).</li>
-<li>Инженерно: L0 → L1 → L3 → L4 → L5.</li>
-<li>Через смыслы: L0 → L2 → L3 → L4 → L5.</li>
-</ul>
-<p>Если нужен только практический слой: прочитай раздел «Два режима
-навигации», затем открой <a href="#nav-cheatsheet">шпаргалку S–T–C</a> и
-<a href="#invariants-and-tests">«Инварианты и тесты»</a>. Разделы про
-интегральную и полевую интуицию ниже можно читать как факультатив.</p>
-<h3 id="два-режима-навигации-цель-и-путь-вглубь--вширь">Два режима
-навигации: цель и путь (вглубь / вширь)</h3>
-<p>В сложных системах полезно различать два ортогональных режима
-навигации. Их часто путают с «типами людей» или даже с «мужским/женским
-мышлением», но это не свойства пола — это <strong>функции
-системы</strong>, которые могут переключаться у одного и того же
-человека/команды.</p>
-<h4 id="вглубь-проверка-механики-достижимости">Вглубь (проверка механики
-достижимости)</h4>
-<p>Это движение по причинности: L3 → L1 → L0. Задача — проверить,
-<em>можем ли мы вообще идти</em> (держится ли базис и readout) и где
-находятся границы режима. Это поиск инварианта/ограничений: что должно
-быть истинно, чтобы «цель» имела смысл и была достижима.</p>
-<h4 id="вширь-перебор-вариантов-внутри-текущих-границ">Вширь (перебор
-вариантов внутри текущих границ)</h4>
-<p>Это перебор допустимых вариантов в текущем базисе (обычно L2–L3):
-оси/проекции, роли/истории, тактики и малые эксперименты. Задача — найти
-путь/вариант действия внутри того, что уже является возможным и не
-ломает контур.</p>
-<p>Практическое правило переключения:</p>
-<ul>
-<li>если readout нестабилен или «любой выбор не меняет траекторию» —
-идти <strong>вглубь</strong>;</li>
-<li>если readout держится — искать <strong>вширь</strong>.</li>
-</ul>
-<h3 id="интегральная-интуиция-уровней-модель">Интегральная интуиция
-уровней (модель)</h3>
-<p>Уровни можно читать как «интегрирование» по времени (в человеческом
-смысле, не как математику):</p>
-<ul>
-<li><strong>Ln = накопленный след Ln-1</strong>, который повторялся
-достаточно долго, чтобы стать дешёвой нормой.</li>
-<li>То, что на Ln выглядит как структура/правило/институт, на Ln-1 было
-множеством локальных шагов, которые <em>сходились по цене</em>.</li>
-</ul>
-<p><img role="img" aria-label="Интегральная интуиция уровней: Ln как интеграл Ln-1 (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjgyMCIgdmlld0JveD0iMCAwIDE0MDAgODIwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAuYm94IHsgZmlsbDogI2Y4ZmFmYzsgc3Ryb2tlOiAjMGYxNzJhOyBzdHJva2Utd2lkdGg6IDI7IHJ4OiAxODsgfQogICAgICAudGl0bGUgeyBmb250OiA3MDAgMjhweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5oIHsgZm9udDogNzAwIDIycHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQ6IDUwMCAxOHB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLm11dGVkIHsgZm9udDogNTAwIDE2cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMzsgZmlsbDogbm9uZTsgbWFya2VyLWVuZDogdXJsKCNtKTsgfQogICAgICAuYXJyb3cyIHsgc3Ryb2tlOiAjNDc1NTY5OyBzdHJva2Utd2lkdGg6IDIuNTsgZmlsbDogbm9uZTsgbWFya2VyLWVuZDogdXJsKCNtMik7IH0KICAgICAgLnBpbGwgeyBmaWxsOiAjZTJlOGYwOyBzdHJva2U6ICM0NzU1Njk7IHN0cm9rZS13aWR0aDogMS41OyByeDogOTk5OyB9CiAgICAgIC5waWxsdGV4dCB7IGZvbnQ6IDYwMCAxNnB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMwZjE3MmE7IH0KICAgIDwvc3R5bGU+CiAgICA8bWFya2VyIGlkPSJtIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIxMCIgbWFya2VySGVpZ2h0PSIxMCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNIDAgMCBMIDEwIDUgTCAwIDEwIHoiIGZpbGw9IiMwZjE3MmEiLz4KICAgIDwvbWFya2VyPgogICAgPG1hcmtlciBpZD0ibTIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjEwIiBtYXJrZXJIZWlnaHQ9IjEwIiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzQ3NTU2OSIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgoKICA8cmVjdCBjbGFzcz0iYmciIHg9IjAiIHk9IjAiIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjgyMCIvPgoKICA8dGV4dCBjbGFzcz0idGl0bGUiIHg9IjYwIiB5PSI3MCI+0JjQvdGC0LXQs9GA0LDQu9GM0L3QsNGPINC40L3RgtGD0LjRhtC40Y8g0YPRgNC+0LLQvdC10Lk6IExuINC60LDQuiDQuNC90YLQtdCz0YDQsNC7IExu4oiSMTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjYwIiB5PSIxMDUiPtCh0LzRi9GB0Ls6INC/0L7QstGC0L7RgNGP0LXQvNGL0LUg0LvQvtC60LDQu9GM0L3Ri9C1INGI0LDQs9C4INC4INC40YUg0YbQtdC90LAsINC90LDQutC+0L/Qu9C10L3QvdGL0LUg0LLQviDQstGA0LXQvNC10L3QuCwg0LrRgNC40YHRgtCw0LvQu9C40LfRg9GO0YLRgdGPINCyINCx0L7Qu9C10LUgwqvQtNC+0LvQs9C+0LbQuNCy0YPRidGD0Y7CuyDRgdGC0YDRg9C60YLRg9GA0YMg0YHQu9C10LTRg9GO0YnQtdCz0L4g0YPRgNC+0LLQvdGPLjwvdGV4dD4KCiAgPCEtLSBCb3hlcyAtLT4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI5MCIgeT0iMTYwIiB3aWR0aD0iNTIwIiBoZWlnaHQ9IjExMCIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSIyOTAiIHdpZHRoPSI1MjAiIGhlaWdodD0iMTEwIi8+CiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iOTAiIHk9IjQyMCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSIxMTAiLz4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSI5MCIgeT0iNTUwIiB3aWR0aD0iNTIwIiBoZWlnaHQ9IjExMCIvPgogIDxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSI2ODAiIHdpZHRoPSI1MjAiIGhlaWdodD0iMTEwIi8+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSIxMjAiIHk9IjIwNSI+TDE8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjE3MCIgeT0iMjA1Ij7QqNCw0LPQuCDQuCByZWFkb3V0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iMTIwIiB5PSIyMzgiPtC80LjQvdC40LzQsNC70YzQvdCw0Y8g0L7Qv9C10YDQsNGG0LjRjyDigKIg0LrQvtGA0L7RgtC60LjQuSDRhtC40LrQuyDigKIg0L/RgNC+0LLQtdGA0Y/QtdC80YvQuSDRjdGE0YTQtdC60YI8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJoIiB4PSIxMjAiIHk9IjMzNSI+TDI8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjE3MCIgeT0iMzM1Ij7QmNGB0YLQvtGA0LjQuCDQuCDRgNC+0LvQuDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iMzY4Ij7Qu9C10LPQuNGC0LjQvNCw0YbQuNGPIOKAoiDRhNGA0LXQudC80Ysg4oCiIMKr0LrRgtC+INC80YsgLyDQstC+INGH0YLQviDQuNCz0YDQsNC10LzCuzwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9IjEyMCIgeT0iNDY1Ij5MMzwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTcwIiB5PSI0NjUiPtCe0YHQuCwg0LzQtdGC0YDQuNC60LgsINC60L7QvdGC0YDQsNC60YLRizwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iNDk4Ij7Qv9GA0LDQstC40LvQsCDQutCw0Log0LDRgNGF0LjRgtC10LrRgtGD0YDQsCDRhtC10L3RiyDigKIg0LTQsNGC0YfQuNC60Lgg4oCiINGB0LDQvdC60YbQuNC4PC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iMTIwIiB5PSI1OTUiPkw0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSIxNzAiIHk9IjU5NSI+0JjQvdGB0YLQuNGC0YPRgtGLINC4INCy0LvQsNGB0YLRjDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjEyMCIgeT0iNjI4Ij7Qv9GA0LDQstCwIOKAoiDQu9C10LPQuNGC0LjQvNC90L7RgdGC0Ywg4oCiINC60YLQviDQvNC+0LbQtdGCINC80LXQvdGP0YLRjCDQv9GA0LDQstC40LvQsDwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImgiIHg9IjEyMCIgeT0iNzI1Ij5MNTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTcwIiB5PSI3MjUiPtCT0YDQsNC90LjRhtGLINC4INC/0LXRgNC10YXQvtC00Ys8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSIxMjAiIHk9Ijc1OCI+0L/QvtCy0LXRgNGF0L3QvtGB0YLRjCDQvdCw0LHQu9GO0LTQtdC90LjRjyDigKIg0YDQtdC20LjQvNGLIOKAoiDCq9Cz0LTQtSDQu9C+0LzQsNC10YLRgdGPwrs8L3RleHQ+CgogIDwhLS0gVmVydGljYWwgYXJyb3dzICsgbGFiZWxzIC0tPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgMjcwIEwgMzUwIDI5MCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgNDAwIEwgMzUwIDQyMCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgNTMwIEwgMzUwIDU1MCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSAzNTAgNjYwIEwgMzUwIDY4MCIvPgoKICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iNjQ1IiB5PSIyMDgiIHdpZHRoPSI2NDAiIGhlaWdodD0iNTIiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjY3MCIgeT0iMjQyIj7QmNC90YLQtdCz0YDQsNC7INC/0L4g0LLRgNC10LzQtdC90Lg6IMKr0L/QvtCy0YLQvtGA0LXQvdC40LUgKyDRhtC10L3QsMK7IOKGkiDCq9C90L7RgNC80LAv0YHRgtGA0YPQutGC0YPRgNCwINGB0LvQtdC00YPRjtGJ0LXQs9C+INGD0YDQvtCy0L3Rj8K7PC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iYXJyb3cyIiBkPSJNIDYxMCAyMzQgTCA2NDIgMjM0Ii8+CgogIDwhLS0gUmlnaHQtc2lkZSBub3RlcyAtLT4KICA8dGV4dCBjbGFzcz0iaCIgeD0iNjkwIiB5PSIzMjAiPtCa0LDQuiDRh9C40YLQsNGC0Ywg0YHRgtGA0LXQu9C60YM8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI2OTAiIHk9IjM1MiI+0JXRgdC70Lgg0L3QsCBMbiDCq9Cy0LTRgNGD0LMg0L/QvtGP0LLQuNC70L7RgdGMwrs6PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzA1IiB5PSIzODIiPjEpINC40YnQuCDQvdCwIExu4oiSMSDQv9C+0LLRgtC+0YDRj9C10LzRi9C1INGI0LDQs9C4PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzA1IiB5PSI0MDgiPjIpINC/0YDQvtCy0LXRgNGMLCDQutCw0LrQsNGPINGG0LXQvdCwINC00LXQu9Cw0LvQsCDQuNGFIMKr0LTQtdGI0ZHQstGL0LzQuMK7PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNzA1IiB5PSI0MzQiPjMpINGN0YLQviDQuCDQtdGB0YLRjCDQvNCw0YLQtdGA0LjQsNC7LCDQuNC3INC60L7RgtC+0YDQvtCz0L4g0LLRi9GA0L7RgdC70LAg0YHRgtGA0YPQutGC0YPRgNCwIExuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaCIgeD0iNjkwIiB5PSI1MDAiPtCf0YDQuNC80LXRgCAo0LPRgNGD0LHQvik8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI2OTAiIHk9IjUzMiI+TDIgPSDiiKtMMTog0L/QvtCy0YLQvtGA0Y/QtdC80YvQtSDRiNCw0LPQuCArINC40YUg0YbQtdC90LAg4oaSINGA0L7Qu9GML9C40YHRgtC+0YDQuNGPPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNjkwIiB5PSI1NTgiPkwzID0g4oirTDI6INC40YHRgtC+0YDQuNC4INC60YDQuNGB0YLQsNC70LvQuNC30YPRjtGC0YHRjyDihpIg0L7RgdC4L9C80LXRgtGA0LjQutC4L9C60L7QvdGC0YDQsNC60YLRizwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjY5MCIgeT0iNTg0Ij5MNCA9IOKIq0wzOiDQv9GA0LDQstC40LvQsCDQttC40LLRg9GCINC00L7Qu9GM0YjQtSDQu9GO0LTQtdC5IOKGkiDQuNC90YHRgtC40YLRg9GC0Ys8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI2OTAiIHk9IjYxMCI+TDUgPSDiiKso0LLRgdC10LPQvik6INCy0LjQtNC90L4g0LPRgNCw0L3QuNGG0Ysg0YDQtdC20LjQvNCwINC4INC/0LXRgNC10YXQvtC00Ys8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJtdXRlZCIgeD0iNjAiIHk9IjgwNSI+REVUTSAvIMKr0KPRgNC+0LLQvdC4IEww4oCTTDXCuyAodjIpOiDRgdGF0LXQvNCwINC00LvRjyDRh9GC0LXQvdC40Y8sINC90LUgwqvQvNCw0YLQtdC80LDRgtC40YfQtdGB0LrQvtC1INC00L7QutCw0LfQsNGC0LXQu9GM0YHRgtCy0L7Cuy48L3RleHQ+Cjwvc3ZnPgo=" alt="Интегральная интуиция уровней: Ln как интеграл Ln-1 (схема)" /></p>
-<p>Примеры (очень грубо):</p>
-<ul>
-<li>L2 можно читать как интеграл L1: повторяемые шаги + их цена
-превращаются в историю и роль.</li>
-<li>L3 можно читать как интеграл L2: истории кристаллизуются в оси,
-метрики и контракты.</li>
-<li>L4 можно читать как интеграл L3: правила начинают жить дольше людей
-(легитимность, санкции, права).</li>
-<li>L5 можно читать как интеграл всего: поверхность, где видно суммарный
-сдвиг и границы режима.</li>
-</ul>
-<p>Это полезно как правило чтения: если на Ln «вдруг появилось», ищи в
-Ln-1 повторяющиеся шаги и их цену.</p>
-<h3 id="опционально-полевая-интуиция-континуум--поля">Опционально:
-полевая интуиция («континуум + поля»)</h3>
-<p>Иногда модель проще держать не как «этажи», а как одну и ту же
-систему, на которую действуют разные поля.</p>
-<ul>
-<li>L0 можно читать как <em>метрику существования</em>: держится ли
-причинность во времени (есть ли «завтра связано с сегодня», есть ли
-локальность шага, есть ли допустимые траектории). Когда L0 падает,
-«пространство шагов» схлопывается: остаётся «сейчас или смерть» (или
-«сейчас или дефолт» — для организаций).</li>
-<li>L1–L4 тогда читаются не как «выше/ниже», а как разные типы
-взаимодействий, которые искривляют траектории (меняют цену направлений)
-на одном и том же континууме.</li>
-</ul>
-<p>Если хочется совсем на пальцах (как рабочую физику, не как истину),
-можно примерить такую аналогию:</p>
-<ul>
-<li>L1 — «сильное»: сцепление шага и эффекта на коротком радиусе (если
-не работает — всё распадается в шум).</li>
-<li>L2 — «слабое»: превращения состояний (роль/идентичность/история: кем
-был → кем стал).</li>
-<li>L3 — «электромагнитное»: сигналы и измерения (оси, метрики, правила;
-здесь же живёт Гудхарт).</li>
-<li>L4 — «гравитация»: институты и инерция (слабое локально, но
-неизбежное глобально; определяет «орбиты» остальных уровней).</li>
-<li>L5 — не «сила», а поверхность наблюдения/граница применимости:
-фазовые переходы, бифуркации, места, где старые поля перестают
-сходиться.</li>
-</ul>
-<p>Эта логика рекурсивна: на любом масштабе можно переименовать текущий
-базис в L0, а остальное читать как поля L1–L5 над ним. Тогда модель
-становится не «картой всего», а способом искать условия существования
-причинности и появления устойчивых паттернов.</p>
-<p>Важная оговорка: это не попытка «объяснить человека физикой». Это
-способ держать <strong>физику описания</strong>: где именно причинно то,
-что мы делаем и говорим.</p>
-<p>Практическое следствие из этого (и оно потом много раз всплывёт в
-главах): почти любой конфликт — это спор на разных уровнях. И часто все
-правы — <em>на своём поле</em>. Отсюда же ограничение: «лечить L0 через
-L3» нельзя; «лечить гравитацию словами» бессмысленно.</p>
-<p>И ещё один полезный инвариант про наблюдение (readout): пока
-измерение/отчёт влияет на траекторию, наблюдатель неотделим от системы.
-Когда же «производная по наблюдению» близка к нулю (проверяем — и ничего
-не меняется), возникает объект/норма/институт как устойчивый инвариант:
-система умеет быть «сама собой» без постоянного контроля.</p>
-<h4 id="ещё-глубже-опционально-поверхность-фаза-и-знак-потока">Ещё
-глубже (опционально): поверхность, фаза и знак потока</h4>
-<p>Если продолжать держать эту картину как «геометрию траекторий», то
-полезно добавить ещё одну связку:</p>
-<ul>
-<li><strong>«Степень уравнения движения» → поверхность объекта.</strong>
-Не буквально «степень полинома», а структурно: сколько независимых
-условий должны выполняться одновременно, чтобы траектория оставалась
-устойчивой. Чем больше таких условий — тем жёстче поверхность инварианта
-(меньше свободы «уплывать»), тем «реальнее» объект как режим.</li>
-<li><strong>Мнимая часть → фазовый вектор устойчивости.</strong> Не
-«нереальная», а <em>фазовая</em>: она не обязана быть наблюдаемой
-напрямую, но задаёт направление и скорость релаксации к «центру массы»
-объекта — к состоянию минимальной цены существования/минимальной
-фазы.</li>
-<li><strong>Смена знака мнимой части → смена направления передачи
-энергии.</strong> Если знак меняется, это не «событие», а смена режима:
-объект становится источником энергии для среды или стоком энергии из
-среды. Это и есть термодинамический баланс по поверхности (обмен идёт
-через границу).</li>
-</ul>
-<p>В этом языке «устойчивость» — это нулевой поток через поверхность
-(вход = выход). «Рост» и «распад» — это просто разные стороны одного и
-того же баланса.</p>
-<p>Короткая формула уровня L4 в этом языке: С гравитацией можно не
-считаться — но тогда она посчитает тебя.</p>
-<h3 id="диагностическая-связка-l0--t1t7--l5-схема">Диагностическая
-связка: L0 ↔︎ T1–T7 ↔︎ L5 (схема)</h3>
-<p><img role="img" aria-label="Диагностическая связка: L0 ↔ T1–T7 ↔ L5 (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAwIiBoZWlnaHQ9Ijk4MCIgdmlld0JveD0iMCAwIDE2MDAgOTgwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAudGl0bGUgeyBmb250OiA4MDAgMzBweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zdWIgeyBmb250OiA1MDAgMThweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5oIHsgZm9udDogODAwIDE4cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQ6IDUwMCAxNnB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLm11dGVkIHsgZm9udDogNTAwIDE0cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAuY29sIHsgZmlsbDogI2Y4ZmFmYzsgc3Ryb2tlOiAjMGYxNzJhOyBzdHJva2Utd2lkdGg6IDI7IHJ4OiAxNDsgfQogICAgICAucm93IHsgZmlsbDogI2ZmZmZmZjsgc3Ryb2tlOiAjY2JkNWUxOyBzdHJva2Utd2lkdGg6IDEuNTsgcng6IDEyOyB9CiAgICAgIC50YWcgeyBmaWxsOiAjMGYxNzJhOyByeDogMTA7IH0KICAgICAgLnRhZ3RleHQgeyBmb250OiA4MDAgMTRweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjZmZmZmZmOyB9CiAgICAgIC5waWxsIHsgZmlsbDogI2UyZThmMDsgc3Ryb2tlOiAjNjQ3NDhiOyBzdHJva2Utd2lkdGg6IDEuMjU7IHJ4OiA5OTk7IH0KICAgICAgLnBpbGx0ZXh0IHsgZm9udDogNzAwIDEzcHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuYXJyb3cgeyBzdHJva2U6ICM2NDc0OGI7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyBtYXJrZXItZW5kOiB1cmwoI20pOyB9CiAgICA8L3N0eWxlPgogICAgPG1hcmtlciBpZD0ibSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTSAwIDAgTCAxMCA1IEwgMCAxMCB6IiBmaWxsPSIjNjQ3NDhiIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDxyZWN0IGNsYXNzPSJiZyIgeD0iMCIgeT0iMCIgd2lkdGg9IjE2MDAiIGhlaWdodD0iOTgwIi8+CgogIDx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iNzAiIHk9IjcwIj7QlNC40LDQs9C90L7RgdGC0LjRh9C10YHQutCw0Y8g0YHQstGP0LfQutCwOiBMMCDihpQgVDHigJNUNyDihpQgTDU8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iNzAiIHk9IjEwNSI+0JjQtNC10Y86IMKr0L/QtdGA0LXQutC+0YEv0LTQtdGE0LjRhtC40YIg0LIg0LHQsNC30LjRgdC1IChMMCkg4oaSINGC0LjQv9C+0LLQvtC5INGA0LXQttC40LwgKFQpIOKGkiDQvdCw0LHQu9GO0LTQsNC10LzRi9C5INGB0LjQvNC/0YLQvtC8INC90LAg0L/QvtCy0LXRgNGF0L3QvtGB0YLQuCAoTDUpIOKGkiDQv9C10YDQstGL0Lkg0L7Qv9C10YDQsNGC0L7RgCDQtNC70Y8g0YHRgtCw0LHQuNC70LjQt9Cw0YbQuNC4wrsuPC90ZXh0PgoKICA8IS0tIENvbHVtbiBoZWFkZXJzIC0tPgogIDxyZWN0IGNsYXNzPSJjb2wiIHg9IjcwIiB5PSIxNTAiIHdpZHRoPSI0NzAiIGhlaWdodD0iNjQiLz4KICA8cmVjdCBjbGFzcz0iY29sIiB4PSI1NjUiIHk9IjE1MCIgd2lkdGg9IjQyMCIgaGVpZ2h0PSI2NCIvPgogIDxyZWN0IGNsYXNzPSJjb2wiIHg9IjEwMTAiIHk9IjE1MCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI2NCIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5NSIgeT0iMTkxIj5MMDog0YfRgtC+IMKr0L3QtSDRgtGP0L3QtdGCwrsgKNC/0LXRgNC10LrQvtGBKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0iaCIgeD0iNTkwIiB5PSIxOTEiPtCi0LXQvNCwIChUKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0iaCIgeD0iMTAzNSIgeT0iMTkxIj5MNTog0YfRgtC+INCy0LjQtNC90L4gwqvRgdCy0LXRgNGF0YPCuyAo0YHQuNC80L/RgtC+0LwpICsg0L/QtdGA0LLRi9C5INC+0L/QtdGA0LDRgtC+0YA8L3RleHQ+CgogIDwhLS0gUm93IHRlbXBsYXRlIHNldHRpbmdzIC0tPgogIDwhLS0gUm93cyB5OiAyNDAsIDMzMCwgNDIwLCA1MTAsIDYwMCwgNjkwLCA3ODAgLS0+CgogIDwhLS0gVDEgLS0+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjI0MCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iNzYiLz4KICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjI2MiIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+CiAgPHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iMjg0Ij5UMTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjI3MCI+0J/QtdGA0LXQs9GA0LXQsiDQutC+0L3RgtGD0YDQsCAvINC90LXRgiDQvtC60L3QsCDQvtGB0YLQsNC90L7QstC60Lg8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iMjk1Ij7Rg9GB0LrQvtGA0LXQvdC40LUgPiDQv9GA0L7QstC10YDRj9C10LzQvtGB0YLRjCwg0YbQtdC90LAg0L7RiNC40LHQutC4INGA0LDRgdGC0ZHRgiDQsdGL0YHRgtGA0LXQtSDQsdGD0YTQtdGA0LA8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iMjcwIj7QntGB0YLQsNC90L7QstC60LAgLyDQv9Cw0YPQt9CwINC60LDQuiDQt9Cw0YnQuNGC0LAg0L/RgNC40YfQuNC90L3QvtGB0YLQuDwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iMjcwIj7QodGA0YvQstGLLCDQsNCy0LDRgNC40LnQvdC+0YHRgtGMLCDCq9Cy0YHRkSDRgdGA0L7Rh9C90L7Cuywg0LrQsNGB0LrQsNC0INC+0YjQuNCx0L7QujwvdGV4dD4KICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iMTAzNSIgeT0iMjg2IiB3aWR0aD0iMTcyIiBoZWlnaHQ9IjI0Ii8+CiAgPHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxMDUwIiB5PSIzMDMiPtGB0YLQsNGA0YI6IEwwLUMxPC90ZXh0PgoKICA8IS0tIFQyIC0tPgogIDxyZWN0IGNsYXNzPSJyb3ciIHg9IjcwIiB5PSIzMzAiIHdpZHRoPSIxNDYwIiBoZWlnaHQ9Ijc2Ii8+CiAgPHJlY3QgY2xhc3M9InRhZyIgeD0iNTg1IiB5PSIzNTIiIHdpZHRoPSI1NCIgaGVpZ2h0PSIzMiIvPgogIDx0ZXh0IGNsYXNzPSJ0YWd0ZXh0IiB4PSI2MDAiIHk9IjM3NCI+VDI8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9Ijk1IiB5PSIzNjAiPtCm0LXQvdCwINGD0YfQsNGB0YLQuNGPINC90LUg0YHRhdC+0LTQuNGC0YHRjyAvINC/0YDQsNCy0LTRgyDQtNC10YDQttCw0YLRjCDRgdC70LjRiNC60L7QvCDQtNC+0YDQvtCz0L48L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iMzg1Ij7QstGL0YXQvtC0L9C80L7Qu9GH0LDQvdC40LUv0YHQsNCx0L7RgtCw0LYg0YHRgtCw0L3QvtCy0LjRgtGB0Y8g0YDQsNGG0LjQvtC90LDQu9GM0L3Ri9C8PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI2NTUiIHk9IjM2MCI+0J7RgtC60LDQtyDRg9GH0LDRgdGC0LLQvtCy0LDRgtGMIC8g0YDQsNC30YDRi9CyINGB0LLRj9C30Lgg0YEg0LvQvtC20YzRjjwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iMzYwIj7Qo9GF0L7QtCDQsiDRgtC10L3RjCwg0LjQvNC40YLQsNGG0LjRjywgwqvQtNC10LvQsNC10Lwg0LLQuNC0wrssINC80LDRgdGB0L7QstGL0LUg0L7RgtC60LDQt9GLPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSIzNzYiIHdpZHRoPSIxNzIiIGhlaWdodD0iMjQiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9IjM5MyI+0YHRgtCw0YDRgjogTDAtQzI8L3RleHQ+CgogIDwhLS0gVDMgLS0+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjQyMCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iNzYiLz4KICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjQ0MiIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+CiAgPHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iNDY0Ij5UMzwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjQ1MCI+0J3QtdGCINCx0YPRhNC10YDQsC/RgNC10YHRg9GA0YHQsCDihpIg0YHQv9Cw0YHQsNC10LzRgdGPINC/0LXRgNC10YDQsNGB0YXQvtC00L7QvDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSI0NzUiPsKr0LTQvtGC0Y/QvdC10Lwg0L3QsCDQs9C10YDQvtC40LfQvNC1wrsg0LLQvNC10YHRgtC+INGD0L/RgNCw0LLQu9C10L3QuNGPINC4INC/0LXRgNC10YHQsdC+0YDQutC4INC90LDQs9GA0YPQt9C60Lg8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iNDUwIj7Qk9C10YDQvtC40YfQtdGB0LrQuNC5INGA0LXQttC40LwgKNC/0LXRgNC10YDQsNGB0YXQvtC0INGA0LXRgdGD0YDRgdCwINCy0LzQtdGB0YLQviDRg9C/0YDQsNCy0LvQtdC90LjRjyk8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjEwMzUiIHk9IjQ1MCI+0JLRi9Cz0L7RgNCw0L3QuNC1LCDQv9C+0LbQsNGA0Ysg0LrQsNC6INC90L7RgNC80LAsINC30LDQstC40YHQuNC80L7RgdGC0Ywg0L7RgiDQs9C10YDQvtC10LIsINC+0LHRgNGL0LI8L3RleHQ+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjEwMzUiIHk9IjQ2NiIgd2lkdGg9IjE3MiIgaGVpZ2h0PSIyNCIvPgogIDx0ZXh0IGNsYXNzPSJwaWxsdGV4dCIgeD0iMTA1MCIgeT0iNDgzIj7RgdGC0LDRgNGCOiBMMC1DMzwvdGV4dD4KCiAgPCEtLSBUNCAtLT4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNTEwIiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI3NiIvPgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iNTMyIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz4KICA8dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI1NTQiPlQ0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iNTQwIj7QntCx0Y/Qt9Cw0YLQtdC70YzRgdGC0LLQsCA+INC80L7RidC90L7RgdGC0YwgLyDQtNC+0LvQsyDRgNCw0YHRgtGR0YIg0LHRi9GB0YLRgNC10LUg0LLRi9C/0L7Qu9C90LXQvdC40Y88L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iNTY1Ij7QvdGD0LbQvdC+INGB0L3QuNC20LDRgtGMINC+0LHQtdGJ0LDQvdC40Y8g0LTQviDQsdCw0LfQuNGB0LAsINC40L3QsNGH0LUg0LTQtdGE0L7Qu9GCPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI2NTUiIHk9IjU0MCI+0KHQvdC40LbQtdC90LjQtSDQvtCx0Y/Qt9Cw0YLQtdC70YzRgdGC0LIg0LTQviDQsdCw0LfQuNGB0LAgKNC30LDQvNC+0YDQvtC30LrQsC/Rg9GA0LXQt9Cw0L3QuNC1KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iNTQwIj7QndC10LLRi9C/0L7Qu9C90LjQvNC+0YHRgtGMLCDQstC10YfQvdGL0LUg0L/QtdGA0LXQvdC+0YHRiywg0LTQtdCz0YDQsNC00LDRhtC40Y8g0LrQsNGH0LXRgdGC0LLQsCwg0LrRgNC40LfQuNGBPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSI1NTYiIHdpZHRoPSIxNzIiIGhlaWdodD0iMjQiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9IjU3MyI+0YHRgtCw0YDRgjogTDAtQzQ8L3RleHQ+CgogIDwhLS0gVDUgLS0+CiAgPHJlY3QgY2xhc3M9InJvdyIgeD0iNzAiIHk9IjYwMCIgd2lkdGg9IjE0NjAiIGhlaWdodD0iNzYiLz4KICA8cmVjdCBjbGFzcz0idGFnIiB4PSI1ODUiIHk9IjYyMiIgd2lkdGg9IjU0IiBoZWlnaHQ9IjMyIi8+CiAgPHRleHQgY2xhc3M9InRhZ3RleHQiIHg9IjYwMCIgeT0iNjQ0Ij5UNTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTUiIHk9IjYzMCI+0KLQvtC60YHQuNGH0L3Ri9C5INGD0LfQtdC7L9C60L7QvdGC0YPRgCDQt9Cw0YDQsNC20LDQtdGCINC+0YHRgtCw0LvRjNC90L7QtTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSI2NTUiPtGA0LjRgdC6INGA0LDRgdC/0YDQvtGB0YLRgNCw0L3Rj9C10YLRgdGPLCDQvdGD0LbQtdC9INCx0LDRgNGM0LXRgC/QuNC30L7Qu9GP0YbQuNGPPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI2NTUiIHk9IjYzMCI+0JrQsNGA0LDQvdGC0LjQvSDRgNCw0LfRgNGL0LLQsCAo0LjQt9C+0LvRj9GG0LjRjyDRgtC+0LrRgdC40YfQvdC+0LPQviDRg9C30LvQsC/QutC+0L3RgtGD0YDQsCk8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjEwMzUiIHk9IjYzMCI+0JrQsNGB0LrQsNC0LCDQt9Cw0YDQsNC20LXQvdC40LUsINGA0LDRgdC/0L7Qu9C30LDQvdC40LUg0LrQvtC90YTQu9C40LrRgtC+0LIv0LjQvdGG0LjQtNC10L3RgtC+0LI8L3RleHQ+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjEwMzUiIHk9IjY0NiIgd2lkdGg9IjE3MiIgaGVpZ2h0PSIyNCIvPgogIDx0ZXh0IGNsYXNzPSJwaWxsdGV4dCIgeD0iMTA1MCIgeT0iNjYzIj7RgdGC0LDRgNGCOiBMMC1DNTwvdGV4dD4KCiAgPCEtLSBUNiAtLT4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNjkwIiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI3NiIvPgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iNzEyIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz4KICA8dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI3MzQiPlQ2PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iNzIwIj7QndC10YIg0LTQsNGC0YfQuNC60L7Qsi/Qv9GA0LDQstC00Ysg4oaSINC90LXQu9GM0LfRjyDRgNCw0LfQu9C+0LbQuNGC0Ywg0L/RgNC40YfQuNC90YMg0L3QsCDRiNCw0LPQuDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9Ijk1IiB5PSI3NDUiPnJlYWRvdXQg0LvQvtC80LDQtdGC0YHRjywg0YHQuNGB0YLQtdC80LAg0L7Qv9GC0LjQvNC40LfQuNGA0YPQtdGCINC+0YLRh9GR0YI8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjY1NSIgeT0iNzIwIj7QktC+0YHRgdGC0LDQvdC+0LLQu9C10L3QuNC1INC+0LHRgNCw0YLQvdC+0Lkg0YHQstGP0LfQuCAo0YHQtNC10LvQsNGC0Ywg0L/RgNCw0LLQtNGDINC00LXRiNGR0LLQvtC5KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iNzIwIj7QoNC+0YHRgiDQuNC80LjRgtCw0YbQuNC4LCDQvNC10YLRgNC40LrQuCDQsdC10Lcg0Y3RhNGE0LXQutGC0LAsIMKr0L3QtdC/0L7QvdGP0YLQvdC+INGH0YLQviDRgNCw0LHQvtGC0LDQtdGCwrs8L3RleHQ+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjEwMzUiIHk9IjczNiIgd2lkdGg9IjE3MiIgaGVpZ2h0PSIyNCIvPgogIDx0ZXh0IGNsYXNzPSJwaWxsdGV4dCIgeD0iMTA1MCIgeT0iNzUzIj7RgdGC0LDRgNGCOiBMMC1DNjwvdGV4dD4KCiAgPCEtLSBUNyAtLT4KICA8cmVjdCBjbGFzcz0icm93IiB4PSI3MCIgeT0iNzgwIiB3aWR0aD0iMTQ2MCIgaGVpZ2h0PSI3NiIvPgogIDxyZWN0IGNsYXNzPSJ0YWciIHg9IjU4NSIgeT0iODAyIiB3aWR0aD0iNTQiIGhlaWdodD0iMzIiLz4KICA8dGV4dCBjbGFzcz0idGFndGV4dCIgeD0iNjAwIiB5PSI4MjQiPlQ3PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5NSIgeT0iODEwIj7QmtC+0L3RhNC70LjQutGCINC+0YHQtdC5IC8g0LTRgNC10LnRhCDRgNC10YTQtdGA0LXQvdGB0LAgLyDCq9GH0YLQviDRgdGH0LjRgtCw0YLRjCDRgNC10LDQu9GM0L3QvtGB0YLRjNGOwrs8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im11dGVkIiB4PSI5NSIgeT0iODM1Ij7Qv9C+0LvQuNGC0LjQutCwINC80LXRgtGA0LjQuiDQuCDQuNC90YLQtdGA0L/RgNC10YLQsNGG0LjQuSDRgdGC0LDQvdC+0LLQuNGC0YHRjyDQv9C+0LvQtdC8INCx0L7RjzwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iNjU1IiB5PSI4MTAiPtCa0L7QvdGC0YDQvtC70Ywg0LjQvdGC0LXRgNC/0YDQtdGC0LDRhtC40LggKNC60LDQutC40LUg0L7RgdC4INGB0YfQuNGC0LDRjtGC0YHRjyDRgNC10LDQu9GM0L3QvtGB0YLRjNGOKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iMTAzNSIgeT0iODEwIj7QktC+0LnQvdCwINC80LXRgtGA0LjQuiwg0JPRg9C00YXQsNGA0YIg0LrQsNC6INC90L7RgNC80LAsINGB0L/QvtGAINC90LUg0L/RgNC+0LLQtdGA0Y/QtdC8PC90ZXh0PgogIDxyZWN0IGNsYXNzPSJwaWxsIiB4PSIxMDM1IiB5PSI4MjYiIHdpZHRoPSIxNzIiIGhlaWdodD0iMjQiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjEwNTAiIHk9Ijg0MyI+0YHRgtCw0YDRgjogTDMtQzc8L3RleHQ+CgogIDwhLS0gQXJyb3dzIGJldHdlZW4gY29sdW1ucyAtLT4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDI3OCBMIDU2NSAyNzgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDM2OCBMIDU2NSAzNjgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDQ1OCBMIDU2NSA0NTgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDU0OCBMIDU2NSA1NDgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDYzOCBMIDU2NSA2MzgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDcyOCBMIDU2NSA3MjgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gNTQwIDgxOCBMIDU2NSA4MTgiLz4KCiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSAyNzggTCAxMDEwIDI3OCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSA5ODUgMzY4IEwgMTAxMCAzNjgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gOTg1IDQ1OCBMIDEwMTAgNDU4Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSA1NDggTCAxMDEwIDU0OCIvPgogIDxwYXRoIGNsYXNzPSJhcnJvdyIgZD0iTSA5ODUgNjM4IEwgMTAxMCA2MzgiLz4KICA8cGF0aCBjbGFzcz0iYXJyb3ciIGQ9Ik0gOTg1IDcyOCBMIDEwMTAgNzI4Ii8+CiAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDk4NSA4MTggTCAxMDEwIDgxOCIvPgoKICA8dGV4dCBjbGFzcz0ibXV0ZWQiIHg9IjcwIiB5PSI5NDAiPtCf0L7QtNGB0LrQsNC30LrQsDog0LXRgdC70LggwqvQu9GO0LHQvtC5INCy0YvQsdC+0YAg0L3QtSDQvNC10L3Rj9C10YIg0YLRgNCw0LXQutGC0L7RgNC40Y7Cuywg0YHQvdCw0YfQsNC70LAg0LTQtdC70LDQuSDRiNCw0LMg0LLQs9C70YPQsdGMIChyZWFkb3V0L9Cx0LDQt9C40YEpLCDQuCDRgtC+0LvRjNC60L4g0L/QvtGC0L7QvCDQv9C10YDQtdCx0LjRgNCw0Lkg0LLQsNGA0LjQsNC90YLRiyDQstGI0LjRgNGMLjwvdGV4dD4KPC9zdmc+Cgo=" alt="Диагностическая связка: L0 ↔ T1–T7 ↔ L5 (схема)" /></p>
 <h2 id="итоги-уровней-l0l5--кратко">Итоги уровней (L0–L5) — кратко</h2>
 <p>Этот файл — «краткая версия» для практического применения: только
 итоговые выводы, перевод на действия и мини-чеклисты.</p>
@@ -1231,6 +1373,100 @@ readout</h3>
 <li>Не запрещены ли стоп/выход/правда (иначе граница будет пройдена
 вслепую)?</li>
 </ul>
+<h2 id="сквозной-кейс-l0l5-проектная-команда-практический-проход">Сквозной
+кейс L0→L5: проектная команда (практический проход)</h2>
+<p><a id="cross-case-l0-l5"></a></p>
+<p>Кейс нужен как &quot;длинная траектория&quot;: один и тот же контур читается по
+всем уровням, а не фрагментами.</p>
+<p>Ситуация: команда продукта из 9 человек третий квартал срывает сроки.
+Отчёты &quot;зелёные&quot;, но релизы нестабильны, переработки растут, два
+ключевых инженера думают об уходе.</p>
+<h3 id="шаг-0-наблюдаемые-входы-без-интерпретаций">Шаг 0. Наблюдаемые
+входы (без интерпретаций)</h3>
+<ul>
+<li>4 релиза из 6 откатили в первые 48 часов.</li>
+<li>3 человека в &quot;героическом&quot; режиме 2+ месяца.</li>
+<li>SLA по инцидентам формально выполняется, но долг по качеству
+растёт.</li>
+<li>На ретро говорят о &quot;коммуникации&quot;, но список задач не
+сокращается.</li>
+<li>Любая новая инициатива начинается до закрытия старых хвостов.</li>
+</ul>
+<h3 id="l0-базис-держится-ли-режим">L0: базис (держится ли режим)</h3>
+<p>Диагноз: <code>L0</code> просажен по ресурсу и праву остановки.</p>
+<p>Оператор: <code>L0-C4</code> (снижение обязательств) +
+<code>L0-C1</code> (остановка набора нового на 2 недели).</p>
+<p>Readout:</p>
+<ul>
+<li>прекращён набор нового (прямой признак <code>L0-C1</code>);</li>
+<li>число параллельных активных задач падает (следствие паузы и урезания
+обязательств);</li>
+<li>переработки снижаются;</li>
+<li>аварийные вмешательства перестают быть &quot;нормой недели&quot;.</li>
+</ul>
+<h3 id="l1-шагэффект">L1: шаг→эффект</h3>
+<p>Диагноз: команда делает много действий, но не держит минимальный
+причинный цикл.</p>
+<p>Оператор: <code>L1-C2</code> (один честный readout релиза: откат/не
+откат) + <code>L1-C4</code> (жёсткий лимит WIP).</p>
+<p>Readout:</p>
+<ul>
+<li>после каждого релиза видно бинарное изменение;</li>
+<li>уменьшается латентность обратной связи;</li>
+<li>&quot;сделано&quot; = &quot;проверено&quot;, а не &quot;закрыто в трекере&quot;.</li>
+</ul>
+<h3 id="l2-истории-и-роли">L2: истории и роли</h3>
+<p>Диагноз: история &quot;мы герои, вытянем&quot; легитимирует перерасход вместо
+ремонта контура.</p>
+<p>Оператор: <code>L2-C5</code> (сменить фрейм: &quot;устойчивость важнее
+героизма&quot;) + <code>L2-C7</code> (объяснение заменять экспериментом).</p>
+<p>Readout:</p>
+<ul>
+<li>на ретро исчезает риторика &quot;надо просто сильнее&quot;;</li>
+<li>решения переходят в формат гипотеза -&gt; тест -&gt; результат.</li>
+</ul>
+<h3 id="l3-правила-и-метрики">L3: правила и метрики</h3>
+<p>Диагноз: метрики оптимизируют отчётность, а не устойчивость
+релиза.</p>
+<p>Оператор: <code>L3-C1</code> (метрика как датчик) +
+<code>L3-C6</code> (анти-имитация) + <code>L3-C5</code> (цена ошибок на
+источник).</p>
+<p>Readout:</p>
+<ul>
+<li>KPI не растут при деградации качества;</li>
+<li>владельцы решений видят цену своих компромиссов;</li>
+<li>исчезают &quot;зелёные&quot; отчёты при красной реальности.</li>
+</ul>
+<h3 id="l4-институты-и-власть">L4: институты и власть</h3>
+<p>Диагноз: нет легитимного права сказать &quot;стоп&quot; при несходимости
+нагрузки.</p>
+<p>Оператор: <code>L4-C1</code> (право вето на запуск при неготовом
+базисе) + <code>L4-C6</code> (институт честной обратной связи).</p>
+<p>Readout:</p>
+<ul>
+<li>stop/hold становится нормальной частью управления;</li>
+<li>плохая правда не наказывается автоматически;</li>
+<li>решения по приоритетам пересматриваются быстрее.</li>
+</ul>
+<h3 id="l5-граница-и-переход-режима">L5: граница и переход режима</h3>
+<p>Диагноз: команда подошла к границе масштаба: старый режим &quot;тащим всё
+параллельно&quot; больше не сходится.</p>
+<p>Оператор: <code>L5-C4</code> (снижение масштаба обязательств) +
+<code>L5-C6</code> (граница обратной связи как обязательный
+checkpoint).</p>
+<p>Readout:</p>
+<ul>
+<li>количество обязательств соответствует мощности;</li>
+<li>траектория становится предсказуемой на горизонте 4-6 недель;</li>
+<li>каскад срывов не воспроизводится.</li>
+</ul>
+<h3 id="короткий-итог-кейса">Короткий итог кейса</h3>
+<p>Если читать тот же кейс только через L2 (&quot;люди устали&quot;) или только
+через L3 (&quot;не те KPI&quot;), решение будет частичным. Сквозной проход L0→L5
+показывает причинную цепочку: базис -&gt; шаг -&gt; история -&gt;
+правило -&gt; институт -&gt; граница.</p>
+<p>Практическое правило: если после правки L3 эффекта нет, почти всегда
+нужно возвращаться в L1/L0, а не добавлять новые метрики.</p>
 <h2 id="навигационная-шпаргалка-stc">Навигационная шпаргалка
 (S–T–C)</h2>
 <p><a id="nav-cheatsheet"></a></p>
@@ -1242,6 +1478,8 @@ readout</h3>
 книге.</li>
 <li>Нажми поиск и вводи код из таблиц ниже (например <code>S4/T6</code>
 или <code>L3-C4</code>).</li>
+<li>Для фиксации цикла используй <a href="#diagnostic-blank">диагностический бланк</a>.</li>
+<li>Для быстрой проверки качества хода используй <a href="#printable-tests-checklist">printable-чек-лист тестов</a>.</li>
 </ul>
 <h3 id="диагностика-вширь-или-вглубь">Диагностика: вширь или
 вглубь?</h3>
@@ -1275,7 +1513,8 @@ else:
 <code>L2-C5</code></p></li>
 <li><p>Симптом: «Цель размыта/конфликтует», «не ясно, что оптимизируем»
 Это: <strong>вширь</strong> Первый ход: <code>L3-C7</code> Часто следом:
-<code>S1/T7…S5/T7</code></p></li>
+<code>S1/T7</code>, <code>S2/T7</code>, <code>S3/T7</code>,
+<code>S4/T7</code>, <code>S5/T7</code></p></li>
 <li><p>Симптом: «Нет следующего шага» Это: сначала check Первый ход:
 <code>L1-C2</code> Часто следом: если readout держится →
 <code>L2-C7</code>; если нет → <code>L0-C1</code></p></li>
@@ -1422,6 +1661,109 @@ else:
 <li><code>L5-C7</code> — Смена базиса (когда оси обязаны быть
 пересобраны)</li>
 </ul>
+<h2 id="диагностический-бланк-24h72h">Диагностический бланк
+(24h/72h)</h2>
+<p><a id="diagnostic-blank"></a></p>
+<p>Назначение: быстрый рабочий шаблон, чтобы не терять причинность в
+цикле «симптом -&gt; код -&gt; шаг -&gt; readout -&gt; цена».</p>
+<h3 id="как-заполнять-3-минуты">Как заполнять (3 минуты)</h3>
+<ol type="1">
+<li>Зафиксируй 5-10 наблюдаемых входов (факты, не объяснения).</li>
+<li>Выбери сцену <code>S1..S5</code> и тему <code>T1..T7</code>.</li>
+<li>Поставь первый оператор <code>Lx-Cn</code> (один шаг, не программа
+на неделю).</li>
+<li>Задай <code>readout</code> на <code>24h</code> и
+<code>72h</code>.</li>
+<li>Явно запиши цену/перенос цены.</li>
+<li>Проверь качество хода по <a href="#printable-tests-checklist">printable-чек-листу тестов</a>.</li>
+</ol>
+<h3 id="шаблон-копируй-как-есть">Шаблон (копируй как есть)</h3>
+<pre class="text"><code>[Контекст]
+Дата/время:
+Сцена: S__
+Тема: T__
+
+[Наблюдаемые входы 5-10]
+1.
+2.
+3.
+4.
+5.
+
+[Гипотеза режима]
+Что, вероятно, ломается:
+На каком уровне действие первым:
+
+[Первый оператор]
+Код: L_-C_
+Формулировка шага (1-2 строки):
+Кто делает:
+Когда:
+
+[Readout 24h]
+Что должно измениться:
+Как измеряем:
+Что считаем &quot;не сработало&quot;:
+
+[Readout 72h]
+Что должно стабилизироваться:
+Как измеряем:
+Граница stop/пересборки:
+
+[Цена и перенос цены]
+Какую цену принимаем:
+Кто платит цену:
+Как предотвращаем скрытый перенос цены:
+
+[Решение по итогам цикла]
+Продолжать / Скорректировать / Остановить
+Следующий шаг (если есть):</code></pre>
+<h3 id="мини-версия-когда-совсем-пожар">Мини-версия (когда совсем
+«пожар»)</h3>
+<pre class="text"><code>Входы: ...
+S/T: ...
+Первый Lx-Cn: ...
+Readout 24h: ...
+Цена: ...</code></pre>
+<h2 id="операционные-карточки-1-страница">Операционные карточки (1
+страница)</h2>
+<p><a id="field-cards"></a></p>
+<p>Назначение: быстрые рабочие карточки для режима «пожар/дедлайн»,
+когда нет времени читать главы.</p>
+<h3 id="карточка-1-пожарный-маршрут-60-секунд">Карточка 1: Пожарный
+маршрут (60 секунд)</h3>
+<pre class="text"><code>1) Симптом -&gt; тема T1..T7
+2) Сцена S1..S5
+3) Первый оператор Lx-Cn (один шаг)
+4) Readout через 24h
+5) Проверка 5 тестами (не ушли ли в отчет)</code></pre>
+<p>Подсказка:</p>
+<ul>
+<li>если любой выбор не меняет траекторию -&gt; идти вглубь
+(<code>L1 -&gt; L0</code>);</li>
+<li>если причинность держится -&gt; идти вширь
+(<code>L2/L3</code>).</li>
+</ul>
+<h3 id="карточка-2-диагностический-бланк-мини">Карточка 2:
+Диагностический бланк (мини)</h3>
+<pre class="text"><code>Входы (5-10 фактов):
+S/T:
+Первый оператор Lx-Cn:
+Readout 24h:
+Readout 72h:
+Цена и кто ее платит:
+Решение: продолжать / корректировать / остановить</code></pre>
+<p>Полная версия: <a href="#diagnostic-blank">диагностический бланк
+(24h/72h)</a>.</p>
+<h3 id="карточка-3-5-тестов-качества-хода">Карточка 3: 5 тестов качества
+хода</h3>
+<pre class="text"><code>1) Ясно, что оптимизируем и какую цену принимаем?
+2) Отчет связан с реальным readout и болью/ценой?
+3) Видно, кто платит цену правила/метрики?
+4) Не подменили результат &quot;присутствием&quot;?
+5) Предсказываем режимы, а не &quot;характер людей&quot;?</code></pre>
+<p>Printable-версия: <a href="#printable-tests-checklist">чек-лист
+тестов на 1 страницу</a>.</p>
 <h2 id="инварианты-и-тесты">Инварианты и тесты</h2>
 <p><a id="invariants-and-tests"></a></p>
 <p>Этот раздел — «карманные проверки», которые помогают не превращать
@@ -1440,6 +1782,57 @@ else:
 <li>Предсказываем ли мы режимы и градиенты, а не «судьбу конкретного
 человека»?</li>
 </ol>
+<p><a id="printable-tests-checklist"></a></p>
+<h4 id="01-printable-чек-лист-тестов-1-страница">0.1) Printable чек-лист
+тестов (1 страница)</h4>
+<table>
+<thead>
+<tr>
+<th>Тест</th>
+<th>Контрольный вопрос</th>
+<th>Да/Нет</th>
+<th>Если «Нет»</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Цель + цена</td>
+<td>Ясно, что оптимизируем и какую цену принимаем?</td>
+<td>☐ Да / ☐ Нет</td>
+<td>Пересобрать оси и цену через <code>L3-C7</code>; при перегрузе
+снизить обязательства (<code>L0-C4</code>).</td>
+</tr>
+<tr>
+<td>2. Отчёт ↔︎ реальность</td>
+<td>Есть ли связка <code>readout</code> с болью/ценой, а не только с
+цифрой?</td>
+<td>☐ Да / ☐ Нет</td>
+<td>Вернуть обратную связь и анти-имитацию: <code>L0-C6</code>,
+<code>L3-C6</code>.</td>
+</tr>
+<tr>
+<td>3. Кто платит</td>
+<td>Видно, где и кем оплачивается цена правила/метрики?</td>
+<td>☐ Да / ☐ Нет</td>
+<td>Разложить правило как функцию оптимизации (раздел 3 ниже), вернуть
+цену на источник (<code>L3-C5</code>).</td>
+</tr>
+<tr>
+<td>4. Не «присутствие» вместо результата</td>
+<td>Не подменили ли результат дисциплиной исполнения?</td>
+<td>☐ Да / ☐ Нет</td>
+<td>Проверить «график vs результат» (раздел 4 ниже), восстановить
+критерий «сделано = проверено» (<code>L1-C7</code>).</td>
+</tr>
+<tr>
+<td>5. Границы применимости</td>
+<td>Предсказываем режимы/градиенты, а не «характер людей»?</td>
+<td>☐ Да / ☐ Нет</td>
+<td>Вернуться к границам модели (раздел 5 ниже), зафиксировать
+применимость и ограничения явно.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="1-kpi-чек-лист-прозрачности-контура">1) KPI: чек-лист
 прозрачности контура</h3>
 <p>Каноническая формула честного KPI:</p>
@@ -1531,6 +1924,35 @@ else:
 градиенты</strong>, но нельзя честно предсказывать <strong>конкретные
 траектории отдельных людей</strong> — слишком много скрытых переменных,
 переключений базиса и локальных контуров.</p>
+<h2 id="заключение-короткий-итог-книги">Заключение (короткий итог
+книги)</h2>
+<p><a id="book-conclusion"></a></p>
+<p>Эта книга предлагает не «теорию всего», а рабочую оптику: систему
+полезно читать по уровням <code>L0-L5</code>, не смешивая масштаб задачи
+и язык объяснения.</p>
+<p>Главные практические выводы:</p>
+<ol type="1">
+<li>Сначала держим базис <code>L0</code> (ресурс, безопасность, доверие,
+право остановки), затем улучшаем верхние уровни.</li>
+<li>Если «любой выбор не меняет траекторию», идти вглубь
+(<code>L3 -&gt; L1 -&gt; L0</code>), а не спорить о смыслах.</li>
+<li>Метрики и правила полезны только как датчики и контуры обратной
+связи, а не как самоцель.</li>
+<li>Отказ, пауза и выход — не сбой дисциплины, а часть управления
+границами режима.</li>
+<li>Качество изменений проверяется readout-панелью и ценой последствий,
+а не одним красивым KPI.</li>
+</ol>
+<p>Мини-протокол после чтения:</p>
+<ol type="1">
+<li>Выбери свою сцену <code>S</code> и тему <code>T</code>.</li>
+<li>Сделай один оператор <code>Lx-Cn</code> с горизонтом проверки.</li>
+<li>Проверь результат через «Инварианты и тесты».</li>
+<li>Если эффекта нет, спускай уровень ниже и повтори цикл.</li>
+</ol>
+<p>Если эта книга сработала, результат будет не в «правильной
+терминологии», а в том, что в системе снова появляется причинность,
+управляемость и честная обратная связь.</p>
 <h2 id="термины">Термины</h2>
 <p><a id="terms"></a></p>
 <p>Ниже — рабочий словарь: короткие определения, которые фиксируют,
@@ -1752,7 +2174,15 @@ readout.</p>
 не «общую устойчивость», а обслуживание этого перекоса. Это модель, а не
 психологическая классификация: она нужна, чтобы описывать, как «дефицит
 внизу» превращается в систематические смещения наверху.</p>
-<p><img role="img" aria-label="L0: «Октаэдр базиса» (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjkwMCIgdmlld0JveD0iMCAwIDE0MDAgOTAwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAudGl0bGUgeyBmb250OiA4MDAgMzBweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zdWIgeyBmb250OiA1MDAgMThweCB1aS1zYW5zLXNlcmlmLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIEFyaWFsOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5oIHsgZm9udDogODAwIDE2cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQ6IDUwMCAxNHB4IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgQXJpYWw7IGZpbGw6ICMzMzQxNTU7IH0KICAgICAgLnN0cm9rZSB7IHN0cm9rZTogIzBmMTcyYTsgc3Ryb2tlLXdpZHRoOiAyOyBmaWxsOiBub25lOyB9CiAgICAgIC5jdXQgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyB9CiAgICAgIC5kYXNoIHsgc3Ryb2tlOiAjNjQ3NDhiOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IHN0cm9rZS1kYXNoYXJyYXk6IDcgNzsgfQogICAgICAubGF5ZXIwIHsgZmlsbDogI2UyZThmMDsgfQogICAgICAubGF5ZXIxIHsgZmlsbDogI2NiZDVlMTsgfQogICAgICAubGF5ZXIyIHsgZmlsbDogI2I2YzJkMTsgfQogICAgICAubGF5ZXIzIHsgZmlsbDogIzk0YTNiODsgfQogICAgICAubGF5ZXI0IHsgZmlsbDogIzBmMTcyYTsgfQogICAgICAub3V0ZXIgeyBmaWxsOiAjMGYxNzJhOyBvcGFjaXR5OiAwLjg4OyB9CiAgICAgIC5jYWxsIHsgc3Ryb2tlOiAjNjQ3NDhiOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IG1hcmtlci1lbmQ6IHVybCgjbSk7IH0KICAgICAgLnBpbGwgeyBmaWxsOiAjZjFmNWY5OyBzdHJva2U6ICNjYmQ1ZTE7IHN0cm9rZS13aWR0aDogMS41OyByeDogMTI7IH0KICAgICAgLnBpbGx0ZXh0IHsgZm9udDogNzAwIDE0cHggdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuc3Bpa2UgeyBmaWxsOiAjZGMyNjI2OyBvcGFjaXR5OiAwLjkyOyB9CiAgICA8L3N0eWxlPgogICAgPG1hcmtlciBpZD0ibSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTSAwIDAgTCAxMCA1IEwgMCAxMCB6IiBmaWxsPSIjNjQ3NDhiIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDxyZWN0IGNsYXNzPSJiZyIgeD0iMCIgeT0iMCIgd2lkdGg9IjE0MDAiIGhlaWdodD0iOTAwIi8+CgogIDx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iNjAiIHk9IjcwIj5MMDog0LHQsNC30LjRgSDQutCw0Log0YHRhNC10YDQsCDRgdC+INGB0YDQtdC30L7QvCAo0LzQvtC00LXQu9GMKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI2MCIgeT0iMTA1Ij7QodC90LDRgNGD0LbQuCDQvdCw0LHQu9GO0LTQsNGC0LXQu9GMINCy0LjQtNC40YIg0YLQvtC70YzQutC+INCy0L3QtdGI0L3QuNC5ICjRgdC80YvRgdC70L7QstC+0LkpINGB0LvQvtC5LiDQktC90YPRgtGA0LXQvdC90LjQtSDRgdC70L7QuCDRgdGC0LDQvdC+0LLRj9GC0YHRjyDQstC40LTQuNC80YvQvNC4INGC0L7Qu9GM0LrQviDQvdCwINGB0YDQtdC30LUuPC90ZXh0PgoKICA8IS0tIFNwaGVyZSAoZnVsbCBvdXRzaWRlIHZpZXcpIC0tPgogIDwhLS0gQ2VudGVyICg0MzAsIDUyMCksIFI9MjYwIC0tPgogIDxjaXJjbGUgY3g9IjQzMCIgY3k9IjUyMCIgcj0iMjYwIiBjbGFzcz0ib3V0ZXIiLz4KICA8Y2lyY2xlIGN4PSI0MzAiIGN5PSI1MjAiIHI9IjI2MCIgY2xhc3M9InN0cm9rZSIgc3R5bGU9Im9wYWNpdHk6MC42NSIvPgoKICA8IS0tIEN1dC1vdXQgc2VjdG9yIChhYm91dCAxMjDCsCkgdG8gcmV2ZWFsIGxheWVycyAtLT4KICA8IS0tIFNlY3RvciBhbmdsZXMgcm91Z2hseSAzMjDCsCB0byA4MMKwICh3cmFwKSwgY2VudGVyIHRvIHRoZSByaWdodCAtLT4KICA8IS0tIFdlJ2xsIHJlbW92ZSBhIHdlZGdlIHBvaW50aW5nIHRvIHRoZSByaWdodC91cC1yaWdodCAtLT4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2OTAgNDUwIEEgMjYwIDI2MCAwIDAgMSA2OTAgNTkwIFoiIGZpbGw9IiNmZmZmZmYiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2OTAgNDUwIEEgMjYwIDI2MCAwIDAgMSA2OTAgNTkwIFoiIGNsYXNzPSJjdXQiLz4KCiAgPCEtLSBDb25jZW50cmljIGxheWVyIHdlZGdlcyB2aXNpYmxlIG9ubHkgb24gdGhlIGN1dCBmYWNlIC0tPgogIDwhLS0gUmFkaWk6IDcwLCAxMTUsIDE2MCwgMjA1LCAyNTAgKG91dGVyKSAtLT4KICA8IS0tIE91dGVyIGxheWVyIChzcGlyaXR1YWwpIHNlZ21lbnQgLS0+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjgwIDQ3MCBBIDI1MCAyNTAgMCAwIDEgNjgwIDU3MCBaIiBjbGFzcz0ibGF5ZXI0IiBvcGFjaXR5PSIwLjI1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjM1IDQ4NSBBIDIwNSAyMDUgMCAwIDEgNjM1IDU1NSBaIiBjbGFzcz0ibGF5ZXIzIiBvcGFjaXR5PSIwLjM1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNTkwIDUwMCBBIDE2MCAxNjAgMCAwIDEgNTkwIDU0MCBaIiBjbGFzcz0ibGF5ZXIyIiBvcGFjaXR5PSIwLjQ1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNTQ1IDUxMCBBIDExNSAxMTUgMCAwIDEgNTQ1IDUzMCBaIiBjbGFzcz0ibGF5ZXIxIiBvcGFjaXR5PSIwLjU1Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNTAwIDUxNiBBIDcwIDcwIDAgMCAxIDUwMCA1MjQgWiIgY2xhc3M9ImxheWVyMCIgb3BhY2l0eT0iMC44NSIvPgoKICA8IS0tIEN1dCBib3VuZGFyeSBlbXBoYXNpcyAtLT4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2OTAgNDUwIiBjbGFzcz0iY3V0Ii8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjkwIDU5MCIgY2xhc3M9ImN1dCIvPgoKICA8IS0tIEF4ZXMgZnJvbSBjb3JlIChkb3R0ZWQpIC0tPgogIDxwYXRoIGQ9Ik0gNDMwIDUyMCBMIDY0NSA1MDAiIGNsYXNzPSJkYXNoIi8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjQ1IDU0MCIgY2xhc3M9ImRhc2giLz4KCiAgPCEtLSBTcGlrZXMgLyBkaXN0b3J0aW9uczogb25seSBvbiBvdXRlciBsYXllcnMsIGRlY2F5aW5nIGlud2FyZCAtLT4KICA8IS0tIFNwaWtlIGFsb25nIHVwcGVyIGF4aXMgLS0+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjY0NSw1MDAgNjkwLDQ4OCA2ODgsNTEyIi8+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjU5MCw1MDUgNjIwLDQ5NyA2MTksNTEzIiBvcGFjaXR5PSIwLjY1Ii8+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjU0NSw1MTAgNTYwLDUwNiA1NjAsNTE0IiBvcGFjaXR5PSIwLjM1Ii8+CgogIDwhLS0gU3Bpa2UgYWxvbmcgbG93ZXIgYXhpcyAtLT4KICA8cG9seWdvbiBjbGFzcz0ic3Bpa2UiIHBvaW50cz0iNjQ1LDU0MCA2OTAsNTI4IDY4OCw1NTIiLz4KICA8cG9seWdvbiBjbGFzcz0ic3Bpa2UiIHBvaW50cz0iNTkwLDUzNSA2MjAsNTI3IDYxOSw1NDMiIG9wYWNpdHk9IjAuNjUiLz4KICA8cG9seWdvbiBjbGFzcz0ic3Bpa2UiIHBvaW50cz0iNTQ1LDUzMCA1NjAsNTI2IDU2MCw1MzQiIG9wYWNpdHk9IjAuMzUiLz4KCiAgPCEtLSBPdXRzaWRlLW9ubHkgbGFiZWwgLS0+CiAgPHJlY3QgY2xhc3M9InBpbGwiIHg9IjE3MCIgeT0iMjM1IiB3aWR0aD0iNTIwIiBoZWlnaHQ9IjU2Ii8+CiAgPHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSIxOTAiIHk9IjI2OCI+0KHQvdCw0YDRg9C20Lgg0LLQuNC00L3Qvjog0YLQvtC70YzQutC+IMKr0LTRg9GF0L7QstC90L7QtSAvINGB0LzRi9GB0LvQvtCy0L7QtcK7PC90ZXh0PgoKICA8IS0tIENhbGxvdXRzIGZvciBsYXllcnMgb24gY3V0IC0tPgogIDxwYXRoIGNsYXNzPSJjYWxsIiBkPSJNIDcyMCA0NzAgTCA5ODAgMzgwIi8+CiAgPHRleHQgY2xhc3M9ImgiIHg9Ijk5NSIgeT0iMzg1Ij7QlNGD0YXQvtCy0L3QvtC1IC8g0YHQvNGL0YHQu9C+0LLQvtC1PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5OTUiIHk9IjQwNSI+0LLQvdC10YjQvdGP0Y8g0L/QvtCy0LXRgNGF0L3QvtGB0YLRjCAo0LLQuNC00L3QviDRgdC90LDRgNGD0LbQuCk8L3RleHQ+CgogIDxwYXRoIGNsYXNzPSJjYWxsIiBkPSJNIDcwNSA1MDUgTCA5ODAgNDUwIi8+CiAgPHRleHQgY2xhc3M9ImgiIHg9Ijk5NSIgeT0iNDU1Ij7QodCw0LzQvtGD0LLQsNC20LXQvdC40LU8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9Ijk5NSIgeT0iNDc1Ij7Qv9C10YDQtdC60L7RgdGLL9C/0LjQutC4INC80L7Qs9GD0YIg0L/RgNC+0Y/QstC70Y/RgtGM0YHRjzwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImNhbGwiIGQ9Ik0gNjg1IDUzMCBMIDk4MCA1MjAiLz4KICA8dGV4dCBjbGFzcz0iaCIgeD0iOTk1IiB5PSI1MjUiPtCh0L7RhtC40LDQu9GM0L3Ri9C1PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5OTUiIHk9IjU0NSI+0LrQvtC90YLQtdC60YHRgiwg0YHQstGP0LfQuCwg0YHRgtCw0YLRg9GBPC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iY2FsbCIgZD0iTSA2NjAgNTUwIEwgOTgwIDU5MCIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5OTUiIHk9IjU5NSI+0JHQtdC30L7Qv9Cw0YHQvdC+0YHRgtGMPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5OTUiIHk9IjYxNSI+0LPRgNCw0L3QuNGG0YssINGA0LjRgdC6LCDQsdCw0LfQvtCy0YvQtSDQs9Cw0YDQsNC90YLQuNC4PC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iY2FsbCIgZD0iTSA1MjAgNTI1IEwgOTgwIDY2MCIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5OTUiIHk9IjY2NSI+0KTQuNC30LjQvtC70L7Qs9C40Y8gKNGP0LTRgNC+KTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTk1IiB5PSI2ODUiPtGB0LPQu9Cw0LbQtdC90L47INC/0LjQutC4INC30LDRgtGD0YXQsNGO0YIg0Log0YbQtdC90YLRgNGDIOKGkiAwPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iNzgwIiB5PSI3MzUiIHdpZHRoPSI1NjAiIGhlaWdodD0iOTIiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjgwMCIgeT0iNzcwIj7QodC80YvRgdC7INC60LDRgNGC0LjQvdC60Lg8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9IjgwMCIgeT0iNzk0Ij7QmtC+0LzQv9C10L3RgdCw0YbQuNC4INC4IMKr0L/QuNC60LjCuyDQtdGB0YLRjCDQvdCwINCy0L3QtdGI0L3QuNGFINGB0LvQvtGP0YUsINC90L4g0LIg0Y/QtNGA0LUg0L7QvdC4INC30LDRgtGD0YXQsNGO0YIuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI4MDAiIHk9IjgxNiI+0KfRgtC+0LHRiyDRg9Cy0LjQtNC10YLRjCDQstC90YPRgtGA0LXQvdC90Y7RjiDQvNC10YXQsNC90LjQutGDLCDQvdGD0LbQtdC9IMKr0YHRgNC10LfCuyAo0L3QsNCx0LvRjtC00LXQvdC40LUv0LTQuNCw0LPQvdC+0YHRgtC40LrQsCkuPC90ZXh0Pgo8L3N2Zz4K" alt="L0: «Октаэдр базиса» (схема)" /></p>
+<p><img role="img" aria-label="L0: «Октаэдр базиса» (схема)" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjkyMCIgdmlld0JveD0iMCAwIDE0MDAgOTIwIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmJnIHsgZmlsbDogI2ZmZmZmZjsgfQogICAgICAudGl0bGUgeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogNDBweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuc3ViIHsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDIwcHg7IGZvbnQtd2VpZ2h0OiA0MDA7IGZpbGw6ICMzMzQxNTU7IH0KICAgICAgLmggeyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMjRweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAudCB7IGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxOHB4OyBmb250LXdlaWdodDogNDAwOyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5zdHJva2UgeyBzdHJva2U6ICMwZjE3MmE7IHN0cm9rZS13aWR0aDogMjsgZmlsbDogbm9uZTsgfQogICAgICAuY3V0bGluZSB7IHN0cm9rZTogIzBmMTcyYTsgc3Ryb2tlLXdpZHRoOiAyLjU7IGZpbGw6IG5vbmU7IH0KICAgICAgLmRhc2ggeyBzdHJva2U6ICM2NDc0OGI7IHN0cm9rZS13aWR0aDogMjsgZmlsbDogbm9uZTsgc3Ryb2tlLWRhc2hhcnJheTogNyA3OyB9CiAgICAgIC5vdXRlciB7IGZpbGw6ICMwZjE3MmE7IG9wYWNpdHk6IDAuODg7IH0KICAgICAgLmxheWVyMCB7IGZpbGw6ICNlMmU4ZjA7IG9wYWNpdHk6IDAuOTI7IH0KICAgICAgLmxheWVyMSB7IGZpbGw6ICNjYmQ1ZTE7IG9wYWNpdHk6IDAuODI7IH0KICAgICAgLmxheWVyMiB7IGZpbGw6ICNiNmMyZDE7IG9wYWNpdHk6IDAuNzI7IH0KICAgICAgLmxheWVyMyB7IGZpbGw6ICM5NGEzYjg7IG9wYWNpdHk6IDAuNjI7IH0KICAgICAgLmxheWVyNCB7IGZpbGw6ICM2NDc0OGI7IG9wYWNpdHk6IDAuNTA7IH0KICAgICAgLnNwaWtlIHsgZmlsbDogI2RjMjYyNjsgb3BhY2l0eTogMC45OyB9CiAgICAgIC5jYWxsIHsgc3Ryb2tlOiAjNjQ3NDhiOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IG1hcmtlci1lbmQ6IHVybCgjbSk7IH0KICAgICAgLnBpbGwgeyBmaWxsOiAjZjFmNWY5OyBzdHJva2U6ICNjYmQ1ZTE7IHN0cm9rZS13aWR0aDogMS41OyByeDogMTI7IH0KICAgICAgLnBpbGx0ZXh0IHsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDE4cHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGZpbGw6ICMwZjE3MmE7IH0KICAgIDwvc3R5bGU+CiAgICA8bWFya2VyIGlkPSJtIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI5IiBtYXJrZXJIZWlnaHQ9IjkiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTSAwIDAgTCAxMCA1IEwgMCAxMCB6IiBmaWxsPSIjNjQ3NDhiIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDxyZWN0IGNsYXNzPSJiZyIgeD0iMCIgeT0iMCIgd2lkdGg9IjE0MDAiIGhlaWdodD0iOTIwIi8+CgogIDx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iNjAiIHk9IjcyIj5MMDog0LHQsNC30LjRgSDQutCw0Log0YHRhNC10YDQsCDRgdC+INGB0YDQtdC30L7QvCAo0LzQvtC00LXQu9GMKTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI2MCIgeT0iMTA2Ij7QodC90LDRgNGD0LbQuCDQstC40LTQtdC9INCy0LXRgNGF0L3QuNC5INGB0LzRi9GB0LvQvtCy0L7QuSDRgdC70L7QuS4g0JLQvdGD0YLRgNC10L3QvdC40LUg0YHQu9C+0Lgg0YHRgtCw0L3QvtCy0Y/RgtGB0Y8g0YDQsNC30LvQuNGH0LjQvNGLINGC0L7Qu9GM0LrQviDQvdCwINGB0YDQtdC30LUuPC90ZXh0PgoKICA8IS0tIFNwaGVyZSAtLT4KICA8Y2lyY2xlIGN4PSI0MzAiIGN5PSI1MjAiIHI9IjI1MCIgY2xhc3M9Im91dGVyIi8+CiAgPGNpcmNsZSBjeD0iNDMwIiBjeT0iNTIwIiByPSIyNTAiIGNsYXNzPSJzdHJva2UiIHN0eWxlPSJvcGFjaXR5OjAuNiIvPgoKICA8IS0tIEN1dCB3ZWRnZSAtLT4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA3MDAgNDUwIEEgMjUwIDI1MCAwIDAgMSA3MDAgNjEwIFoiIGZpbGw9IiNmZmZmZmYiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA3MDAgNDUwIEEgMjUwIDI1MCAwIDAgMSA3MDAgNjEwIFoiIGNsYXNzPSJjdXRsaW5lIi8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNzAwIDQ1MCIgY2xhc3M9ImN1dGxpbmUiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA3MDAgNjEwIiBjbGFzcz0iY3V0bGluZSIvPgoKICA8IS0tIExheWVyIHdlZGdlcyAtLT4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2ODggNDY2IEEgMjM1IDIzNSAwIDAgMSA2ODggNTk0IFoiIGNsYXNzPSJsYXllcjQiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2NTAgNDc4IEEgMjAwIDIwMCAwIDAgMSA2NTAgNTcwIFoiIGNsYXNzPSJsYXllcjMiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA2MTIgNDkwIEEgMTY1IDE2NSAwIDAgMSA2MTIgNTUwIFoiIGNsYXNzPSJsYXllcjIiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA1NzUgNTAwIEEgMTMwIDEzMCAwIDAgMSA1NzUgNTQwIFoiIGNsYXNzPSJsYXllcjEiLz4KICA8cGF0aCBkPSJNIDQzMCA1MjAgTCA1MzggNTEwIEEgOTUgOTUgMCAwIDEgNTM4IDUzMCBaIiBjbGFzcz0ibGF5ZXIwIi8+CgogIDwhLS0gSW50ZXJuYWwgZ3VpZGVzIC0tPgogIDxwYXRoIGQ9Ik0gNDMwIDUyMCBMIDY0NiA0OTgiIGNsYXNzPSJkYXNoIi8+CiAgPHBhdGggZD0iTSA0MzAgNTIwIEwgNjQ2IDU0MiIgY2xhc3M9ImRhc2giLz4KCiAgPCEtLSBEaXN0b3J0aW9uIHNwaWtlcyBvbiBvdXRlciBsYXllcnMgLS0+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjY0Niw0OTggNjkyLDQ4OCA2OTAsNTEyIi8+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjYxMiw1MDIgNjMzLDQ5NyA2MzIsNTExIiBzdHlsZT0ib3BhY2l0eTowLjY1Ii8+CiAgPHBvbHlnb24gY2xhc3M9InNwaWtlIiBwb2ludHM9IjU3NSw1MDYgNTg2LDUwMyA1ODYsNTExIiBzdHlsZT0ib3BhY2l0eTowLjM1Ii8+CgogIDxwb2x5Z29uIGNsYXNzPSJzcGlrZSIgcG9pbnRzPSI2NDYsNTQyIDY5Miw1MzIgNjkwLDU1NiIvPgogIDxwb2x5Z29uIGNsYXNzPSJzcGlrZSIgcG9pbnRzPSI2MTIsNTM4IDYzMyw1MzMgNjMyLDU0NyIgc3R5bGU9Im9wYWNpdHk6MC42NSIvPgogIDxwb2x5Z29uIGNsYXNzPSJzcGlrZSIgcG9pbnRzPSI1NzUsNTM0IDU4Niw1MzEgNTg2LDUzOSIgc3R5bGU9Im9wYWNpdHk6MC4zNSIvPgoKICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iMTcwIiB5PSIyMzYiIHdpZHRoPSI1MzAiIGhlaWdodD0iNTYiLz4KICA8dGV4dCBjbGFzcz0icGlsbHRleHQiIHg9IjE5MCIgeT0iMjcwIj7QodC90LDRgNGD0LbQuCDQstC40LTQvdC+INGC0L7Qu9GM0LrQviDCq9C00YPRhdC+0LLQvdC+0LUgLyDRgdC80YvRgdC70L7QstC+0LXCuzwvdGV4dD4KCiAgPCEtLSBMYXllciBjYWxsb3V0cyAtLT4KICA8cGF0aCBjbGFzcz0iY2FsbCIgZD0iTSA3MDUgNDY4IEwgOTcwIDM4MiIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5ODgiIHk9IjM4NiI+0JTRg9GF0L7QstC90L7QtSAvINGB0LzRi9GB0LvQvtCy0L7QtTwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTg4IiB5PSI0MTAiPtCS0L3QtdGI0L3Rj9GPINC/0L7QstC10YDRhdC90L7RgdGC0YwsINC30LDQvNC10YLQvdCw0Y8g0YHQvdCw0YDRg9C20LguPC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iY2FsbCIgZD0iTSA2OTAgNDk2IEwgOTcwIDQ1NCIvPgogIDx0ZXh0IGNsYXNzPSJoIiB4PSI5ODgiIHk9IjQ1OCI+0KHQsNC80L7Rg9Cy0LDQttC10L3QuNC1PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5ODgiIHk9IjQ4MiI+0J/QuNC60Lgg0Lgg0LrQvtC80L/QtdC90YHQsNGG0LjQuCDRh9Cw0YHRgtC+INC/0YDQvtGP0LLQu9GP0Y7RgtGB0Y8g0LfQtNC10YHRjC48L3RleHQ+CgogIDxwYXRoIGNsYXNzPSJjYWxsIiBkPSJNIDY2NiA1MjIgTCA5NzAgNTI2Ii8+CiAgPHRleHQgY2xhc3M9ImgiIHg9Ijk4OCIgeT0iNTMwIj7QodC+0YbQuNCw0LvRjNC90YvQtSDRgdCy0Y/Qt9C4PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5ODgiIHk9IjU1NCI+0JrQvtC90YLQtdC60YHRgiwg0YHRgtCw0YLRg9GBLCDQv9GA0LjQvdCw0LTQu9C10LbQvdC+0YHRgtGMLjwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImNhbGwiIGQ9Ik0gNjMwIDU0OCBMIDk3MCA1OTgiLz4KICA8dGV4dCBjbGFzcz0iaCIgeD0iOTg4IiB5PSI2MDIiPtCR0LXQt9C+0L/QsNGB0L3QvtGB0YLRjDwvdGV4dD4KICA8dGV4dCBjbGFzcz0idCIgeD0iOTg4IiB5PSI2MjYiPtCT0YDQsNC90LjRhtGLLCDRgNC40YHQuiwg0LHQsNC30L7QstGL0LUg0LPQsNGA0LDQvdGC0LjQuC48L3RleHQ+CgogIDxwYXRoIGNsYXNzPSJjYWxsIiBkPSJNIDU0MiA1MjAgTCA5NzAgNjcwIi8+CiAgPHRleHQgY2xhc3M9ImgiIHg9Ijk4OCIgeT0iNjc0Ij7QpNC40LfQuNC+0LvQvtCz0LjRjyAo0Y/QtNGA0L4pPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI5ODgiIHk9IjY5OCI+0J/QuNC60Lgg0Log0YbQtdC90YLRgNGDINC30LDRgtGD0YXQsNGO0YI6INCyINGP0LTRgNC1INC60L7Qu9C10LHQsNC90LjQtSDQsdC70LjQttC1INC6IDAuPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0icGlsbCIgeD0iNzcwIiB5PSI3NDgiIHdpZHRoPSI1NzAiIGhlaWdodD0iMTEwIi8+CiAgPHRleHQgY2xhc3M9InBpbGx0ZXh0IiB4PSI3OTIiIHk9Ijc4MiI+0KHQvNGL0YHQuyDQvNC+0LTQtdC70Lg8L3RleHQ+CiAgPHRleHQgY2xhc3M9InQiIHg9Ijc5MiIgeT0iODA4Ij7QmtC+0LzQv9C10L3RgdCw0YbQuNC4INC4IMKr0L/QuNC60LjCuyDRgdC40LvRjNC90LXQtSDQvdCwINCy0L3QtdGI0L3QuNGFINGB0LvQvtGP0YUuPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ0IiB4PSI3OTIiIHk9IjgzNCI+0KfRgtC+0LHRiyDRg9Cy0LjQtNC10YLRjCDQvNC10YXQsNC90LjQutGDINCy0L3Rg9GC0YDQuCwg0L3Rg9C20LXQvSDRgdGA0LXQtzog0L3QsNCx0LvRjtC00LXQvdC40LUg0Lgg0LTQuNCw0LPQvdC+0YHRgtC40LrQsC48L3RleHQ+Cjwvc3ZnPgo=" alt="L0: «Октаэдр базиса» (схема)" /></p>
+<p>Текстовый fallback (если схема не рендерится):</p>
+<ul>
+<li>«октаэдр» — это модель балансировки базиса, а не психологический
+тип;</li>
+<li>долгий дефицит по одной грани смещает весь режим;</li>
+<li>тогда верхние уровни (<code>L1–L4</code>) начинают оптимизировать не
+устойчивость в целом, а обслуживание этого дефицита.</li>
+</ul>
 <p><a id="term-axis-projection"></a></p>
 <h3 id="ось-вектор-проекция">Ось (вектор), проекция</h3>
 <p>Ось — выбранное измерение, по которому мы «сжимаем» реальность в
@@ -1860,7 +2290,7 @@ readout.</p>
 <li><a href="#term-sanction">Санкция</a></li>
 <li><a href="#term-input-selection-bias">Смещение выбора входов (ошибка
 анализа)</a></li>
-<li>Суммарный вектор (модель)</li>
+<li><a href="#term-resultant-vector">Суммарный вектор (модель)</a></li>
 <li><a href="#term-tabu">Табу</a></li>
 <li><a href="#term-participation">Участие</a></li>
 <li><a href="#term-energy">Энергия (в этой книге)</a></li>
@@ -1882,9 +2312,21 @@ readout.</p>
 <li><code>T7</code> — Контроль интерпретации (какие оси считаются
 реальностью)</li>
 </ul>
+<h3 id="сквозной-кейс">Сквозной кейс</h3>
+<ul>
+<li><a href="#cross-case-l0-l5">Сквозной кейс L0→L5: проектная
+команда</a></li>
+</ul>
+<h3 id="операционные-шаблоны">Операционные шаблоны</h3>
+<ul>
+<li><a href="#diagnostic-blank">Диагностический бланк (24h/72h)</a></li>
+<li><a href="#printable-tests-checklist">Printable-чек-лист тестов (1
+страница)</a></li>
+<li><a href="#field-cards">Операционные карточки (1 страница)</a></li>
+</ul>
 <h3 id="действия-lx-cn-1">Действия (Lx-Cn)</h3>
 <p>Источник: раздел <a href="#case-registry">«Реестр ситуаций»</a>
-(блоки «Действия уровня …»).</p>
+(блоки «Действия уровня L0-L5»).</p>
 <ul>
 <li><code>L0-C1</code> — Остановка как защита причинности</li>
 <li><code>L0-C2</code> — Отказ участвовать как датчик лжи</li>
@@ -3342,6 +3784,6 @@ L5 (границы/переходы/смена базиса)</h3>
 появляется новая область применимости (L5).</li>
 </ul>
 <hr />
-<p><em>stats: chars=120713, words=15865, pages=67.1 (rough)</em></p>
+<p><em>stats: chars=135443, words=17890, pages=75.2 (rough)</em></p>
 </body>
 </html>

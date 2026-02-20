@@ -1,81 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="840" viewBox="0 0 1400 840">
   <defs>
     <style>
       .bg { fill: #ffffff; }
-      .box { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 18; }
-      .title { font: 700 28px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .h { font: 700 22px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .t { font: 500 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .muted { font: 500 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #334155; }
-      .arrow { stroke: #0f172a; stroke-width: 3; fill: none; marker-end: url(#m); }
-      .arrow2 { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#m2); }
+      .title { font-family: Arial, sans-serif; font-size: 38px; font-weight: 700; fill: #0f172a; }
+      .sub { font-family: Arial, sans-serif; font-size: 20px; font-weight: 400; fill: #334155; }
+      .box { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 14; }
+      .h { font-family: Arial, sans-serif; font-size: 22px; font-weight: 700; fill: #0f172a; }
+      .t { font-family: Arial, sans-serif; font-size: 18px; font-weight: 400; fill: #334155; }
+      .cardh { font-family: Arial, sans-serif; font-size: 30px; font-weight: 700; fill: #0f172a; }
+      .cardt { font-family: Arial, sans-serif; font-size: 20px; font-weight: 400; fill: #0f172a; }
+      .muted { font-family: Arial, sans-serif; font-size: 18px; font-weight: 400; fill: #334155; }
       .pill { fill: #e2e8f0; stroke: #475569; stroke-width: 1.5; rx: 999; }
-      .pilltext { font: 600 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
+      .arrow { stroke: #0f172a; stroke-width: 2.5; fill: none; marker-end: url(#m); }
     </style>
-    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a"/>
-    </marker>
-    <marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
     </marker>
   </defs>
 
-  <rect class="bg" x="0" y="0" width="1400" height="820"/>
+  <rect class="bg" x="0" y="0" width="1400" height="840"/>
 
-  <text class="title" x="60" y="70">Интегральная интуиция уровней: Ln как интеграл Ln−1</text>
-  <text class="muted" x="60" y="105">Смысл: повторяемые локальные шаги и их цена, накопленные во времени, кристаллизуются в более «долгоживущую» структуру следующего уровня.</text>
+  <text class="title" x="56" y="66">Интегральная интуиция уровней: Ln как интеграл Ln-1</text>
+  <text class="sub" x="56" y="98">Повторяющиеся шаги и их цена со временем кристаллизуются в структуру следующего уровня.</text>
 
-  <!-- Boxes -->
-  <rect class="box" x="90" y="160" width="520" height="110"/>
-  <rect class="box" x="90" y="290" width="520" height="110"/>
-  <rect class="box" x="90" y="420" width="520" height="110"/>
-  <rect class="box" x="90" y="550" width="520" height="110"/>
-  <rect class="box" x="90" y="680" width="520" height="110"/>
+  <rect class="box" x="56" y="136" width="610" height="102"/>
+  <rect class="box" x="56" y="252" width="610" height="102"/>
+  <rect class="box" x="56" y="368" width="610" height="102"/>
+  <rect class="box" x="56" y="484" width="610" height="102"/>
+  <rect class="box" x="56" y="600" width="610" height="102"/>
 
-  <text class="h" x="120" y="205">L1</text>
-  <text class="t" x="170" y="205">Шаги и readout</text>
-  <text class="muted" x="120" y="238">минимальная операция • короткий цикл • проверяемый эффект</text>
+  <text class="h" x="84" y="170">L1  Шаги и readout</text>
+  <text class="t" x="84" y="196">Минимальная операция, короткий цикл, проверяемый эффект.</text>
 
-  <text class="h" x="120" y="335">L2</text>
-  <text class="t" x="170" y="335">Истории и роли</text>
-  <text class="muted" x="120" y="368">легитимация • фреймы • «кто мы / во что играем»</text>
+  <text class="h" x="84" y="286">L2  Истории и роли</text>
+  <text class="t" x="84" y="312">Легитимация, фреймы, «кто мы / во что играем».</text>
 
-  <text class="h" x="120" y="465">L3</text>
-  <text class="t" x="170" y="465">Оси, метрики, контракты</text>
-  <text class="muted" x="120" y="498">правила как архитектура цены • датчики • санкции</text>
+  <text class="h" x="84" y="402">L3  Оси, метрики, контракты</text>
+  <text class="t" x="84" y="428">Правила как архитектура цены, датчики, санкции.</text>
 
-  <text class="h" x="120" y="595">L4</text>
-  <text class="t" x="170" y="595">Институты и власть</text>
-  <text class="muted" x="120" y="628">права • легитимность • кто может менять правила</text>
+  <text class="h" x="84" y="518">L4  Институты и власть</text>
+  <text class="t" x="84" y="544">Права, легитимность, кто может менять правила.</text>
 
-  <text class="h" x="120" y="725">L5</text>
-  <text class="t" x="170" y="725">Границы и переходы</text>
-  <text class="muted" x="120" y="758">поверхность наблюдения • режимы • «где ломается»</text>
+  <text class="h" x="84" y="634">L5  Границы и переходы</text>
+  <text class="t" x="84" y="660">Поверхностные симптомы и точки смены режима.</text>
 
-  <!-- Vertical arrows + labels -->
-  <path class="arrow" d="M 350 270 L 350 290"/>
-  <path class="arrow" d="M 350 400 L 350 420"/>
-  <path class="arrow" d="M 350 530 L 350 550"/>
-  <path class="arrow" d="M 350 660 L 350 680"/>
+  <path class="arrow" d="M 360 238 L 360 252"/>
+  <path class="arrow" d="M 360 354 L 360 368"/>
+  <path class="arrow" d="M 360 470 L 360 484"/>
+  <path class="arrow" d="M 360 586 L 360 600"/>
 
-  <rect class="pill" x="645" y="208" width="640" height="52"/>
-  <text class="pilltext" x="670" y="242">Интеграл по времени: «повторение + цена» → «норма/структура следующего уровня»</text>
+  <rect class="pill" x="700" y="154" width="640" height="78"/>
+  <text class="cardt" x="724" y="184">Интеграл по времени:</text>
+  <text class="cardt" x="724" y="210">повторяемость шага + цена -> норма/структура следующего уровня.</text>
 
-  <path class="arrow2" d="M 610 234 L 642 234"/>
+  <text class="cardh" x="700" y="300">Как читать стрелку</text>
+  <text class="cardt" x="700" y="336">Если на Ln «вдруг появилось», то:</text>
+  <text class="cardt" x="718" y="366">1) ищи на Ln-1 повторяемые шаги;</text>
+  <text class="cardt" x="718" y="396">2) проверь, какая цена делала их «дешевыми»;</text>
+  <text class="cardt" x="718" y="426">3) это материал, из которого выросла структура Ln.</text>
 
-  <!-- Right-side notes -->
-  <text class="h" x="690" y="320">Как читать стрелку</text>
-  <text class="muted" x="690" y="352">Если на Ln «вдруг появилось»:</text>
-  <text class="muted" x="705" y="382">1) ищи на Ln−1 повторяемые шаги</text>
-  <text class="muted" x="705" y="408">2) проверь, какая цена делала их «дешёвыми»</text>
-  <text class="muted" x="705" y="434">3) это и есть материал, из которого выросла структура Ln</text>
+  <text class="cardh" x="700" y="500">Пример (грубо)</text>
+  <text class="muted" x="700" y="532">L2 = ∫L1: повторяемые шаги + их цена -> роль/история.</text>
+  <text class="muted" x="700" y="560">L3 = ∫L2: истории закрепляются -> оси/метрики/контракты.</text>
+  <text class="muted" x="700" y="588">L4 = ∫L3: правила живут дольше людей -> институты.</text>
+  <text class="muted" x="700" y="616">L5 = ∫(всего): видим границы режима и переходы.</text>
 
-  <text class="h" x="690" y="500">Пример (грубо)</text>
-  <text class="muted" x="690" y="532">L2 = ∫L1: повторяемые шаги + их цена → роль/история</text>
-  <text class="muted" x="690" y="558">L3 = ∫L2: истории кристаллизуются → оси/метрики/контракты</text>
-  <text class="muted" x="690" y="584">L4 = ∫L3: правила живут дольше людей → институты</text>
-  <text class="muted" x="690" y="610">L5 = ∫(всего): видно границы режима и переходы</text>
-
-  <text class="muted" x="60" y="805">DETM / «Уровни L0–L5» (v2): схема для чтения, не «математическое доказательство».</text>
+  <text class="muted" x="56" y="812">DETM / RU v2 - схема для чтения (интуиция, не формальное доказательство).</text>
 </svg>

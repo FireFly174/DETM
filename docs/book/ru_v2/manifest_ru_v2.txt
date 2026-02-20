@@ -1,14 +1,14 @@
 # Order of chapters for compilation (RU book v2 draft)
 # Paths are relative to this file.
 00_frontmatter/00_hook.md
+00_frontmatter/01_thesis.md
+00_frontmatter/02_reader_map.md
+00_frontmatter/03_how_to_read.md
 00_frontmatter/01_levels_map.md
 00_frontmatter/00_quickstart.md
 00_frontmatter/05_first_aid.md
 00_frontmatter/06_human_system.md
 00_frontmatter/07_human_system_deep_dive.md
-00_frontmatter/01_thesis.md
-00_frontmatter/02_reader_map.md
-00_frontmatter/03_how_to_read.md
 10_L0/01_L0.md
 20_L1/01_L1.md
 30_L2/01_L2.md
@@ -19,6 +19,10 @@
 # Appendix (optional)
 90_appendix/01_terms.md
 90_appendix/02_case_registry.md
+90_appendix/07_cross_case_l0_l5.md
 90_appendix/03_navigation.md
+90_appendix/08_diagnostic_blank.md
+90_appendix/09_field_cards.md
 90_appendix/05_invariants_and_tests.md
+90_appendix/06_conclusion.md
 90_appendix/04_index.md

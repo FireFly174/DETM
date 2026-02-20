@@ -1,102 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="920" viewBox="0 0 1400 920">
   <defs>
     <style>
       .bg { fill: #ffffff; }
-      .title { font: 800 30px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .sub { font: 500 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #334155; }
-      .h { font: 800 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .t { font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #334155; }
+      .title { font-family: Arial, sans-serif; font-size: 40px; font-weight: 700; fill: #0f172a; }
+      .sub { font-family: Arial, sans-serif; font-size: 20px; font-weight: 400; fill: #334155; }
+      .h { font-family: Arial, sans-serif; font-size: 24px; font-weight: 700; fill: #0f172a; }
+      .t { font-family: Arial, sans-serif; font-size: 18px; font-weight: 400; fill: #334155; }
       .stroke { stroke: #0f172a; stroke-width: 2; fill: none; }
-      .cut { stroke: #0f172a; stroke-width: 2.5; fill: none; }
+      .cutline { stroke: #0f172a; stroke-width: 2.5; fill: none; }
       .dash { stroke: #64748b; stroke-width: 2; fill: none; stroke-dasharray: 7 7; }
-      .layer0 { fill: #e2e8f0; }
-      .layer1 { fill: #cbd5e1; }
-      .layer2 { fill: #b6c2d1; }
-      .layer3 { fill: #94a3b8; }
-      .layer4 { fill: #0f172a; }
       .outer { fill: #0f172a; opacity: 0.88; }
+      .layer0 { fill: #e2e8f0; opacity: 0.92; }
+      .layer1 { fill: #cbd5e1; opacity: 0.82; }
+      .layer2 { fill: #b6c2d1; opacity: 0.72; }
+      .layer3 { fill: #94a3b8; opacity: 0.62; }
+      .layer4 { fill: #64748b; opacity: 0.50; }
+      .spike { fill: #dc2626; opacity: 0.9; }
       .call { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#m); }
       .pill { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.5; rx: 12; }
-      .pilltext { font: 700 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; fill: #0f172a; }
-      .spike { fill: #dc2626; opacity: 0.92; }
+      .pilltext { font-family: Arial, sans-serif; font-size: 18px; font-weight: 700; fill: #0f172a; }
     </style>
-    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
     </marker>
   </defs>
 
-  <rect class="bg" x="0" y="0" width="1400" height="900"/>
+  <rect class="bg" x="0" y="0" width="1400" height="920"/>
 
-  <text class="title" x="60" y="70">L0: базис как сфера со срезом (модель)</text>
-  <text class="sub" x="60" y="105">Снаружи наблюдатель видит только внешний (смысловой) слой. Внутренние слои становятся видимыми только на срезе.</text>
+  <text class="title" x="60" y="72">L0: базис как сфера со срезом (модель)</text>
+  <text class="sub" x="60" y="106">Снаружи виден верхний смысловой слой. Внутренние слои становятся различимы только на срезе.</text>
 
-  <!-- Sphere (full outside view) -->
-  <!-- Center (430, 520), R=260 -->
-  <circle cx="430" cy="520" r="260" class="outer"/>
-  <circle cx="430" cy="520" r="260" class="stroke" style="opacity:0.65"/>
+  <!-- Sphere -->
+  <circle cx="430" cy="520" r="250" class="outer"/>
+  <circle cx="430" cy="520" r="250" class="stroke" style="opacity:0.6"/>
 
-  <!-- Cut-out sector (about 120°) to reveal layers -->
-  <!-- Sector angles roughly 320° to 80° (wrap), center to the right -->
-  <!-- We'll remove a wedge pointing to the right/up-right -->
-  <path d="M 430 520 L 690 450 A 260 260 0 0 1 690 590 Z" fill="#ffffff"/>
-  <path d="M 430 520 L 690 450 A 260 260 0 0 1 690 590 Z" class="cut"/>
+  <!-- Cut wedge -->
+  <path d="M 430 520 L 700 450 A 250 250 0 0 1 700 610 Z" fill="#ffffff"/>
+  <path d="M 430 520 L 700 450 A 250 250 0 0 1 700 610 Z" class="cutline"/>
+  <path d="M 430 520 L 700 450" class="cutline"/>
+  <path d="M 430 520 L 700 610" class="cutline"/>
 
-  <!-- Concentric layer wedges visible only on the cut face -->
-  <!-- Radii: 70, 115, 160, 205, 250 (outer) -->
-  <!-- Outer layer (spiritual) segment -->
-  <path d="M 430 520 L 680 470 A 250 250 0 0 1 680 570 Z" class="layer4" opacity="0.25"/>
-  <path d="M 430 520 L 635 485 A 205 205 0 0 1 635 555 Z" class="layer3" opacity="0.35"/>
-  <path d="M 430 520 L 590 500 A 160 160 0 0 1 590 540 Z" class="layer2" opacity="0.45"/>
-  <path d="M 430 520 L 545 510 A 115 115 0 0 1 545 530 Z" class="layer1" opacity="0.55"/>
-  <path d="M 430 520 L 500 516 A 70 70 0 0 1 500 524 Z" class="layer0" opacity="0.85"/>
+  <!-- Layer wedges -->
+  <path d="M 430 520 L 688 466 A 235 235 0 0 1 688 594 Z" class="layer4"/>
+  <path d="M 430 520 L 650 478 A 200 200 0 0 1 650 570 Z" class="layer3"/>
+  <path d="M 430 520 L 612 490 A 165 165 0 0 1 612 550 Z" class="layer2"/>
+  <path d="M 430 520 L 575 500 A 130 130 0 0 1 575 540 Z" class="layer1"/>
+  <path d="M 430 520 L 538 510 A 95 95 0 0 1 538 530 Z" class="layer0"/>
 
-  <!-- Cut boundary emphasis -->
-  <path d="M 430 520 L 690 450" class="cut"/>
-  <path d="M 430 520 L 690 590" class="cut"/>
+  <!-- Internal guides -->
+  <path d="M 430 520 L 646 498" class="dash"/>
+  <path d="M 430 520 L 646 542" class="dash"/>
 
-  <!-- Axes from core (dotted) -->
-  <path d="M 430 520 L 645 500" class="dash"/>
-  <path d="M 430 520 L 645 540" class="dash"/>
+  <!-- Distortion spikes on outer layers -->
+  <polygon class="spike" points="646,498 692,488 690,512"/>
+  <polygon class="spike" points="612,502 633,497 632,511" style="opacity:0.65"/>
+  <polygon class="spike" points="575,506 586,503 586,511" style="opacity:0.35"/>
 
-  <!-- Spikes / distortions: only on outer layers, decaying inward -->
-  <!-- Spike along upper axis -->
-  <polygon class="spike" points="645,500 690,488 688,512"/>
-  <polygon class="spike" points="590,505 620,497 619,513" opacity="0.65"/>
-  <polygon class="spike" points="545,510 560,506 560,514" opacity="0.35"/>
+  <polygon class="spike" points="646,542 692,532 690,556"/>
+  <polygon class="spike" points="612,538 633,533 632,547" style="opacity:0.65"/>
+  <polygon class="spike" points="575,534 586,531 586,539" style="opacity:0.35"/>
 
-  <!-- Spike along lower axis -->
-  <polygon class="spike" points="645,540 690,528 688,552"/>
-  <polygon class="spike" points="590,535 620,527 619,543" opacity="0.65"/>
-  <polygon class="spike" points="545,530 560,526 560,534" opacity="0.35"/>
+  <rect class="pill" x="170" y="236" width="530" height="56"/>
+  <text class="pilltext" x="190" y="270">Снаружи видно только «духовное / смысловое»</text>
 
-  <!-- Outside-only label -->
-  <rect class="pill" x="170" y="235" width="520" height="56"/>
-  <text class="pilltext" x="190" y="268">Снаружи видно: только «духовное / смысловое»</text>
+  <!-- Layer callouts -->
+  <path class="call" d="M 705 468 L 970 382"/>
+  <text class="h" x="988" y="386">Духовное / смысловое</text>
+  <text class="t" x="988" y="410">Внешняя поверхность, заметная снаружи.</text>
 
-  <!-- Callouts for layers on cut -->
-  <path class="call" d="M 720 470 L 980 380"/>
-  <text class="h" x="995" y="385">Духовное / смысловое</text>
-  <text class="t" x="995" y="405">внешняя поверхность (видно снаружи)</text>
+  <path class="call" d="M 690 496 L 970 454"/>
+  <text class="h" x="988" y="458">Самоуважение</text>
+  <text class="t" x="988" y="482">Пики и компенсации часто проявляются здесь.</text>
 
-  <path class="call" d="M 705 505 L 980 450"/>
-  <text class="h" x="995" y="455">Самоуважение</text>
-  <text class="t" x="995" y="475">перекосы/пики могут проявляться</text>
+  <path class="call" d="M 666 522 L 970 526"/>
+  <text class="h" x="988" y="530">Социальные связи</text>
+  <text class="t" x="988" y="554">Контекст, статус, принадлежность.</text>
 
-  <path class="call" d="M 685 530 L 980 520"/>
-  <text class="h" x="995" y="525">Социальные</text>
-  <text class="t" x="995" y="545">контекст, связи, статус</text>
+  <path class="call" d="M 630 548 L 970 598"/>
+  <text class="h" x="988" y="602">Безопасность</text>
+  <text class="t" x="988" y="626">Границы, риск, базовые гарантии.</text>
 
-  <path class="call" d="M 660 550 L 980 590"/>
-  <text class="h" x="995" y="595">Безопасность</text>
-  <text class="t" x="995" y="615">границы, риск, базовые гарантии</text>
+  <path class="call" d="M 542 520 L 970 670"/>
+  <text class="h" x="988" y="674">Физиология (ядро)</text>
+  <text class="t" x="988" y="698">Пики к центру затухают: в ядре колебание ближе к 0.</text>
 
-  <path class="call" d="M 520 525 L 980 660"/>
-  <text class="h" x="995" y="665">Физиология (ядро)</text>
-  <text class="t" x="995" y="685">сглажено; пики затухают к центру → 0</text>
-
-  <rect class="pill" x="780" y="735" width="560" height="92"/>
-  <text class="pilltext" x="800" y="770">Смысл картинки</text>
-  <text class="t" x="800" y="794">Компенсации и «пики» есть на внешних слоях, но в ядре они затухают.</text>
-  <text class="t" x="800" y="816">Чтобы увидеть внутреннюю механику, нужен «срез» (наблюдение/диагностика).</text>
+  <rect class="pill" x="770" y="748" width="570" height="110"/>
+  <text class="pilltext" x="792" y="782">Смысл модели</text>
+  <text class="t" x="792" y="808">Компенсации и «пики» сильнее на внешних слоях.</text>
+  <text class="t" x="792" y="834">Чтобы увидеть механику внутри, нужен срез: наблюдение и диагностика.</text>
 </svg>

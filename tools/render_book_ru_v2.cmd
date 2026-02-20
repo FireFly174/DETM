@@ -49,6 +49,18 @@ if errorlevel 1 goto :fail
 echo.
 echo Wrote: %OUT_HTML%
 
+rem Validate same-document anchor links in compiled HTML.
+rem Set RU_V2_SKIP_ANCHOR_CHECK=1 to skip (not recommended).
+if /I "%RU_V2_SKIP_ANCHOR_CHECK%"=="1" goto :skip_anchor_check
+python tools\check_html_anchors.py "%OUT_HTML%"
+if errorlevel 1 (
+  echo.
+  echo Anchor validation failed for %OUT_HTML%.
+  popd
+  exit /b 1
+)
+:skip_anchor_check
+
 set OUT_PDF=%IN:.md=.pdf%
 for %%I in ("%OUT_HTML%") do set "OUT_HTML_ABS=%%~fI"
 for %%I in ("%OUT_PDF%") do set "OUT_PDF_ABS=%%~fI"

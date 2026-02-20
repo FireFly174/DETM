@@ -39,6 +39,16 @@ if errorlevel 1 (
 echo.
 echo Wrote: %OUT%
 
+rem Validate local markdown links/anchors in the compiled artifact.
+rem Set RU_V2_SKIP_MD_LINK_CHECK=1 to skip (not recommended).
+if /I "%RU_V2_SKIP_MD_LINK_CHECK%"=="1" goto :skip_md_link_check
+python tools\check_markdown_links.py "%OUT%"
+if errorlevel 1 (
+  popd
+  exit /b 1
+)
+:skip_md_link_check
+
 rem Also render HTML/PDF so the build artifact is always up to date (with embedded images).
 rem Set RU_V2_SKIP_RENDER=1 to skip rendering (useful for export scripts that render separately).
 if /I "%RU_V2_SKIP_RENDER%"=="1" goto :skip_render
