@@ -71,6 +71,7 @@ docs/source/
 *.avi
 *.zip
 !docs/media/source/
+llms-full*
 
 # --- Obsidian (если решишь хранить vault внутри repo) ---
 .obsidian/

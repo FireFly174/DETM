@@ -1,6 +1,6 @@
 ﻿# ROADMAP (human)
 
-Обновлено: 2026-02-14
+Обновлено: 2026-02-21
 
 > Этот файл — человеческая версия roadmap в старом формате (как в `D:\github\game\ROADMAP.md`).
 > Детальная инженерная спецификация с PM-полями: `docs/rus/ROADMAP.md`.
@@ -94,6 +94,7 @@
 - [ ] F-03: anti-Goodhart readout + `goodhart_flag`
 
 Примечание (2026-02-16): в runtime уже добавлен baseline operator-contract (`operator` блок в refinement events + `discrete_torsion_v1`), rule-based selection (`torsion_guard_v1`) и bounded runtime history (`operator_decision_history`), а также policy knobs (`refinement_operator_torsion_threshold`, `refinement_operator_torsion_guard_enabled`, `refinement_operator_history_limit`), отдельный artifact-first файл `operator_decisions.jsonl` (с `trace_ref`) и агрегаты в `watch_contract`; для `F-02` добавлена baseline portability-панель (`hold_rate/operator_reuse/transferability`) с threshold-gate и acceptance scenario `portable vs strict`; для `F-03` добавлен baseline anti-Goodhart блок (`anti_goodhart.goodhart_flag`, `degraded_signals`, `policy_reaction`) поверх multi-signal панели, вынесены policy knobs в `LevelPolicy` (`anti_goodhart_*`), подключена runtime reaction в adaptive window/profile path, экспорт snapshot в `watch_trace/watch_contract` readout-панель и typed контракт в `detm/runtime/watch_contract.py`. Этапы `F-01/F-02/F-03` остаются open до полного DoD.
+Примечание (2026-02-21): в книге RU v2 формальный state-space слой уже зафиксирован (x_t, x_{t+1}=F(...), декомпозиция `b/a/h/r/i/g/d`); следующий практический шаг - вынести в runtime/watch отдельную метрику времени исследуемости (exploration_horizon_ticks) и связать её с anti-Goodhart/readout панелью. Подробность: `docs/rus/90_notes/context_graph_exploration_horizon_2026-02-21.md`.
 
 ### Этап G-ND (N-мерность)
 
