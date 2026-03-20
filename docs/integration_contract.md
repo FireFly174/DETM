@@ -82,6 +82,64 @@
   - `session_get_state_blob(session_id)`
 - Без глобальных синглтонов: DETM должна поддерживать несколько одновременных сессий (или явный запрет). Рантайм-бридж организует изоляцию без UI/ComfyUI зависимостей.
 
+## Artifact-first analytics read-model
+
+App-layer post-run analytics не меняет канонический runtime API и не превращает SQLite в source-of-truth.
+
+Реализованный слой:
+- `python main.py headless analytics ingest --run-dir <path>`
+- `python main.py headless analytics summarize --run-dir <path>`
+- `python main.py headless analytics query --db <path> --sql <query>`
+- Python API: `ingest_run(run_dir)`, `summarize_run(run_dir)`, `open_run_db(run_dir)`
+
+Derived outputs рядом с completed run:
+- `analytics.sqlite`
+- `analytics/run_summary.json`
+- `analytics/event_windows.jsonl`
+- `analytics/decision_windows.jsonl`
+- `analytics/outerfields_index.jsonl`
+
+Контракт:
+- raw artifacts (`trace/watch/contract/outerfields/state`) остаются каноном;
+- SQLite хранит только summaries/refs/meta;
+- dense field arrays и full tensors не пишутся в БД;
+- ingest идемпотентен и должен корректно маркировать `ok | partial | broken`.
+
+## Multiscale bridge catalog (observe-only baseline)
+
+Реализованный baseline не ускоряет runtime и не подменяет `step()`. Он сидит поверх `step` events и строит derived multiscale readout.
+
+Текущий контракт:
+- `DETMConfig.multiscale_catalog`
+- local bounded ring buffer в `detm.runtime.pattern_memory`
+- bridge-shaped record scaffold:
+  - `window_signature`
+  - `interface_signature`
+  - `horizon_k`
+  - `forward_descriptor`
+  - `reverse_descriptor_short`
+  - `validity_envelope`
+  - `db_refs`
+- derived artifacts:
+  - `multiscale_candidates.jsonl`
+  - `scale_tension.jsonl`
+  - `operator_catalog_hits.jsonl`
+
+Observe-only semantics:
+- canonical `DETMState` остаётся owned runtime/session;
+- multiscale слой не делает `jump`, `refine`, `promote` или substitute execution;
+- Redis не требуется для завершения run и не является source-of-truth;
+- при наличии `redis_url` наружу сериализуется только safe endpoint, без credentials.
+
+## Transitional boundaries (not final architecture)
+
+Следующее нельзя трактовать как финальную архитектуру:
+- `analytics.sqlite` не заменяет raw artifact-first слой;
+- `multiscale_catalog` пока не является `Ln <-> Ln+1` executable bridge runtime;
+- текущий `BridgeRecord` не хранит full forward/reverse trajectory bodies;
+- Redis hot transport и trajectory store DB ещё не реализованы;
+- particle/macronode semantics, `hint` execution и guarded `jump` остаются отдельным следующим этапом.
+
 ## Definition of Done (минимум для интеграции)
 - Реализованы `reset/step/digest/serialize/deserialize`.
 - Повторяемость: фиксированный `seed` → одинаковый результат.

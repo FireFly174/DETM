@@ -163,6 +163,64 @@ Flattened watchpoint поля для быстрых потребителей:
 - `anti_goodhart_policy_reaction_applied`;
 - `anti_goodhart_runtime_profile_applied`.
 
+## Analytics read-model (app-layer, post-run)
+
+Реализованный analytics слой не меняет канонический runtime API и не переводит DETM на direct DB writes.
+
+Поддерживаемые entrypoints:
+- `python main.py headless analytics ingest --run-dir <path>`
+- `python main.py headless analytics summarize --run-dir <path>`
+- `python main.py headless analytics query --db <path> --sql <query>`
+- Python API: `ingest_run(run_dir)`, `summarize_run(run_dir)`, `open_run_db(run_dir)`
+
+Derived outputs рядом с completed run:
+- `analytics.sqlite`
+- `analytics/run_summary.json`
+- `analytics/event_windows.jsonl`
+- `analytics/decision_windows.jsonl`
+- `analytics/outerfields_index.jsonl`
+
+Контракт этого слоя:
+- raw artifact-first outputs (`trace/watch/contract/outerfields/state`) остаются source-of-truth;
+- SQLite хранит summaries/refs/meta, а не dense arrays;
+- ingest идемпотентен;
+- результат должен честно маркироваться как `ok`, `partial` или `broken`.
+
+## Multiscale bridge catalog (MSC-01, observe-only)
+
+Текущий multiscale baseline не является runtime acceleration. Он строит derived multiscale readout поверх `step` events.
+
+Зафиксированный интерфейс:
+- `DETMConfig.multiscale_catalog`
+- local bounded ring buffer в `detm.runtime.pattern_memory`
+- bridge-shaped record scaffold:
+  - `window_signature`
+  - `interface_signature`
+  - `horizon_k`
+  - `forward_descriptor`
+  - `reverse_descriptor_short`
+  - `validity_envelope`
+  - `db_refs`
+- derived artifacts:
+  - `multiscale_candidates.jsonl`
+  - `scale_tension.jsonl`
+  - `operator_catalog_hits.jsonl`
+
+Observe-only semantics:
+- canonical `DETMState` остаётся owned runtime/session;
+- multiscale слой не делает `jump`, `refine`, `promote` или substitute execution;
+- Redis не обязателен для completed run и не является source-of-truth;
+- при наличии `redis_url` в артефакты и `config.json` уходит только safe endpoint без credentials.
+
+## Transitional boundaries (не финальная архитектура)
+
+Следующее нельзя трактовать как уже закрытую финальную архитектуру:
+- `analytics.sqlite` не заменяет raw artifact-first слой;
+- `multiscale_catalog` пока не является полноценным `Ln <-> Ln+1` executable bridge runtime;
+- текущий `BridgeRecord` не хранит full forward/reverse trajectory bodies;
+- Redis hot transport и trajectory store DB ещё не реализованы;
+- particle/macronode semantics, `hint` execution и guarded `jump` остаются следующим отдельным этапом.
+
 ## Definition of Done (минимум для интеграции)
 - Реализованы `reset/step/digest/serialize/deserialize`.
 - Повторяемость: фиксированный `seed` → одинаковый результат.

@@ -171,3 +171,67 @@ Flattened watchpoint mirrors (for quick consumers):
 - `anti_goodhart_degraded_signal_count`
 - `anti_goodhart_policy_reaction_applied`
 - `anti_goodhart_runtime_profile_applied`
+
+---
+
+## Analytics read-model (app-layer, post-run)
+
+The implemented analytics layer does not change the canonical runtime API and does not introduce direct DB writes from runtime/subscribers.
+
+Supported entrypoints:
+- `python main.py headless analytics ingest --run-dir <path>`
+- `python main.py headless analytics summarize --run-dir <path>`
+- `python main.py headless analytics query --db <path> --sql <query>`
+- Python API: `ingest_run(run_dir)`, `summarize_run(run_dir)`, `open_run_db(run_dir)`
+
+Derived outputs next to a completed run:
+- `analytics.sqlite`
+- `analytics/run_summary.json`
+- `analytics/event_windows.jsonl`
+- `analytics/decision_windows.jsonl`
+- `analytics/outerfields_index.jsonl`
+
+Contract:
+- raw artifact-first outputs (`trace/watch/contract/outerfields/state`) remain the source of truth;
+- SQLite stores summaries/refs/meta, not dense arrays;
+- ingest is idempotent;
+- the result must be marked honestly as `ok`, `partial`, or `broken`.
+
+---
+
+## Multiscale bridge catalog (MSC-01, observe-only)
+
+The current multiscale baseline is not runtime acceleration. It builds derived multiscale readout on top of `step` events.
+
+Current surface:
+- `DETMConfig.multiscale_catalog`
+- a local bounded ring buffer in `detm.runtime.pattern_memory`
+- a bridge-shaped record scaffold:
+  - `window_signature`
+  - `interface_signature`
+  - `horizon_k`
+  - `forward_descriptor`
+  - `reverse_descriptor_short`
+  - `validity_envelope`
+  - `db_refs`
+- derived artifacts:
+  - `multiscale_candidates.jsonl`
+  - `scale_tension.jsonl`
+  - `operator_catalog_hits.jsonl`
+
+Observe-only semantics:
+- canonical `DETMState` remains owned by runtime/session;
+- the multiscale layer does not perform `jump`, `refine`, `promote`, or substitute execution;
+- Redis is not required for a completed run and is not a source of truth;
+- when `redis_url` is present, artifacts and `config.json` expose only a safe endpoint form without credentials.
+
+---
+
+## Transitional boundaries (not final architecture)
+
+The following must not be treated as final architecture:
+- `analytics.sqlite` does not replace the raw artifact-first layer;
+- `multiscale_catalog` is not yet a full `Ln <-> Ln+1` executable bridge runtime;
+- the current `BridgeRecord` does not store full forward/reverse trajectory bodies;
+- Redis hot transport and the trajectory store DB are not implemented yet;
+- particle/macronode semantics, `hint` execution, and guarded `jump` remain later stages.
