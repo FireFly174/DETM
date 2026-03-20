@@ -27,7 +27,7 @@
 ## 2) Canonical Prompt Stack (обязательно)
 
 Перед любой нетривиальной задачей восстанови контекст по стеку:
-1. `PROMT.md` (канонический bootstrap и текущий статус)
+1. `.codex/PROMT.md` (операционный bootstrap и текущий статус)
 2. `docs/rus/ROADMAP.md` (source-of-truth по фазам/статусам)
 3. `docs/rus/ROADMAP_HUMAN.md` (короткая человеческая проекция)
 4. `docs/rus/00_overview/README.md` (карта документации)
@@ -41,6 +41,10 @@
 - `docs/rus/90_notes/architecture_variants_l0_and_fabric_2026-02-09.md`
 
 ---
+
+Operational note:
+- `.codex/*` задаёт агентный execution context;
+- канон DETM по модели и архитектуре остаётся в `docs/rus/*`.
 
 ## 3) Обязательная фиксация после bootstrap
 

@@ -7,6 +7,9 @@
 Он не дублирует всю теорию из книги и карточек, а фиксирует рабочий минимум:
 канон, фазу roadmap, ограничения и ближайшие приоритеты.
 
+Файл хранится в `.codex/` как operational bootstrap layer.
+Он не является более сильным источником истины, чем canonical docs в `docs/rus/*`.
+
 ---
 
 ## 1) Команда bootstrap
@@ -15,7 +18,7 @@
 - `прочитай PROMT.md`
 
 означает:
-1. восстановить контекст по prompt-stack (`SYSTEM_PROMT_DETM_CREATIVE.md` + этот файл + `docs/rus/ROADMAP.md` + опорные карточки),
+1. восстановить контекст по prompt-stack (`.codex/SYSTEM_PROMT_DETM_CREATIVE.md` + этот файл + `docs/rus/ROADMAP.md` + опорные карточки),
 2. отделить `as-is` от `to-be`,
 3. дать короткий запускной ответ:
    - текущая фаза roadmap,
@@ -97,8 +100,8 @@ North star задан документами:
 ## 7) Prompt Stack (кратко)
 
 База:
-- `SYSTEM_PROMT_DETM_CREATIVE.md`
-- `PROMT.md`
+- `.codex/SYSTEM_PROMT_DETM_CREATIVE.md`
+- `.codex/PROMT.md`
 - `docs/rus/ROADMAP.md`
 - `docs/rus/ROADMAP_HUMAN.md`
 - `docs/rus/90_notes/book_concepts_single_source.md`

@@ -1,23 +1,21 @@
 # DETM Agent Workspace Preservation
 
-Статус: локальный operational runbook для Codex/Continue и других coding agents.
+Статус: локальный operational runbook для Codex и других coding agents.
 
 Цель: зафиксировать, какие части агентного окружения в DETM уже являются рабочей инфраструктурой и должны сохраняться при дальнейшей настройке репозитория.
 
 Этот документ дополняет:
 - `AGENTS.md`
-- `.continue/rules/workspace-agent-contract.md`
 - `docs/rus/90_notes/memory_playbook_detm.md`
 
-Он не заменяет `PROMT.md`, roadmap или source-of-truth docs по самой архитектуре DETM.
+Он не заменяет `.codex/PROMT.md`, roadmap или source-of-truth docs по самой архитектуре DETM.
 
 ## 1) Что считается уже построенной инфраструктурой
 
 Считать штатными и сохраняемыми артефактами:
 
 - repo-root policy: `AGENTS.md`
-- Continue wiring: `.continue/README.md`, `.continue/rules/workspace-agent-contract.md`
-- prompt stack: `SYSTEM_PROMT_DETM_CREATIVE.md`, `PROMT.md`
+- prompt stack: `.codex/SYSTEM_PROMT_DETM_CREATIVE.md`, `.codex/PROMT.md`
 - roadmap stack: `docs/rus/ROADMAP.md`, `docs/rus/ROADMAP_HUMAN.md`
 - memory layer: `.aimemo/` и `docs/rus/90_notes/memory_playbook_detm.md`
 - repo-local launcher layer: `_mcp_launchers/*`
@@ -45,8 +43,7 @@ DETM уже строился в окружении, где часть инфра
 
 1. policy/bootstrap:
    - `AGENTS.md`
-   - `.continue/rules/workspace-agent-contract.md`
-   - `PROMT.md` stack по локальному контракту
+   - `.codex/PROMT.md` stack по локальному контракту
 2. project memory:
    - `aimemo_detm_memory`
    - затем локальные canonical docs
@@ -71,7 +68,7 @@ Skills считаются внешним capability-layer, а не частью 
 
 - использовать глобальные skills, когда задача им соответствует;
 - не дублировать skill bodies в DETM;
-- не создавать repo-local pseudo-bootstrap, который перетирает существующие `.continue`, `_mcp_launchers`, `AGENTS.md`;
+- не создавать repo-local pseudo-bootstrap, который перетирает существующие `_mcp_launchers`, `AGENTS.md`;
 - не использовать `bootstrap-repository` для DETM без отдельного ручного review, потому что в репозитории уже есть важные hand-crafted артефакты.
 
 ## 5) Что нельзя перетирать автоматически
@@ -79,11 +76,10 @@ Skills считаются внешним capability-layer, а не частью 
 Без явного запроса пользователя не регенерировать и не массово переписывать:
 
 - `AGENTS.md`
-- `.continue/*`
 - `_mcp_launchers/*`
 - `.aimemo/*`
-- `PROMT.md`
-- `SYSTEM_PROMT_DETM_CREATIVE.md`
+- `.codex/PROMT.md`
+- `.codex/SYSTEM_PROMT_DETM_CREATIVE.md`
 - `docs/rus/ROADMAP.md`
 - `docs/rus/ROADMAP_HUMAN.md`
 
@@ -113,6 +109,6 @@ Skills считаются внешним capability-layer, а не частью 
 
 1. восстановить project memory (`aimemo_detm_memory`);
 2. прочитать локальный `AGENTS.md`;
-3. при bootstrap-команде прочитать `PROMT.md` stack по локальному контракту;
-4. учитывать, что `_mcp_launchers/*`, `.continue/*` и `.aimemo/*` уже являются рабочей инфраструктурой;
+3. при bootstrap-команде прочитать `.codex/PROMT.md` stack по локальному контракту;
+4. учитывать, что `_mcp_launchers/*` и `.aimemo/*` уже являются рабочей инфраструктурой;
 5. менять agent-environment только точечно и с сохранением существующей схемы.

@@ -55,7 +55,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 
 ### Канон и архитектура
 
-- Зафиксирован канон DETM и north star (`PROMT.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`).
+- Зафиксирован канон DETM и north star (`.codex/PROMT.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`).
 - Граница `detm`/`detm_app` очищена; legacy entrypoints удалены.
 - `System Trace`/`Watch Trace` и `watch_contract` в production-контуре.
 - Веточный контур разработки зафиксирован: активная разработка идёт через `dev/main`, `main` используется как release-ветка (`docs/BRANCHING.md`).
@@ -666,7 +666,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: `docs/rus/ROADMAP.md`.
 - `risks`: потеря контекста при переносе старых разделов.
 - `dod`: новый формат принят и закрывает общие пункты.
-- `readout` (2026-02-13): синхронизированы архитектурные и launch-документы после migration `detm.run -> detm_app.runtime`: обновлены `README.md`, `docs/rus/architecture.md`, `docs/eng/architecture.md`, `docs/rus/00_overview/architecture.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`, `docs/rus/30_architecture/commit_protocol.md`, `docs/eng/integration_contract.md`, `docs/rus/integration_contract.md`, `PROMT_SHORT.md`.
+- `readout` (2026-02-13): синхронизированы архитектурные и launch-документы после migration `detm.run -> detm_app.runtime`: обновлены `README.md`, `docs/rus/architecture.md`, `docs/eng/architecture.md`, `docs/rus/00_overview/architecture.md`, `docs/rus/30_architecture/target_architecture_synthesis.md`, `docs/rus/30_architecture/commit_protocol.md`, `docs/eng/integration_contract.md`, `docs/rus/integration_contract.md`, `.codex/PROMT_SHORT.md`.
 - `readout` (2026-02-14): актуализированы статусные карточки program-layer экспериментов (`docs/rus/50_experiments/{00,01,02}_*.md`, `docs/eng/40_experiments/{00,01,02}_*.md`, README-индексы), а также регенерирован единый mega UML (`docs/uml/ALL_PROJECT_UML_MEGA.puml`) под текущий layout `session/*`, `ui_runtime/*`, `subscribers/*`, `serialization/*`, `fabric/*`.
 
 ## Imported from game: implemented vs pending
