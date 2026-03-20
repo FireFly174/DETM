@@ -93,6 +93,34 @@ def _center_of_mass_from_torch(energy) -> tuple[float, float]:
     return float(cx.item()), float(cy.item())
 
 
+def project_field_plane_any(values: Any) -> Any:
+    """Project an N-D field to the canonical 2D runtime plane.
+
+    Until G-ND-02 lands, digest/readout contracts remain 2D. For tensors or
+    arrays with leading axes, collapse those axes by mean and keep the trailing
+    `(H, W)` plane.
+    """
+
+    if _is_torch_tensor(values):
+        dims = int(values.ndim)
+        if dims < 2:
+            raise ValueError(f"field must be at least 2D, got ndim={dims}")
+        if dims == 2:
+            return values
+        import torch  # type: ignore
+
+        leading_axes = tuple(range(dims - 2))
+        return values.to(dtype=torch.float64).mean(dim=leading_axes)
+
+    array = np.asarray(values, dtype=float)
+    if array.ndim < 2:
+        raise ValueError(f"field must be at least 2D, got ndim={array.ndim}")
+    if array.ndim == 2:
+        return array
+    leading_axes = tuple(range(array.ndim - 2))
+    return array.mean(axis=leading_axes)
+
+
 def digest_fields_any(energy: Any, entropy: Any, internal_time: Any) -> DETMSignature:
     """Compute signature without forcing a dense CPU copy of fields."""
     if _is_torch_tensor(energy) or _is_torch_tensor(entropy) or _is_torch_tensor(internal_time):
@@ -148,4 +176,5 @@ __all__ = [
     "describe_field_from_array",
     "digest_fields",
     "digest_fields_any",
+    "project_field_plane_any",
 ]

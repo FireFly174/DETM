@@ -14,7 +14,7 @@ from detm.runtime.config import DETMConfig
 from detm.runtime.diagnostics.attractors import detect_attractors
 from detm.runtime.influence import DETMInfluence
 from detm.runtime.refinement import maybe_apply_refinement
-from detm.runtime.signature import describe_field_any, digest_fields_any
+from detm.runtime.signature import describe_field_any, digest_fields_any, project_field_plane_any
 from detm.runtime.state import DETMState
 
 
@@ -100,10 +100,13 @@ def build_observables(
     refinement_event: dict[str, Any] | None,
     influence_application: Any | None,
 ) -> Observables:
-    lattice = state.lattice
-    energy = state.field_state.energy.reshape(lattice.height, lattice.width)
-    entropy = state.field_state.entropy.reshape(lattice.height, lattice.width)
-    internal_time = state.field_state.internal_time.reshape(lattice.height, lattice.width)
+    full_energy = state.field_state.energy
+    full_entropy = state.field_state.entropy
+    full_internal_time = state.field_state.internal_time
+    energy = project_field_plane_any(state.field_state.energy)
+    entropy = project_field_plane_any(state.field_state.entropy)
+    internal_time = project_field_plane_any(state.field_state.internal_time)
+    energy_np = _to_numpy(energy)
 
     signature = digest_fields_any(energy, entropy, internal_time)
     summaries = FieldSummaries(
@@ -114,21 +117,23 @@ def build_observables(
 
     attractors = []
     if str(config.observables_mode).strip().lower() == "cpu_full":
-        energy_arr = _to_numpy(energy)
-        attractors = detect_attractors(energy_arr)
+        attractors = detect_attractors(energy_np)
 
     cost = {
         "cpu_time_ms": float(elapsed_s) * 1000.0,
-        "step_ops_estimate": float(lattice.size * max(1, int(n_ticks))),
-        "memory_bytes_estimate": _estimate_array_bytes(energy)
-        + _estimate_array_bytes(entropy)
-        + _estimate_array_bytes(internal_time),
+        "step_ops_estimate": float(_to_numpy(full_energy).size * max(1, int(n_ticks))),
+        "memory_bytes_estimate": _estimate_array_bytes(full_energy)
+        + _estimate_array_bytes(full_entropy)
+        + _estimate_array_bytes(full_internal_time),
     }
     quality = _apply_quality_proxies(signature.vector)
 
     events: list[dict[str, object]] = []
     if refinement_event is not None:
-        events.append(refinement_event)
+        if isinstance(refinement_event, list):
+            events.extend(dict(event) for event in refinement_event)
+        else:
+            events.append(dict(refinement_event))
     events.extend(
         [
             {

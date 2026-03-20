@@ -14,21 +14,36 @@ from detm.runtime.state import DETMFieldState
 
 def _make_field_state(energy: np.ndarray, *, entropy: np.ndarray | None = None) -> DETMFieldState:
     energy_np = np.asarray(energy, dtype=float)
-    h, w = int(energy_np.shape[0]), int(energy_np.shape[1])
+    h, w = int(energy_np.shape[-2]), int(energy_np.shape[-1])
     lattice = Lattice(width=w, height=h, boundary="periodic")
     if entropy is None:
-        entropy_np = NumpyBackend._compute_entropy(
-            np.nan_to_num(energy_np, nan=0.0, posinf=1.0, neginf=0.0),
-            DynamicsParameters(energy_bounds=None),
-            boundary=lattice.boundary,
-        )
+        clean = np.nan_to_num(energy_np, nan=0.0, posinf=1.0, neginf=0.0)
+        if clean.ndim == 2:
+            entropy_np = NumpyBackend._compute_entropy(
+                clean,
+                DynamicsParameters(energy_bounds=None),
+                boundary=lattice.boundary,
+            )
+        else:
+            flat = clean.reshape(-1, h, w)
+            entropy_np = np.stack(
+                [
+                    NumpyBackend._compute_entropy(
+                        plane,
+                        DynamicsParameters(energy_bounds=None),
+                        boundary=lattice.boundary,
+                    )
+                    for plane in flat
+                ],
+                axis=0,
+            ).reshape(clean.shape)
     else:
         entropy_np = np.asarray(entropy, dtype=float)
     return DETMFieldState(
         lattice=lattice,
         energy=energy_np.copy(),
         entropy=entropy_np.copy(),
-        internal_time=np.zeros((h, w), dtype=float),
+        internal_time=np.zeros(energy_np.shape, dtype=float),
     )
 
 
@@ -70,6 +85,18 @@ def test_refinement_pipeline_detect_stage_reports_overflow_and_updates_history()
     assert int(context.overflow_count) == 1
     assert float(context.overflow_ratio) > 0.0
     assert isinstance(runtime_memory.get("capacity_temporal_history"), list)
+
+
+def test_refinement_pipeline_detect_stage_projects_nd_field_state():
+    energy = np.zeros((2, 7, 7), dtype=float)
+    energy[-1, 3, 3] = 3.0
+    state = _make_field_state(energy)
+
+    context = _detect(state)
+
+    assert context.energy.shape == (7, 7)
+    assert int(context.overflow_count) == 1
+    assert float(context.overflow_mean) > 0.0
 
 
 def test_refinement_pipeline_roi_stage_detects_nonfinite_hotspot():

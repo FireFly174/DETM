@@ -6,6 +6,8 @@ import numpy as np
 
 from detm_app.runtime.session import DetmSession
 from detm_app.runtime.subscribers import JsonlTraceWriter, WatchContractWriter
+from detm.core.entropy import DynamicsParameters
+from detm.runtime.backends.numpy_backend import NumpyBackend
 from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
 from detm.runtime.watch_contract import WatchContractPacket
@@ -135,3 +137,46 @@ def test_watch_contract_storage_policy_prunes_entries_and_artifacts(tmp_path):
     artifact_rows = sorted(outerfields_dir.glob("outerfields_*.npz"), key=lambda p: p.name)
     assert len(artifact_rows) == 3
     assert [int(path.stem.split("_")[-1]) for path in artifact_rows] == [4, 5, 6]
+
+
+def test_watch_contract_preserves_plane_index_for_nd_refinement_events(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        shape=(2, 7, 5),
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        level_policy=LevelPolicy(allow_refinement=True, commit_stride=1, microsteps_per_global_tick=1),
+    )
+    session = DetmSession.create(cfg, seed=33)
+
+    contract_path = tmp_path / "watch_contract.jsonl"
+    outerfields_dir = tmp_path / "outerfields"
+
+    WatchContractWriter.attach(
+        session.bus,
+        contract_path,
+        outerfields_dir=outerfields_dir,
+        retention_window=0,
+        compaction_budget=0,
+    )
+
+    energy = np.zeros((2, 7, 5), dtype=float)
+    energy[1, 3, 2] = 3.0
+    session.state.field_state.energy = energy
+    session.state.field_state.internal_time = np.zeros_like(energy)
+    session.state.field_state.entropy = NumpyBackend._compute_entropy(
+        energy,
+        session.config.dynamics,
+        boundary=session.state.lattice.boundary,
+    )
+
+    session.step(None, 1, rng=session.state.restore_rng())
+    session.close()
+
+    contract_entries = _read_jsonl(contract_path)
+    assert len(contract_entries) == 1
+    events = list(contract_entries[0].get("events", []))
+    refinement_events = [event for event in events if str(event.get("type")) == "refinement"]
+    assert len(refinement_events) == 1
+    assert list(refinement_events[0].get("plane_index", [])) == [1]

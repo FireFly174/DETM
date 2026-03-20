@@ -14,6 +14,19 @@ from detm.runtime.config.normalization import (
 from detm.runtime.level_policy import LevelPolicy
 from detm.runtime.schemas import DETM_CONFIG_V1
 
+
+def _normalize_shape(raw_shape: Any, *, width: Any, height: Any) -> tuple[int, ...]:
+    if raw_shape in (None, "", (), []):
+        dims = (int(height), int(width))
+    else:
+        dims = tuple(int(value) for value in raw_shape)
+    if len(dims) < 2:
+        raise ValueError("shape must contain at least two axes")
+    if any(int(value) <= 0 for value in dims):
+        raise ValueError("shape axes must be positive")
+    return tuple(int(value) for value in dims)
+
+
 @dataclass(frozen=True)
 class DETMConfig:
     """Structured configuration with explicit versioning.
@@ -28,6 +41,7 @@ class DETMConfig:
     device: str = "cuda"  # preferred device; may fall back to cpu if unavailable
     width: int = 24
     height: int = 24
+    shape: tuple[int, ...] = field(default_factory=tuple)
     boundary: str = "periodic"
     dynamics: DynamicsParameters = DynamicsParameters()
     initial_noise: float = 0.08
@@ -49,8 +63,17 @@ class DETMConfig:
     pattern_prune_deviation_threshold: float = 0.5
     level_policy: LevelPolicy = field(default_factory=LevelPolicy)
 
+    def __post_init__(self) -> None:
+        shape = _normalize_shape(self.shape, width=self.width, height=self.height)
+        object.__setattr__(self, "shape", shape)
+        object.__setattr__(self, "height", int(shape[-2]))
+        object.__setattr__(self, "width", int(shape[-1]))
+
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
+        data["shape"] = list(self.shape)
+        data["height"] = int(self.height)
+        data["width"] = int(self.width)
         dyn = data.pop("dynamics")
         data["dynamics"] = asdict(DynamicsParameters(**dyn))
         level_policy_raw = data.pop("level_policy", None)
@@ -116,6 +139,7 @@ class DETMConfig:
             device=str(data.get("device", "cuda")),
             width=int(data.get("width", 24)),
             height=int(data.get("height", 24)),
+            shape=_normalize_shape(data.get("shape"), width=data.get("width", 24), height=data.get("height", 24)),
             boundary=str(data.get("boundary", "periodic")),
             dynamics=dynamics,
             initial_noise=float(data.get("initial_noise", 0.08)),

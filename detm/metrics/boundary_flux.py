@@ -16,6 +16,7 @@ from typing import Any, Dict
 import numpy as np
 
 from detm.metrics.base import MetricContext, MetricPlugin
+from detm.runtime.signature import project_field_plane_any
 
 
 def _is_torch_tensor(x: Any) -> bool:
@@ -100,7 +101,7 @@ class BoundaryFluxMetrics(MetricPlugin):
 
         state = ctx.state
         lattice = state.lattice
-        E = state.field_state.energy.reshape(lattice.height, lattice.width)
+        E = project_field_plane_any(state.field_state.energy)
 
         Jx, Jy = _central_diffs(E)
         Jmag = _sqrt(Jx * Jx + Jy * Jy)

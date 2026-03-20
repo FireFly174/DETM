@@ -13,6 +13,18 @@ def _field_state(w: int, h: int) -> DETMFieldState:
     return DETMFieldState(lattice=lattice, energy=zeros.copy(), entropy=zeros.copy(), internal_time=zeros.copy())
 
 
+def _field_state_nd(shape: tuple[int, ...]) -> DETMFieldState:
+    lattice = Lattice(shape[-1], shape[-2], boundary="periodic")
+    zeros = np.zeros(shape, dtype=float)
+    return DETMFieldState(
+        lattice=lattice,
+        energy=zeros.copy(),
+        entropy=zeros.copy(),
+        internal_time=zeros.copy(),
+        shape=shape,
+    )
+
+
 def test_ring_mask_is_thinner_than_pulse_mask() -> None:
     rng = np.random.default_rng(0)
 
@@ -63,3 +75,26 @@ def test_stripe_mask_broadcasts_to_full_lattice() -> None:
     horizontal = DETMInfluence(symbol_id="stripe", amplitude=0.1, phase=1.0, region=(12, 12, 4))
     app_h = apply_influence(state2, horizontal, rng)
     assert app_h.affected_fraction > 0.0
+
+
+def test_pulse_influence_broadcasts_across_nd_planes() -> None:
+    rng = np.random.default_rng(0)
+    state = _field_state_nd((2, 11, 11))
+    infl = DETMInfluence(symbol_id="pulse", amplitude=0.2, region=(5, 5, 3))
+
+    app = apply_influence(state, infl, rng)
+
+    assert app.affected_fraction > 0.0
+    assert float(state.energy[0, 5, 5]) > 0.0
+    assert float(state.energy[1, 5, 5]) > 0.0
+
+
+def test_joystick_field_applies_to_all_nd_planes() -> None:
+    rng = np.random.default_rng(0)
+    state = _field_state_nd((2, 3, 7))
+    infl = DETMInfluence(symbol_id="joystick_field", amplitude=0.5, external_features={"dx": 1.0, "dy": 0.0})
+
+    apply_influence(state, infl, rng)
+
+    assert float(state.energy[0, 1, -1]) > float(state.energy[0, 1, 0])
+    assert float(state.energy[1, 1, -1]) > float(state.energy[1, 1, 0])

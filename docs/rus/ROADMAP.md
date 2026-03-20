@@ -426,7 +426,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 ### G-ND-01 — Эволюция `DETMState` к `shape[N]`
 
 - `id`: `G-ND-01`
-- `status`: `todo`
+- `status`: `in_progress`
 - `priority`: `P2`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-14`
@@ -439,11 +439,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: schema version report + migration test logs.
 - `risks`: поломка существующих 2D сценариев.
 - `dod`: 2D и N-D контуры работают параллельно без регрессий.
+- `readout` (2026-03-20): начат backward-compatible migration slice для `state/config`: в `DETMConfig` введён канонический `shape[N]` при сохранении `width/height` как alias последних двух осей, а `DETMFieldState` и `serialization/state.py` научены сохранять и восстанавливать N-D shape без потери 2D lattice-совместимости. Публичный API теперь создаёт N-D state через `reset(...)`, а `digest(...)`/`digest_blob(...)` проецируют N-D поля в каноническую 2D plane readout по trailing axes; при этом `step(...)` переведён в fail-closed режим для `shape>2` с явным `NotImplementedError`, чтобы не закреплять невалидный переходный runtime path до `G-ND-02`. Добавлены RED/GREEN тесты `tests/test_nd_state_shape.py` и расширен API regression в `tests/test_integration_contract.py`; соседние regression-срезы `tests/test_state_schema_migration.py`, `tests/test_refinement_mvp.py`, `tests/test_level_policy_runtime.py -k "roundtrip or anti_goodhart or runtime_adaptive"` остаются зелёными. Этот срез не считает `G-ND-01` завершённым: runtime math/refinement/outerfields всё ещё опираются на 2D и будут обобщаться в `G-ND-02`.
 
 ### G-ND-02 — N-D контракты serialization/refinement/outerfields
 
 - `id`: `G-ND-02`
-- `status`: `todo`
+- `status`: `in_progress`
 - `priority`: `P2`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-16`
@@ -456,6 +457,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: ND trace/outerfields artifacts.
 - `risks`: неконсистентность артефактов между backend-ами.
 - `dod`: N-D контракты валидны и совместимы с существующими проверками.
+- `readout` (2026-03-20): начат первый contract-layer slice без включения полного N-D evolution path. В `diagnostics/attractors.py`, `api/step_flow.py`, `refinement/pipeline/detect.py` и `metrics/boundary_flux.py` убраны жёсткие `reshape(H,W)` предпосылки: эти слои теперь используют каноническую 2D-проекцию N-D полей по trailing axes, усредняя leading axes. Дополнительно открыт безопасный runtime slice: `NumpyBackend` и `TorchBackend` умеют эволюционировать N-D state plane-wise по trailing `(H,W)` axes, influence-path обобщён на N-D через broadcast по leading axes для mask-based символов и plane-wise применение для `joystick_field`/`source_sink`, а refinement-path больше не fail-closed для `shape>2`. Текущий refinement-контракт остаётся переходным и bounded: `maybe_apply_refinement_pipeline(...)` выполняет correction plane-wise по каждому trailing `(H,W)` slice и эмитит отдельные refinement-events с `plane_index`, без full cross-plane aggregation semantics. Добавлены tests `tests/test_nd_projection_runtime.py`, ND detect/correction coverage в `tests/test_refinement_pipeline_steps.py` и `tests/test_refinement_mvp.py`, ND integration coverage в `tests/test_integration_contract.py`, backend parity check в `tests/test_numpy_torch_parity.py` и ND influence tests в `tests/test_influence.py`; regression-срезы `tests/test_level_policy_runtime.py`, `tests/test_system_watch_trace.py`, `tests/test_watch_contract_writer.py`, `tests/test_ui_learning_runtime.py` остаются зелёными. Следующая открытая граница: `G-ND-03` и deeper outerfields/watch semantics для N-D plane metadata, а также возможная cross-plane coordination логика в refinement, если она понадобится как канон, а не как transition.
 
 ### G-ND-03 — UI projection adapters для N-D
 

@@ -102,6 +102,11 @@
 - [ ] G-ND-02: N-D контракты `serialization/refinement/outerfields`
 - [ ] G-ND-03: UI projection adapters для совместимости napari/readout consumers
 
+Примечание (2026-03-20): стартовал первый кодовый срез `G-ND-01`: `DETMConfig` получил канонический `shape[N]`, `width/height` оставлены как backward-compatible alias последних двух осей, state serialization уже держит N-D shape и проходит 3D smoke roundtrip, а публичный `reset(...)` умеет создавать N-D state. Одновременно граница зафиксирована жёстко: `digest(...)` пока работает через 2D-проекцию по trailing axes, а `step(...)` для `shape>2` намеренно fail-closed до следующего шага `G-ND-02`, где будут обобщаться runtime/refinement/outerfields контракты.
+Примечание (2026-03-20, позже): начался первый кодовый срез `G-ND-02`. Слои `readout/diagnostics/refinement-detect/boundary-flux` больше не завязаны на прямой `reshape(H,W)` и читают N-D state через каноническую 2D-проекцию по trailing axes. Это ещё не full N-D runtime: evolution path и вычислительные backend-ы по-прежнему не обобщены, но артефактный и detection-контур уже перестают быть 2D-only.
+Примечание (2026-03-20, ещё позже): вычислительный срез `G-ND-02` тоже сдвинут. `NumpyBackend` и `TorchBackend` уже умеют plane-wise evolution для N-D state, influence-path обобщён на leading-axis broadcast, а `step(...)` открыт для bounded N-D режима с influence при выключенном refinement. Это всё ещё переходный контракт: refinement correction/orchestration для `shape>2` остаётся намеренно закрытым до следующего подэтапа.
+Примечание (2026-03-20, поздний срез): следующий bounded-подэтап `G-ND-02` открыт и для refinement. Вместо «магического» full N-D correction runtime теперь делает plane-wise refinement по каждому trailing `(H,W)` slice, пишет исправления обратно в исходный N-D state и публикует отдельные refinement-events с `plane_index`. Это всё ещё не финальная архитектура N-D: cross-plane aggregation semantics и richer outerfields/watch presentation для plane metadata остаются следующей границей, а текущий контракт надо читать как переходный и безопасный.
+
 ### Этап G-R&D (local-first)
 
 - [ ] G-RND-01: отдельная спецификация `local-first + validation-sync` (prod-scope vs R&D-scope)

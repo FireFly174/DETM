@@ -33,6 +33,24 @@ def _copy_array(value: ArrayLike) -> ArrayLike:
     return np.asarray(value, dtype=float).copy()
 
 
+def _array_shape(value: ArrayLike) -> tuple[int, ...]:
+    if _is_torch_tensor(value):
+        return tuple(int(dim) for dim in value.shape)
+    return tuple(int(dim) for dim in np.asarray(value).shape)
+
+
+def _normalize_field_shape(raw_shape: Any, *, fallback: ArrayLike) -> tuple[int, ...]:
+    if raw_shape in (None, "", (), []):
+        shape = _array_shape(fallback)
+    else:
+        shape = tuple(int(dim) for dim in raw_shape)
+    if len(shape) < 2:
+        raise ValueError("field shape must contain at least two axes")
+    if any(int(dim) <= 0 for dim in shape):
+        raise ValueError("field shape axes must be positive")
+    return tuple(int(dim) for dim in shape)
+
+
 @dataclass
 class DETMFieldState:
     """Backend-owned numeric state for a single DETM tick."""
@@ -41,18 +59,25 @@ class DETMFieldState:
     energy: ArrayLike  # shape (H, W)
     entropy: ArrayLike  # shape (H, W)
     internal_time: ArrayLike  # shape (H, W)
+    shape: tuple[int, ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        self.shape = _normalize_field_shape(self.shape, fallback=self.energy)
+        self.ensure_alignment()
 
     def ensure_alignment(self) -> None:
         h, w = self.lattice.height, self.lattice.width
-        expected = (h, w)
+        expected = self.shape
+        if tuple(expected[-2:]) != (h, w):
+            raise ValueError(f"field shape tail {tuple(expected[-2:])} does not match lattice {(h, w)}")
         for name, array in [
             ("energy", self.energy),
             ("entropy", self.entropy),
             ("internal_time", self.internal_time),
         ]:
-            shape = tuple(array.shape) if _is_torch_tensor(array) else tuple(np.asarray(array).shape)
+            shape = _array_shape(array)
             if shape != expected:
-                raise ValueError(f"{name} shape {shape} does not match lattice {expected}")
+                raise ValueError(f"{name} shape {shape} does not match field shape {expected}")
 
     def copy(self) -> "DETMFieldState":
         return DETMFieldState(
@@ -60,6 +85,7 @@ class DETMFieldState:
             energy=_copy_array(self.energy),
             entropy=_copy_array(self.entropy),
             internal_time=_copy_array(self.internal_time),
+            shape=self.shape,
         )
 
 
@@ -87,6 +113,10 @@ class DETMState:
     @property
     def lattice(self) -> Lattice:
         return self.field_state.lattice
+
+    @property
+    def shape(self) -> tuple[int, ...]:
+        return self.field_state.shape
 
     def copy(self) -> "DETMState":
         return DETMState(

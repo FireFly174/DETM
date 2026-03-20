@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Iterable, List
 
 import numpy as np
 
-from detm.runtime.signature import digest_fields
+from detm.runtime.signature import digest_fields, project_field_plane_any
 
 if TYPE_CHECKING:
     from detm.runtime.state import DETMState
@@ -45,10 +45,9 @@ def detect_attractors(state_or_energy: np.ndarray | "DETMState", threshold: floa
     """
 
     if isinstance(state_or_energy, np.ndarray):
-        energy = state_or_energy
+        energy = _to_numpy(project_field_plane_any(state_or_energy))
     else:
-        lattice = state_or_energy.lattice
-        energy = _to_numpy(state_or_energy.field_state.energy).reshape(lattice.height, lattice.width)
+        energy = _to_numpy(project_field_plane_any(state_or_energy.field_state.energy))
 
     if energy.size == 0:
         return []
@@ -90,10 +89,9 @@ def stability_metrics(signatures: Iterable[np.ndarray]) -> StabilityReport:
 def signature_from_state(state) -> np.ndarray:
     import numpy as _np
 
-    lattice = state.lattice
-    energy = _to_numpy(state.field_state.energy).reshape(lattice.height, lattice.width)
-    entropy = _to_numpy(state.field_state.entropy).reshape(lattice.height, lattice.width)
-    internal_time = _to_numpy(state.field_state.internal_time).reshape(lattice.height, lattice.width)
+    energy = _to_numpy(project_field_plane_any(state.field_state.energy))
+    entropy = _to_numpy(project_field_plane_any(state.field_state.entropy))
+    internal_time = _to_numpy(project_field_plane_any(state.field_state.internal_time))
     return _np.asarray(digest_fields(energy, entropy, internal_time).vector, dtype=float)
 
 

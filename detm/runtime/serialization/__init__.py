@@ -17,7 +17,7 @@ from detm.runtime.serialization.payload import (
     unpack_payload,
 )
 from detm.runtime.serialization.state import build_state_from_payload, state_to_payload
-from detm.runtime.signature import digest_fields
+from detm.runtime.signature import digest_fields, project_field_plane_any
 from detm.runtime.state import DETMState
 
 _MIGRATION_ADAPTERS: dict[tuple[str, str], MigrationAdapter] = {}
@@ -79,9 +79,9 @@ def deserialize_state(blob: bytes) -> DETMState:
 def digest_blob(blob: bytes) -> bytes:
     state = deserialize_state(blob)
     sig = digest_fields(
-        to_numpy(state.field_state.energy).reshape(state.lattice.height, state.lattice.width),
-        to_numpy(state.field_state.entropy).reshape(state.lattice.height, state.lattice.width),
-        to_numpy(state.field_state.internal_time).reshape(state.lattice.height, state.lattice.width),
+        to_numpy(project_field_plane_any(state.field_state.energy)),
+        to_numpy(project_field_plane_any(state.field_state.entropy)),
+        to_numpy(project_field_plane_any(state.field_state.internal_time)),
     )
     return pack_payload(sig.as_dict())
 

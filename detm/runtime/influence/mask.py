@@ -10,9 +10,11 @@ from detm.core.fields import Lattice
 from detm.runtime.influence.contracts import DETMInfluence
 
 
-def resolve_mask(lattice: Lattice, influence: DETMInfluence) -> np.ndarray:
+def resolve_mask(lattice: Lattice, influence: DETMInfluence, field_shape: tuple[int, ...] | None = None) -> np.ndarray:
     if influence.mask is not None:
         mask = np.asarray(influence.mask, dtype=bool)
+        if field_shape is not None and mask.shape == tuple(int(dim) for dim in field_shape):
+            return mask
         if mask.shape != (lattice.height, lattice.width):
             raise ValueError("Influence mask shape does not match lattice")
         return mask

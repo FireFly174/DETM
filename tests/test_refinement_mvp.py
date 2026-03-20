@@ -64,6 +64,17 @@ def _seed_capacity_near_cap(session: DetmSession, *, value: float = 0.97) -> Non
     state.field_state.entropy = NumpyBackend._compute_entropy(energy, session.config.dynamics, boundary=state.lattice.boundary)
 
 
+def _seed_nd_overflow_hotspots(session: DetmSession, hotspots: list[tuple[int, int, int, float]]) -> None:
+    state = session.state
+    shape = tuple(int(dim) for dim in state.shape)
+    energy = np.zeros(shape, dtype=float)
+    for plane, y, x, value in hotspots:
+        energy[int(plane), int(y), int(x)] = float(value)
+    state.field_state.energy = energy
+    state.field_state.internal_time = np.zeros_like(energy)
+    state.field_state.entropy = NumpyBackend._compute_entropy(energy, session.config.dynamics, boundary=state.lattice.boundary)
+
+
 def test_refinement_emits_event_and_reports_correction():
     cfg = DETMConfig(
         backend="numpy",
@@ -192,6 +203,84 @@ def test_refinement_detects_capacity_pressure_for_mass_overflow():
     assert bool(event.get("detector_capacity_triggered")) is True
     assert float(event.get("detector_overflow_ratio", 0.0)) >= float(event.get("detector_capacity_ratio_threshold", 1.0))
     assert int(event.get("detector_capacity_secondary_hits", 0)) >= int(event.get("detector_capacity_secondary_required", 0))
+
+
+def test_refinement_emits_plane_index_for_nd_overflow_event():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        shape=(2, 11, 11),
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        level_policy=LevelPolicy(allow_refinement=True, commit_stride=1),
+    )
+    session = DetmSession.create(cfg, seed=111)
+    _seed_nd_overflow_hotspots(session, [(1, 5, 5, 3.0)])
+
+    obs = session.step(None, 0, rng=session.state.restore_rng())
+    session.close()
+
+    refinement_events = [event for event in list(obs.events) if str(event.get("type")) == "refinement"]
+    assert len(refinement_events) == 1
+    event = refinement_events[0]
+    assert list(event.get("plane_index", [])) == [1]
+    correction = dict(event.get("correction", {}))
+    assert int(correction.get("overflow_count_after", 999)) < int(correction.get("overflow_count_before", 0))
+
+
+def test_refinement_emits_one_event_per_nd_plane():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        shape=(2, 11, 11),
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        level_policy=LevelPolicy(allow_refinement=True, commit_stride=1),
+    )
+    session = DetmSession.create(cfg, seed=112)
+    _seed_nd_overflow_hotspots(session, [(0, 5, 5, 3.0), (1, 5, 5, 3.0)])
+
+    obs = session.step(None, 0, rng=session.state.restore_rng())
+    session.close()
+
+    refinement_events = [event for event in list(obs.events) if str(event.get("type")) == "refinement"]
+    assert len(refinement_events) == 2
+    assert sorted(list(event.get("plane_index", [])) for event in refinement_events) == [[0], [1]]
+
+
+def test_refinement_preserves_operator_runtime_memory_after_mixed_nd_planes():
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        shape=(2, 11, 11),
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        level_policy=LevelPolicy(allow_refinement=True, commit_stride=1),
+    )
+    session = DetmSession.create(cfg, seed=113)
+    state = session.state
+    energy = np.zeros((2, 11, 11), dtype=float)
+    energy[0, 5, 5] = np.nan
+    energy[1, 5, 5] = 3.0
+    state.field_state.energy = energy
+    state.field_state.internal_time = np.zeros_like(energy)
+    state.field_state.entropy = NumpyBackend._compute_entropy(
+        np.nan_to_num(energy, nan=0.0, posinf=1.0, neginf=0.0),
+        session.config.dynamics,
+        boundary=state.lattice.boundary,
+    )
+
+    obs = session.step(None, 0, rng=session.state.restore_rng())
+
+    refinement_events = [event for event in list(obs.events) if str(event.get("type")) == "refinement"]
+    assert len(refinement_events) == 2
+    runtime_memory = getattr(session.state, "_refinement_runtime", None)
+    assert isinstance(runtime_memory, dict)
+    assert isinstance(runtime_memory.get("operator_last_decision"), dict)
+    assert isinstance(runtime_memory.get("operator_contract_last"), dict)
+    history = list(runtime_memory.get("capacity_temporal_history", []))
+    assert len(history) == 1
+    session.close()
 
 
 def test_refinement_capacity_detector_respects_policy_threshold():

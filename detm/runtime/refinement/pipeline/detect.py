@@ -6,6 +6,7 @@ from typing import Dict
 
 import numpy as np
 
+from detm.runtime.signature import project_field_plane_any
 from detm.runtime.refinement.numpy_utils import to_numpy as _to_numpy
 from detm.runtime.refinement.pipeline.contracts import DetectionContext
 from detm.runtime.state import DETMFieldState
@@ -40,9 +41,9 @@ def detect_refinement_context(
 ) -> DetectionContext:
     lattice = field_state.lattice
     boundary = str(lattice.boundary)
-    energy = _to_numpy(field_state.energy).astype(float, copy=False).reshape(lattice.height, lattice.width)
-    entropy = _to_numpy(field_state.entropy).astype(float, copy=False).reshape(lattice.height, lattice.width)
-    internal_time = _to_numpy(field_state.internal_time).astype(float, copy=False).reshape(lattice.height, lattice.width)
+    energy = _to_numpy(project_field_plane_any(field_state.energy)).astype(float, copy=False)
+    entropy = _to_numpy(project_field_plane_any(field_state.entropy)).astype(float, copy=False)
+    internal_time = _to_numpy(project_field_plane_any(field_state.internal_time)).astype(float, copy=False)
 
     lo, hi = (0.0, 1.0)
     overflow_score = np.maximum(np.maximum(float(lo) - energy, 0.0), np.maximum(energy - float(hi), 0.0))

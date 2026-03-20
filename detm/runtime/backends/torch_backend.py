@@ -52,8 +52,9 @@ class TorchBackend:
         dtype = state.energy.dtype
 
         h, w = lattice.height, lattice.width
-        e = state.energy.reshape(h, w).to(device=device, dtype=dtype)
-        tau = state.internal_time.reshape(h, w).to(device=device, dtype=dtype)
+        shape = tuple(int(dim) for dim in state.energy.shape)
+        flat_energy = state.energy.reshape(-1, h, w).to(device=device, dtype=dtype)
+        flat_tau = state.internal_time.reshape(-1, h, w).to(device=device, dtype=dtype)
 
         e0 = float(params.equilibrium_energy)
         beta = float(params.beta)
@@ -73,45 +74,54 @@ class TorchBackend:
             )
             return beta * (local_delta**2) + gamma * neighbourhood
 
-        current_e = e
-        current_tau = tau
-        for _ in range(max(0, n_ticks)):
-            s = compute_entropy_t(current_e)
+        next_energy = []
+        next_tau = []
 
-            mu = 2.0 * beta * (current_e - e0)
-            mu_eff = mu - mu.mean()
+        for plane_energy, plane_tau in zip(flat_energy, flat_tau):
+            current_e = plane_energy
+            current_tau = plane_tau
+            for _ in range(max(0, n_ticks)):
+                s = compute_entropy_t(current_e)
 
-            sigma = 1.0 / (1.0 + alpha * s)
-            v = 1.0 / (1.0 + lambda_t * s)
+                mu = 2.0 * beta * (current_e - e0)
+                mu_eff = mu - mu.mean()
 
-            tau_next = current_tau + v
-            active = tau_next >= activation_threshold
-            tau_next = torch.where(active, tau_next - activation_threshold, tau_next)
+                sigma = 1.0 / (1.0 + alpha * s)
+                v = 1.0 / (1.0 + lambda_t * s)
 
-            active_f = active.to(dtype)
+                tau_next = current_tau + v
+                active = tau_next >= activation_threshold
+                tau_next = torch.where(active, tau_next - activation_threshold, tau_next)
 
-            mu_r = torch.roll(mu_eff, shifts=-1, dims=1)
-            mu_d = torch.roll(mu_eff, shifts=-1, dims=0)
+                active_f = active.to(dtype)
 
-            flux_r = kappa * sigma * (mu_eff - mu_r) * active_f
-            flux_d = kappa * sigma * (mu_eff - mu_d) * active_f
+                mu_r = torch.roll(mu_eff, shifts=-1, dims=1)
+                mu_d = torch.roll(mu_eff, shifts=-1, dims=0)
 
-            delta = -(flux_r + flux_d)
-            delta = delta + torch.roll(flux_r, shifts=1, dims=1) + torch.roll(flux_d, shifts=1, dims=0)
+                flux_r = kappa * sigma * (mu_eff - mu_r) * active_f
+                flux_d = kappa * sigma * (mu_eff - mu_d) * active_f
 
-            current_e = current_e + delta
-            if params.energy_bounds is not None:
-                lo, hi = params.energy_bounds
-                current_e = torch.clamp(current_e, min=float(lo), max=float(hi))
+                delta = -(flux_r + flux_d)
+                delta = delta + torch.roll(flux_r, shifts=1, dims=1) + torch.roll(flux_d, shifts=1, dims=0)
 
-            current_tau = tau_next
+                current_e = current_e + delta
+                if params.energy_bounds is not None:
+                    lo, hi = params.energy_bounds
+                    current_e = torch.clamp(current_e, min=float(lo), max=float(hi))
 
-        # recompute entropy for returned state (matches core.entropy.step behaviour)
-        final_entropy = compute_entropy_t(current_e)
+                current_tau = tau_next
+
+            next_energy.append(current_e)
+            next_tau.append(current_tau)
+
+        current_e = torch.stack(next_energy, dim=0).reshape(shape)
+        current_tau = torch.stack(next_tau, dim=0).reshape(shape)
+        final_entropy = torch.stack([compute_entropy_t(plane) for plane in current_e.reshape(-1, h, w)], dim=0).reshape(shape)
 
         return DETMFieldState(
             lattice=lattice,
             energy=current_e,
             entropy=final_entropy,
             internal_time=current_tau,
+            shape=shape,
         )

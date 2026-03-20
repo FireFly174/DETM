@@ -12,6 +12,13 @@ from detm.runtime.influence.mask import resolve_mask as _resolve_mask
 from detm.runtime.state import DETMFieldState
 
 
+def _broadcast_plane_numpy(plane: np.ndarray, shape: tuple[int, ...]) -> np.ndarray:
+    if tuple(plane.shape) == tuple(shape):
+        return plane
+    leading = (1,) * max(0, len(shape) - 2)
+    return np.broadcast_to(plane.reshape((*leading, *plane.shape)), shape)
+
+
 def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.random.Generator) -> InfluenceApplication:
     """Apply influence to energy field in-place.
 
@@ -40,6 +47,7 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
         energy_t = state.energy
         device = energy_t.device
         dtype = energy_t.dtype
+        shape = tuple(int(dim) for dim in energy_t.shape)
 
         if sid == "joystick_field":
             dx = float(external_features.get("dx", 0.0)) if external_features else 0.0
@@ -48,6 +56,8 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
             xs = torch.linspace(-1.0, 1.0, steps=w, device=device, dtype=dtype).reshape(1, w).expand(h, w)
             ys = torch.linspace(-1.0, 1.0, steps=h, device=device, dtype=dtype).reshape(h, 1).expand(h, w)
             plane = dx * xs + dy * ys
+            if len(shape) > 2:
+                plane = plane.reshape(*((1,) * (len(shape) - 2)), h, w).expand(*shape)
             updated = torch.clamp(energy_t + amplitude * plane, min=0.0, max=1.0)
             state.energy = updated
             affected_fraction = 1.0
@@ -69,10 +79,20 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
             dst_value = float(external_features.get("dst_value", 0.0)) if external_features else 0.0
             strength = float(min(1.0, max(0.0, abs(amplitude))))
 
-            energy = energy_t.reshape(h, w)
-            energy[src_y % h, src_x % w] = (1.0 - strength) * energy[src_y % h, src_x % w] + strength * src_value
-            energy[dst_y % h, dst_x % w] = (1.0 - strength) * energy[dst_y % h, dst_x % w] + strength * dst_value
-            state.energy = torch.clamp(energy, min=0.0, max=1.0)
+            src_y %= h
+            src_x %= w
+            dst_y %= h
+            dst_x %= w
+            if len(shape) == 2:
+                energy = energy_t.reshape(h, w)
+                energy[src_y, src_x] = (1.0 - strength) * energy[src_y, src_x] + strength * src_value
+                energy[dst_y, dst_x] = (1.0 - strength) * energy[dst_y, dst_x] + strength * dst_value
+                state.energy = torch.clamp(energy, min=0.0, max=1.0)
+            else:
+                energy = energy_t.reshape(-1, h, w)
+                energy[:, src_y, src_x] = (1.0 - strength) * energy[:, src_y, src_x] + strength * src_value
+                energy[:, dst_y, dst_x] = (1.0 - strength) * energy[:, dst_y, dst_x] + strength * dst_value
+                state.energy = torch.clamp(energy.reshape(shape), min=0.0, max=1.0)
             affected_fraction = float(2.0 / float(max(1, h * w)))
             return InfluenceApplication(
                 symbol_id=influence.symbol_id,
@@ -82,7 +102,9 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
                 external_features=external_features,
             )
 
-        mask = _resolve_mask(lattice, influence)
+        mask = _resolve_mask(lattice, influence, field_shape=shape)
+        if tuple(mask.shape) != shape:
+            mask = _broadcast_plane_numpy(np.asarray(mask, dtype=bool), shape)
         mask_t = torch.from_numpy(mask).to(device=device)
         noise_np = influence_rng.normal(loc=0.0, scale=0.05, size=mask.shape).astype(np.float64)
         noise_t = torch.from_numpy(noise_np).to(device=device, dtype=dtype)
@@ -92,6 +114,7 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
         state.energy = torch.where(mask_t, updated, energy_t)
     else:
         energy = np.asarray(state.energy, dtype=float)
+        shape = tuple(int(dim) for dim in energy.shape)
 
         if sid == "joystick_field":
             dx = float(external_features.get("dx", 0.0)) if external_features else 0.0
@@ -100,7 +123,7 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
             xs = np.linspace(-1.0, 1.0, num=w, dtype=float).reshape(1, w).repeat(h, axis=0)
             ys = np.linspace(-1.0, 1.0, num=h, dtype=float).reshape(h, 1).repeat(w, axis=1)
             plane = dx * xs + dy * ys
-            state.energy = np.clip(energy + amplitude * plane, 0.0, 1.0)
+            state.energy = np.clip(energy + amplitude * _broadcast_plane_numpy(plane, shape), 0.0, 1.0)
             affected_fraction = 1.0
             return InfluenceApplication(
                 symbol_id=influence.symbol_id,
@@ -124,8 +147,13 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
             src_y %= h
             dst_x %= w
             dst_y %= h
-            energy[src_y, src_x] = (1.0 - strength) * energy[src_y, src_x] + strength * src_value
-            energy[dst_y, dst_x] = (1.0 - strength) * energy[dst_y, dst_x] + strength * dst_value
+            if energy.ndim == 2:
+                energy[src_y, src_x] = (1.0 - strength) * energy[src_y, src_x] + strength * src_value
+                energy[dst_y, dst_x] = (1.0 - strength) * energy[dst_y, dst_x] + strength * dst_value
+            else:
+                flat = energy.reshape(-1, h, w)
+                flat[:, src_y, src_x] = (1.0 - strength) * flat[:, src_y, src_x] + strength * src_value
+                flat[:, dst_y, dst_x] = (1.0 - strength) * flat[:, dst_y, dst_x] + strength * dst_value
             state.energy = np.clip(energy, 0.0, 1.0)
             affected_fraction = float(2.0 / float(max(1, h * w)))
             return InfluenceApplication(
@@ -136,7 +164,9 @@ def apply_influence(state: DETMFieldState, influence: DETMInfluence, rng: np.ran
                 external_features=external_features,
             )
 
-        mask = _resolve_mask(lattice, influence)
+        mask = _resolve_mask(lattice, influence, field_shape=shape)
+        if tuple(mask.shape) != shape:
+            mask = _broadcast_plane_numpy(np.asarray(mask, dtype=bool), shape)
         noise = influence_rng.normal(loc=0.0, scale=0.05, size=energy.shape)
         energy[mask] = np.clip(energy[mask] + amplitude * (1.0 + noise[mask]), 0.0, 1.0)
         state.energy = energy

@@ -25,7 +25,7 @@ from detm.runtime.influence import DETMInfluence, apply_influence
 from detm.runtime.pattern_memory import get_pattern_runtime_for_state
 from detm.runtime.serialization import deserialize_state, migrate_state, serialize_state
 from detm.runtime.schemas import get_schema_versions
-from detm.runtime.signature import DETMSignature, digest_fields_any
+from detm.runtime.signature import DETMSignature, digest_fields_any, project_field_plane_any
 from detm.runtime.state import DETMState
 
 
@@ -82,10 +82,9 @@ def step(
 
 
 def digest(state: DETMState) -> DETMSignature:
-    lattice = state.lattice
-    energy = state.field_state.energy.reshape(lattice.height, lattice.width)
-    entropy = state.field_state.entropy.reshape(lattice.height, lattice.width)
-    internal_time = state.field_state.internal_time.reshape(lattice.height, lattice.width)
+    energy = project_field_plane_any(state.field_state.energy)
+    entropy = project_field_plane_any(state.field_state.entropy)
+    internal_time = project_field_plane_any(state.field_state.internal_time)
     return digest_fields_any(energy, entropy, internal_time)
 
 
