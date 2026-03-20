@@ -180,3 +180,45 @@ def test_watch_contract_preserves_plane_index_for_nd_refinement_events(tmp_path)
     refinement_events = [event for event in events if str(event.get("type")) == "refinement"]
     assert len(refinement_events) == 1
     assert list(refinement_events[0].get("plane_index", [])) == [1]
+
+
+def test_watch_contract_projects_nd_outerfields_and_records_projection_metadata(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        shape=(2, 7, 5),
+        initial_noise=0.01,
+        level_policy=LevelPolicy(commit_stride=1, microsteps_per_global_tick=1),
+    )
+    session = DetmSession.create(cfg, seed=34)
+
+    contract_path = tmp_path / "watch_contract.jsonl"
+    outerfields_dir = tmp_path / "outerfields"
+
+    WatchContractWriter.attach(
+        session.bus,
+        contract_path,
+        outerfields_dir=outerfields_dir,
+        retention_window=0,
+        compaction_budget=0,
+    )
+
+    session.step(None, 1, rng=session.state.restore_rng())
+    session.close()
+
+    contract_entries = _read_jsonl(contract_path)
+    assert len(contract_entries) == 1
+    packet = WatchContractPacket.from_dict(contract_entries[0])
+    projection = dict(packet.projection)
+    assert projection["kind"] == "nd_projection"
+    assert list(projection["source_shape"]) == [2, 7, 5]
+    assert list(projection["projected_shape"]) == [7, 5]
+    assert list(projection["collapsed_axes"]) == [0]
+    assert projection["collapsed_plane_count"] == 2
+    assert projection["reduction"] == "mean_leading_axes"
+
+    artifact_path = contract_path.parent / packet.outerfields_ref.uri
+    with np.load(artifact_path) as data:
+        assert data["strength"].shape == (7, 5)
+        meta = json.loads(str(data["meta_json"][0]))
+    assert dict(meta.get("projection", {})) == projection

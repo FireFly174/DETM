@@ -8,7 +8,7 @@ from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
 from detm_app.config.ui_models import UiRunSettings
 from detm_app.runtime.ui_runtime import DetmUiRunner
-from detm_app.runtime.ui_runtime.learning import learning_status_multiline
+from detm_app.runtime.ui_runtime.learning import learning_status_compact, learning_status_multiline
 
 
 def _seed_overflow_hotspot(runner: DetmUiRunner) -> None:
@@ -89,12 +89,51 @@ def test_ui_runner_learning_status_respects_disable_flag() -> None:
         runner.close()
 
 
+def test_ui_runner_learning_snapshot_includes_nd_projection_metadata() -> None:
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        shape=(2, 11, 11),
+        initial_noise=0.01,
+        level_policy=LevelPolicy(commit_stride=1, microsteps_per_global_tick=1),
+    )
+    settings = UiRunSettings(
+        config=cfg,
+        influence_mode="none",
+        viz_enabled=False,
+        viz_transport="none",
+        learning_view_enabled=True,
+        learning_window_steps=4,
+    )
+    runner = DetmUiRunner(settings)
+    try:
+        runner.step_once()
+        snapshot = runner.learning_snapshot
+        projection = dict(snapshot.get("projection", {}))
+        assert projection["kind"] == "nd_projection"
+        assert list(projection["source_shape"]) == [2, 11, 11]
+        assert list(projection["projected_shape"]) == [11, 11]
+        assert projection["reduction"] == "mean_leading_axes"
+        compact = runner.learning_status_compact(max_len=200)
+        assert "proj=2x11x11->11x11" in compact
+    finally:
+        runner.close()
+
+
 def test_learning_status_multiline_shows_exploration_horizon_fields() -> None:
     out = learning_status_multiline(
         {
             "tick": 4,
             "event_count": 2,
             "event_types": ["refinement"],
+            "projection": {
+                "kind": "nd_projection",
+                "source_shape": [2, 11, 11],
+                "projected_shape": [11, 11],
+                "collapsed_axes": [0],
+                "collapsed_plane_count": 2,
+                "reduction": "mean_leading_axes",
+            },
             "portability_panel": {
                 "hold_rate": 0.8,
                 "operator_reuse": 0.5,
@@ -139,3 +178,32 @@ def test_learning_status_multiline_shows_exploration_horizon_fields() -> None:
     assert "start_tick=2" in out
     assert "break_reason=goodhart_flag" in out
     assert "recovery_cost_ticks=1" in out
+    assert "Projection:" in out
+    assert "source_shape=[2, 11, 11] -> projected_shape=[11, 11]" in out
+    assert "reduction=mean_leading_axes collapsed_axes=[0] planes=2" in out
+
+
+def test_learning_status_compact_shows_nd_projection_summary() -> None:
+    out = learning_status_compact(
+        {
+            "tick": 3,
+            "portability_panel": {
+                "hold_rate": 0.4,
+                "operator_reuse": 0.25,
+                "transferability": 0.1,
+                "counts": {"total_decisions": 2},
+            },
+            "watchpoints": {
+                "runtime_adaptive_profile": "manual",
+                "runtime_adaptive_window_active": False,
+                "anti_goodhart_flag": False,
+            },
+            "projection": {
+                "kind": "nd_projection",
+                "source_shape": [3, 9, 7],
+                "projected_shape": [9, 7],
+            },
+        },
+        max_len=200,
+    )
+    assert "proj=3x9x7->9x7" in out

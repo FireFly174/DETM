@@ -11,7 +11,10 @@ from typing import Any, Mapping
 import numpy as np
 
 from detm.runtime.diagnostics.attractors import detect_attractors
-from detm_app.ui.napari.interactive.helpers import build_quiver_vectors as _build_quiver_vectors
+from detm_app.ui.napari.interactive.helpers import (
+    build_quiver_vectors as _build_quiver_vectors,
+    format_projection_plane_label as _format_projection_plane_label,
+)
 from detm_app.ui.napari.subscriber import state_to_layers
 
 try:
@@ -57,6 +60,7 @@ class NapariRenderFlow:
         settings: Any,
         status_widget: Any,
         field_name: str,
+        plane_index: tuple[int, ...] | None,
         cmap_name: str,
         quiver_enabled: bool,
         quiver_step: int,
@@ -68,7 +72,7 @@ class NapariRenderFlow:
         anchors_capture_ticks: int,
     ) -> dict[str, Any]:
         state = runner.state
-        layers = state_to_layers(state)
+        layers = state_to_layers(state, plane_index=plane_index)
         field = np.asarray(
             layers.get(str(field_name).strip().lower() or "energy", layers["energy"]),
             dtype=np.float32,
@@ -123,6 +127,7 @@ class NapariRenderFlow:
             if hasattr(runner, "runtime_backend_label")
             else str(requested_backend)
         )
+        view_text = _format_projection_plane_label(plane_index)
         backend_text = runtime_backend
         if runtime_backend != requested_backend:
             backend_text = f"{runtime_backend} (requested={requested_backend})"
@@ -142,6 +147,8 @@ class NapariRenderFlow:
             + str(signature[:4])
             + " backend="
             + backend_text
+            + " view="
+            + view_text
             + " boundary="
             + str(settings.config.boundary)
             + " a,b,k,g,t="

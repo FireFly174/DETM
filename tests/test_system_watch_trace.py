@@ -119,3 +119,29 @@ def test_watch_trace_runtime_adaptive_telemetry_switches_when_window_active(tmp_
     assert bool(dict(watch_entries[0].get("policy", {})).get("runtime_adaptive_window_active")) is False
     assert any(bool(dict(entry.get("policy", {})).get("runtime_adaptive_window_active")) for entry in watch_entries[1:])
 
+
+def test_watch_trace_includes_nd_projection_metadata(tmp_path):
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        shape=(2, 6, 6),
+        initial_noise=0.01,
+        level_policy=LevelPolicy(commit_stride=1, microsteps_per_global_tick=1),
+    )
+    session = DetmSession.create(cfg, seed=24)
+    watch_path = tmp_path / "watch_trace.jsonl"
+    WatchTraceWriter.attach(session.bus, watch_path)
+
+    session.step(None, 1, rng=session.state.restore_rng())
+    session.close()
+
+    watch_entries = _read_jsonl(watch_path)
+    assert len(watch_entries) == 1
+    projection = dict(watch_entries[0].get("projection", {}))
+    assert projection["kind"] == "nd_projection"
+    assert list(projection["source_shape"]) == [2, 6, 6]
+    assert list(projection["projected_shape"]) == [6, 6]
+    assert list(projection["collapsed_axes"]) == [0]
+    assert projection["collapsed_plane_count"] == 2
+    assert projection["reduction"] == "mean_leading_axes"
+

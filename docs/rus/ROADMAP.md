@@ -372,7 +372,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 ### F-01 — Контур накопления reaction/correction операторов
 
 - `id`: `F-01`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-08`
@@ -390,7 +390,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 ### F-02 — Переносимость операторов
 
 - `id`: `F-02`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-10`
@@ -408,7 +408,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 ### F-03 — Anti-Goodhart readout и `goodhart_flag`
 
 - `id`: `F-03`
-- `status`: `in_progress`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-12`
@@ -421,12 +421,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: readout panel snapshots + trace policy events.
 - `risks`: шумные сигналы и переалертинг.
 - `dod`: flag срабатывает по формализованным правилам и покрыт тестами.
-- `readout` (2026-02-16): в portability-панель `operator_decisions.jsonl` добавлен multi-signal anti-Goodhart блок (`anti_goodhart`) с формализованным правилом `goodhart_flag=(d_target>0) and (degraded_signals>=2)` для `target=operator_reuse`; учитываются деградации `hold_rate/transferability/torsion_health`, публикуются `target_delta`, `degraded_signals`, `policy_reaction` (`downweight_target_signal`, `enable_extended_outerfields_audit`, profile-hint) и applicability (`cold_start|runtime_panel|disabled`); anti-Goodhart поведение стало policy-driven через `LevelPolicy` knobs (`anti_goodhart_enabled`, `anti_goodhart_target_signal`, `anti_goodhart_min_target_delta`, `anti_goodhart_min_degraded_signals`, `anti_goodhart_degradation_epsilon`, `anti_goodhart_policy_reaction_enabled`, `anti_goodhart_prefer_runtime_profile`) и теперь реакция реально влияет на runtime-adaptive контур (`session._runtime_adaptive_profile/window`) при `policy_reaction.apply=true`; anti-Goodhart snapshot также экспортируется в `watch_trace/watch_contract` (`policy.anti_goodhart` + `watchpoints.anti_goodhart*`) и формализован typed readout-контрактом `AntiGoodhartSnapshot/AntiGoodhartReaction` в `detm/runtime/watch_contract.py`; добавлены тесты детекции/ложных срабатываний `tests/test_operator_anti_goodhart.py`, policy wiring `tests/test_operator_decision_writer.py`, runtime reaction scenario `tests/test_level_policy_runtime.py`, watch trace/contract checks `tests/test_system_watch_trace.py`, `tests/test_watch_contract_writer.py`, typed contract checks `tests/test_watch_contract_anti_goodhart.py` и интеграционный smoke `tests/test_operator_portability_panel.py`.
+- `readout` (2026-02-16): в portability-панель `operator_decisions.jsonl` добавлен multi-signal anti-Goodhart блок (`anti_goodhart`) с формализованным правилом `goodhart_flag=(d_target>0) and (degraded_signals>=2)` для `target=operator_reuse`; учитываются деградации `hold_rate/transferability/torsion_health`, публикуются `target_delta`, `degraded_signals`, `policy_reaction` (`downweight_target_signal`, `enable_extended_outerfields_audit`, profile-hint) и applicability (`cold_start|runtime_panel|disabled`); anti-Goodhart поведение стало policy-driven через `LevelPolicy` knobs (`anti_goodhart_enabled`, `anti_goodhart_target_signal`, `anti_goodhart_min_target_delta`, `anti_goodhart_min_degraded_signals`, `anti_goodhart_degradation_epsilon`, `anti_goodhart_policy_reaction_enabled`, `anti_goodhart_prefer_runtime_profile`) и теперь реакция реально влияет на runtime-adaptive контур (`session._runtime_adaptive_profile/window`) при `policy_reaction.apply=true`; anti-Goodhart snapshot также экспортируется в `watch_trace/watch_contract` (`policy.anti_goodhart` + `watchpoints.anti_goodhart*`) и формализован typed readout-контрактом `AntiGoodhartSnapshot/AntiGoodhartReaction` в `detm/runtime/watch_contract.py`; exploration-horizon contour (`exploration_horizon_ticks`, `horizon_start_tick`, `horizon_break_reason`, `horizon_recovery_cost_ticks`) теперь тоже живёт в runtime/watch/readout и покрыт рядом тестов вместе с anti-Goodhart path. Добавлены тесты детекции/ложных срабатываний `tests/test_operator_anti_goodhart.py`, policy wiring `tests/test_operator_decision_writer.py`, runtime reaction scenario `tests/test_level_policy_runtime.py`, watch trace/contract checks `tests/test_system_watch_trace.py`, `tests/test_watch_contract_writer.py`, typed contract checks `tests/test_watch_contract_anti_goodhart.py` и интеграционный smoke `tests/test_operator_portability_panel.py`.
 
 ### G-ND-01 — Эволюция `DETMState` к `shape[N]`
 
 - `id`: `G-ND-01`
-- `status`: `in_progress`
+- `status`: `done`
 - `priority`: `P2`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-14`
@@ -439,12 +439,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: schema version report + migration test logs.
 - `risks`: поломка существующих 2D сценариев.
 - `dod`: 2D и N-D контуры работают параллельно без регрессий.
-- `readout` (2026-03-20): начат backward-compatible migration slice для `state/config`: в `DETMConfig` введён канонический `shape[N]` при сохранении `width/height` как alias последних двух осей, а `DETMFieldState` и `serialization/state.py` научены сохранять и восстанавливать N-D shape без потери 2D lattice-совместимости. Публичный API теперь создаёт N-D state через `reset(...)`, а `digest(...)`/`digest_blob(...)` проецируют N-D поля в каноническую 2D plane readout по trailing axes; при этом `step(...)` переведён в fail-closed режим для `shape>2` с явным `NotImplementedError`, чтобы не закреплять невалидный переходный runtime path до `G-ND-02`. Добавлены RED/GREEN тесты `tests/test_nd_state_shape.py` и расширен API regression в `tests/test_integration_contract.py`; соседние regression-срезы `tests/test_state_schema_migration.py`, `tests/test_refinement_mvp.py`, `tests/test_level_policy_runtime.py -k "roundtrip or anti_goodhart or runtime_adaptive"` остаются зелёными. Этот срез не считает `G-ND-01` завершённым: runtime math/refinement/outerfields всё ещё опираются на 2D и будут обобщаться в `G-ND-02`.
+- `readout` (2026-03-20): backward-compatible migration slice для `state/config` закрыт как отдельный этап. В `DETMConfig` введён канонический `shape[N]` при сохранении `width/height` как alias последних двух осей, а `DETMFieldState` и `serialization/state.py` сохраняют и восстанавливают N-D shape без потери 2D lattice-совместимости. Публичный API создаёт N-D state через `reset(...)`, а `digest(...)`/`digest_blob(...)` проецируют N-D поля в каноническую 2D plane readout по trailing axes; дальнейшее обобщение runtime/refinement/outerfields было вынесено и закрывалось уже в `G-ND-02`. Добавлены RED/GREEN тесты `tests/test_nd_state_shape.py` и расширен API regression в `tests/test_integration_contract.py`; соседние regression-срезы `tests/test_state_schema_migration.py`, `tests/test_refinement_mvp.py`, `tests/test_level_policy_runtime.py -k "roundtrip or anti_goodhart or runtime_adaptive"` остаются зелёными.
 
 ### G-ND-02 — N-D контракты serialization/refinement/outerfields
 
 - `id`: `G-ND-02`
-- `status`: `in_progress`
+- `status`: `done`
 - `priority`: `P2`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-16`
@@ -457,12 +457,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: ND trace/outerfields artifacts.
 - `risks`: неконсистентность артефактов между backend-ами.
 - `dod`: N-D контракты валидны и совместимы с существующими проверками.
-- `readout` (2026-03-20): начат первый contract-layer slice без включения полного N-D evolution path. В `diagnostics/attractors.py`, `api/step_flow.py`, `refinement/pipeline/detect.py` и `metrics/boundary_flux.py` убраны жёсткие `reshape(H,W)` предпосылки: эти слои теперь используют каноническую 2D-проекцию N-D полей по trailing axes, усредняя leading axes. Дополнительно открыт безопасный runtime slice: `NumpyBackend` и `TorchBackend` умеют эволюционировать N-D state plane-wise по trailing `(H,W)` axes, influence-path обобщён на N-D через broadcast по leading axes для mask-based символов и plane-wise применение для `joystick_field`/`source_sink`, а refinement-path больше не fail-closed для `shape>2`. Текущий refinement-контракт остаётся переходным и bounded: `maybe_apply_refinement_pipeline(...)` выполняет correction plane-wise по каждому trailing `(H,W)` slice и эмитит отдельные refinement-events с `plane_index`, без full cross-plane aggregation semantics. Добавлены tests `tests/test_nd_projection_runtime.py`, ND detect/correction coverage в `tests/test_refinement_pipeline_steps.py` и `tests/test_refinement_mvp.py`, ND integration coverage в `tests/test_integration_contract.py`, backend parity check в `tests/test_numpy_torch_parity.py` и ND influence tests в `tests/test_influence.py`; regression-срезы `tests/test_level_policy_runtime.py`, `tests/test_system_watch_trace.py`, `tests/test_watch_contract_writer.py`, `tests/test_ui_learning_runtime.py` остаются зелёными. Следующая открытая граница: `G-ND-03` и deeper outerfields/watch semantics для N-D plane metadata, а также возможная cross-plane coordination логика в refinement, если она понадобится как канон, а не как transition.
+- `readout` (2026-03-20): bounded N-D runtime/contracts slice закрыт в пределах текущего канона. В `diagnostics/attractors.py`, `api/step_flow.py`, `refinement/pipeline/detect.py` и `metrics/boundary_flux.py` убраны жёсткие `reshape(H,W)` предпосылки: эти слои используют каноническую 2D-проекцию N-D полей по trailing axes, усредняя leading axes. Дополнительно `NumpyBackend` и `TorchBackend` умеют эволюционировать N-D state plane-wise по trailing `(H,W)` axes, influence-path обобщён на N-D через broadcast по leading axes для mask-based символов и plane-wise применение для `joystick_field`/`source_sink`, а refinement-path выполняет correction plane-wise по каждому trailing `(H,W)` slice и эмитит отдельные refinement-events с `plane_index`. Это завершает именно bounded transition-контракт для N-D runtime/serialization/refinement/outerfields и не объявляет richer cross-plane semantics каноном. Добавлены tests `tests/test_nd_projection_runtime.py`, ND detect/correction coverage в `tests/test_refinement_pipeline_steps.py` и `tests/test_refinement_mvp.py`, ND integration coverage в `tests/test_integration_contract.py`, backend parity check в `tests/test_numpy_torch_parity.py` и ND influence tests в `tests/test_influence.py`; regression-срезы `tests/test_level_policy_runtime.py`, `tests/test_system_watch_trace.py`, `tests/test_watch_contract_writer.py`, `tests/test_ui_learning_runtime.py` остаются зелёными.
 
 ### G-ND-03 — UI projection adapters для N-D
 
 - `id`: `G-ND-03`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P2`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-18`
@@ -474,7 +474,8 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `tests_required`: napari projection compatibility tests.
 - `readout_artifacts`: viewer snapshots + projection logs.
 - `risks`: потеря значимых сигналов при проекции.
-- `dod`: текущие UI не ломаются на N-D данных.
+- `dod`: текущие adapter-consumers не ломаются на N-D данных и явно показывают projection semantics вместо маскировки projected 2D view под native lattice.
+- `readout` (2026-03-20): bounded adapter-layer для `G-ND-03` закрыт. `watch_trace` и `watch_contract` публикуют `projection` metadata (`source_shape`, `projected_shape`, `collapsed_axes`, `collapsed_plane_count`, `reduction`), `WatchContractWriter` строит `outerfields` для N-D state по канонической 2D-проекции по trailing axes с той же metadata в `outerfields.meta`, а UI/readout слой (`learning_snapshot`, compact/multiline learning status) показывает projected plane как projection, а не как native 2D lattice. В napari `state_to_layers(...)` по умолчанию корректно проецирует N-D state в 2D и принимает explicit `plane_index` для UI-only просмотра, interactive controls получили bounded plane selector (`mean` или конкретный leading-axis plane), а `NapariGraphDock` продолжает читать canonical telemetry из `learning_snapshot`, отдельно вычисляет optional `visual_energy_*` series только из текущей rendered plane и маркирует status как `telemetry=<canonical projection>` + `view=<selected plane>`. Embedded Tk viz panel больше не 2D-only: он читает ту же каноническую projection для N-D state и показывает `proj=` suffix в status, не вводя новых plane-selection semantics. Это завершает именно compatibility/adapter слой и намеренно не притворяется full N-D UI: selector влияет только на visual field projection, без richer cross-plane semantics, без multi-plane sync и без смены канонического `mean_leading_axes` watch/readout contract. Добавлены regression tests `tests/test_system_watch_trace.py`, `tests/test_watch_contract_writer.py`, `tests/test_ui_learning_runtime.py`, `tests/test_napari_subscriber_path.py`, `tests/test_napari_interactive_controls.py`, `tests/test_napari_graph_flow.py` и `tests/test_tk_panel_flow.py`; соседние `tests/test_integration_contract.py` остаются зелёными.
 
 ### G-RND-01 — Local-first + validation-sync спецификация
 
@@ -698,8 +699,8 @@ Source-of-truth по статусам и зависимостям задач: `d
 - Evidence: `CommitPacket` реализован; `Correction/Influence` как отдельные protocol packets в DETM runtime не доведены до parity уровня `game` docs.
 
 3. Runtime anti-Goodhart code contour
-- Status: `pending`
-- Evidence: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md` есть; runtime item `F-03` открыт.
+- Status: `baseline implemented`
+- Evidence: `detm_app/runtime/anti_goodhart.py`, `detm_app/runtime/session/adaptive.py`, `detm/runtime/watch_contract.py`, `tests/test_operator_anti_goodhart.py`, `tests/test_watch_contract_anti_goodhart.py`.
 
 ## Risks Register
 

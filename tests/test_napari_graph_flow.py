@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import numpy as np
+import pytest
+
 from detm_app.ui.napari.interactive.flow.graph import (
     _build_histogram_bins,
+    build_visual_energy_summary,
     available_graph_series_ids,
     extract_graph_series_values,
+    format_graph_context_summary,
     parse_graph_series_csv,
 )
 
@@ -75,6 +80,15 @@ def test_extract_graph_series_values_reads_snapshot_paths() -> None:
             "hold_rate": 0.8,
             "torsion_health": 0.9,
         },
+        "visual_field_summaries": {
+            "energy": {
+                "minimum": 0.2,
+                "maximum": 0.7,
+                "mean": 0.4,
+                "std": 0.15,
+                "range": 0.5,
+            }
+        },
     }
     values = extract_graph_series_values(
         snapshot=snapshot,
@@ -102,6 +116,11 @@ def test_extract_graph_series_values_reads_snapshot_paths() -> None:
             "energy_max",
             "energy_std",
             "energy_range",
+            "visual_energy_mean",
+            "visual_energy_min",
+            "visual_energy_max",
+            "visual_energy_std",
+            "visual_energy_range",
             "entropy_mean",
             "tau_mean",
             "center_x",
@@ -142,6 +161,11 @@ def test_extract_graph_series_values_reads_snapshot_paths() -> None:
     assert float(values["energy_max"]) == 0.9
     assert float(values["energy_std"]) == 0.1
     assert float(values["energy_range"]) == 0.8
+    assert float(values["visual_energy_mean"]) == 0.4
+    assert float(values["visual_energy_min"]) == 0.2
+    assert float(values["visual_energy_max"]) == 0.7
+    assert float(values["visual_energy_std"]) == 0.15
+    assert float(values["visual_energy_range"]) == 0.5
     assert float(values["entropy_mean"]) == 0.12
     assert float(values["tau_mean"]) == 0.77
     assert float(values["center_x"]) == 11.5
@@ -167,10 +191,36 @@ def test_available_graph_series_ids_contains_core_defaults() -> None:
 
 
 def test_build_histogram_bins_for_tiny_span_returns_edges() -> None:
-    import numpy as np
-
     values = np.asarray([1.0, 1.0 + 1e-16], dtype=np.float64)
     bins = _build_histogram_bins(values, requested_bins=48)
     assert isinstance(bins, np.ndarray)
     assert bins.shape[0] == 49
     assert bool(np.all(np.diff(bins) > 0.0))
+
+
+def test_build_visual_energy_summary_computes_plane_local_metrics() -> None:
+    field = np.asarray([[1.0, 3.0], [5.0, 7.0]], dtype=np.float32)
+    summary = build_visual_energy_summary(field)
+
+    assert float(summary["minimum"]) == 1.0
+    assert float(summary["maximum"]) == 7.0
+    assert float(summary["mean"]) == 4.0
+    assert float(summary["range"]) == 6.0
+    assert float(summary["std"]) == pytest.approx(float(np.std(field)))
+
+
+def test_format_graph_context_summary_marks_canonical_telemetry_and_visual_plane() -> None:
+    snapshot = {
+        "projection": {
+            "kind": "nd_projection",
+            "source_shape": [2, 6, 5],
+            "projected_shape": [6, 5],
+            "collapsed_axes": [0],
+            "collapsed_plane_count": 2,
+            "reduction": "mean_leading_axes",
+        }
+    }
+
+    out = format_graph_context_summary(snapshot=snapshot, view_label="plane[1]")
+
+    assert out == "telemetry=mean_leading_axes[2, 6, 5]->[6, 5] view=plane[1]"

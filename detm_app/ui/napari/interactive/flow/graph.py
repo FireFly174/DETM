@@ -145,6 +145,31 @@ def _energy_range(snapshot: Mapping[str, Any]) -> float:
     return _to_float(energy.get("range", 0.0))
 
 
+def _visual_energy_mean(snapshot: Mapping[str, Any]) -> float:
+    energy = dict(dict(snapshot.get("visual_field_summaries", {})).get("energy", {}))
+    return _to_float(energy.get("mean", 0.0))
+
+
+def _visual_energy_min(snapshot: Mapping[str, Any]) -> float:
+    energy = dict(dict(snapshot.get("visual_field_summaries", {})).get("energy", {}))
+    return _to_float(energy.get("minimum", 0.0))
+
+
+def _visual_energy_max(snapshot: Mapping[str, Any]) -> float:
+    energy = dict(dict(snapshot.get("visual_field_summaries", {})).get("energy", {}))
+    return _to_float(energy.get("maximum", 0.0))
+
+
+def _visual_energy_std(snapshot: Mapping[str, Any]) -> float:
+    energy = dict(dict(snapshot.get("visual_field_summaries", {})).get("energy", {}))
+    return _to_float(energy.get("std", 0.0))
+
+
+def _visual_energy_range(snapshot: Mapping[str, Any]) -> float:
+    energy = dict(dict(snapshot.get("visual_field_summaries", {})).get("energy", {}))
+    return _to_float(energy.get("range", 0.0))
+
+
 def _entropy_mean(snapshot: Mapping[str, Any]) -> float:
     summary = dict(snapshot.get("signature_summary", {}))
     return _to_float(summary.get("entropy_mean", 0.0))
@@ -261,6 +286,11 @@ def _register_builtin_series() -> None:
         GraphSeriesSpec("energy_max", "energy_max", _energy_max),
         GraphSeriesSpec("energy_std", "energy_std", _energy_std),
         GraphSeriesSpec("energy_range", "energy_range", _energy_range),
+        GraphSeriesSpec("visual_energy_mean", "visual_energy_mean", _visual_energy_mean),
+        GraphSeriesSpec("visual_energy_min", "visual_energy_min", _visual_energy_min),
+        GraphSeriesSpec("visual_energy_max", "visual_energy_max", _visual_energy_max),
+        GraphSeriesSpec("visual_energy_std", "visual_energy_std", _visual_energy_std),
+        GraphSeriesSpec("visual_energy_range", "visual_energy_range", _visual_energy_range),
         GraphSeriesSpec("entropy_mean", "entropy_mean", _entropy_mean),
         GraphSeriesSpec("tau_mean", "tau_mean", _tau_mean),
         GraphSeriesSpec("center_x", "center_x", _center_x),
@@ -362,6 +392,47 @@ def _build_histogram_bins(values: np.ndarray, requested_bins: int) -> int | np.n
         pad = max(tiny, 1e-12)
         return np.linspace(lo - pad, hi + pad, bins + 1, dtype=np.float64)
     return bins
+
+
+def build_visual_energy_summary(energy_field: Any) -> dict[str, float]:
+    arr = np.asarray(energy_field, dtype=np.float64).reshape(-1)
+    finite = arr[np.isfinite(arr)]
+    if finite.size <= 0:
+        return {
+            "minimum": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "std": 0.0,
+            "range": 0.0,
+        }
+    minimum = float(np.min(finite))
+    maximum = float(np.max(finite))
+    mean = float(np.mean(finite))
+    std = float(np.std(finite))
+    return {
+        "minimum": minimum,
+        "maximum": maximum,
+        "mean": mean,
+        "std": std,
+        "range": float(maximum - minimum),
+    }
+
+
+def format_graph_context_summary(*, snapshot: Mapping[str, Any], view_label: str | None = None) -> str:
+    projection = dict(snapshot.get("projection", {}))
+    kind = str(projection.get("kind", "")).strip()
+    view_text = str(view_label or "").strip()
+    parts: list[str] = []
+    if kind == "nd_projection":
+        reduction = str(projection.get("reduction", "projected")).strip() or "projected"
+        source_shape = list(projection.get("source_shape", []))
+        projected_shape = list(projection.get("projected_shape", []))
+        parts.append(f"telemetry={reduction}{source_shape}->{projected_shape}")
+    elif kind == "identity_projection":
+        parts.append("telemetry=native")
+    if view_text:
+        parts.append(f"view={view_text}")
+    return " ".join(parts).strip()
 
 
 def _patch_six_meta_path_importer() -> None:
@@ -496,6 +567,7 @@ class NapariGraphDock:
         snapshot: Mapping[str, Any],
         energy_field: Any | None = None,
         anchor_summary: Mapping[str, Any] | None = None,
+        view_label: str | None = None,
     ) -> None:
         payload = dict(snapshot)
         if not self._enabled or not payload:
@@ -508,6 +580,7 @@ class NapariGraphDock:
             arr = np.asarray(energy_field, dtype=np.float32)
             if arr.size > 0:
                 self._latest_energy_field = arr.reshape(-1)
+                payload["visual_field_summaries"] = {"energy": build_visual_energy_summary(arr)}
         if anchor_summary is not None:
             self._anchor_summary = {str(k): v for k, v in dict(anchor_summary).items()}
         values = extract_graph_series_values(snapshot=payload, series_ids=self._series_ids)
@@ -515,7 +588,11 @@ class NapariGraphDock:
         preview = ", ".join(f"{sid}={float(values.get(sid, 0.0)):.3g}" for sid in self._series_ids)
         detected = int(self._anchor_summary.get("detected", 0))
         captured = int(self._anchor_summary.get("captured", 0))
-        self._status.setText(f"graphs: tick={int(tick)} [{preview}] anchors={captured}/{detected}")
+        context = format_graph_context_summary(snapshot=payload, view_label=view_label)
+        suffix = f" {context}" if context else ""
+        self._status.setText(
+            f"graphs: tick={int(tick)} [{preview}] anchors={captured}/{detected}{suffix}"
+        )
         self._render()
 
     def _render(self) -> None:
@@ -570,8 +647,10 @@ __all__ = [
     "GRAPH_SERIES_REGISTRY",
     "GraphSeriesSpec",
     "NapariGraphDock",
+    "build_visual_energy_summary",
     "available_graph_series_ids",
     "extract_graph_series_values",
+    "format_graph_context_summary",
     "parse_graph_series_csv",
     "register_graph_series",
 ]

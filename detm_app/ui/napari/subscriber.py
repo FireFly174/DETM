@@ -56,9 +56,9 @@ def _runtime_api():
     return _RUNTIME_API
 
 
-def state_to_layers(state: "DETMState") -> Dict[str, np.ndarray]:
+def state_to_layers(state: "DETMState", plane_index: tuple[int, ...] | None = None) -> Dict[str, np.ndarray]:
     """Project runtime state into canonical napari layer payload."""
-    return _flow.state_to_layers(state)
+    return _flow.state_to_layers(state, plane_index=plane_index)
 
 
 @dataclass(frozen=True)

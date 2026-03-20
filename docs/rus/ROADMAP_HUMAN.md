@@ -57,7 +57,7 @@
 - [x] Закрыт baseline replicated validator coordination + replay policy tiers (`G-FAB-03`)
 - [x] Закрыт production hardening для `epoch/watermark` consensus path (`G-FAB-04`)
 - [x] Закрыт production profile distributed validator handshake поверх `ProofAck/TrustAck` (`G-FAB-05`)
-- [ ] Нет code-contour фазы F (reaction operators + transferability + anti-Goodhart)
+- [x] Есть baseline code-contour фазы F (reaction operators + transferability + anti-Goodhart)
 - [ ] Нет N-D runtime модели и межуровневой геометрии
 - [ ] Нет отдельной formal спецификации `local-first + validation-sync` как R&D трека
 - [x] Закрыт app-layer maintenance debt (`config -> runner` decoupling, viewer adapter registry, shared batch service)
@@ -89,23 +89,20 @@
 
 ### Этап F (обучение реакций)
 
-- [ ] F-01: накопление reaction/correction операторов
-- [ ] F-02: переносимость операторов (`hold_rate`, `operator_reuse`, `transferability`)
-- [ ] F-03: anti-Goodhart readout + `goodhart_flag`
+- [x] F-01: накопление reaction/correction операторов
+- [x] F-02: переносимость операторов (`hold_rate`, `operator_reuse`, `transferability`)
+- [x] F-03: anti-Goodhart readout + `goodhart_flag`
 
-Примечание (2026-02-16): в runtime уже добавлен baseline operator-contract (`operator` блок в refinement events + `discrete_torsion_v1`), rule-based selection (`torsion_guard_v1`) и bounded runtime history (`operator_decision_history`), а также policy knobs (`refinement_operator_torsion_threshold`, `refinement_operator_torsion_guard_enabled`, `refinement_operator_history_limit`), отдельный artifact-first файл `operator_decisions.jsonl` (с `trace_ref`) и агрегаты в `watch_contract`; для `F-02` добавлена baseline portability-панель (`hold_rate/operator_reuse/transferability`) с threshold-gate и acceptance scenario `portable vs strict`; для `F-03` добавлен baseline anti-Goodhart блок (`anti_goodhart.goodhart_flag`, `degraded_signals`, `policy_reaction`) поверх multi-signal панели, вынесены policy knobs в `LevelPolicy` (`anti_goodhart_*`), подключена runtime reaction в adaptive window/profile path, экспорт snapshot в `watch_trace/watch_contract` readout-панель и typed контракт в `detm/runtime/watch_contract.py`. Этапы `F-01/F-02/F-03` остаются open до полного DoD.
-Примечание (2026-02-21): в книге RU v2 формальный state-space слой уже зафиксирован (x_t, x_{t+1}=F(...), декомпозиция `b/a/h/r/i/g/d`); следующий практический шаг - вынести в runtime/watch отдельную метрику времени исследуемости (exploration_horizon_ticks) и связать её с anti-Goodhart/readout панелью. Подробность: `docs/rus/90_notes/context_graph_exploration_horizon_2026-02-21.md`.
+Примечание (2026-03-20): baseline F-контур уже закрыт в коде. В runtime есть явный operator-contract в refinement events, bounded history/persistence и отдельный artifact-first поток `operator_decisions.jsonl`; portability-панель (`hold_rate/operator_reuse/transferability`) измерима через формальный acceptance-gate; anti-Goodhart контур rule-based и policy-driven, экспортируется в `watch_trace/watch_contract`, а exploration-horizon (`exploration_horizon_ticks`, `horizon_break_reason`, `recovery_cost_ticks`) уже живёт в runtime/watch/readout и связан с anti-Goodhart/runtime-adaptive слоем. Это закрывает baseline phase-F code contour, но не обещает ML-heavy learning pipeline или более широкий auto-tuning beyond current bounded contract.
 
 ### Этап G-ND (N-мерность)
 
-- [ ] G-ND-01: `DETMState` `(H,W)` -> `shape[N]` (backward compatible)
-- [ ] G-ND-02: N-D контракты `serialization/refinement/outerfields`
-- [ ] G-ND-03: UI projection adapters для совместимости napari/readout consumers
+- [x] G-ND-01: `DETMState` `(H,W)` -> `shape[N]` (backward compatible)
+- [x] G-ND-02: N-D контракты `serialization/refinement/outerfields`
+- [x] G-ND-03: UI projection adapters для совместимости napari/readout consumers
 
-Примечание (2026-03-20): стартовал первый кодовый срез `G-ND-01`: `DETMConfig` получил канонический `shape[N]`, `width/height` оставлены как backward-compatible alias последних двух осей, state serialization уже держит N-D shape и проходит 3D smoke roundtrip, а публичный `reset(...)` умеет создавать N-D state. Одновременно граница зафиксирована жёстко: `digest(...)` пока работает через 2D-проекцию по trailing axes, а `step(...)` для `shape>2` намеренно fail-closed до следующего шага `G-ND-02`, где будут обобщаться runtime/refinement/outerfields контракты.
-Примечание (2026-03-20, позже): начался первый кодовый срез `G-ND-02`. Слои `readout/diagnostics/refinement-detect/boundary-flux` больше не завязаны на прямой `reshape(H,W)` и читают N-D state через каноническую 2D-проекцию по trailing axes. Это ещё не full N-D runtime: evolution path и вычислительные backend-ы по-прежнему не обобщены, но артефактный и detection-контур уже перестают быть 2D-only.
-Примечание (2026-03-20, ещё позже): вычислительный срез `G-ND-02` тоже сдвинут. `NumpyBackend` и `TorchBackend` уже умеют plane-wise evolution для N-D state, influence-path обобщён на leading-axis broadcast, а `step(...)` открыт для bounded N-D режима с influence при выключенном refinement. Это всё ещё переходный контракт: refinement correction/orchestration для `shape>2` остаётся намеренно закрытым до следующего подэтапа.
-Примечание (2026-03-20, поздний срез): следующий bounded-подэтап `G-ND-02` открыт и для refinement. Вместо «магического» full N-D correction runtime теперь делает plane-wise refinement по каждому trailing `(H,W)` slice, пишет исправления обратно в исходный N-D state и публикует отдельные refinement-events с `plane_index`. Это всё ещё не финальная архитектура N-D: cross-plane aggregation semantics и richer outerfields/watch presentation для plane metadata остаются следующей границей, а текущий контракт надо читать как переходный и безопасный.
+Примечание (2026-03-20): baseline N-D migration/runtime contour закрыт в bounded форме. `DETMConfig` получил канонический `shape[N]`, `width/height` остались backward-compatible alias последних двух осей, state serialization держит N-D shape, а публичный `reset(...)` создаёт N-D state. Дальше N-D контракт был доведён через readout/detection/runtime slices: `digest(...)` и readout используют каноническую 2D-проекцию по trailing axes, `NumpyBackend` и `TorchBackend` умеют plane-wise evolution, influence-path обобщён на leading-axis broadcast, а refinement выполняется plane-wise с отдельными `plane_index` events. Это закрывает текущий bounded N-D runtime/serialization/refinement/outerfields слой, но не объявляет richer cross-plane semantics или новую “настоящую” N-D геометрию финальной архитектурой.
+Примечание (2026-03-20, закрытие `G-ND-03`): adapter-layer для текущих watch/readout consumers доведён до bounded logical completion. `watch_trace` и `watch_contract` явно несут `projection` metadata о том, как N-D state был свёрнут в каноническую 2D плоскость (`source_shape -> projected_shape`, collapsed axes/count, reduction mode), а `outerfields` для N-D строятся из той же канонической проекции. Эта же metadata дошла до UI learning/readout слоя: snapshot и status panel показывают пользователю, что он смотрит на projected plane, а не на “обычную” 2D сцену. Napari interactive получил plane selector для N-D просмотра (`mean` или конкретная плоскость по leading axes) только для visual inspection, а graph/readout adapter в napari развели честно: графики по-прежнему строятся из canonical `learning_snapshot`, а plane-local визуальная информация добавляется только как отдельные `visual_energy_*` series и явная маркировка `telemetry=<canonical projection>` / `view=<selected plane>` в status. Embedded Tk viz panel тоже больше не 2D-only: он читает ту же каноническую projection для N-D state и показывает краткий `proj=` suffix в status. Это закрывает именно compatibility/adapter слой для текущих consumers, но не объявляет full N-D UI: richer cross-plane presentation, multi-plane sync и смена канонического watch/readout projection contract по-прежнему вне этого этапа.
 
 ### Этап G-R&D (local-first)
 
@@ -128,11 +125,11 @@
 
 ## Следующие 5 шагов (приоритет)
 
-- [ ] 1. Закрыть `F-01` (контур reaction/correction operators в коде)
-- [ ] 2. Закрыть `G-ND-01` (эволюция `DETMState` к `shape[N]`)
-- [ ] 3. Закрыть `F-02` (переносимость операторов)
-- [ ] 4. Закрыть `F-03` (anti-Goodhart readout + `goodhart_flag`)
-- [ ] 5. Закрыть `G-ND-02` (N-D контракты serialization/refinement/outerfields)
+- [ ] 1. Описать `G-RND-01` как отдельный `local-first + validation-sync` R&D трек
+- [ ] 2. Закрыть `PUB-01` (demo assets в `docs/media` и README)
+- [ ] 3. Закрыть `PUB-02` (каноничные визуальные пресеты и runbooks)
+- [ ] 4. Закрыть `PUB-03` (one-page overview RU/EN)
+- [ ] 5. Закрыть `QLT-01` (docstrings/type hints для ключевых runtime API)
 
 ## Imported from game (кратко)
 

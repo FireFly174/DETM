@@ -6,6 +6,7 @@ from typing import Any
 
 from detm.runtime import api
 from detm.runtime.level_policy import LevelPolicy, PolicyDecision
+from detm.runtime.signature import projection_metadata_any
 from detm.runtime.watch_contract import (
     AntiGoodhartSnapshot,
     ExplorationHorizonSnapshot,
@@ -193,12 +194,14 @@ def build_watch_trace_entry(
     tick = int(state.step_count)
     events = filter_events(observables=observables, policy_decision=policy_decision)
     kinds = event_types(events)
+    projection = projection_metadata_any(state.field_state.energy)
     return {
         "type": "watch_step",
         "tick": tick,
         "trace_ref": _trace_ref_for_tick(tick),
         "event_types": kinds,
         "event_count": int(len(kinds)),
+        "projection": projection,
         "watchpoints": runtime_watchpoints(
             events=events,
             policy_decision=policy_decision,
@@ -229,6 +232,7 @@ def build_watch_contract_packet(
         observables=observables,
         include_telemetry=False,
     )
+    projection = projection_metadata_any(state.field_state.energy)
     outerfields_ref = OuterFieldsRef(
         kind="outerfields",
         level_src=str(level_src),
@@ -253,6 +257,7 @@ def build_watch_contract_packet(
         event_types=kinds,
         event_count=int(len(kinds)),
         policy=runtime_policy_projection(policy_decision),
+        projection=projection,
     )
 
 

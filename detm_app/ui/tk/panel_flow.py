@@ -4,6 +4,8 @@ from typing import Any
 
 import numpy as np
 
+from detm.runtime.signature import project_field_plane_any, projection_metadata_any
+
 
 def to_numpy(array: Any) -> np.ndarray:
     try:
@@ -46,15 +48,32 @@ def central_grad(arr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 
 def field_from_state(*, state: Any, mode: str) -> np.ndarray:
     lattice = getattr(state, "lattice")
-    if mode == "entropy":
-        return to_numpy(state.field_state.entropy).astype(float, copy=False).reshape(lattice.height, lattice.width)
-    if mode in {"internal_time", "time", "tau"}:
-        return (
-            to_numpy(state.field_state.internal_time)
-            .astype(float, copy=False)
-            .reshape(lattice.height, lattice.width)
+    def _normalize_field(values: Any) -> np.ndarray:
+        array = to_numpy(values).astype(float, copy=False)
+        if array.ndim == 1:
+            array = array.reshape(lattice.height, lattice.width)
+        return project_field_plane_any(array).astype(float, copy=False).reshape(
+            lattice.height,
+            lattice.width,
         )
-    return to_numpy(state.field_state.energy).astype(float, copy=False).reshape(lattice.height, lattice.width)
+    if mode == "entropy":
+        return _normalize_field(state.field_state.entropy)
+    if mode in {"internal_time", "time", "tau"}:
+        return _normalize_field(state.field_state.internal_time)
+    return _normalize_field(state.field_state.energy)
+
+
+def projection_status_from_state(*, state: Any) -> str:
+    projection = projection_metadata_any(getattr(getattr(state, "field_state"), "energy"))
+    source_shape = list(projection.get("source_shape", []))
+    projected_shape = list(projection.get("projected_shape", []))
+    if len(source_shape) <= 0 or len(projected_shape) <= 0:
+        return ""
+    if source_shape == projected_shape:
+        return ""
+    source = "x".join(str(int(dim)) for dim in source_shape)
+    projected = "x".join(str(int(dim)) for dim in projected_shape)
+    return f" proj={source}->{projected}"
 
 
 def ensure_grid(panel: Any, *, h: int, w: int) -> None:
@@ -166,6 +185,7 @@ __all__ = [
     "layout_grid",
     "on_canvas_configure",
     "paint_field",
+    "projection_status_from_state",
     "to_image_gray",
     "to_numpy",
 ]

@@ -7,6 +7,7 @@ from typing import Any
 
 from detm.runtime import api
 from detm.runtime.level_policy import LevelPolicy, PolicyDecision
+from detm.runtime.signature import projection_metadata_any
 from detm.runtime.state import DETMState
 from detm_app.runtime.subscribers.watch.flow import filter_events, operator_decision_rows, runtime_watchpoints
 from detm_app.runtime.subscribers.watch.portability import PortabilityThresholds, evaluate_portability_acceptance
@@ -159,6 +160,19 @@ def _window_summary(runtime: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _projection_summary_text(raw: dict[str, Any]) -> str:
+    payload = dict(raw or {})
+    source_shape = list(payload.get("source_shape", []))
+    projected_shape = list(payload.get("projected_shape", []))
+    if len(source_shape) <= 0 or len(projected_shape) <= 0:
+        return ""
+    source = "x".join(str(int(dim)) for dim in source_shape)
+    projected = "x".join(str(int(dim)) for dim in projected_shape)
+    if source == projected:
+        return ""
+    return f"{source}->{projected}"
+
+
 def update_learning_snapshot(
     runtime: dict[str, Any],
     *,
@@ -185,6 +199,7 @@ def update_learning_snapshot(
     )
     decisions = operator_decision_rows(events=events)
     panel = _update_panel_counters(runtime=runtime, decisions=decisions)
+    projection = projection_metadata_any(state.field_state.energy)
     signature_summary = {
         str(key): float(value)
         for key, value in dict(getattr(observables.signature, "summary", {})).items()
@@ -221,6 +236,7 @@ def update_learning_snapshot(
         "tick": int(state.step_count),
         "event_count": int(len(events)),
         "event_types": [str(event.get("type", "")) for event in events],
+        "projection": projection,
         "watchpoints": watchpoints,
         "signature_summary": signature_summary,
         "field_summaries": field_summaries,
@@ -257,6 +273,7 @@ def learning_status_compact(
     runtime_profile = str(watchpoints.get("runtime_adaptive_profile", "manual"))
     runtime_active = bool(watchpoints.get("runtime_adaptive_window_active", False))
     anti_goodhart = bool(watchpoints.get("anti_goodhart_flag", False))
+    projection_text = _projection_summary_text(dict(payload.get("projection", {})))
     out = (
         f"learn tick={int(payload.get('tick', 0))}"
         f" dec={total}"
@@ -266,6 +283,8 @@ def learning_status_compact(
         f" rt={runtime_profile}{'*' if runtime_active else ''}"
         f" ag={1 if anti_goodhart else 0}"
     )
+    if projection_text:
+        out += f" proj={projection_text}"
     limit = max(32, int(max_len))
     if len(out) > limit:
         return out[: limit - 1] + "…"
@@ -289,30 +308,51 @@ def learning_status_multiline(
     watchpoints = dict(payload.get("watchpoints", {}))
     window = dict(payload.get("window", {}))
     anti = dict(watchpoints.get("anti_goodhart", {}))
+    projection = dict(payload.get("projection", {}))
     lines = [
         f"Tick: {int(payload.get('tick', 0))}",
         f"Events: {int(payload.get('event_count', 0))}  types={list(payload.get('event_types', []))}",
-        "Portability panel:",
-        f"  hold_rate={float(panel.get('hold_rate', 0.0)):.4f}",
-        f"  operator_reuse={float(panel.get('operator_reuse', 0.0)):.4f}",
-        f"  transferability={float(panel.get('transferability', 0.0)):.4f}",
-        f"  torsion_health={float(panel.get('torsion_health', 1.0)):.4f}",
-        f"  acceptance.passed={bool(acceptance.get('passed', False))} failed={list(acceptance.get('failed_signals', []))}",
-        "Counts:",
-        f"  total={int(counts.get('total_decisions', 0))} reuse={int(counts.get('reuse_decisions', 0))} transferable_reuse={int(counts.get('transferable_reuse_decisions', 0))}",
-        f"  compatible={int(counts.get('compatible_decisions', 0))} torsion_flag={int(counts.get('torsion_flag_decisions', 0))}",
-        "Runtime adaptive / anti-goodhart:",
-        f"  runtime_profile={str(watchpoints.get('runtime_adaptive_profile', 'manual'))} window_active={bool(watchpoints.get('runtime_adaptive_window_active', False))}",
-        f"  signal_triggered={bool(watchpoints.get('runtime_adaptive_signal_triggered', False))} anti_goodhart_flag={bool(watchpoints.get('anti_goodhart_flag', False))}",
-        f"  anti_goodhart.applicability={str(anti.get('applicability', 'n/a'))} degraded_count={int(anti.get('degraded_signal_count', 0))}",
-        f"  anti_goodhart.reaction_applied={bool(watchpoints.get('anti_goodhart_policy_reaction_applied', False))} runtime_profile_applied={bool(watchpoints.get('anti_goodhart_runtime_profile_applied', False))}",
-        "Exploration horizon:",
-        f"  ticks={int(watchpoints.get('exploration_horizon_ticks', 0))} start_tick={int(watchpoints.get('horizon_start_tick', 0))}",
-        f"  break_reason={str(watchpoints.get('horizon_break_reason', ''))} recovery_cost_ticks={int(watchpoints.get('horizon_recovery_cost_ticks', 0))}",
-        "Window:",
-        f"  steps={int(window.get('steps', 0))} events={int(window.get('event_count', 0))} refinements={int(window.get('refinement_count', 0))}",
-        f"  decisions={int(window.get('decision_count', 0))} reuse_rate={float(window.get('reuse_rate', 0.0)):.4f}",
     ]
+    if len(projection) > 0:
+        lines.extend(
+            [
+                "Projection:",
+                "  source_shape="
+                + str(list(projection.get("source_shape", [])))
+                + " -> projected_shape="
+                + str(list(projection.get("projected_shape", []))),
+                "  reduction="
+                + str(projection.get("reduction", ""))
+                + " collapsed_axes="
+                + str(list(projection.get("collapsed_axes", [])))
+                + " planes="
+                + str(int(projection.get("collapsed_plane_count", 0))),
+            ]
+        )
+    lines.extend(
+        [
+            "Portability panel:",
+            f"  hold_rate={float(panel.get('hold_rate', 0.0)):.4f}",
+            f"  operator_reuse={float(panel.get('operator_reuse', 0.0)):.4f}",
+            f"  transferability={float(panel.get('transferability', 0.0)):.4f}",
+            f"  torsion_health={float(panel.get('torsion_health', 1.0)):.4f}",
+            f"  acceptance.passed={bool(acceptance.get('passed', False))} failed={list(acceptance.get('failed_signals', []))}",
+            "Counts:",
+            f"  total={int(counts.get('total_decisions', 0))} reuse={int(counts.get('reuse_decisions', 0))} transferable_reuse={int(counts.get('transferable_reuse_decisions', 0))}",
+            f"  compatible={int(counts.get('compatible_decisions', 0))} torsion_flag={int(counts.get('torsion_flag_decisions', 0))}",
+            "Runtime adaptive / anti-goodhart:",
+            f"  runtime_profile={str(watchpoints.get('runtime_adaptive_profile', 'manual'))} window_active={bool(watchpoints.get('runtime_adaptive_window_active', False))}",
+            f"  signal_triggered={bool(watchpoints.get('runtime_adaptive_signal_triggered', False))} anti_goodhart_flag={bool(watchpoints.get('anti_goodhart_flag', False))}",
+            f"  anti_goodhart.applicability={str(anti.get('applicability', 'n/a'))} degraded_count={int(anti.get('degraded_signal_count', 0))}",
+            f"  anti_goodhart.reaction_applied={bool(watchpoints.get('anti_goodhart_policy_reaction_applied', False))} runtime_profile_applied={bool(watchpoints.get('anti_goodhart_runtime_profile_applied', False))}",
+            "Exploration horizon:",
+            f"  ticks={int(watchpoints.get('exploration_horizon_ticks', 0))} start_tick={int(watchpoints.get('horizon_start_tick', 0))}",
+            f"  break_reason={str(watchpoints.get('horizon_break_reason', ''))} recovery_cost_ticks={int(watchpoints.get('horizon_recovery_cost_ticks', 0))}",
+            "Window:",
+            f"  steps={int(window.get('steps', 0))} events={int(window.get('event_count', 0))} refinements={int(window.get('refinement_count', 0))}",
+            f"  decisions={int(window.get('decision_count', 0))} reuse_rate={float(window.get('reuse_rate', 0.0)):.4f}",
+        ]
+    )
     return "\n".join(lines)
 
 

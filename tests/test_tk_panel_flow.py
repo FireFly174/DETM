@@ -103,6 +103,40 @@ def test_field_from_state_selects_expected_tensor() -> None:
     assert np.allclose(internal_time, np.array([[20, 21, 22], [23, 24, 25]], dtype=float))
 
 
+def test_field_from_state_projects_nd_tensor_via_canonical_projection() -> None:
+    state = SimpleNamespace(
+        lattice=SimpleNamespace(height=2, width=3),
+        field_state=SimpleNamespace(
+            energy=np.asarray(
+                [
+                    [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
+                    [[6.0, 7.0, 8.0], [9.0, 10.0, 11.0]],
+                ],
+                dtype=float,
+            ),
+            entropy=np.zeros((2, 2, 3), dtype=float),
+            internal_time=np.zeros((2, 2, 3), dtype=float),
+        ),
+    )
+
+    energy = panel_flow.field_from_state(state=state, mode="energy")
+
+    assert energy.shape == (2, 3)
+    assert np.allclose(energy, np.array([[3.0, 4.0, 5.0], [6.0, 7.0, 8.0]], dtype=float))
+
+
+def test_projection_status_from_state_returns_short_nd_summary() -> None:
+    nd_state = SimpleNamespace(
+        field_state=SimpleNamespace(energy=np.zeros((2, 2, 3), dtype=float)),
+    )
+    native_state = SimpleNamespace(
+        field_state=SimpleNamespace(energy=np.zeros((2, 3), dtype=float)),
+    )
+
+    assert panel_flow.projection_status_from_state(state=native_state) == ""
+    assert panel_flow.projection_status_from_state(state=nd_state) == " proj=2x2x3->2x3"
+
+
 def test_ensure_grid_creates_cells_and_layout_coords() -> None:
     panel = _fake_panel()
     panel_flow.ensure_grid(panel, h=2, w=3)

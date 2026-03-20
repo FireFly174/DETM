@@ -6,37 +6,73 @@ from typing import Any, Callable, Dict, Mapping
 import numpy as np
 
 from detm_app.transport.subscriber import TcpVizSubscriber, VizPacket
+from detm.runtime.signature import project_field_plane_any
 
 
-def to_numpy_2d(array: Any, *, height: int, width: int) -> np.ndarray:
+def _select_plane_any(array: Any, *, plane_index: tuple[int, ...] | None = None) -> Any:
+    if plane_index is None:
+        return project_field_plane_any(array)
     try:
         import torch  # type: ignore
     except ModuleNotFoundError:
         torch = None
     if torch is not None and isinstance(array, torch.Tensor):
-        out = array.detach().to("cpu").numpy()
+        dims = int(array.ndim)
+        expected_len = max(0, dims - 2)
+        if len(tuple(plane_index)) != expected_len:
+            raise ValueError(
+                f"plane index length {len(tuple(plane_index))} does not match field leading rank {expected_len}"
+            )
+        return array[tuple(int(value) for value in tuple(plane_index))]
+    out = np.asarray(array)
+    dims = int(out.ndim)
+    expected_len = max(0, dims - 2)
+    if len(tuple(plane_index)) != expected_len:
+        raise ValueError(
+            f"plane index length {len(tuple(plane_index))} does not match field leading rank {expected_len}"
+        )
+    return out[tuple(int(value) for value in tuple(plane_index))]
+
+
+def to_numpy_2d(
+    array: Any,
+    *,
+    height: int,
+    width: int,
+    plane_index: tuple[int, ...] | None = None,
+) -> np.ndarray:
+    selected = _select_plane_any(array, plane_index=plane_index)
+    try:
+        import torch  # type: ignore
+    except ModuleNotFoundError:
+        torch = None
+    if torch is not None and isinstance(selected, torch.Tensor):
+        out = selected.detach().to("cpu").numpy()
     else:
-        out = np.asarray(array)
+        out = np.asarray(selected)
     return out.astype(np.float32, copy=False).reshape(int(height), int(width))
 
 
-def state_to_layers(state: Any) -> Dict[str, np.ndarray]:
+def state_to_layers(state: Any, plane_index: tuple[int, ...] | None = None) -> Dict[str, np.ndarray]:
     lattice = state.lattice
     return {
         "energy": to_numpy_2d(
             state.field_state.energy,
             height=lattice.height,
             width=lattice.width,
+            plane_index=plane_index,
         ),
         "entropy": to_numpy_2d(
             state.field_state.entropy,
             height=lattice.height,
             width=lattice.width,
+            plane_index=plane_index,
         ),
         "internal_time": to_numpy_2d(
             state.field_state.internal_time,
             height=lattice.height,
             width=lattice.width,
+            plane_index=plane_index,
         ),
     }
 

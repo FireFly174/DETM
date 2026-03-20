@@ -73,6 +73,7 @@ class _InteractiveDockController:
         self._closed = False
         self._closing = False
         self._field_combo: Any = None
+        self._plane_combo: Any = None
         self._cmap_combo: Any = None
         self._quiver_enabled: Any = None
         self._quiver_step: Any = None
@@ -172,11 +173,13 @@ class _InteractiveDockController:
     def _render(self, *, force_autoscale: bool = False) -> None:
         if force_autoscale:
             self._autoscale = True
+        self._refresh_plane_options()
         render_meta = self._render_flow.render(
             runner=self._runner,
             settings=self._settings,
             status_widget=self._status,
             field_name=str(self._field_combo.currentText()),
+            plane_index=self._selected_plane_index(),
             cmap_name=str(self._cmap_combo.currentText()),
             quiver_enabled=bool(self._quiver_enabled.isChecked()),
             quiver_step=max(1, self._read_int(self._quiver_step, 2)),
@@ -192,6 +195,56 @@ class _InteractiveDockController:
         if force_autoscale:
             self._autoscale = bool(self._autoscale_check.isChecked())
 
+    def _selected_plane_index(self) -> tuple[int, ...] | None:
+        if self._plane_combo is None:
+            return None
+        value = self._plane_combo.currentData()
+        if value is None:
+            return None
+        return tuple(int(item) for item in tuple(value))
+
+    def _refresh_plane_options(self) -> None:
+        if self._plane_combo is None:
+            return
+        from detm_app.ui.napari.interactive.helpers import build_projection_plane_options
+
+        shape = tuple(int(dim) for dim in tuple(getattr(self._runner.state.field_state, "shape", ()) or ()))
+        if len(shape) <= 0:
+            shape = (
+                int(self._runner.state.lattice.height),
+                int(self._runner.state.lattice.width),
+            )
+        desired_options = build_projection_plane_options(shape)
+        current_value = self._selected_plane_index()
+        existing = [
+            (
+                str(self._plane_combo.itemText(index)),
+                self._plane_combo.itemData(index),
+            )
+            for index in range(int(self._plane_combo.count()))
+        ]
+        normalized_existing = [
+            (
+                str(label),
+                None if value is None else tuple(int(item) for item in tuple(value)),
+            )
+            for label, value in existing
+        ]
+        if normalized_existing == desired_options:
+            return
+        self._plane_combo.blockSignals(True)
+        try:
+            self._plane_combo.clear()
+            selected_index = 0
+            for index, (label, value) in enumerate(desired_options):
+                self._plane_combo.addItem(str(label), value)
+                if value == current_value:
+                    selected_index = int(index)
+            self._plane_combo.setCurrentIndex(selected_index)
+            self._plane_combo.setEnabled(len(desired_options) > 1)
+        finally:
+            self._plane_combo.blockSignals(False)
+
     def _configure_graph_dock(self) -> None:
         if self._graph_dock is None:
             return
@@ -206,16 +259,25 @@ class _InteractiveDockController:
     def _update_graph_dock(self) -> None:
         if self._graph_dock is None:
             return
+        from detm_app.ui.napari.interactive.helpers import format_projection_plane_label
+
         self._configure_graph_dock()
         meta = dict(self._last_render_meta or {})
         snapshot = dict(getattr(self._runner, "learning_snapshot", {}))
         legacy_metrics = dict(meta.get("legacy_metrics", {}))
         if len(legacy_metrics) > 0:
             snapshot["legacy_metrics"] = legacy_metrics
+        shape = tuple(int(dim) for dim in tuple(getattr(self._runner.state.field_state, "shape", ()) or ()))
+        plane_index = self._selected_plane_index()
+        if len(shape) > 2:
+            view_label = format_projection_plane_label(plane_index)
+        else:
+            view_label = "native"
         self._graph_dock.update(
             snapshot=snapshot,
             energy_field=meta.get("energy_field"),
             anchor_summary=dict(meta.get("anchor_summary", {})),
+            view_label=view_label,
         )
 
     def _on_tick(self) -> None:

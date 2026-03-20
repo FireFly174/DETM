@@ -121,6 +121,32 @@ def project_field_plane_any(values: Any) -> Any:
     return array.mean(axis=leading_axes)
 
 
+def projection_metadata_any(values: Any) -> Dict[str, object]:
+    """Describe how an arbitrary field is projected onto the canonical 2D plane."""
+
+    if _is_torch_tensor(values):
+        shape = tuple(int(dim) for dim in values.shape)
+    else:
+        shape = tuple(int(dim) for dim in np.asarray(values).shape)
+    if len(shape) < 2:
+        raise ValueError(f"field must be at least 2D, got ndim={len(shape)}")
+    collapsed_axes = list(range(max(0, len(shape) - 2)))
+    projected_shape = list(shape[-2:])
+    collapsed_plane_count = (
+        int(np.prod(shape[:-2], dtype=np.int64))
+        if len(shape) > 2
+        else 1
+    )
+    return {
+        "kind": "nd_projection" if len(shape) > 2 else "identity_projection",
+        "source_shape": list(shape),
+        "projected_shape": projected_shape,
+        "collapsed_axes": collapsed_axes,
+        "collapsed_plane_count": int(max(1, collapsed_plane_count)),
+        "reduction": "mean_leading_axes" if len(shape) > 2 else "identity",
+    }
+
+
 def digest_fields_any(energy: Any, entropy: Any, internal_time: Any) -> DETMSignature:
     """Compute signature without forcing a dense CPU copy of fields."""
     if _is_torch_tensor(energy) or _is_torch_tensor(entropy) or _is_torch_tensor(internal_time):
@@ -176,5 +202,6 @@ __all__ = [
     "describe_field_from_array",
     "digest_fields",
     "digest_fields_any",
+    "projection_metadata_any",
     "project_field_plane_any",
 ]

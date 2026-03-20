@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from itertools import product
 from typing import Any
 
 import numpy as np
+
+MAX_EXPLICIT_PROJECTION_PLANES = 64
 
 
 def central_grad(arr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -66,8 +69,31 @@ def to_float(text: str, default: float) -> float:
         return float(default)
 
 
+def format_projection_plane_label(plane_index: tuple[int, ...] | None) -> str:
+    if plane_index is None:
+        return "mean"
+    return "plane[" + ",".join(str(int(value)) for value in tuple(plane_index)) + "]"
+
+
+def build_projection_plane_options(shape: tuple[int, ...] | list[int]) -> list[tuple[str, tuple[int, ...] | None]]:
+    dims = tuple(int(dim) for dim in tuple(shape))
+    if len(dims) <= 2:
+        return [("native", None)]
+    leading_shape = dims[:-2]
+    total_planes = int(np.prod(leading_shape, dtype=np.int64)) if len(leading_shape) > 0 else 1
+    options: list[tuple[str, tuple[int, ...] | None]] = [("mean projection", None)]
+    if total_planes > int(MAX_EXPLICIT_PROJECTION_PLANES):
+        return options
+    for plane_index in product(*[range(int(dim)) for dim in leading_shape]):
+        plane_tuple = tuple(int(value) for value in plane_index)
+        options.append((format_projection_plane_label(plane_tuple), plane_tuple))
+    return options
+
+
 __all__ = [
     "build_quiver_vectors",
+    "build_projection_plane_options",
+    "format_projection_plane_label",
     "resolve_influence_policy",
     "to_float",
     "to_int",

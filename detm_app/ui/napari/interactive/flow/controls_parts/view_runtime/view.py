@@ -32,6 +32,14 @@ def add_view_page(controller: Any, *, QtWidgets: Any, settings: Any) -> None:
     row_field.addWidget(self._field_combo)
     lay_view.addLayout(row_field)
 
+    self._plane_combo = QtWidgets.QComboBox()
+    self._plane_combo.addItem("native", None)
+    self._plane_combo.currentIndexChanged.connect(lambda *_args: self._render())
+    row_plane = QtWidgets.QHBoxLayout()
+    row_plane.addWidget(QtWidgets.QLabel("plane"))
+    row_plane.addWidget(self._plane_combo)
+    lay_view.addLayout(row_plane)
+
     self._cmap_combo = QtWidgets.QComboBox()
     self._cmap_combo.addItems(["heat", "gray"])
     self._cmap_combo.setCurrentText("heat")

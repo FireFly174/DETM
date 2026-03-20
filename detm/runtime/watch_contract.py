@@ -261,6 +261,7 @@ class WatchContractPacket:
     event_types: List[str] = field(default_factory=list)
     event_count: int = 0
     policy: Dict[str, Any] = field(default_factory=dict)
+    projection: Dict[str, Any] = field(default_factory=dict)
     schema: str = "WATCH_CONTRACT_V1"
 
     @classmethod
@@ -310,6 +311,7 @@ class WatchContractPacket:
                 min_value=0,
             ),
             policy=policy,
+            projection=dict(data.get("projection", {})),
             schema=_require_non_empty_str(
                 data.get("schema", "WATCH_CONTRACT_V1"),
                 field_name="schema",
@@ -329,6 +331,7 @@ class WatchContractPacket:
             "event_types": [str(x) for x in list(self.event_types)],
             "event_count": int(self.event_count),
             "policy": dict(self.policy),
+            "projection": dict(self.projection),
         }
 
 

@@ -10,6 +10,7 @@ import numpy as np
 from detm.runtime import api
 from detm.runtime.level_policy import LevelPolicy, PolicyDecision
 from detm.runtime.outerfields import compute_outerfields_v1
+from detm.runtime.signature import project_field_plane_any, projection_metadata_any
 from detm.runtime.state import DETMState
 from detm.runtime.watch_contract import WatchContractPacket
 
@@ -157,11 +158,15 @@ class WatchContractWriter:
             return
 
         tick = int(state.step_count)
+        projection = projection_metadata_any(state.field_state.energy)
         outerfields = compute_outerfields_v1(
-            energy=state.field_state.energy,
-            entropy=state.field_state.entropy,
-            internal_time=state.field_state.internal_time,
+            energy=project_field_plane_any(state.field_state.energy),
+            entropy=project_field_plane_any(state.field_state.entropy),
+            internal_time=project_field_plane_any(state.field_state.internal_time),
         )
+        outerfields_meta = dict(getattr(outerfields, "meta", {}) or {})
+        outerfields_meta["projection"] = dict(projection)
+        outerfields = type(outerfields)(**{**outerfields.as_dict(), "meta": outerfields_meta})
 
         self._ensure()
         uri = self._save_outerfields(tick=tick, outerfields=outerfields)

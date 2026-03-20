@@ -183,6 +183,7 @@ class DetmVizPanel:
         state = deserialize_state(state_blob)
         mode = str(self.field_var.get()).strip().lower() or "energy"
         field = _flow.field_from_state(state=state, mode=mode)
+        projection_suffix = _flow.projection_status_from_state(state=state)
 
         lattice = state.lattice
         self._ensure_grid(int(lattice.height), int(lattice.width))
@@ -194,13 +195,14 @@ class DetmVizPanel:
         sig_preview = f" sig0..3={signature[:4]}" if signature else ""
         self.status_left.set(f"tick={int(tick)}")
         self.status_mid.set(f"lattice={lattice.width}x{lattice.height}")
-        self.status_right.set(f"field={mode}{sig_preview}")
+        self.status_right.set(f"field={mode}{projection_suffix}{sig_preview}")
         self._sync_status_var()
 
 
     def update_from_state(self, *, state: Any, tick: int, signature: Optional[list[float]] = None) -> None:
         mode = str(self.field_var.get()).strip().lower() or "energy"
         field = _flow.field_from_state(state=state, mode=mode)
+        projection_suffix = _flow.projection_status_from_state(state=state)
         lattice = getattr(state, "lattice")
 
         self._ensure_grid(int(lattice.height), int(lattice.width))
@@ -210,9 +212,10 @@ class DetmVizPanel:
 
         self._draw_quiver(field)
         sig_preview = f" sig0..3={signature[:4]}" if signature else ""
-        self.status_var.set(
-            f"tick={int(tick)}  lattice={lattice.width}x{lattice.height}  field={mode}{sig_preview}"
-        )
+        self.status_left.set(f"tick={int(tick)}")
+        self.status_mid.set(f"lattice={lattice.width}x{lattice.height}")
+        self.status_right.set(f"field={mode}{projection_suffix}{sig_preview}")
+        self._sync_status_var()
 
 
 __all__ = ["DetmVizPanel", "VizFrame"]

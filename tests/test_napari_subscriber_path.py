@@ -16,6 +16,7 @@ from detm_app.ui.napari.subscriber import (
     packet_to_layer_frame,
     resolve_napari_endpoint,
     run_napari_subscriber,
+    state_to_layers,
     wait_latest_packet,
 )
 from detm_app.transport.subscriber import TcpVizSubscriber, VizPacket
@@ -44,6 +45,41 @@ def test_packet_to_layer_frame_decodes_runtime_state_blob():
     assert frame.meta == {}
     for arr in frame.layers.values():
         assert arr.shape == (int(config.height), int(config.width))
+
+
+def test_state_to_layers_projects_nd_state_by_default():
+    config = DETMConfig(shape=(2, 4, 3), backend="numpy")
+    state = api.reset(config, seed=17)
+    energy = np.zeros((2, 4, 3), dtype=np.float32)
+    energy[0, :, :] = 1.0
+    energy[1, :, :] = 3.0
+    state.field_state.energy = energy
+    state.field_state.entropy = energy + 1.0
+    state.field_state.internal_time = energy + 2.0
+
+    layers = state_to_layers(state)
+
+    assert layers["energy"].shape == (4, 3)
+    assert np.allclose(layers["energy"], np.full((4, 3), 2.0, dtype=np.float32))
+    assert np.allclose(layers["entropy"], np.full((4, 3), 3.0, dtype=np.float32))
+    assert np.allclose(layers["internal_time"], np.full((4, 3), 4.0, dtype=np.float32))
+
+
+def test_state_to_layers_accepts_explicit_nd_plane_index():
+    config = DETMConfig(shape=(2, 4, 3), backend="numpy")
+    state = api.reset(config, seed=18)
+    energy = np.zeros((2, 4, 3), dtype=np.float32)
+    energy[0, :, :] = 1.0
+    energy[1, :, :] = 5.0
+    state.field_state.energy = energy
+    state.field_state.entropy = energy + 10.0
+    state.field_state.internal_time = energy + 20.0
+
+    layers = state_to_layers(state, plane_index=(1,))
+
+    assert np.allclose(layers["energy"], np.full((4, 3), 5.0, dtype=np.float32))
+    assert np.allclose(layers["entropy"], np.full((4, 3), 15.0, dtype=np.float32))
+    assert np.allclose(layers["internal_time"], np.full((4, 3), 25.0, dtype=np.float32))
 
 
 def test_patch_six_meta_path_importer_sets_missing_path():
