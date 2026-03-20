@@ -7,6 +7,7 @@ from collections import Counter, deque
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
+from uuid import uuid4
 
 import numpy as np
 
@@ -21,9 +22,9 @@ from detm.runtime.pattern_memory.flow import (
     runtime_key_from_config as _runtime_key_from_config_flow,
     scoped_key as _scoped_key_flow,
 )
-from detm.runtime.pattern_memory.record import BridgeRecord, BridgeRecordSource, PatternRecord
+from detm.runtime.pattern_memory.record import BridgeRecord, BridgeRecordSource, PatternRecord, VerificationRun
 from detm.runtime.pattern_memory.scope import normalize_reuse_scope
-from detm.runtime.pattern_memory.store import FileBridgeSourceStore, FilePatternStore
+from detm.runtime.pattern_memory.store import FileBridgeSourceStore, FilePatternStore, FileVerificationRunStore
 
 
 def _quantize_array(array: np.ndarray, *, quantization: float) -> np.ndarray:
@@ -69,6 +70,12 @@ def _bridge_source_store_path(path: Path) -> Path:
     return path.with_name(f"{stem}.bridge_sources{suffix}")
 
 
+def _bridge_verification_store_path(path: Path) -> Path:
+    stem = path.stem or path.name
+    suffix = path.suffix or ".json"
+    return path.with_name(f"{stem}.bridge_verification_runs{suffix}")
+
+
 class PatternMemoryRuntime:
     def __init__(
         self,
@@ -103,8 +110,10 @@ class PatternMemoryRuntime:
             else FilePatternStore(Path(str(store_path).strip()))
         )
         self.bridge_source_store = None
+        self.verification_run_store = None
         if self.store is not None:
             self.bridge_source_store = FileBridgeSourceStore(_bridge_source_store_path(self.store.path))
+            self.verification_run_store = FileVerificationRunStore(_bridge_verification_store_path(self.store.path))
         if self.store is not None:
             for record in self.store.load().values():
                 self.cache.put(record)
@@ -124,6 +133,10 @@ class PatternMemoryRuntime:
         self._bridge_sources: dict[str, BridgeRecordSource] = (
             {} if self.bridge_source_store is None else self.bridge_source_store.load()
         )
+        self._verification_runs: dict[str, VerificationRun] = (
+            {} if self.verification_run_store is None else self.verification_run_store.load()
+        )
+        self._verification_run_namespace = uuid4().hex
         self._transition_counts: dict[tuple[str, str], int] = {}
         self._multiscale_last_positions: dict[tuple[int, int], tuple[str, str]] = {}
         self._multiscale_last_tick: int = 0
@@ -235,6 +248,9 @@ class PatternMemoryRuntime:
     def bridge_source_count(self) -> int:
         return int(len(self._bridge_sources))
 
+    def verification_run_count(self) -> int:
+        return int(len(self._verification_runs))
+
     def multiscale_backend_info(self) -> dict[str, Any]:
         return {
             "kind": str(self._multiscale_backend_kind),
@@ -268,6 +284,7 @@ class PatternMemoryRuntime:
                 "miss_count": 0,
                 "record_count": int(len(self._bridge_records)),
                 "source_count": int(len(self._bridge_sources)),
+                "verification_run_count": int(len(self._verification_runs)),
             }
 
         projected = np.asarray(energy, dtype=float)
@@ -319,6 +336,7 @@ class PatternMemoryRuntime:
         previous_positions = dict(self._multiscale_last_positions)
         previous_records = dict(self._bridge_records)
         previous_sources = dict(self._bridge_sources)
+        next_verification_runs = dict(self._verification_runs)
         current_positions: dict[tuple[int, int], tuple[str, str]] = {}
         next_records = dict(previous_records)
         next_sources = dict(previous_sources)
@@ -431,6 +449,11 @@ class PatternMemoryRuntime:
                 next_sources[source_id] = source
                 verification_rows.append(
                     {
+                        "verification_id": (
+                            f"verify:{self._verification_run_namespace}:{str(source_id)}:"
+                            f"{int(tick)}:{int(center_y)}:{int(center_x)}"
+                        ),
+                        "schema_version": "verification_run/v1",
                         "source_id": str(source_id),
                         "tick": int(tick),
                         "trace_ref": str(trace_ref),
@@ -440,9 +463,15 @@ class PatternMemoryRuntime:
                         "result_signature": result_signature,
                         "matched": matched,
                         "status": str(last_status),
-                        "verification_count": int(verification_count),
-                        "success_count": int(success_count),
-                        "failure_count": int(failure_count),
+                        "confidence": float(confidence),
+                        "support": int(support),
+                        "usage_count": int(usage_count),
+                        "details": {
+                            "verification_count": int(verification_count),
+                            "success_count": int(success_count),
+                            "failure_count": int(failure_count),
+                            "center": [int(center_y), int(center_x)],
+                        },
                     }
                 )
             bridge = BridgeRecord(
@@ -511,6 +540,10 @@ class PatternMemoryRuntime:
         self._multiscale_last_positions = current_positions
         self._bridge_records = next_records
         self._bridge_sources = next_sources
+        for verification in verification_rows:
+            record = VerificationRun.from_dict(verification)
+            next_verification_runs[str(record.verification_id)] = record
+        self._verification_runs = next_verification_runs
         self._multiscale_last_tick = int(tick)
         self._multiscale_snapshots.append(
             {
@@ -524,6 +557,8 @@ class PatternMemoryRuntime:
         if self.bridge_source_store is not None:
             for source in source_rows:
                 self.bridge_source_store.upsert(BridgeRecordSource.from_dict(source))
+        if self.verification_run_store is not None:
+            self.verification_run_store.replace_all(next_verification_runs)
         unique_signature_count = len(signature_counts)
         attractor_candidates = sum(1 for count in signature_counts.values() if int(count) >= candidate_threshold)
         return {
@@ -543,6 +578,7 @@ class PatternMemoryRuntime:
             "miss_count": int(max(0, len(windows) - repeated_hits)),
             "record_count": int(len(self._bridge_records)),
             "source_count": int(len(self._bridge_sources)),
+            "verification_run_count": int(len(self._verification_runs)),
         }
 
     def _is_reusable_record(self, record: PatternRecord) -> bool:

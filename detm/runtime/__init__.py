@@ -67,10 +67,12 @@ from detm.runtime.level_policy import LevelPolicy, ObservabilityProfile, PolicyD
 from detm.runtime.pattern_memory import (
     FilePatternStore,
     FileBridgeSourceStore,
+    FileVerificationRunStore,
     PatternCache,
     PatternMemoryRuntime,
     BridgeRecordSource,
     PatternRecord,
+    VerificationRun,
     get_pattern_runtime_for_state,
 )
 from detm.runtime.schemas import get_schema_versions
@@ -148,9 +150,11 @@ __all__ = [
     "PolicyDecision",
     "BridgeRecordSource",
     "FileBridgeSourceStore",
+    "FileVerificationRunStore",
     "PatternRecord",
     "PatternCache",
     "FilePatternStore",
+    "VerificationRun",
     "PatternMemoryRuntime",
     "get_pattern_runtime_for_state",
     "DETMInfluence",

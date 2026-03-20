@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from detm.runtime.pattern_memory.record import BridgeRecordSource, PatternRecord
+from detm.runtime.pattern_memory.record import BridgeRecordSource, PatternRecord, VerificationRun
 
 
 class FilePatternStore:
@@ -91,4 +91,42 @@ class FileBridgeSourceStore:
         self.path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-__all__ = ["FileBridgeSourceStore", "FilePatternStore"]
+class FileVerificationRunStore:
+    """File-backed store for durable verification runs."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = Path(path)
+
+    def load(self) -> dict[str, VerificationRun]:
+        if not self.path.exists():
+            return {}
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+        if not isinstance(payload, dict):
+            return {}
+        out: dict[str, VerificationRun] = {}
+        for raw in payload.values():
+            if not isinstance(raw, dict):
+                continue
+            record = VerificationRun.from_dict(raw)
+            if record.verification_id:
+                out[str(record.verification_id)] = record
+        return out
+
+    def upsert(self, record: VerificationRun) -> None:
+        records = self.load()
+        records[str(record.verification_id)] = record
+        self._write(records)
+
+    def replace_all(self, records: dict[str, VerificationRun]) -> None:
+        self._write(records)
+
+    def _write(self, records: dict[str, VerificationRun]) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        serializable = {key: record.to_dict() for key, record in records.items()}
+        self.path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+__all__ = ["FileBridgeSourceStore", "FilePatternStore", "FileVerificationRunStore"]

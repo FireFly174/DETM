@@ -166,5 +166,64 @@ class BridgeRecordSource:
             db_refs=dict(data.get("db_refs", {})),
         )
 
+@dataclass(frozen=True)
+class VerificationRun:
+    verification_id: str
+    schema_version: str = "verification_run/v1"
+    source_id: str = ""
+    tick: int = 0
+    trace_ref: str = ""
+    level: str = "L0"
+    window_signature: str = ""
+    interface_signature: str = ""
+    result_signature: str = ""
+    matched: bool | None = None
+    status: str = "observed"
+    confidence: float = 0.0
+    support: int = 0
+    usage_count: int = 0
+    details: Dict[str, Any] = field(default_factory=dict)
 
-__all__ = ["BridgeRecord", "BridgeRecordSource", "PatternRecord"]
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "verification_id": str(self.verification_id),
+            "schema_version": str(self.schema_version),
+            "source_id": str(self.source_id),
+            "tick": int(self.tick),
+            "trace_ref": str(self.trace_ref),
+            "level": str(self.level),
+            "window_signature": str(self.window_signature),
+            "interface_signature": str(self.interface_signature),
+            "result_signature": str(self.result_signature),
+            "matched": self.matched,
+            "status": str(self.status),
+            "confidence": float(self.confidence),
+            "support": int(self.support),
+            "usage_count": int(self.usage_count),
+            "details": dict(self.details),
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Dict[str, Any]) -> "VerificationRun":
+        data = dict(payload)
+        matched = data.get("matched")
+        return cls(
+            verification_id=str(data.get("verification_id", "")),
+            schema_version=str(data.get("schema_version", "verification_run/v1")),
+            source_id=str(data.get("source_id", "")),
+            tick=max(0, int(data.get("tick", 0))),
+            trace_ref=str(data.get("trace_ref", "")),
+            level=str(data.get("level", "L0")),
+            window_signature=str(data.get("window_signature", "")),
+            interface_signature=str(data.get("interface_signature", "")),
+            result_signature=str(data.get("result_signature", "")),
+            matched=None if matched is None else bool(matched),
+            status=str(data.get("status", "observed")),
+            confidence=min(1.0, max(0.0, float(data.get("confidence", 0.0)))),
+            support=max(0, int(data.get("support", 0))),
+            usage_count=max(0, int(data.get("usage_count", 0))),
+            details=dict(data.get("details", {})),
+        )
+
+
+__all__ = ["BridgeRecord", "BridgeRecordSource", "PatternRecord", "VerificationRun"]

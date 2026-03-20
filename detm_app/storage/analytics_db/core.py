@@ -210,11 +210,13 @@ def ingest_run(run_dir: Path) -> IngestReport:
         operator_catalog_hits_rows=operator_catalog_hits_rows,
     )
     operator_rows = _build_operator_rows(decision_rows)
+    verification_run_rows = _build_verification_run_rows(bridge_verifications_rows, issues=issues)
 
     counts = {
         "tick_count": len(ticks),
         "eventful_tick_count": sum(1 for row in ticks_data.values() if int(row["event_count"]) > 0),
         "decision_tick_count": len(operator_rows),
+        "verification_run_count": len(verification_run_rows),
         "outerfields_file_count": len(outerfields_rows),
     }
     if counts["outerfields_file_count"] >= counts["tick_count"] and counts["tick_count"] >= 50:
@@ -240,6 +242,7 @@ def ingest_run(run_dir: Path) -> IngestReport:
         commit_validation_payload=commit_validation_payload,
         ticks_data=ticks_data,
         operator_rows=operator_rows,
+        verification_run_rows=verification_run_rows,
         outerfields_rows=outerfields_rows,
         outerfields_total_bytes=outerfields_total_bytes,
         multiscale_candidates_rows=multiscale_candidates_rows,
@@ -268,6 +271,7 @@ def ingest_run(run_dir: Path) -> IngestReport:
         )
         _insert_tick_rows(conn, run_id, ticks_data)
         _insert_operator_rows(conn, run_id, operator_rows)
+        _insert_verification_run_rows(conn, run_id, verification_run_rows)
         _insert_artifact_rows(conn, run_id, artifact_rows)
         _insert_issues(conn, run_id, issues)
         conn.commit()
@@ -288,6 +292,10 @@ def ingest_run(run_dir: Path) -> IngestReport:
             for row in sorted(operator_rows, key=lambda item: int(item["tick"]))
             if int(row["decision_count"]) > 0
         ],
+    )
+    _write_jsonl(
+        analytics_dir / "verification_windows.jsonl",
+        [_build_verification_window_row(row) for row in verification_run_rows],
     )
     _write_jsonl(analytics_dir / "outerfields_index.jsonl", outerfields_rows)
 
@@ -385,6 +393,22 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             policy_reaction_actions_json TEXT,
             PRIMARY KEY (run_id, tick)
         );
+        CREATE TABLE IF NOT EXISTS bridge_verification_runs (
+            run_id TEXT NOT NULL,
+            verification_id TEXT NOT NULL,
+            source_id TEXT,
+            tick INTEGER NOT NULL,
+            trace_ref TEXT,
+            schema_version TEXT,
+            level TEXT,
+            status TEXT,
+            matched INTEGER,
+            confidence REAL,
+            support INTEGER,
+            usage_count INTEGER,
+            details_json TEXT,
+            PRIMARY KEY (run_id, verification_id)
+        );
         CREATE TABLE IF NOT EXISTS artifact_refs (
             run_id TEXT NOT NULL,
             artifact_kind TEXT NOT NULL,
@@ -412,13 +436,17 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             ON tick_summary(run_id, runtime_adaptive_window_active, tick);
         CREATE INDEX IF NOT EXISTS idx_operator_panel_run_acceptance_tick
             ON operator_panel(run_id, acceptance_passed, tick);
+        CREATE INDEX IF NOT EXISTS idx_bridge_verification_runs_run_tick
+            ON bridge_verification_runs(run_id, tick);
+        CREATE INDEX IF NOT EXISTS idx_bridge_verification_runs_run_status_tick
+            ON bridge_verification_runs(run_id, status, tick);
         CREATE INDEX IF NOT EXISTS idx_artifact_refs_run_kind_tick ON artifact_refs(run_id, artifact_kind, tick);
         """
     )
 
 
 def _purge_run(conn: sqlite3.Connection, run_id: str) -> None:
-    for table in ("tick_summary", "operator_panel", "artifact_refs", "run_issues", "runs"):
+    for table in ("tick_summary", "operator_panel", "bridge_verification_runs", "artifact_refs", "run_issues", "runs"):
         conn.execute(f"DELETE FROM {table} WHERE run_id = ?", (run_id,))
 
 
@@ -573,6 +601,35 @@ def _insert_operator_rows(conn: sqlite3.Connection, run_id: str, operator_rows: 
                 json.dumps(row["policy_reaction_actions"], ensure_ascii=False),
             )
             for row in operator_rows
+        ],
+    )
+
+
+def _insert_verification_run_rows(conn: sqlite3.Connection, run_id: str, verification_run_rows: list[dict[str, Any]]) -> None:
+    conn.executemany(
+        """
+        INSERT INTO bridge_verification_runs (
+            run_id, verification_id, source_id, tick, trace_ref, schema_version, level, status, matched,
+            confidence, support, usage_count, details_json
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        [
+            (
+                run_id,
+                str(row["verification_id"]),
+                row.get("source_id"),
+                int(row["tick"]),
+                row.get("trace_ref"),
+                row.get("schema_version"),
+                row.get("level"),
+                row.get("status"),
+                None if row.get("matched") is None else int(bool(row.get("matched"))),
+                row.get("confidence"),
+                row.get("support"),
+                row.get("usage_count"),
+                json.dumps(row.get("details", {}), ensure_ascii=False),
+            )
+            for row in verification_run_rows
         ],
     )
 
@@ -910,6 +967,81 @@ def _build_operator_rows(decision_rows: list[dict[str, Any]]) -> list[dict[str, 
     return rows
 
 
+def _build_verification_run_rows(
+    bridge_verifications_rows: list[dict[str, Any]],
+    *,
+    issues: list[IngestIssue],
+) -> list[dict[str, Any]]:
+    rows_by_id: dict[str, dict[str, Any]] = {}
+    for entry in bridge_verifications_rows:
+        tick = entry.get("tick")
+        if tick is None:
+            continue
+        trace_ref = entry.get("trace_ref")
+        mode = entry.get("mode")
+        catalog_backend = _coerce_dict(entry.get("catalog_backend"))
+        for index, item in enumerate(list(entry.get("verifications", []))):
+            if not isinstance(item, dict):
+                continue
+            verification_id = str(item.get("verification_id", "")).strip()
+            if verification_id == "":
+                issues.append(
+                    IngestIssue(
+                        severity="warning",
+                        code="invalid_bridge_verification_row",
+                        message="Bridge verification row is missing verification_id",
+                        details={"tick": int(tick), "index": int(index)},
+                    )
+                )
+                continue
+            try:
+                row_tick = int(item.get("tick", tick))
+            except Exception:
+                issues.append(
+                    IngestIssue(
+                        severity="warning",
+                        code="invalid_bridge_verification_row",
+                        message="Bridge verification row has invalid tick",
+                        details={"verification_id": verification_id, "tick": item.get("tick", tick), "index": int(index)},
+                    )
+                )
+                continue
+            details = _coerce_dict(item.get("details"))
+            details.update(
+                {
+                    "mode": mode,
+                    "catalog_backend": catalog_backend,
+                }
+            )
+            row = {
+                "verification_id": verification_id,
+                "source_id": item.get("source_id"),
+                "tick": row_tick,
+                "trace_ref": item.get("trace_ref", trace_ref),
+                "schema_version": item.get("schema_version"),
+                "level": item.get("level"),
+                "status": item.get("status"),
+                "matched": item.get("matched"),
+                "confidence": _coerce_float(item.get("confidence")),
+                "support": _coerce_int(item.get("support")),
+                "usage_count": _coerce_int(item.get("usage_count")),
+                "details": details,
+            }
+            if verification_id in rows_by_id:
+                issues.append(
+                    IngestIssue(
+                        severity="warning",
+                        code="duplicate_bridge_verification_id",
+                        message="Bridge verification row duplicates verification_id within one run",
+                        details={"verification_id": verification_id, "tick": row_tick},
+                    )
+                )
+            rows_by_id[verification_id] = row
+    rows = list(rows_by_id.values())
+    rows.sort(key=lambda row: (int(row["tick"]), str(row["verification_id"])))
+    return rows
+
+
 def _build_outerfields_rows(
     *,
     run_path: Path,
@@ -1081,6 +1213,7 @@ def _build_run_summary_payload(
     commit_validation_payload: dict[str, Any] | None,
     ticks_data: dict[int, dict[str, Any]],
     operator_rows: list[dict[str, Any]],
+    verification_run_rows: list[dict[str, Any]],
     outerfields_rows: list[dict[str, Any]],
     outerfields_total_bytes: int,
     multiscale_candidates_rows: list[dict[str, Any]],
@@ -1096,7 +1229,9 @@ def _build_run_summary_payload(
     tick_count = len(tick_rows)
     eventful_tick_count = sum(1 for row in tick_rows if int(row["event_count"]) > 0)
     decision_tick_count = len(operator_rows)
+    verification_run_count = len(verification_run_rows)
     final_operator = operator_rows[-1] if operator_rows else None
+    final_verification_run = verification_run_rows[-1] if verification_run_rows else None
     final_anti_goodhart = None
     final_exploration = None
     if tick_rows:
@@ -1136,8 +1271,24 @@ def _build_run_summary_payload(
             "tick_count": tick_count,
             "eventful_tick_count": eventful_tick_count,
             "decision_tick_count": decision_tick_count,
+            "verification_run_count": verification_run_count,
         },
         "final_portability_panel": None if final_operator is None else final_operator["portability_panel"],
+        "final_verification_run": None
+        if final_verification_run is None
+        else {
+            "verification_id": final_verification_run["verification_id"],
+            "source_id": final_verification_run.get("source_id"),
+            "tick": int(final_verification_run["tick"]),
+            "trace_ref": final_verification_run.get("trace_ref"),
+            "schema_version": final_verification_run.get("schema_version"),
+            "level": final_verification_run.get("level"),
+            "status": final_verification_run.get("status"),
+            "matched": final_verification_run.get("matched"),
+            "confidence": final_verification_run.get("confidence"),
+            "support": final_verification_run.get("support"),
+            "usage_count": final_verification_run.get("usage_count"),
+        },
         "final_anti_goodhart": final_anti_goodhart,
         "final_exploration_horizon": final_exploration,
         "artifact_inventory": {
@@ -1205,6 +1356,23 @@ def _build_decision_window_row(row: dict[str, Any]) -> dict[str, Any]:
         else float(row["reuse_count"]) / max(int(row["decision_count"]), 1),
         "portability_panel": row["portability_panel"],
         "anti_goodhart": row["anti_goodhart"],
+    }
+
+
+def _build_verification_window_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "verification_id": row["verification_id"],
+        "source_id": row.get("source_id"),
+        "tick": int(row["tick"]),
+        "trace_ref": row.get("trace_ref"),
+        "schema_version": row.get("schema_version"),
+        "level": row.get("level"),
+        "status": row.get("status"),
+        "matched": row.get("matched"),
+        "confidence": row.get("confidence"),
+        "support": row.get("support"),
+        "usage_count": row.get("usage_count"),
+        "details": dict(row.get("details", {})),
     }
 
 
