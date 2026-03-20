@@ -8,6 +8,10 @@ from typing import Any
 from detm.runtime.level_policy import ObservabilityProfile, PolicyDecision
 
 from detm_app.runtime.anti_goodhart import AntiGoodhartThresholds, evaluate_anti_goodhart
+from detm_app.runtime.subscribers.watch.portability import (
+    PortabilityThresholds,
+    evaluate_portability_acceptance,
+)
 
 
 def _normalize_runtime_profile(profile: str) -> str:
@@ -30,9 +34,113 @@ def _ensure_anti_goodhart_runtime(session: Any) -> dict[str, object]:
         "operator_scopes": {},
         "last_panel": None,
         "last_snapshot": {},
+        "horizon_active": False,
+        "horizon_start_tick": None,
+        "horizon_last_break_tick": None,
+        "horizon_last_recovery_cost_ticks": 0,
+        "horizon_last_snapshot": {},
     }
     session._anti_goodhart_runtime = state
     return state
+
+
+def _default_exploration_horizon_snapshot() -> dict[str, object]:
+    return {
+        "exploration_horizon_ticks": 0,
+        "horizon_start_tick": 0,
+        "horizon_break_reason": "",
+        "horizon_recovery_cost_ticks": 0,
+    }
+
+
+def derive_exploration_horizon_break_reason(
+    *,
+    anti_snapshot: dict[str, object] | None,
+    panel: dict[str, object] | None,
+    decisions: list[dict[str, object]],
+    manual_stop: bool = False,
+) -> str:
+    if bool(manual_stop):
+        return "manual_stop"
+    anti = dict(anti_snapshot or {})
+    applicability = str(anti.get("applicability", "")).strip().lower()
+    if bool(anti.get("goodhart_flag", False)):
+        return "goodhart_flag"
+    if any(bool(dict(decision.get("contract", {})).get("torsion_flag", False)) for decision in list(decisions)):
+        return "boundary_stress"
+    payload = dict(panel or {})
+    acceptance_raw = payload.get("acceptance", {})
+    acceptance = dict(acceptance_raw) if isinstance(acceptance_raw, dict) else {}
+    failed_signals = list(acceptance.get("failed_signals", []))
+    accepted = bool(acceptance.get("passed", len(failed_signals) == 0))
+    if applicability == "cold_start":
+        return ""
+    if (not accepted) or len(failed_signals) > 0:
+        return "readout_degraded"
+    return ""
+
+
+def advance_exploration_horizon(
+    *,
+    runtime: dict[str, object],
+    tick: int,
+    break_reason: str,
+    can_start: bool = True,
+) -> dict[str, object]:
+    step_tick = max(0, int(tick))
+    active = bool(runtime.get("horizon_active", False))
+    start_tick = runtime.get("horizon_start_tick")
+    if not isinstance(start_tick, int):
+        start_tick = None
+    last_break_tick = runtime.get("horizon_last_break_tick")
+    if not isinstance(last_break_tick, int):
+        last_break_tick = None
+    last_recovery_cost = max(0, int(runtime.get("horizon_last_recovery_cost_ticks", 0)))
+    normalized_break_reason = str(break_reason or "").strip()
+    start_allowed = bool(can_start)
+
+    if start_tick is None and (not start_allowed or normalized_break_reason):
+        snapshot = _default_exploration_horizon_snapshot()
+        snapshot["horizon_break_reason"] = str(normalized_break_reason)
+        runtime["horizon_active"] = False
+        runtime["horizon_start_tick"] = None
+        runtime["horizon_last_snapshot"] = dict(snapshot)
+        if normalized_break_reason:
+            runtime["horizon_last_break_tick"] = int(step_tick)
+            runtime["horizon_last_recovery_cost_ticks"] = 0
+        return dict(snapshot)
+
+    if start_tick is None:
+        start_tick = step_tick
+        active = True
+        if last_break_tick is not None:
+            last_recovery_cost = max(0, step_tick - int(last_break_tick))
+        else:
+            last_recovery_cost = 0
+        runtime["horizon_start_tick"] = int(start_tick)
+        runtime["horizon_active"] = bool(active)
+        runtime["horizon_last_recovery_cost_ticks"] = int(last_recovery_cost)
+
+    horizon_ticks = max(1, int(step_tick) - int(start_tick) + 1)
+    snapshot = {
+        "exploration_horizon_ticks": int(horizon_ticks),
+        "horizon_start_tick": int(start_tick),
+        "horizon_break_reason": str(normalized_break_reason),
+        "horizon_recovery_cost_ticks": int(0 if normalized_break_reason else last_recovery_cost),
+    }
+
+    if normalized_break_reason:
+        runtime["horizon_active"] = False
+        runtime["horizon_start_tick"] = None
+        runtime["horizon_last_break_tick"] = int(step_tick)
+        runtime["horizon_last_recovery_cost_ticks"] = 0
+    else:
+        runtime["horizon_active"] = True
+        runtime["horizon_start_tick"] = int(start_tick)
+        runtime["horizon_last_recovery_cost_ticks"] = int(last_recovery_cost)
+
+    runtime["horizon_last_snapshot"] = dict(snapshot)
+    return dict(snapshot)
 
 
 def _operator_decisions_from_events(events: list[dict[str, object]]) -> list[dict[str, object]]:
@@ -114,6 +222,14 @@ def runtime_anti_goodhart_snapshot(session: Any) -> dict[str, object]:
     return dict(snapshot) if isinstance(snapshot, dict) else {}
 
 
+def runtime_exploration_horizon_snapshot(session: Any) -> dict[str, object]:
+    state = _ensure_anti_goodhart_runtime(session)
+    snapshot = state.get("horizon_last_snapshot", {})
+    if isinstance(snapshot, dict) and len(snapshot) > 0:
+        return dict(snapshot)
+    return _default_exploration_horizon_snapshot()
+
+
 def reset_runtime_adaptive_state(session: Any) -> None:
     session._adaptive_until_step = 0
     session._runtime_adaptive_until_step = 0
@@ -129,6 +245,11 @@ def reset_runtime_adaptive_state(session: Any) -> None:
         "operator_scopes": {},
         "last_panel": None,
         "last_snapshot": {},
+        "horizon_active": False,
+        "horizon_start_tick": None,
+        "horizon_last_break_tick": None,
+        "horizon_last_recovery_cost_ticks": 0,
+        "horizon_last_snapshot": {},
     }
 
 
@@ -228,8 +349,15 @@ def update_runtime_adaptive_window_from_events(
     anti_runtime = _ensure_anti_goodhart_runtime(session)
     decisions = _operator_decisions_from_events(events)
     anti_snapshot: dict[str, object] = {}
+    panel: dict[str, object] | None = None
     if len(decisions) > 0:
         panel = _anti_goodhart_panel_from_decisions(session, decisions)
+        portability_thresholds = PortabilityThresholds()
+        panel["thresholds"] = portability_thresholds.to_dict()
+        panel["acceptance"] = evaluate_portability_acceptance(
+            panel=panel,
+            thresholds=portability_thresholds,
+        )
         previous_panel = anti_runtime.get("last_panel")
         previous = dict(previous_panel) if isinstance(previous_panel, dict) else None
         thresholds = AntiGoodhartThresholds(
@@ -282,6 +410,19 @@ def update_runtime_adaptive_window_from_events(
         anti_snapshot["runtime_profile_applied"] = False
         anti_runtime["last_panel"] = dict(panel)
 
+    break_reason = derive_exploration_horizon_break_reason(
+        anti_snapshot=anti_snapshot,
+        panel=panel,
+        decisions=decisions,
+        manual_stop=False,
+    )
+    horizon_snapshot = advance_exploration_horizon(
+        runtime=anti_runtime,
+        tick=int(step_after),
+        break_reason=str(break_reason),
+        can_start=len(decisions) > 0,
+    )
+
     if int(step_after) > int(session._runtime_adaptive_cooldown_until_step):
         signal_hits = level_policy.runtime_adaptive_signal_hits(events, quality=quality, cost=cost)
         if level_policy.runtime_adaptive_signal_triggered(
@@ -318,11 +459,15 @@ def update_runtime_adaptive_window_from_events(
             anti_snapshot["runtime_profile_applied"] = False
 
     anti_runtime["last_snapshot"] = dict(anti_snapshot)
+    anti_runtime["horizon_last_snapshot"] = dict(horizon_snapshot)
 
 
 __all__ = [
     "adaptive_profile_for_window",
+    "advance_exploration_horizon",
+    "derive_exploration_horizon_break_reason",
     "reset_runtime_adaptive_state",
+    "runtime_exploration_horizon_snapshot",
     "runtime_anti_goodhart_snapshot",
     "runtime_adaptive_decision_for_window",
     "runtime_adaptive_telemetry_snapshot",

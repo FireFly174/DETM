@@ -75,6 +75,16 @@ def _anti_goodhart_flag(snapshot: Mapping[str, Any]) -> float:
     return _to_flag(watchpoints.get("anti_goodhart_flag", False))
 
 
+def _exploration_horizon_ticks(snapshot: Mapping[str, Any]) -> float:
+    watchpoints = dict(snapshot.get("watchpoints", {}))
+    return _to_float(watchpoints.get("exploration_horizon_ticks", 0.0))
+
+
+def _horizon_recovery_cost_ticks(snapshot: Mapping[str, Any]) -> float:
+    watchpoints = dict(snapshot.get("watchpoints", {}))
+    return _to_float(watchpoints.get("horizon_recovery_cost_ticks", 0.0))
+
+
 def _cpu_time_ms(snapshot: Mapping[str, Any]) -> float:
     watchpoints = dict(snapshot.get("watchpoints", {}))
     return _to_float(watchpoints.get("cpu_time_ms", 0.0))
@@ -233,6 +243,12 @@ def _register_builtin_series() -> None:
         GraphSeriesSpec("torsion_health", "torsion_health", _torsion_health),
         GraphSeriesSpec("runtime_active", "runtime_active", _runtime_active),
         GraphSeriesSpec("anti_goodhart_flag", "anti_goodhart_flag", _anti_goodhart_flag),
+        GraphSeriesSpec("exploration_horizon_ticks", "exploration_horizon_ticks", _exploration_horizon_ticks),
+        GraphSeriesSpec(
+            "horizon_recovery_cost_ticks",
+            "horizon_recovery_cost_ticks",
+            _horizon_recovery_cost_ticks,
+        ),
         GraphSeriesSpec("cpu_time_ms", "cpu_time_ms", _cpu_time_ms),
         GraphSeriesSpec("oscillation_score", "oscillation_score", _oscillation_score),
         GraphSeriesSpec("influence_count", "influence_count", _influence_count),

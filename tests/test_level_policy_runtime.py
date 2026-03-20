@@ -518,6 +518,7 @@ def test_level_policy_anti_goodhart_reaction_applies_runtime_profile_hint(tmp_pa
     session.step(None, 1, rng=session.state.restore_rng())  # seed operator history
     _seed_overflow_hotspot(session)
     session.step(None, 1, rng=session.state.restore_rng())  # reuse + torsion pressure -> anti-goodhart
+    _seed_overflow_hotspot(session)
     session.step(None, 1, rng=session.state.restore_rng())  # runtime profile hint should apply
     session.close()
 
@@ -530,6 +531,12 @@ def test_level_policy_anti_goodhart_reaction_applies_runtime_profile_hint(tmp_pa
     assert any(bool(row.get("goodhart_flag")) for row in anti_rows)
     assert any(bool(row.get("runtime_profile_applied")) for row in anti_rows)
     assert any(str(row.get("preferred_runtime_profile", "")) == "throughput" for row in anti_rows)
+    horizon_rows = [
+        dict(dict(dict(entry.get("policy", {})).get("runtime_adaptive_guard", {})).get("exploration_horizon", {}))
+        for entry in entries
+    ]
+    assert any(str(row.get("horizon_break_reason", "")) == "goodhart_flag" for row in horizon_rows)
+    assert any(int(row.get("exploration_horizon_ticks", 0)) >= 1 for row in horizon_rows)
 
     adaptive_entries = [dict(entry.get("policy", {})) for entry in entries if int(entry.get("tick", 0)) >= 3]
     assert any(bool(policy.get("runtime_adaptive_window_active")) for policy in adaptive_entries)
@@ -810,4 +817,3 @@ def test_level_policy_batch_size_wiring_preserves_single_influence_apply():
     influence_events = [event for event in list(obs.events) if str(event.get("type")) == "influence"]
     assert len(influence_events) == 1
     assert float(obs.cost["step_ops_estimate"]) == float(6 * 6 * 5)
-

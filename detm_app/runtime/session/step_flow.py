@@ -119,6 +119,9 @@ def run_step(
         anti_snapshot = session._runtime_anti_goodhart_snapshot()
         if len(dict(anti_snapshot)) > 0:
             guard_meta["anti_goodhart"] = dict(anti_snapshot)
+        horizon_snapshot = session._runtime_exploration_horizon_snapshot()
+        if len(dict(horizon_snapshot)) > 0:
+            guard_meta["exploration_horizon"] = dict(horizon_snapshot)
         return replace(
             base_decision,
             runtime_adaptive_window_active=bool(runtime_window_active),

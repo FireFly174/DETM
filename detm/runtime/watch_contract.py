@@ -161,6 +161,41 @@ class AntiGoodhartSnapshot:
 
 
 @dataclass(frozen=True)
+class ExplorationHorizonSnapshot:
+    exploration_horizon_ticks: int = 0
+    horizon_start_tick: int = 0
+    horizon_break_reason: str = ""
+    horizon_recovery_cost_ticks: int = 0
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any] | None) -> "ExplorationHorizonSnapshot":
+        payload = dict(data or {})
+        return cls(
+            exploration_horizon_ticks=max(
+                0,
+                _coerce_int(payload.get("exploration_horizon_ticks", 0), default=0),
+            ),
+            horizon_start_tick=max(
+                0,
+                _coerce_int(payload.get("horizon_start_tick", 0), default=0),
+            ),
+            horizon_break_reason=str(payload.get("horizon_break_reason", "")),
+            horizon_recovery_cost_ticks=max(
+                0,
+                _coerce_int(payload.get("horizon_recovery_cost_ticks", 0), default=0),
+            ),
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "exploration_horizon_ticks": int(max(0, self.exploration_horizon_ticks)),
+            "horizon_start_tick": int(max(0, self.horizon_start_tick)),
+            "horizon_break_reason": str(self.horizon_break_reason),
+            "horizon_recovery_cost_ticks": int(max(0, self.horizon_recovery_cost_ticks)),
+        }
+
+
+@dataclass(frozen=True)
 class OuterFieldsRef:
     """Reference to an OuterFields artifact."""
 
@@ -248,11 +283,19 @@ class WatchContractPacket:
             watch_anti.policy_reaction.apply
         )
         watchpoints["anti_goodhart_runtime_profile_applied"] = bool(watch_anti.runtime_profile_applied)
+        watch_horizon = ExplorationHorizonSnapshot.from_dict(dict(watchpoints.get("exploration_horizon", {})))
+        watchpoints["exploration_horizon"] = watch_horizon.to_dict()
+        watchpoints["exploration_horizon_ticks"] = int(watch_horizon.exploration_horizon_ticks)
+        watchpoints["horizon_start_tick"] = int(watch_horizon.horizon_start_tick)
+        watchpoints["horizon_break_reason"] = str(watch_horizon.horizon_break_reason)
+        watchpoints["horizon_recovery_cost_ticks"] = int(watch_horizon.horizon_recovery_cost_ticks)
         metrics["watchpoints"] = watchpoints
 
         policy = dict(data.get("policy", {}))
         policy_anti = AntiGoodhartSnapshot.from_dict(dict(policy.get("anti_goodhart", {})))
         policy["anti_goodhart"] = policy_anti.to_dict()
+        policy_horizon = ExplorationHorizonSnapshot.from_dict(dict(policy.get("exploration_horizon", {})))
+        policy["exploration_horizon"] = policy_horizon.to_dict()
         return cls(
             tick=_require_int_at_least(data.get("tick", 0), field_name="tick", min_value=0),
             trace_ref=_require_non_empty_str(data.get("trace_ref"), field_name="trace_ref"),
@@ -292,6 +335,7 @@ class WatchContractPacket:
 __all__ = [
     "AntiGoodhartReaction",
     "AntiGoodhartSnapshot",
+    "ExplorationHorizonSnapshot",
     "OuterFieldsRef",
     "WatchContractPacket",
 ]

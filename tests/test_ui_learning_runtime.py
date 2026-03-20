@@ -8,6 +8,7 @@ from detm.runtime.config import DETMConfig
 from detm.runtime.level_policy import LevelPolicy
 from detm_app.config.ui_models import UiRunSettings
 from detm_app.runtime.ui_runtime import DetmUiRunner
+from detm_app.runtime.ui_runtime.learning import learning_status_multiline
 
 
 def _seed_overflow_hotspot(runner: DetmUiRunner) -> None:
@@ -86,3 +87,55 @@ def test_ui_runner_learning_status_respects_disable_flag() -> None:
         assert "disabled" in runner.learning_status_multiline().lower()
     finally:
         runner.close()
+
+
+def test_learning_status_multiline_shows_exploration_horizon_fields() -> None:
+    out = learning_status_multiline(
+        {
+            "tick": 4,
+            "event_count": 2,
+            "event_types": ["refinement"],
+            "portability_panel": {
+                "hold_rate": 0.8,
+                "operator_reuse": 0.5,
+                "transferability": 0.25,
+                "torsion_health": 0.9,
+                "acceptance": {"passed": False, "failed_signals": ["transferability"]},
+                "counts": {
+                    "total_decisions": 4,
+                    "reuse_decisions": 2,
+                    "transferable_reuse_decisions": 1,
+                    "compatible_decisions": 3,
+                    "torsion_flag_decisions": 1,
+                },
+            },
+            "watchpoints": {
+                "runtime_adaptive_profile": "throughput",
+                "runtime_adaptive_window_active": True,
+                "runtime_adaptive_signal_triggered": True,
+                "anti_goodhart_flag": True,
+                "anti_goodhart": {
+                    "applicability": "runtime_panel",
+                    "degraded_signal_count": 2,
+                },
+                "anti_goodhart_policy_reaction_applied": True,
+                "anti_goodhart_runtime_profile_applied": True,
+                "exploration_horizon_ticks": 3,
+                "horizon_start_tick": 2,
+                "horizon_break_reason": "goodhart_flag",
+                "horizon_recovery_cost_ticks": 1,
+            },
+            "window": {
+                "steps": 4,
+                "event_count": 6,
+                "refinement_count": 3,
+                "decision_count": 4,
+                "reuse_rate": 0.5,
+            },
+        }
+    )
+    assert "Exploration horizon:" in out
+    assert "ticks=3" in out
+    assert "start_tick=2" in out
+    assert "break_reason=goodhart_flag" in out
+    assert "recovery_cost_ticks=1" in out

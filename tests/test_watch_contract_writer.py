@@ -68,6 +68,11 @@ def test_watch_contract_trace_ref_and_outerfields_linkage(tmp_path):
         assert "anti_goodhart_policy_reaction_applied" in watchpoints
         assert "anti_goodhart_runtime_profile_applied" in watchpoints
         assert "anti_goodhart" in watchpoints
+        assert "exploration_horizon" in watchpoints
+        assert "exploration_horizon_ticks" in watchpoints
+        assert "horizon_start_tick" in watchpoints
+        assert "horizon_break_reason" in watchpoints
+        assert "horizon_recovery_cost_ticks" in watchpoints
         assert "operator_decision_count" in watchpoints
         assert "operator_reuse_count" in watchpoints
         assert "operator_search_count" in watchpoints
@@ -125,8 +130,8 @@ def test_watch_contract_storage_policy_prunes_entries_and_artifacts(tmp_path):
         assert "operator_search_count" in watchpoints
         assert "operator_torsion_flag_count" in watchpoints
         assert "anti_goodhart" in watchpoints
+        assert "exploration_horizon" in watchpoints
 
     artifact_rows = sorted(outerfields_dir.glob("outerfields_*.npz"), key=lambda p: p.name)
     assert len(artifact_rows) == 3
     assert [int(path.stem.split("_")[-1]) for path in artifact_rows] == [4, 5, 6]
-

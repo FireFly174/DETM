@@ -63,6 +63,8 @@ def test_extract_graph_series_values_reads_snapshot_paths() -> None:
             "operator_reuse_rate": 0.5,
             "runtime_adaptive_window_active": True,
             "anti_goodhart_flag": False,
+            "exploration_horizon_ticks": 5,
+            "horizon_recovery_cost_ticks": 2,
             "cpu_time_ms": 12.5,
             "step_ops_estimate": 144.0,
             "oscillation_score": 0.75,
@@ -86,6 +88,8 @@ def test_extract_graph_series_values_reads_snapshot_paths() -> None:
             "torsion_health",
             "runtime_active",
             "anti_goodhart_flag",
+            "exploration_horizon_ticks",
+            "horizon_recovery_cost_ticks",
             "cpu_time_ms",
             "oscillation_score",
             "influence_count",
@@ -124,6 +128,8 @@ def test_extract_graph_series_values_reads_snapshot_paths() -> None:
     assert float(values["torsion_health"]) == 0.9
     assert float(values["runtime_active"]) == 1.0
     assert float(values["anti_goodhart_flag"]) == 0.0
+    assert float(values["exploration_horizon_ticks"]) == 5.0
+    assert float(values["horizon_recovery_cost_ticks"]) == 2.0
     assert float(values["cpu_time_ms"]) == 12.5
     assert float(values["oscillation_score"]) == 0.75
     assert float(values["influence_count"]) == 2.0

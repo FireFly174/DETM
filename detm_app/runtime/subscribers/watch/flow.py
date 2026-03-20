@@ -6,7 +6,12 @@ from typing import Any
 
 from detm.runtime import api
 from detm.runtime.level_policy import LevelPolicy, PolicyDecision
-from detm.runtime.watch_contract import AntiGoodhartSnapshot, OuterFieldsRef, WatchContractPacket
+from detm.runtime.watch_contract import (
+    AntiGoodhartSnapshot,
+    ExplorationHorizonSnapshot,
+    OuterFieldsRef,
+    WatchContractPacket,
+)
 
 from detm_app.runtime.subscribers.common import _trace_ref_for_tick
 
@@ -49,6 +54,13 @@ def anti_goodhart_projection(policy_decision: PolicyDecision) -> dict[str, Any]:
     raw = guard.get("anti_goodhart", {})
     payload = dict(raw) if isinstance(raw, dict) else {}
     return AntiGoodhartSnapshot.from_dict(payload).to_dict()
+
+
+def exploration_horizon_projection(policy_decision: PolicyDecision) -> dict[str, Any]:
+    guard = dict(policy_decision.runtime_adaptive_guard)
+    raw = guard.get("exploration_horizon", {})
+    payload = dict(raw) if isinstance(raw, dict) else {}
+    return ExplorationHorizonSnapshot.from_dict(payload).to_dict()
 
 
 def operator_decision_rows(*, events: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -117,6 +129,7 @@ def runtime_watchpoints(
         else 0.0
     )
     anti_goodhart = anti_goodhart_projection(policy_decision)
+    exploration_horizon = exploration_horizon_projection(policy_decision)
     out = {
         "refinement_count": int(sum(1 for event in events if str(event.get("type", "")) == "refinement")),
         "influence_count": int(sum(1 for event in events if str(event.get("type", "")) == "influence")),
@@ -143,6 +156,11 @@ def runtime_watchpoints(
             anti_goodhart.get("runtime_profile_applied", False)
         ),
         "anti_goodhart": anti_goodhart,
+        "exploration_horizon_ticks": int(exploration_horizon.get("exploration_horizon_ticks", 0)),
+        "horizon_start_tick": int(exploration_horizon.get("horizon_start_tick", 0)),
+        "horizon_break_reason": str(exploration_horizon.get("horizon_break_reason", "")),
+        "horizon_recovery_cost_ticks": int(exploration_horizon.get("horizon_recovery_cost_ticks", 0)),
+        "exploration_horizon": exploration_horizon,
     }
     if bool(include_telemetry):
         out["cpu_time_ms"] = float(observables.cost.get("cpu_time_ms", 0.0))
@@ -153,6 +171,7 @@ def runtime_watchpoints(
 
 def runtime_policy_projection(policy_decision: PolicyDecision) -> dict[str, Any]:
     anti_goodhart = anti_goodhart_projection(policy_decision)
+    exploration_horizon = exploration_horizon_projection(policy_decision)
     return {
         "active_level": str(policy_decision.active_level),
         "detail_mode": policy_decision.observability_profile.normalized_detail_mode(),
@@ -161,6 +180,7 @@ def runtime_policy_projection(policy_decision: PolicyDecision) -> dict[str, Any]
         "runtime_adaptive_profile": str(policy_decision.runtime_adaptive_profile),
         "runtime_adaptive_signal_triggered": bool(policy_decision.runtime_adaptive_signal_triggered),
         "anti_goodhart": anti_goodhart,
+        "exploration_horizon": exploration_horizon,
     }
 
 
@@ -280,6 +300,7 @@ __all__ = [
     "build_watch_contract_packet",
     "build_watch_trace_entry",
     "anti_goodhart_projection",
+    "exploration_horizon_projection",
     "filter_events",
     "operator_decision_rows",
     "resolve_policy_decision",
