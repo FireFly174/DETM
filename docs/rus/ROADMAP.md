@@ -199,6 +199,23 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `dod`: runtime остаётся canonical single-writer; multiscale слой сидит поверх `step` events; ring buffer bounded; отсутствие redis dependency не роняет run; analytics видит новые artifacts.
 - `readout` (2026-03-20): добавлен `multiscale_catalog` config block (`observe|hint|jump`, Redis URL, ring window, patch/interface quantization, support/confidence thresholds); `PatternMemoryRuntime` расширен bounded local multiscale ring buffer и `BridgeRecord`-shaped observe-only catalog state; app-layer subscriber пишет `multiscale_candidates.jsonl`, `scale_tension.jsonl`, `operator_catalog_hits.jsonl`; analytics ingest индексирует эти files как derived artifacts. Это сознательно не runtime acceleration: `hint/jump`, trajectory DB, reverse refine bodies и full Redis transport semantics остаются отдельным следующим этапом.
 
+### MSC-02 — BridgeRecordSource + Redis hot transport + trajectory store contract
+
+- `id`: `MSC-02`
+- `status`: `proposed`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `depends_on`: `[MSC-01, ANL-01]`
+- `scope_in`: формализовать следующий bounded шаг после observe-only baseline: ввести `BridgeRecordSource` как durable источник межуровневого оператора, отделить `BridgeRecord` как hot executable projection для Redis/runtime, зафиксировать contract для `ForwardCompress`, `ReverseRefine`, `ValidityEnvelope`, `db_refs`, verification history и trajectory-store сущностей (`RawTrajectory`, `CompressedTrajectory`, `VerificationRun`, `EquivalenceClass`, `CanonicalRepresentative`).
+- `scope_out`: live runtime `jump` substitution, policy-level `hint` execution, particle/macronode semantics как final architecture, выбор окончательной production DB технологии для trajectory store, перенос canonical `DETMState` или dense grids в Redis.
+- `deliverables`: RFC/contract doc для `BridgeRecordSource` и multiscale transport, schema draft для hot/cold record split, явное разделение `runtime grid memory / Redis bridge index / trajectory store DB`, readout invariants и verification hooks.
+- `api_contract_changes`: пока doc/schema only; допустимо только добавить ссылки/контракты, но не ломать текущий `MSC-01` observe-only API.
+- `tests_required`: отсутствуют как обязательный runtime gate для этого шага, пока изменения ограничены doc-first contract layer.
+- `readout_artifacts`: `docs/rus/30_architecture/bridge_record_source_and_multiscale_transport.md`
+- `risks`: преждевременно превратить RFC в утверждённую runtime architecture; спутать hot Redis projection с source-of-truth; требовать exact replay вместо допустимого `ReverseRefine` класса траекторий; перепутать межуровневой bridge с “кэшем клеток”.
+- `dod`: roadmap и architecture docs явно фиксируют `BridgeRecordSource` как следующий bounded этап после `MSC-01`; границы между observe-only baseline, hot transport и future guarded jump недвусмысленно разведены.
+- `notes`: см. `docs/rus/30_architecture/bridge_record_source_and_multiscale_transport.md`.
+
 ### E-MNT-01 — Napari-only cutover в canonical entrypoints/docs
 
 - `id`: `E-MNT-01`
