@@ -207,3 +207,20 @@ def test_learning_status_compact_shows_nd_projection_summary() -> None:
         max_len=200,
     )
     assert "proj=3x9x7->9x7" in out
+
+
+def test_ui_runner_invalid_invariant_streams_fail_closed() -> None:
+    cfg = DETMConfig(backend="numpy", device="cpu", width=8, height=8)
+    settings = UiRunSettings(
+        config=cfg,
+        influence_mode="none",
+        viz_enabled=False,
+        viz_transport="none",
+        invariant_streams=r"runs\out",
+    )
+
+    runner = DetmUiRunner(settings)
+    try:
+        assert runner.invariant_status_compact() == r"inv=invalid(runs\out)"
+    finally:
+        runner.close()

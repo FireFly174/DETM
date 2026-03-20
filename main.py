@@ -69,6 +69,7 @@ def _print_launcher_help() -> None:
           python main.py napari [NAPARI_ARGS]
           python main.py shell [SHELL_ARGS]
           python main.py headless [HEADLESS_ARGS]
+          python main.py headless analytics [ANALYTICS_ARGS]
           python main.py [HEADLESS_ARGS]
 
         Modes:
@@ -83,6 +84,8 @@ def _print_launcher_help() -> None:
             Show this launcher-level help (only run modes/start options).
           python main.py headless --help
             Show full headless CLI options (including advanced/internal knobs).
+          python main.py headless analytics --help
+            Show post-run analytics ingest/query commands.
           python main.py napari --help
             Show napari mode options.
           python main.py shell --help

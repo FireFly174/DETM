@@ -62,6 +62,7 @@ class DetmUiRunner:
         self._fields_recorder: FieldHistoryRecorder | None = None
         self._coarsener: InvariantCoarsener | None = None
         self._invariant_key: str | None = None
+        self._invariant_error: str | None = None
         self._last_influence_key: tuple | None = None
         self._influence_remaining: int = 0
         self._learning_runtime: dict[str, object] = init_learning_runtime(
@@ -110,6 +111,14 @@ class DetmUiRunner:
             self._learning_snapshot,
             enabled=bool(getattr(self.settings, "learning_view_enabled", True)),
         )
+
+    def invariant_status_compact(self) -> str:
+        key = str(self.settings.invariant_streams or "").strip()
+        if self._invariant_error and key:
+            return f"inv=invalid({key})"
+        if self._coarsener is None or not key:
+            return ""
+        return f"inv={key}"
 
     def close(self) -> None:
         self._running = False
@@ -254,12 +263,20 @@ class DetmUiRunner:
         key = (self.settings.invariant_streams or "").strip()
         if not key:
             self._disable_invariants()
+            self._invariant_error = None
             return
         if self._invariant_key == key and self._coarsener is not None:
+            self._invariant_error = None
             return
         self._disable_invariants()
-        self._coarsener = InvariantCoarsener.attach(self._session.bus, parse_invariant_streams(key))
+        try:
+            self._coarsener = InvariantCoarsener.attach(self._session.bus, parse_invariant_streams(key))
+        except ValueError as exc:
+            self._disable_invariants()
+            self._invariant_error = str(exc)
+            return
         self._invariant_key = key
+        self._invariant_error = None
         self._configure_invariant_recording()
 
     def _configure_invariant_recording(self) -> None:

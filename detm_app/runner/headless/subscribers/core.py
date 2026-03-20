@@ -14,6 +14,7 @@ from detm_app.runtime.subscribers import (
     CommitValidationReporter,
     InvariantTickJsonlWriter,
     JsonlTraceWriter,
+    MultiscaleCatalogWriter,
     OperatorDecisionWriter,
     TraceRecorder,
     WatchContractWriter,
@@ -84,6 +85,14 @@ def attach_core_subscribers(
             out_dir / "operator_decisions.jsonl",
             retention_window=int(operator_decisions_policy.get("retention_window", 0)),
             compaction_budget=int(operator_decisions_policy.get("compaction_budget", 0)),
+        )
+    if bool(config.multiscale_catalog.enabled):
+        multiscale_policy = storage_policy(config=config, level_name=level_name, artifact="multiscale_catalog")
+        MultiscaleCatalogWriter.attach(
+            session.bus,
+            out_dir,
+            retention_window=int(multiscale_policy.get("retention_window", 0)),
+            compaction_budget=int(multiscale_policy.get("compaction_budget", 0)),
         )
 
     commits_policy = storage_policy(config=config, level_name=level_name, artifact="commits")

@@ -1,6 +1,6 @@
 ﻿# ROADMAP (human)
 
-Обновлено: 2026-02-21
+Обновлено: 2026-03-20
 
 > Этот файл — человеческая версия roadmap в старом формате (как в `D:\github\game\ROADMAP.md`).
 > Детальная инженерная спецификация с PM-полями: `docs/rus/ROADMAP.md`.
@@ -28,7 +28,8 @@
 - [x] Есть network MVP: TCP relay/transport, TLS/HMAC, dedup, backpressure, delivery receipts
 - [x] Есть epoch/watermark + pre-consensus MVP + quorum/reporting
 - [x] Архитектурные docs/cards синхронизированы с текущим layout (`detm_app/runtime/*`, launcher `main.py`, `detm/runtime/fabric/*`)
-- [x] Тестовый snapshot зелёный: `pytest -q -> 348 passed`
+- [x] Добавлен local-first analytics read-model: post-run ingest в `analytics.sqlite` + structured exports в `analytics/*`
+- [x] Тестовый snapshot зелёный: `pytest -q -> 425 passed`
 - [x] Веточная политика зафиксирована: разработка через `dev/main`, релизы через `main` (`docs/BRANCHING.md`)
 
 ## Зафиксированные архитектурные решения
@@ -60,6 +61,7 @@
 - [x] Есть baseline code-contour фазы F (reaction operators + transferability + anti-Goodhart)
 - [ ] Нет N-D runtime модели и межуровневой геометрии
 - [ ] Нет отдельной formal спецификации `local-first + validation-sync` как R&D трека
+- [ ] Нет follow-up этапа для оптимизации шумного `outerfields` хранения поверх уже добавленного analytics read-model
 - [x] Закрыт app-layer maintenance debt (`config -> runner` decoupling, viewer adapter registry, shared batch service)
 - [ ] Остался P1 runtime/app structural debt (крупные orchestration-модули: `detm/runtime/fabric/tcp_transport/transport.py`, `detm_app/runtime/subscribers/fabric/*`)
 
@@ -115,6 +117,18 @@
 - [x] RT-MNT-03: декомпозиция `fabric/runtime_composer` + handshake normalize path
 - [x] RT-MNT-04: закрыть schema migration path в `detm/runtime/serialization/*`
 
+### Этап ANL (analytics read-model)
+
+- [x] ANL-01: local-first SQLite read-model + structured run packs
+
+Примечание (2026-03-20): в app-layer добавлен post-run analytics контур на `sqlite3`, не меняющий runtime write path. Completed run теперь можно ingest-ить в `analytics.sqlite`, а рядом строятся derived exports `analytics/run_summary.json`, `analytics/event_windows.jsonl`, `analytics/decision_windows.jsonl`, `analytics/outerfields_index.jsonl`. Raw artifact-first слой остаётся source-of-truth; SQLite хранит только summaries/refs/meta без dense arrays. Реальный ingest на `runs/out/ui_run` показывает, что слой пригоден для chain/trace/decision analysis и честно маркирует неполный artifact-set как `partial`, если `watch_contract` ссылается на отсутствующие `outerfields` файлы. Это закрывает именно read-model/analytics baseline, но не оптимизирует сам raw outerfields storage format и не вводит live DB writer.
+
+### Этап MSC (multiscale bridge catalog, observe-only baseline)
+
+- [x] MSC-01: bounded observe-only baseline для multiscale/Redis трека
+
+Примечание (2026-03-20): в `DETMConfig` добавлен `multiscale_catalog` block, а `pattern_memory` расширен local ring buffer и bridge-record shaped observe-only catalog state. На `step` events теперь можно писать derived artifacts `multiscale_candidates.jsonl`, `scale_tension.jsonl`, `operator_catalog_hits.jsonl`, а analytics ingest индексирует их в `analytics.sqlite`. Это ещё не runtime acceleration и не full Redis bridge runtime: `hint/jump`, live Redis transport, trajectory DB с full forward/reverse bodies и particle/macronode semantics остаются следующим отдельным этапом.
+
 ### Этап PUB (public packaging, non-blocking)
 
 - [ ] PUB-01: добавить 3-5 demo assets (`docs/media`) и встроить их в `README.md`
@@ -126,10 +140,10 @@
 ## Следующие 5 шагов (приоритет)
 
 - [ ] 1. Описать `G-RND-01` как отдельный `local-first + validation-sync` R&D трек
-- [ ] 2. Закрыть `PUB-01` (demo assets в `docs/media` и README)
-- [ ] 3. Закрыть `PUB-02` (каноничные визуальные пресеты и runbooks)
-- [ ] 4. Закрыть `PUB-03` (one-page overview RU/EN)
-- [ ] 5. Закрыть `QLT-01` (docstrings/type hints для ключевых runtime API)
+- [ ] 2. Спроектировать follow-up к `MSC-01`: Redis hot transport + trajectory store DB (`BridgeRecordSource`, verification, forward/reverse bodies) без premature jump semantics
+- [ ] 3. Спроектировать follow-up к `ANL-01`: sharded/deduplicated policy для raw `outerfields` и bounded retention для long runs
+- [ ] 4. Закрыть `PUB-01` (demo assets в `docs/media` и README)
+- [ ] 5. Закрыть `PUB-02` или `PUB-03` в зависимости от того, что сильнее помогает external readability текущего baseline
 
 ## Imported from game (кратко)
 

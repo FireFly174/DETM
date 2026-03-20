@@ -205,6 +205,7 @@ def test_napari_render_flow_status_shows_selected_plane_view():
             "last_observables": [0.1, 0.2, 0.3, 0.4],
             "runtime_backend_label": lambda self: "numpy/cpu",
             "learning_status_compact": lambda self, max_len=96: "",
+            "invariant_status_compact": lambda self: r"inv=invalid(runs\out)",
         },
     )()
     viewer = _FakeViewer()
@@ -229,3 +230,4 @@ def test_napari_render_flow_status_shows_selected_plane_view():
 
     assert np.allclose(meta["energy_field"], np.full((6, 5), 4.0, dtype=np.float32))
     assert "view=plane[1]" in status.text
+    assert r"inv=invalid(runs\out)" in status.text

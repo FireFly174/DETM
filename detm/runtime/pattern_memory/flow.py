@@ -99,6 +99,7 @@ def is_reusable_record(*, record: Any, prune_error_threshold: float, prune_devia
 
 
 def runtime_key_from_config(config: Any) -> tuple[Any, ...]:
+    multiscale = getattr(config, "multiscale_catalog", None)
     return (
         bool(getattr(config, "pattern_reuse_enabled", True)),
         normalize_reuse_scope(getattr(config, "pattern_reuse_scope", "portable")),
@@ -109,6 +110,17 @@ def runtime_key_from_config(config: Any) -> tuple[Any, ...]:
         None
         if getattr(config, "pattern_store_path", None) is None
         else str(getattr(config, "pattern_store_path")),
+        bool(getattr(multiscale, "enabled", False)),
+        str(getattr(multiscale, "mode", "observe")),
+        None if getattr(multiscale, "redis_url", None) in (None, "") else str(getattr(multiscale, "redis_url")),
+        int(getattr(multiscale, "window_ticks", 10)),
+        int(getattr(multiscale, "patch_radius", 1)),
+        tuple(int(value) for value in tuple(getattr(multiscale, "horizons", (1,)))),
+        float(getattr(multiscale, "quantization", 0.05)),
+        int(getattr(multiscale, "candidate_min_support", 3)),
+        float(getattr(multiscale, "candidate_min_confidence", 0.75)),
+        float(getattr(multiscale, "jump_max_error", 0.05)),
+        bool(getattr(multiscale, "commit_only_sampling", True)),
     )
 
 

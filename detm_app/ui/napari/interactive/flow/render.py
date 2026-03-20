@@ -121,6 +121,9 @@ class NapariRenderFlow:
         learning = ""
         if hasattr(runner, "learning_status_compact"):
             learning = str(runner.learning_status_compact(max_len=96))
+        invariant_status = ""
+        if hasattr(runner, "invariant_status_compact"):
+            invariant_status = str(runner.invariant_status_compact() or "")
         requested_backend = f"{settings.config.backend}/{settings.config.device}"
         runtime_backend = (
             str(runner.runtime_backend_label())
@@ -155,6 +158,7 @@ class NapariRenderFlow:
             + f"[{dyn.alpha:.3g},{dyn.beta:.3g},{dyn.kappa:.3g},{dyn.gamma:.3g},{dyn.lambda_t:.3g}]"
             + anchors_text
             + legacy_text
+            + (" " + invariant_status if invariant_status else "")
             + (" " + learning if learning else "")
         )
         return {

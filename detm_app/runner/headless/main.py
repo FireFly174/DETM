@@ -190,6 +190,11 @@ def _build_run_headless_kwargs(options: HeadlessMainOptions) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if argv and argv[0] == "analytics":
+        from detm_app.runner.headless.analytics import main as analytics_main
+
+        return int(analytics_main(argv[1:]))
+
     ap = build_headless_parser()
     args = ap.parse_args(argv)
 

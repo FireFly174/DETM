@@ -1,6 +1,6 @@
 ﻿# ROADMAP V2 — DETM
 
-Обновлено: 2026-02-14
+Обновлено: 2026-03-20
 
 Короткая версия для чтения: `docs/rus/ROADMAP_HUMAN.md`.
 Source-of-truth по статусам и зависимостям задач: `docs/rus/ROADMAP.md`.
@@ -66,9 +66,15 @@ Source-of-truth по статусам и зависимостям задач: `d
 - Есть transport/network MVP (`InMemoryFabricBus`, `TcpFabricTransport` + TLS/HMAC + dedup + backpressure).
 - Есть epoch/watermark и pre-consensus MVP, delivery outbox, receipt tracking, quorum reports.
 
+### Analytics/Artifacts
+
+- В app-layer добавлен local-first SQLite read-model для post-run ingest: `detm_app/storage/analytics_db`.
+- Для завершённого run-а теперь могут строиться derived analytics artifacts: `analytics.sqlite`, `analytics/run_summary.json`, `analytics/event_windows.jsonl`, `analytics/decision_windows.jsonl`, `analytics/outerfields_index.jsonl`.
+- Канон не изменён: raw artifact-first слой (`trace/watch/contract/outerfields/state`) остаётся source-of-truth, а SQLite хранит summaries/refs/meta без dense array blobs.
+
 ### Тестовый срез
 
-- Локальный snapshot (2026-02-14): `pytest -q -> 348 passed`.
+- Локальный snapshot (2026-03-20): `pytest -q -> 425 passed`.
 - Fabric-focused срез в roadmap и status snapshots уже зафиксирован (`docs/rus/90_notes/status_snapshot_2026-02-12_fabric_and_napari.md`, `docs/rus/90_notes/status_snapshot_2026-02-13_napari_phase_profiler.md`).
 
 ## Workstreams
@@ -146,7 +152,52 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `QLT-01` Code-level docstrings/type hints для ключевых runtime-модулей.
 - `DAGM-01` RFC по general-graph runtime треку (DAGM beyond lattice).
 
+## WS-ANL — Artifact Analytics Read-Model
+
+Цель: добавить local-first post-run analytics слой поверх текущих artifact-first run outputs без перевода runtime на direct DB writes.
+
+Состав:
+
+- `ANL-01` SQLite read-model + structured run packs
+- `MSC-01` Observe-only multiscale bridge catalog baseline
+
 ## PM Registry (open items)
+
+### ANL-01 — SQLite read-model + structured run packs
+
+- `id`: `ANL-01`
+- `status`: `done`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-20`
+- `depends_on`: `[]`
+- `scope_in`: добавить app-layer storage/analytics контур с post-run ingest в `analytics.sqlite`, derived exports (`run_summary.json`, `event_windows.jsonl`, `decision_windows.jsonl`, `outerfields_index.jsonl`), Python API (`ingest_run`, `summarize_run`, `open_run_db`) и headless CLI (`main.py headless analytics ...`).
+- `scope_out`: direct DB writes из runtime/subscribers, Postgres/Redis, live tailing/dashboards, dense arrays/BLOB storage в БД, изменение raw artifact writer semantics.
+- `deliverables`: `detm_app/storage/analytics_db/*`, headless analytics CLI, tests на ingest/idempotency/partial mode/query path, structured exports рядом с run-dir.
+- `api_contract_changes`: новый app-layer analytics API и CLI; existing runtime contracts не меняются.
+- `tests_required`: ingest full-run, re-ingest idempotency, partial ingest, `watch_trace_enabled=false`, zero-event run, CLI smoke/query tests.
+- `readout_artifacts`: `analytics.sqlite`, `analytics/run_summary.json`, `analytics/event_windows.jsonl`, `analytics/decision_windows.jsonl`, `analytics/outerfields_index.jsonl`.
+- `risks`: принять read-model как замену raw artifacts; раздувать run summary тысячами per-tick warnings; путать partial run artifacts с ingest failures.
+- `dod`: completed run можно аналитически прочитать через SQLite/derived JSONL без ручного разбора raw jsonl; SQLite содержит summaries/refs/meta, а не dense arrays; ingest идемпотентен и raw artifact-first канон сохранён.
+- `readout` (2026-03-20): добавлен `detm_app/storage/analytics_db` на stdlib `sqlite3` с таблицами `runs`, `tick_summary`, `operator_panel`, `artifact_refs`, `run_issues`; headless CLI расширен под `analytics ingest|summarize|query`; structured exports пишутся в `run_dir/analytics/*`; ingest работает как post-run step и не меняет runtime/subscriber write path. Реальный ingest на `runs/out/ui_run` подтверждает `2668` ticks / `21` eventful ticks / `21` decision ticks и корректно маркирует run как `partial`, если `watch_contract` ссылается на отсутствующие `outerfields` artifacts. Summary warnings агрегируются по code-level, чтобы long-run readout не раздувался тысячами строк.
+
+### MSC-01 — Observe-only multiscale bridge catalog baseline
+
+- `id`: `MSC-01`
+- `status`: `done`
+- `priority`: `P1`
+- `owner_role`: `runtime`
+- `target_date`: `2026-03-20`
+- `depends_on`: `[ANL-01]`
+- `scope_in`: добавить bounded `observe-only` baseline для multiscale/Redis трека без изменения canonical runtime math: новый `multiscale_catalog` config block, bridge-oriented record shape (`window_signature/interface_signature/horizon/forward/reverse placeholder/validity/db_refs`), local ring buffer в `pattern_memory`, derived artifacts (`multiscale_candidates.jsonl`, `scale_tension.jsonl`, `operator_catalog_hits.jsonl`) и индексирование этих artifacts в `analytics.sqlite`.
+- `scope_out`: runtime `jump` substitution, policy-driven `hint` execution, обязательный live Redis dependency, хранение dense grids в Redis, trajectory store DB для full forward/reverse bodies, particle semantics как final architecture.
+- `deliverables`: `MultiscaleCatalogConfig`, bridge-record scaffolding в `detm.runtime.pattern_memory`, observe-only subscriber/writer, tests на config roundtrip/ring-buffer/graceful degradation/analytics ingest.
+- `api_contract_changes`: расширение `DETMConfig` новым nested block `multiscale_catalog`; новые derived artifact files рядом с run-dir.
+- `tests_required`: config roundtrip, observe-only artifact emission, graceful degradation при `redis_url` без redis client, analytics ingest/indexing.
+- `readout_artifacts`: `multiscale_candidates.jsonl`, `scale_tension.jsonl`, `operator_catalog_hits.jsonl`, `analytics.sqlite` artifact refs.
+- `risks`: выдать observe-only baseline за готовый `Ln <-> Ln+1` bridge runtime; начать считать Redis source-of-truth; перенести в Redis dense state вместо signatures/operators/refs.
+- `dod`: runtime остаётся canonical single-writer; multiscale слой сидит поверх `step` events; ring buffer bounded; отсутствие redis dependency не роняет run; analytics видит новые artifacts.
+- `readout` (2026-03-20): добавлен `multiscale_catalog` config block (`observe|hint|jump`, Redis URL, ring window, patch/interface quantization, support/confidence thresholds); `PatternMemoryRuntime` расширен bounded local multiscale ring buffer и `BridgeRecord`-shaped observe-only catalog state; app-layer subscriber пишет `multiscale_candidates.jsonl`, `scale_tension.jsonl`, `operator_catalog_hits.jsonl`; analytics ingest индексирует эти files как derived artifacts. Это сознательно не runtime acceleration: `hint/jump`, trajectory DB, reverse refine bodies и full Redis transport semantics остаются отдельным следующим этапом.
 
 ### E-MNT-01 — Napari-only cutover в canonical entrypoints/docs
 

@@ -66,7 +66,7 @@ def test_l0_artifact_storage_policy_applies_to_streaming_artifacts(tmp_path):
     assert [entry["tick"] for entry in trace_entries] == [5, 6]
     assert len(history_entries) == 3
     assert [entry["tick"] for entry in watch_entries] == [4, 5, 6]
-    assert [entry["tick"] for entry in watch_contract_entries] == [4, 5, 6]
+    assert [entry["tick"] for entry in watch_contract_entries] == [5, 6]
     assert [entry["tick"] for entry in operator_decision_entries] == [4, 5, 6]
     assert [int(entry["tick_ref"]["tick"]) for entry in commits_entries] == [5, 6]
     assert [int(entry["tick_ref"]["tick"]) for entry in commits_audit_entries] == [6]
@@ -74,6 +74,13 @@ def test_l0_artifact_storage_policy_applies_to_streaming_artifacts(tmp_path):
 
     outerfields_rows = sorted((out_dir / "outerfields").glob("outerfields_*.npz"), key=lambda p: p.name)
     assert [int(path.stem.split("_")[-1]) for path in outerfields_rows] == [5, 6]
+    assert {
+        int(entry["tick"]): str(entry["outerfields_ref"]["uri"])
+        for entry in watch_contract_entries
+    } == {
+        5: "outerfields/outerfields_000000005.npz",
+        6: "outerfields/outerfields_000000006.npz",
+    }
 
 
 def test_l0_artifact_storage_policy_applies_to_fabric_reports(tmp_path):

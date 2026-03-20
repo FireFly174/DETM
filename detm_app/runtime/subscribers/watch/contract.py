@@ -115,12 +115,10 @@ class WatchContractWriter:
                 continue
 
     def _apply_storage_limit(self) -> None:
-        limit = _effective_storage_limit(
+        contract_limit = _effective_storage_limit(
             retention_window=int(self.retention_window),
             compaction_budget=int(self.compaction_budget),
         )
-        if limit > 0:
-            _tail_limit(self.path, max_entries=limit)
         outer_limit = _effective_storage_limit(
             retention_window=(
                 int(self.retention_window)
@@ -133,6 +131,10 @@ class WatchContractWriter:
                 else int(self.outerfields_compaction_budget)
             ),
         )
+        if outer_limit > 0:
+            contract_limit = outer_limit if contract_limit <= 0 else min(contract_limit, outer_limit)
+        if contract_limit > 0:
+            _tail_limit(self.path, max_entries=contract_limit)
         if outer_limit > 0:
             self._prune_outerfields(max_entries=outer_limit)
 

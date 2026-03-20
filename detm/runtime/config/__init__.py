@@ -1,5 +1,5 @@
 """Configuration objects for DETM runtime APIs."""
 
-from detm.runtime.config.model import DETMConfig
+from detm.runtime.config.model import DETMConfig, MultiscaleCatalogConfig
 
-__all__ = ["DETMConfig"]
+__all__ = ["DETMConfig", "MultiscaleCatalogConfig"]
