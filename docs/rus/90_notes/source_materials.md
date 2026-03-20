@@ -73,6 +73,7 @@
 - модель обучения DETM (удержание инварианта): `docs/rus/90_notes/learning_model_detm.md`
 - протокол readout/anti-Goodhart: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
 - контекст как состояние + метрика времени исследуемости: `docs/rus/90_notes/context_graph_exploration_horizon_2026-02-21.md`
+- сохранение и адаптация agent workspace в DETM: `docs/rus/90_notes/agent_workspace_preservation.md`
 - архив двух архитектурных вариантов (L0-подписчики vs Node/Fabric): `docs/rus/90_notes/architecture_variants_l0_and_fabric_2026-02-09.md`
 
 Эти темы не должны требоваться для работы канонического L0 API (`detm/runtime/api/*`).
