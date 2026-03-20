@@ -131,8 +131,6 @@ def collect_links(path: pathlib.Path) -> list[tuple[int, str]]:
         if line.startswith("    ") or line.startswith("\t"):
             continue
         for m in LINK_RE.finditer(line):
-            if m.group("image"):
-                continue
             dest = parse_link_dest(m.group("dest"))
             if not dest or is_external(dest):
                 continue

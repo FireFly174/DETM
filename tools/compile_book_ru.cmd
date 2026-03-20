@@ -17,6 +17,8 @@ if /I "%MODE%"=="print" set OUT=docs\book\ru\_compiled_print.md
 pushd "%~dp0\.."
 rem Some environments (CI / sandboxed shells) disallow Python writing to files directly.
 rem Use stdout redirection so compilation still works.
+set "PYTHONUTF8=1"
+set "PYTHONIOENCODING=utf-8"
 python tools\compile_book_ru.py --mode "%MODE%" --out - --report > "%OUT%"
 if errorlevel 1 (
   popd

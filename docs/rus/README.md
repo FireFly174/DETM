@@ -1,69 +1,41 @@
-# Документация (RU)
+# Documentation Index (RU Canonical)
 
-Это каноническая русская документация проекта.
+This page is an index-only entrypoint for canonical Russian documentation.
 
-Точка входа:
-- `docs/rus/00_overview/README.md`
-- `docs/rus/00_overview/one_pager.md`
+## Start Here
 
-Справочно:
-- Контракт интеграции: `docs/rus/integration_contract.md`
-- Архитектура runtime/UI/viz: `docs/rus/architecture.md`
-- Синтез целевой архитектуры (north star): `docs/rus/30_architecture/target_architecture_synthesis.md`
-- OuterFields и подписки: `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
-- Commit-протокол и межнодовое согласование: `docs/rus/30_architecture/commit_protocol.md`
-- Миграция `detm.run` -> `detm_app` (legacy фасады `detm.*`): `docs/rus/30_architecture/detm_run_migration.md`
-- Strict-режим отключения legacy фасадов (`DETM_DISABLE_LEGACY_FACADES=1`): `docs/rus/30_architecture/detm_run_migration.md`
-- Контракты как инварианты переноса: `docs/rus/20_mechanisms/contracts_as_flow_invariants.md`
-- Карта исходников → канон: `docs/rus/90_notes/source_materials.md`
-- Единый источник концепций из книги: `docs/rus/90_notes/book_concepts_single_source.md`
-- Модель обучения DETM (без повторов из книги): `docs/rus/90_notes/learning_model_detm.md`
-- Протокол readout/anti-Goodhart: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
-- Архив архитектурных вариантов из обсуждений: `docs/rus/90_notes/architecture_variants_l0_and_fabric_2026-02-09.md`
+- Overview: `docs/rus/00_overview/README.md`
+- One-pager: `docs/rus/00_overview/one_pager.md`
+- Canonical integration contract: `docs/rus/integration_contract.md`
+- Runtime/UI/viz architecture: `docs/rus/architecture.md`
+- Shared docs root index: `docs/README.md`
 
+## Canonical Section Map
 
+- `00_overview/`
+- `10_model/`
+- `20_mechanisms/`
+- `30_architecture/`
+- `40_hypotheses/`
+- `50_experiments/`
+- `60_limits/`
+- `90_notes/`
 
----
-# Заметка №1
-Квантовый компьютер использует квантовые эффекты
-как вычислительную мощность,
-а моя модель — как способ обнаружения
-структур, возникающих из энтропийной эволюции.
+## High-Priority Governance Notes
 
-В данной модели эволюция среды рассматривается как первичный процесс,
-не зависящий от наблюдения.
-Квантовые эффекты интерпретируются как свойства операций наблюдения
-и агрегации, возникающие при проекции высокоразмерной энтропийной динамики
-в ограниченное представление.
-Квантовые вычисления, в этом контексте, представляют собой специализированный
-вычислительный рантайм, использующий квантовые эффекты наблюдения
-как вычислительный ресурс, а не как фундаментальный субстрат модели.
+- Book concepts single source: `docs/rus/90_notes/book_concepts_single_source.md`
+- Learning model: `docs/rus/90_notes/learning_model_detm.md`
+- Readout and anti-Goodhart: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
+- Source materials map: `docs/rus/90_notes/source_materials.md`
+- RU->EN critical translation backlog: `docs/rus/90_notes/en_translation_backlog_critical_2026-02-28.md`
 
-# Заметка № 2
-Искать перегревы не во времени, а в фазе.
+## Translation and Derivative Layers
 
-Считать «шум» носителем информации о будущем сбое.
+- EN translation index: `docs/eng/README.md`
+- Book framing (non-canon): `docs/book/`
+- Raw/source archive: `docs/source/`
 
-Использовать наблюдение как активный инструмент, а не пассивный.
+## Policy
 
-Считать волновую функцию динамики, а не состояния.
-
-Рассматривать квантовость как аварийный режим описания.
-
-Не пытаться “отделить реальность от квантования” — это невозможно.
-
-Проектировать измерение как часть модели, а не как внешний слой.
-
-
-#Заметка № 3
-
-Уровень Ln задаёт допустимую дискретизацию времени.
-Объект уровня Ln+1 допустим тогда и только тогда,
-когда его частота является целочисленным кратным частоты Ln.
-Нарушение этой делимости является операционным признаком
-необходимости смены уровня описания (refinement или coarsening).
-
-Эволюция модели представляет собой не обновление состояния
-в фиксированной решётке,
-а последовательность отображений между решётками,
-где инварианты сохраняются как векторы перехода.
+- RU docs are the source-of-truth for content conflicts.
+- EN docs are derivative translation.

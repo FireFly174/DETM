@@ -1,19 +1,33 @@
-# Documentation (EN)
+# Documentation Index (EN Translation)
 
-This is the English translation of the canonical Russian docs in `docs/rus/`.
+This page is an index-only entrypoint for English translation docs.
 
-Start here:
+## Start Here
+
 - Overview: `docs/eng/00_overview/README.md`
 - One-pager: `docs/eng/00_overview/one_pager.md`
-- Roadmap snapshot (EN): `docs/eng/00_overview/roadmap_snapshot.md`
-- Architecture overview: `docs/eng/00_overview/architecture.md`
-- Runtime/UI/viz architecture: `docs/eng/architecture.md`
-- Integration contract: `docs/eng/integration_contract.md`
-- Source materials mapping: `docs/eng/90_notes/source_materials.md`
-- Branching policy (shared): `docs/BRANCHING.md`
-- Book (EN v2, non-canon): `docs/book/en_v2/_compiled_v2.md`
+- Integration contract (EN): `docs/eng/integration_contract.md`
+- Runtime/UI/viz architecture (EN): `docs/eng/architecture.md`
+- Shared docs root index: `docs/README.md`
 
-Coverage note:
-- `10_model`, `20_mechanisms`, `30_hypotheses`, `50_experiments`, `80_limits` are aligned with the canonical Russian cards.
-- Compatibility mirrors are kept in EN for legacy numbering (`40_experiments`, `50_limits`).
-- Architecture deep cards and working notes remain primarily canonical in `docs/rus/*`.
+## EN Section Map
+
+- `00_overview/`
+- `10_model/`
+- `20_mechanisms/`
+- `30_hypotheses/`
+- `40_experiments/`
+- `50_limits/`
+- `90_notes/`
+
+## Translation Scope Notes
+
+- EN is derivative from canonical RU docs in `docs/rus/`.
+- Mirror depth can lag behind RU for architecture and notes.
+- For canon conflicts, use RU source-of-truth.
+
+## Related Layers
+
+- RU canonical index: `docs/rus/README.md`
+- Book framing (non-canon): `docs/book/`
+- Source archive: `docs/source/`

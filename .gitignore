@@ -76,3 +76,13 @@ llms-full*
 # --- Obsidian (если решишь хранить vault внутри repo) ---
 .obsidian/
 .trash/
+
+# --- aiMemo local storage (fully ignored) ---
+/.aimemo/
+/aimemo/
+
+_archive/
+_mcp_launchers/
+.continue/
+*cache/
+docs/rus/90_notes/docs*

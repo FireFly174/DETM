@@ -101,41 +101,68 @@ def render_navigation(
     t_order = [f"T{i}" for i in range(1, 8)]
 
     out: list[str] = []
-    out.append("# Навигационная шпаргалка (S–T–C) (v2, черновик)")
+    out.append('<a id="nav-cheatsheet"></a>')
+    out.append("# Навигационная шпаргалка (S-T-C) (v2, черновик)")
     out.append("")
-    out.append("Это файл для цифрового чтения. Идея простая: **вместо ссылок — короткие коды**, которые легко искать.")
+    out.append("Файл для быстрого цифрового и PDF-чтения: вместо длинных ссылок — короткие коды.")
     out.append("")
-    out.append("Как пользоваться:")
+    out.append("## Как пользоваться")
     out.append("")
-    out.append("- Открой раздел [«Реестр ситуаций»](#case-registry) в этой книге.")
-    out.append("- Нажми поиск и вводи код из таблиц ниже (например `S4/T6` или `L3-C4`).")
+    out.append("1) Найди симптом в блоке ниже.")
+    out.append("2) Возьми тему `T` и сцену `S`.")
+    out.append("3) Найди первый оператор `Lx-Cn` в [реестре ситуаций](#case-registry).")
+    out.append("4) Проверь ход по readout через `24h/72h`.")
     out.append("")
-    out.append("## Сцены (S1–S5)")
+    out.append("## Симптом -> первый ход -> тест readout")
     out.append("")
+    out.append("- «Любой выбор не меняет траекторию»")
+    out.append("  Первый ход: `L1-C2` -> `L1-C5`.")
+    out.append("  Тест: появился ли стабильный readout, меняющий следующий шаг.")
+    out.append("")
+    out.append("- «Метрики растут, а реальность нет»")
+    out.append("  Первый ход: `L3-C1` или `L3-C6`.")
+    out.append("  Тест: перестали ли решения приниматься по витринным метрикам.")
+    out.append("")
+    out.append("- «Спор о смыслах/осях»")
+    out.append("  Первый ход: `L3-C7`.")
+    out.append("  Тест: зафиксированы ли общие оси и критерии проверяемости.")
+    out.append("")
+    out.append("- «Цель размыта, нет следующего шага»")
+    out.append("  Первый ход: `L1-C2`.")
+    out.append("  Тест: определен ли один ближайший шаг и его readout.")
+    out.append("")
+    out.append("- «Пожарность и каскад сбоев»")
+    out.append("  Первый ход: `L0-C1`, затем `L0-C5` при необходимости.")
+    out.append("  Тест: локализован ли каскад в пределах одного контура.")
+    out.append("")
+    out.append("## Сцены (S1-S5)")
+    out.append("")
+    scene_fallback = {
+        "S1": "человек",
+        "S2": "семья/близкие",
+        "S3": "общество/игры",
+        "S4": "организация",
+        "S5": "государство/институты",
+    }
     for s in s_order:
-        title = scenes.get(s, "")
-        if title:
-            out.append(f"- `{s}` — {title}")
-        else:
-            out.append(f"- `{s}`")
+        title = scenes.get(s) or scene_fallback[s]
+        out.append(f"- `{s}` — {title}")
     out.append("")
-    out.append("## Темы в сценах (Sx/Ty)")
+    out.append("## Темы (T1-T7)")
     out.append("")
-    out.append("| Тема | S1 | S2 | S3 | S4 | S5 |")
-    out.append("|---|---|---|---|---|---|")
     for t in t_order:
         theme = next((x for x in themes if x.code == t), None)
-        label = f"`{t}`"
-        if theme is not None:
-            label = f"`{t}`: {theme.title}"
-        row = [label]
+        title = theme.title if theme is not None else ""
+        # Keep all Sx/Ty shortcuts explicit; they are core navigation affordances.
+        codes = [f"`{s}/{t}`" for s in s_order]
+        # If case registry parsing found a subset, prefer it only when non-empty.
+        parsed_codes = []
         for s in s_order:
             key = f"{s}/{t}"
             if key in scene_themes:
-                row.append(f"`{key}`")
-            else:
-                row.append("")
-        out.append("| " + " | ".join(row) + " |")
+                parsed_codes.append(f"`{key}`")
+        suffix = ", ".join(parsed_codes or codes)
+        out.append(f"- `{t}` {title}: {suffix}".rstrip())
     out.append("")
     out.append("## Действия (Lx-Cn)")
     out.append("")

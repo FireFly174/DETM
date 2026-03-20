@@ -29,6 +29,8 @@ if /I "%VARIANT%"=="quick" set TITLE=DETM Book (EN v2 quick)
 if /I "%MODE%"=="draft" set TITLE=%TITLE% [draft]
 
 pushd "%~dp0\.."
+set "PYTHONUTF8=1"
+set "PYTHONIOENCODING=utf-8"
 python tools\compile_book_ru.py --manifest "%MANIFEST%" --mode "%MODE%" --title "%TITLE%" --out - --report > "%OUT%"
 if errorlevel 1 (
   popd

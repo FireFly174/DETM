@@ -22,6 +22,8 @@ if /I "%~2"=="quick" set VARIANT=quick
 if /I "%~2"=="full" set VARIANT=full
 
 pushd "%~dp0\.."
+set "PYTHONUTF8=1"
+set "PYTHONIOENCODING=utf-8"
 
 rem Compile first, but skip its best-effort render so we render exactly once (and can fail hard if it fails).
 set RU_V2_SKIP_RENDER=1

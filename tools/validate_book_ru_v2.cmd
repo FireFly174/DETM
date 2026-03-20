@@ -31,6 +31,7 @@ if /I not "%TARGET%"=="all" if /I not "%TARGET%"=="full" if /I not "%TARGET%"=="
 )
 
 set /a TOTAL=0
+set /a TOTAL+=1
 if "%RUN_FULL%"=="1" set /a TOTAL+=2
 if "%RUN_QUICK%"=="1" set /a TOTAL+=2
 set /a IDX=0
@@ -38,6 +39,16 @@ set /a IDX=0
 pushd "%~dp0\.."
 
 echo RU v2 validate target=%TARGET% steps=%TOTAL%
+
+set /a IDX+=1
+echo.
+echo [!IDX!/!TOTAL!] readability/frontmatter
+python tools\check_frontmatter_readability.py
+if errorlevel 1 (
+  echo.
+  echo VALIDATION FAILED at step: readability/frontmatter
+  goto :fail
+)
 
 if "%RUN_FULL%"=="1" call :run_step "draft/full" draft
 if errorlevel 1 goto :fail

@@ -26,6 +26,8 @@ if /I "%MODE%"=="print" if /I "%VARIANT%"=="quick" set OUT=docs\book\ru_v2\_comp
 
 pushd "%~dp0\.."
 rem Use stdout redirection so compilation works in sandboxed environments.
+set "PYTHONUTF8=1"
+set "PYTHONIOENCODING=utf-8"
 set "TITLE=DETM - RU v2"
 if /I "%VARIANT%"=="quick" set "TITLE=DETM - RU v2 (quick)"
 set "ICON_MODE=%RU_V2_ICON_MODE%"

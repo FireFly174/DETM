@@ -1,0 +1,58 @@
+limits:
+  file_loc: 120
+  function_loc: 70
+  class_methods: 15
+  max_imports: 25
+  nesting: 4
+
+layer_patterns:
+  - layer: domain
+    patterns:
+      - "detm/core/**"
+  - layer: service
+    patterns:
+      - "detm/runtime/**"
+      - "detm/analysis/**"
+      - "detm/metrics/**"
+      - "detm/presets/**"
+  - layer: infrastructure
+    patterns:
+      - "detm/integrations/**"
+      - "detm_app/config/**"
+  - layer: adapter_transport
+    patterns:
+      - "detm_app/transport/**"
+      - "detm_app/ui/**"
+  - layer: orchestration
+    patterns:
+      - "detm_app/runner/**"
+      - "detm_app/runtime/**"
+
+allowed_dependencies:
+  domain:
+    - domain
+  service:
+    - domain
+    - service
+  infrastructure:
+    - domain
+    - service
+    - infrastructure
+  adapter_transport:
+    - domain
+    - service
+    - infrastructure
+    - adapter_transport
+  orchestration:
+    - domain
+    - service
+    - infrastructure
+    - adapter_transport
+    - orchestration
+  unknown:
+    - domain
+    - service
+    - infrastructure
+    - adapter_transport
+    - orchestration
+    - unknown

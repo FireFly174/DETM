@@ -1,6 +1,7 @@
 # Order of chapters for compilation (RU book v2 draft)
 # Paths are relative to this file.
 00_frontmatter/00_hook.md
+00_frontmatter/00_start_here.md
 00_frontmatter/01_thesis.md
 00_frontmatter/02_reader_map.md
 00_frontmatter/03_how_to_read.md

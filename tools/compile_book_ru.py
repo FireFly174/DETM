@@ -20,6 +20,7 @@ class Chapter:
 PAD_RE = re.compile(r"^\s*<!--\s*PAD:\s*\.{5,}\s*-->\s*$")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
 ADMONITION_START_RE = re.compile(r"^>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*$")
+COMPILED_ASSET_LINK_RE = re.compile(r"(!?\[[^\]]*]\(\s*<?)\.\./assets/")
 
 
 def load_manifest(manifest_path: pathlib.Path) -> List[pathlib.Path]:
@@ -266,9 +267,16 @@ def render(
 def postprocess_compiled_markdown(
     text: str, manifest_path: pathlib.Path, mode: str, icon_mode: str
 ) -> str:
+    manifest_posix = manifest_path.as_posix()
+
+    # Compiled files live in `docs/book/*_v2/`, so chapter-local `../assets/...`
+    # links become invalid after concatenation. Normalize them for compiled outputs.
+    if "/book/ru_v2/" in manifest_posix or "/book/en_v2/" in manifest_posix:
+        text = COMPILED_ASSET_LINK_RE.sub(r"\1./assets/", text)
+
     # Keep the source Markdown simple and do small readability tweaks at compile time.
     # Currently this is only used for RU v2.
-    if "ru_v2" not in manifest_path.as_posix():
+    if "ru_v2" not in manifest_posix:
         return text
 
     # Remove compile-mode marker from print-ready artifact (it is a technical build hint).
