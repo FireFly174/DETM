@@ -202,7 +202,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 ### MSC-02 — BridgeRecordSource + Redis hot transport + trajectory store contract
 
 - `id`: `MSC-02`
-- `status`: `proposed`
+- `status`: `in_progress`
 - `priority`: `P1`
 - `owner_role`: `runtime`
 - `depends_on`: `[MSC-01, ANL-01]`
@@ -215,6 +215,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `risks`: преждевременно превратить RFC в утверждённую runtime architecture; спутать hot Redis projection с source-of-truth; требовать exact replay вместо допустимого `ReverseRefine` класса траекторий; перепутать межуровневой bridge с “кэшем клеток”.
 - `dod`: roadmap и architecture docs явно фиксируют `BridgeRecordSource` как следующий bounded этап после `MSC-01`; границы между observe-only baseline, hot transport и future guarded jump недвусмысленно разведены.
 - `notes`: см. `docs/rus/30_architecture/bridge_record_source_and_multiscale_transport.md`.
+- `readout` (2026-03-20): в `detm.runtime.pattern_memory` добавлен first-class `BridgeRecordSource` contract и local file-backed source store; observe-only multiscale runtime теперь поднимает durable source records для зрелых кандидатов и связывает `BridgeRecord.db_refs.source_id` с cold-source сущностью. App-layer writer пишет новый derived artifact `bridge_record_sources.jsonl`, а analytics ingest индексирует его как run-level file + logical-row refs. Это ещё не trajectory store DB и не hot Redis transport semantics: full forward/reverse bodies, verification history как отдельная durable сущность и live `hint/jump` по-прежнему остаются незакрытой частью `MSC-02`.
 
 ### E-MNT-01 — Napari-only cutover в canonical entrypoints/docs
 

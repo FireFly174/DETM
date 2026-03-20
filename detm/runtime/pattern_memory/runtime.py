@@ -21,9 +21,9 @@ from detm.runtime.pattern_memory.flow import (
     runtime_key_from_config as _runtime_key_from_config_flow,
     scoped_key as _scoped_key_flow,
 )
-from detm.runtime.pattern_memory.record import BridgeRecord, PatternRecord
+from detm.runtime.pattern_memory.record import BridgeRecord, BridgeRecordSource, PatternRecord
 from detm.runtime.pattern_memory.scope import normalize_reuse_scope
-from detm.runtime.pattern_memory.store import FilePatternStore
+from detm.runtime.pattern_memory.store import FileBridgeSourceStore, FilePatternStore
 
 
 def _quantize_array(array: np.ndarray, *, quantization: float) -> np.ndarray:
@@ -63,6 +63,12 @@ def _safe_endpoint(raw: object) -> str | None:
     return urlunsplit((parsed.scheme, netloc, parsed.path, "", ""))
 
 
+def _bridge_source_store_path(path: Path) -> Path:
+    stem = path.stem or path.name
+    suffix = path.suffix or ".json"
+    return path.with_name(f"{stem}.bridge_sources{suffix}")
+
+
 class PatternMemoryRuntime:
     def __init__(
         self,
@@ -96,6 +102,9 @@ class PatternMemoryRuntime:
             if store_path is None or not str(store_path).strip()
             else FilePatternStore(Path(str(store_path).strip()))
         )
+        self.bridge_source_store = None
+        if self.store is not None:
+            self.bridge_source_store = FileBridgeSourceStore(_bridge_source_store_path(self.store.path))
         if self.store is not None:
             for record in self.store.load().values():
                 self.cache.put(record)
@@ -112,6 +121,9 @@ class PatternMemoryRuntime:
         self.multiscale_commit_only_sampling = bool(multiscale_commit_only_sampling)
         self._multiscale_snapshots: deque[dict[str, Any]] = deque(maxlen=self.multiscale_window_ticks)
         self._bridge_records: dict[str, BridgeRecord] = {}
+        self._bridge_sources: dict[str, BridgeRecordSource] = (
+            {} if self.bridge_source_store is None else self.bridge_source_store.load()
+        )
         self._transition_counts: dict[tuple[str, str], int] = {}
         self._multiscale_last_positions: dict[tuple[int, int], tuple[str, str]] = {}
         self._multiscale_last_tick: int = 0
@@ -220,6 +232,9 @@ class PatternMemoryRuntime:
     def multiscale_snapshot_count(self) -> int:
         return int(len(self._multiscale_snapshots))
 
+    def bridge_source_count(self) -> int:
+        return int(len(self._bridge_sources))
+
     def multiscale_backend_info(self) -> dict[str, Any]:
         return {
             "kind": str(self._multiscale_backend_kind),
@@ -241,6 +256,7 @@ class PatternMemoryRuntime:
                 "mode": str(self.multiscale_mode),
                 "catalog_backend": self.multiscale_backend_info(),
                 "candidates": [],
+                "sources": [],
                 "summary": {
                     "coarsen_candidate_count": 0,
                     "refine_candidate_count": 0,
@@ -251,6 +267,7 @@ class PatternMemoryRuntime:
                 "hit_count": 0,
                 "miss_count": 0,
                 "record_count": int(len(self._bridge_records)),
+                "source_count": int(len(self._bridge_sources)),
             }
 
         projected = np.asarray(energy, dtype=float)
@@ -258,6 +275,7 @@ class PatternMemoryRuntime:
         windows: list[dict[str, Any]] = []
         signature_counts: Counter[str] = Counter()
         candidate_rows: list[dict[str, Any]] = []
+        source_rows_by_id: dict[str, dict[str, Any]] = {}
         repeated_hits = 0
         refine_candidates = 0
         candidate_threshold = max(1, int(self.multiscale_candidate_min_support))
@@ -289,6 +307,8 @@ class PatternMemoryRuntime:
                         "center": [int(center_y), int(center_x)],
                         "window_signature": window_signature,
                         "interface_signature": interface_signature,
+                        "patch_shape": [int(value) for value in patch.shape],
+                        "interface_radius": int(interface_radius),
                         "patch_mean": float(np.mean(patch)),
                         "patch_var": float(np.var(patch)),
                         "boundary_activity": float(np.max(interface_descriptor) - np.min(interface_descriptor)),
@@ -297,8 +317,10 @@ class PatternMemoryRuntime:
 
         previous_positions = dict(self._multiscale_last_positions)
         previous_records = dict(self._bridge_records)
+        previous_sources = dict(self._bridge_sources)
         current_positions: dict[tuple[int, int], tuple[str, str]] = {}
         next_records = dict(previous_records)
+        next_sources = dict(previous_sources)
         for window in windows:
             center_y, center_x = int(window["center"][0]), int(window["center"][1])
             position = (center_y, center_x)
@@ -322,6 +344,69 @@ class PatternMemoryRuntime:
                 )
                 if str(prev_pair[0]) != str(window_signature):
                     refine_candidates += 1
+            source_id: str | None = None
+            source = None
+            if int(support) >= candidate_threshold and confidence >= float(self.multiscale_candidate_min_confidence):
+                source_id = f"source:{str(level)}:{window_signature}:{interface_signature}:{int(self.multiscale_horizons[0])}"
+                previous_source = previous_sources.get(source_id)
+                source_status = "candidate_ready"
+                if previous_source is not None and str(previous_source.status):
+                    source_status = str(previous_source.status)
+                validity_envelope = {
+                    "boundary": str(boundary),
+                    "patch_radius": int(self.multiscale_patch_radius),
+                    "interface_radius": int(window["interface_radius"]),
+                    "quantization": float(self.multiscale_quantization),
+                    "jump_max_error": float(self.multiscale_jump_max_error),
+                }
+                source = BridgeRecordSource(
+                    source_id=source_id,
+                    level_src=str(level),
+                    level_dst=f"{str(level)}+1",
+                    window_signature=window_signature,
+                    interface_signature=interface_signature,
+                    horizon_k=int(self.multiscale_horizons[0]),
+                    result_signature=result_signature,
+                    window_geometry={
+                        "patch_radius": int(self.multiscale_patch_radius),
+                        "interface_radius": int(window["interface_radius"]),
+                        "patch_shape": list(window["patch_shape"]),
+                    },
+                    invariants_preserved=(
+                        "window_signature",
+                        "interface_signature",
+                        "boundary",
+                        "quantization",
+                    ),
+                    forward_body={
+                        "type": "forward_body_observe_placeholder",
+                        "result_signature": result_signature,
+                        "patch_mean": float(window["patch_mean"]),
+                        "patch_var": float(window["patch_var"]),
+                        "boundary_activity": float(window["boundary_activity"]),
+                    },
+                    reverse_body={
+                        "type": "reverse_refine_placeholder",
+                        "mode": "canonical_reconstruction_placeholder",
+                        "available": False,
+                    },
+                    validity_envelope=validity_envelope,
+                    verification_summary={
+                        "support": int(support),
+                        "confidence": float(confidence),
+                        "usage_count": int(usage_count),
+                        "last_verified_tick": int(tick),
+                    },
+                    provenance={
+                        "mode": str(self.multiscale_mode),
+                        "backend": dict(self.multiscale_backend_info()),
+                        "trace_ref": str(trace_ref),
+                        "first_observed_tick": int(tick if previous_source is None else previous_source.provenance.get("first_observed_tick", tick)),
+                    },
+                    status=source_status,
+                    db_refs={"source_store": "bridge_record_sources"},
+                )
+                next_sources[source_id] = source
             bridge = BridgeRecord(
                 record_id=record_id,
                 level=str(level),
@@ -360,17 +445,17 @@ class PatternMemoryRuntime:
                     "last_verified_tick": int(tick),
                 },
                 db_refs={
+                    "source_id": source_id,
                     "forward": None,
                     "reverse": None,
                 },
             )
             next_records[record_id] = bridge
-            if int(support) >= candidate_threshold and confidence >= float(
-                self.multiscale_candidate_min_confidence
-            ):
+            if source_id is not None:
                 candidate_rows.append(
                     {
                         "record_id": str(record_id),
+                        "source_id": str(source_id),
                         "level": str(level),
                         "center": [int(center_y), int(center_x)],
                         "window_signature": window_signature,
@@ -382,9 +467,12 @@ class PatternMemoryRuntime:
                         "db_refs": dict(bridge.db_refs),
                     }
                 )
+                assert source is not None
+                source_rows_by_id[str(source_id)] = source.to_dict()
 
         self._multiscale_last_positions = current_positions
         self._bridge_records = next_records
+        self._bridge_sources = next_sources
         self._multiscale_last_tick = int(tick)
         self._multiscale_snapshots.append(
             {
@@ -394,12 +482,17 @@ class PatternMemoryRuntime:
                 "positions": current_positions,
             }
         )
+        source_rows = list(source_rows_by_id.values())
+        if self.bridge_source_store is not None:
+            for source in source_rows:
+                self.bridge_source_store.upsert(BridgeRecordSource.from_dict(source))
         unique_signature_count = len(signature_counts)
         attractor_candidates = sum(1 for count in signature_counts.values() if int(count) >= candidate_threshold)
         return {
             "mode": str(self.multiscale_mode),
             "catalog_backend": self.multiscale_backend_info(),
             "candidates": candidate_rows,
+            "sources": source_rows,
             "summary": {
                 "coarsen_candidate_count": int(len(candidate_rows)),
                 "refine_candidate_count": int(refine_candidates),
@@ -410,6 +503,7 @@ class PatternMemoryRuntime:
             "hit_count": int(repeated_hits),
             "miss_count": int(max(0, len(windows) - repeated_hits)),
             "record_count": int(len(self._bridge_records)),
+            "source_count": int(len(self._bridge_sources)),
         }
 
     def _is_reusable_record(self, record: PatternRecord) -> bool:

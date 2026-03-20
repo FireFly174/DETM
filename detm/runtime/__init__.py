@@ -66,8 +66,10 @@ from detm.runtime.influence import DETMInfluence
 from detm.runtime.level_policy import LevelPolicy, ObservabilityProfile, PolicyDecision
 from detm.runtime.pattern_memory import (
     FilePatternStore,
+    FileBridgeSourceStore,
     PatternCache,
     PatternMemoryRuntime,
+    BridgeRecordSource,
     PatternRecord,
     get_pattern_runtime_for_state,
 )
@@ -144,6 +146,8 @@ __all__ = [
     "LevelPolicy",
     "ObservabilityProfile",
     "PolicyDecision",
+    "BridgeRecordSource",
+    "FileBridgeSourceStore",
     "PatternRecord",
     "PatternCache",
     "FilePatternStore",

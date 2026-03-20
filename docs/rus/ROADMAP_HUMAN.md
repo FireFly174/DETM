@@ -129,9 +129,11 @@
 
 Примечание (2026-03-20): в `DETMConfig` добавлен `multiscale_catalog` block, а `pattern_memory` расширен local ring buffer и bridge-record shaped observe-only catalog state. На `step` events теперь можно писать derived artifacts `multiscale_candidates.jsonl`, `scale_tension.jsonl`, `operator_catalog_hits.jsonl`, а analytics ingest индексирует их в `analytics.sqlite`. Это ещё не runtime acceleration и не full Redis bridge runtime: `hint/jump`, live Redis transport, trajectory DB с full forward/reverse bodies и particle/macronode semantics остаются следующим отдельным этапом.
 
-- [ ] MSC-02: зафиксировать `BridgeRecordSource + Redis hot transport + trajectory store` как следующий bounded contract step
+- [~] MSC-02: зафиксировать и начать кодировать `BridgeRecordSource + Redis hot transport + trajectory store` как bounded contract step
 
 Примечание (2026-03-20): следующий шаг после `MSC-01` вынесен в отдельный RFC `docs/rus/30_architecture/bridge_record_source_and_multiscale_transport.md`. Смысл шага: не “сразу включить jump”, а сначала развести три роли: `runtime grid memory`, `Redis bridge index` и `trajectory store DB`. `BridgeRecordSource` должен стать durable источником межуровневого оператора, а `BridgeRecord` в Redis — его hot executable projection с `ForwardCompress`, `ReverseRefine`, `ValidityEnvelope`, `db_refs` и verification history. Это по-прежнему transition-layer, а не финальная particle/macronode architecture.
+
+Примечание (реализация, 2026-03-20): первый bounded code slice для `MSC-02` уже в коде. В `pattern_memory` появился `BridgeRecordSource` и local file-backed source store, observe-only multiscale runtime начал поднимать cold-source записи для зрелых кандидатов, а в run artifacts появился `bridge_record_sources.jsonl` с индексированием через `analytics.sqlite`. Это пока именно source/contract baseline: ни trajectory store DB в полном виде, ни hot Redis transport, ни guarded `jump` ещё не включены.
 
 ### Этап PUB (public packaging, non-blocking)
 

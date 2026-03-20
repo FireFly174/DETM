@@ -1,11 +1,11 @@
-"""File-backed pattern record store."""
+"""File-backed pattern and bridge-source stores."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from detm.runtime.pattern_memory.record import PatternRecord
+from detm.runtime.pattern_memory.record import BridgeRecordSource, PatternRecord
 
 
 class FilePatternStore:
@@ -56,4 +56,39 @@ class FilePatternStore:
         self.path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-__all__ = ["FilePatternStore"]
+class FileBridgeSourceStore:
+    """File-backed store for durable bridge-record sources."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = Path(path)
+
+    def load(self) -> dict[str, BridgeRecordSource]:
+        if not self.path.exists():
+            return {}
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+        if not isinstance(payload, dict):
+            return {}
+        out: dict[str, BridgeRecordSource] = {}
+        for raw in payload.values():
+            if not isinstance(raw, dict):
+                continue
+            record = BridgeRecordSource.from_dict(raw)
+            if record.source_id:
+                out[str(record.source_id)] = record
+        return out
+
+    def upsert(self, record: BridgeRecordSource) -> None:
+        records = self.load()
+        records[str(record.source_id)] = record
+        self._write(records)
+
+    def _write(self, records: dict[str, BridgeRecordSource]) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        serializable = {key: record.to_dict() for key, record in records.items()}
+        self.path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+__all__ = ["FileBridgeSourceStore", "FilePatternStore"]

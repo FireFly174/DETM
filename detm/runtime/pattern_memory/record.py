@@ -102,5 +102,69 @@ class BridgeRecord:
             db_refs=dict(data.get("db_refs", {})),
         )
 
+@dataclass(frozen=True)
+class BridgeRecordSource:
+    source_id: str
+    schema_version: str = "bridge_record_source/v1"
+    level_src: str = "L0"
+    level_dst: str = "L0+1"
+    window_signature: str = ""
+    interface_signature: str = ""
+    horizon_k: int = 1
+    result_signature: str = ""
+    window_geometry: Dict[str, Any] = field(default_factory=dict)
+    invariants_preserved: tuple[str, ...] = field(default_factory=tuple)
+    forward_body: Dict[str, Any] = field(default_factory=dict)
+    reverse_body: Dict[str, Any] = field(default_factory=dict)
+    validity_envelope: Dict[str, Any] = field(default_factory=dict)
+    verification_summary: Dict[str, Any] = field(default_factory=dict)
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    status: str = "observed"
+    db_refs: Dict[str, Any] = field(default_factory=dict)
 
-__all__ = ["BridgeRecord", "PatternRecord"]
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "source_id": str(self.source_id),
+            "schema_version": str(self.schema_version),
+            "level_src": str(self.level_src),
+            "level_dst": str(self.level_dst),
+            "window_signature": str(self.window_signature),
+            "interface_signature": str(self.interface_signature),
+            "horizon_k": int(self.horizon_k),
+            "result_signature": str(self.result_signature),
+            "window_geometry": dict(self.window_geometry),
+            "invariants_preserved": [str(value) for value in tuple(self.invariants_preserved)],
+            "forward_body": dict(self.forward_body),
+            "reverse_body": dict(self.reverse_body),
+            "validity_envelope": dict(self.validity_envelope),
+            "verification_summary": dict(self.verification_summary),
+            "provenance": dict(self.provenance),
+            "status": str(self.status),
+            "db_refs": dict(self.db_refs),
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Dict[str, Any]) -> "BridgeRecordSource":
+        data = dict(payload)
+        return cls(
+            source_id=str(data.get("source_id", "")),
+            schema_version=str(data.get("schema_version", "bridge_record_source/v1")),
+            level_src=str(data.get("level_src", "L0")),
+            level_dst=str(data.get("level_dst", "L0+1")),
+            window_signature=str(data.get("window_signature", "")),
+            interface_signature=str(data.get("interface_signature", "")),
+            horizon_k=max(1, int(data.get("horizon_k", 1))),
+            result_signature=str(data.get("result_signature", "")),
+            window_geometry=dict(data.get("window_geometry", {})),
+            invariants_preserved=tuple(str(value) for value in list(data.get("invariants_preserved", ()))),
+            forward_body=dict(data.get("forward_body", {})),
+            reverse_body=dict(data.get("reverse_body", {})),
+            validity_envelope=dict(data.get("validity_envelope", {})),
+            verification_summary=dict(data.get("verification_summary", {})),
+            provenance=dict(data.get("provenance", {})),
+            status=str(data.get("status", "observed")),
+            db_refs=dict(data.get("db_refs", {})),
+        )
+
+
+__all__ = ["BridgeRecord", "BridgeRecordSource", "PatternRecord"]

@@ -76,6 +76,33 @@ def _make_multiscale_run(tmp_path, *, redis_url: str | None = None):
     return run_dir, runtime
 
 
+def _make_multiscale_runtime_with_store(tmp_path):
+    store_path = tmp_path / "pattern_store.json"
+    cfg = DETMConfig(
+        backend="numpy",
+        device="cpu",
+        width=5,
+        height=5,
+        initial_noise=0.0,
+        dynamics=DynamicsParameters(energy_bounds=None),
+        pattern_store_path=str(store_path),
+        multiscale_catalog={
+            "enabled": True,
+            "mode": "observe",
+            "window_ticks": 2,
+            "patch_radius": 1,
+            "horizons": [1],
+            "quantization": 0.05,
+            "candidate_min_support": 1,
+            "candidate_min_confidence": 0.0,
+            "commit_only_sampling": True,
+        },
+    )
+    session = DetmSession.create(cfg, seed=11)
+    runtime = get_pattern_runtime_for_state(state=session.state, config=cfg)
+    return session, runtime, store_path
+
+
 def test_multiscale_catalog_config_roundtrip():
     cfg = DETMConfig.from_dict(
         {
@@ -163,17 +190,48 @@ def test_multiscale_observe_only_writes_artifacts_and_keeps_ring_buffer_bounded(
     run_dir, runtime = _make_multiscale_run(tmp_path)
 
     candidates = _read_jsonl(run_dir / "multiscale_candidates.jsonl")
+    sources = _read_jsonl(run_dir / "bridge_record_sources.jsonl")
     tensions = _read_jsonl(run_dir / "scale_tension.jsonl")
     hits = _read_jsonl(run_dir / "operator_catalog_hits.jsonl")
 
     assert len(candidates) == 3
+    assert len(sources) == 3
     assert len(tensions) == 3
     assert len(hits) == 3
     assert all(row["mode"] == "observe" for row in candidates)
+    assert all(isinstance(row["sources"], list) for row in sources)
+    assert any(row["sources"] for row in sources)
+    assert candidates[-1]["candidates"][0]["source_id"]
     assert any(int(row["summary"]["coarsen_candidate_count"]) > 0 for row in tensions)
     assert int(hits[-1]["hit_count"]) >= 0
     assert runtime is not None
     assert int(runtime.multiscale_snapshot_count()) == 2
+    assert int(hits[-1]["source_count"]) >= 0
+
+
+def test_multiscale_bridge_sources_persist_to_local_source_store(tmp_path):
+    session, runtime, store_path = _make_multiscale_runtime_with_store(tmp_path)
+    energy = np.zeros((5, 5), dtype=float)
+
+    runtime.observe_multiscale(
+        energy=energy,
+        tick=1,
+        boundary=str(session.state.lattice.boundary),
+        level="L0",
+        trace_ref="trace://tick/1",
+    )
+    session.close()
+
+    source_store_path = store_path.with_name("pattern_store.bridge_sources.json")
+    payload = json.loads(source_store_path.read_text(encoding="utf-8"))
+
+    assert source_store_path.exists()
+    assert payload
+    first = next(iter(payload.values()))
+    assert first["schema_version"] == "bridge_record_source/v1"
+    assert first["source_id"]
+    assert first["forward_body"]["type"] == "forward_body_observe_placeholder"
+    assert first["reverse_body"]["type"] == "reverse_refine_placeholder"
 
 
 def test_multiscale_artifacts_and_config_redact_redis_credentials(tmp_path):
@@ -206,6 +264,7 @@ def test_analytics_ingest_indexes_multiscale_artifacts(tmp_path):
     assert report.status == "ok"
     summary = json.loads((run_dir / "analytics" / "run_summary.json").read_text(encoding="utf-8"))
     assert int(summary["artifact_inventory"]["multiscale_candidates_file_count"]) == 1
+    assert int(summary["artifact_inventory"]["bridge_record_sources_file_count"]) == 1
     assert int(summary["artifact_inventory"]["scale_tension_file_count"]) == 1
     assert int(summary["artifact_inventory"]["operator_catalog_hits_file_count"]) == 1
 
@@ -216,12 +275,13 @@ def test_analytics_ingest_indexes_multiscale_artifacts(tmp_path):
                 """
                 SELECT artifact_kind, COUNT(*) AS n
                 FROM artifact_refs
-                WHERE artifact_kind IN ('multiscale_candidates', 'scale_tension', 'operator_catalog_hits')
+                WHERE artifact_kind IN ('multiscale_candidates', 'bridge_record_sources', 'scale_tension', 'operator_catalog_hits')
                 GROUP BY artifact_kind
                 """
             ).fetchall()
         }
     assert counts == {
+        "bridge_record_sources": 3,
         "multiscale_candidates": 3,
         "operator_catalog_hits": 3,
         "scale_tension": 3,

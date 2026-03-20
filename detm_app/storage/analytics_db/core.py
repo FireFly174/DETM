@@ -142,6 +142,12 @@ def ingest_run(run_dir: Path) -> IngestReport:
         required=False,
         code="missing_multiscale_candidates",
     )
+    bridge_record_sources_rows = _read_jsonl(
+        run_path / "bridge_record_sources.jsonl",
+        issues=issues,
+        required=False,
+        code="missing_bridge_record_sources",
+    )
     scale_tension_rows = _read_jsonl(
         run_path / "scale_tension.jsonl",
         issues=issues,
@@ -192,6 +198,7 @@ def ingest_run(run_dir: Path) -> IngestReport:
         commit_validation_payload=commit_validation_payload,
         outerfields_rows=outerfields_rows,
         multiscale_candidates_rows=multiscale_candidates_rows,
+        bridge_record_sources_rows=bridge_record_sources_rows,
         scale_tension_rows=scale_tension_rows,
         operator_catalog_hits_rows=operator_catalog_hits_rows,
     )
@@ -229,6 +236,7 @@ def ingest_run(run_dir: Path) -> IngestReport:
         outerfields_rows=outerfields_rows,
         outerfields_total_bytes=outerfields_total_bytes,
         multiscale_candidates_rows=multiscale_candidates_rows,
+        bridge_record_sources_rows=bridge_record_sources_rows,
         scale_tension_rows=scale_tension_rows,
         operator_catalog_hits_rows=operator_catalog_hits_rows,
         created_at_ms=created_at_ms,
@@ -949,6 +957,7 @@ def _build_artifact_rows(
     commit_validation_payload: dict[str, Any] | None,
     outerfields_rows: list[dict[str, Any]],
     multiscale_candidates_rows: list[dict[str, Any]],
+    bridge_record_sources_rows: list[dict[str, Any]],
     scale_tension_rows: list[dict[str, Any]],
     operator_catalog_hits_rows: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
@@ -962,6 +971,7 @@ def _build_artifact_rows(
         ("watch_contract", run_path / "watch_contract.jsonl", contract_rows[0].get("schema") if contract_rows else None),
         ("operator_decisions", run_path / "operator_decisions.jsonl", None),
         ("multiscale_candidates_file", run_path / "multiscale_candidates.jsonl", None),
+        ("bridge_record_sources_file", run_path / "bridge_record_sources.jsonl", None),
         ("scale_tension_file", run_path / "scale_tension.jsonl", None),
         ("operator_catalog_hits_file", run_path / "operator_catalog_hits.jsonl", None),
         ("commits", run_path / "commits.jsonl", commits_rows[0].get("schema_version") if commits_rows else None),
@@ -1010,11 +1020,13 @@ def _build_artifact_rows(
         )
     path_lookup = {
         "multiscale_candidates": run_path / "multiscale_candidates.jsonl",
+        "bridge_record_sources": run_path / "bridge_record_sources.jsonl",
         "scale_tension": run_path / "scale_tension.jsonl",
         "operator_catalog_hits": run_path / "operator_catalog_hits.jsonl",
     }
     for artifact_kind, source_rows in (
         ("multiscale_candidates", multiscale_candidates_rows),
+        ("bridge_record_sources", bridge_record_sources_rows),
         ("scale_tension", scale_tension_rows),
         ("operator_catalog_hits", operator_catalog_hits_rows),
     ):
@@ -1060,6 +1072,7 @@ def _build_run_summary_payload(
     outerfields_rows: list[dict[str, Any]],
     outerfields_total_bytes: int,
     multiscale_candidates_rows: list[dict[str, Any]],
+    bridge_record_sources_rows: list[dict[str, Any]],
     scale_tension_rows: list[dict[str, Any]],
     operator_catalog_hits_rows: list[dict[str, Any]],
     created_at_ms: int | None,
@@ -1119,6 +1132,7 @@ def _build_run_summary_payload(
             "outerfields_total_bytes": int(outerfields_total_bytes),
             "outerfields_density_per_100_ticks": 0.0 if tick_count == 0 else (len(outerfields_rows) * 100.0) / tick_count,
             "multiscale_candidates_file_count": int((run_path / "multiscale_candidates.jsonl").exists()),
+            "bridge_record_sources_file_count": int((run_path / "bridge_record_sources.jsonl").exists()),
             "scale_tension_file_count": int((run_path / "scale_tension.jsonl").exists()),
             "operator_catalog_hits_file_count": int((run_path / "operator_catalog_hits.jsonl").exists()),
         },
