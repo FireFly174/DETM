@@ -276,6 +276,7 @@ class PatternMemoryRuntime:
         signature_counts: Counter[str] = Counter()
         candidate_rows: list[dict[str, Any]] = []
         source_rows_by_id: dict[str, dict[str, Any]] = {}
+        verification_rows: list[dict[str, Any]] = []
         repeated_hits = 0
         refine_candidates = 0
         candidate_threshold = max(1, int(self.multiscale_candidate_min_support))
@@ -352,6 +353,23 @@ class PatternMemoryRuntime:
                 source_status = "candidate_ready"
                 if previous_source is not None and str(previous_source.status):
                     source_status = str(previous_source.status)
+                previous_verification = (
+                    {} if previous_source is None else dict(previous_source.verification_summary)
+                )
+                verification_count = max(0, int(previous_verification.get("verification_count", 0)))
+                success_count = max(0, int(previous_verification.get("success_count", 0)))
+                failure_count = max(0, int(previous_verification.get("failure_count", 0)))
+                last_status = "observed"
+                matched = None
+                if previous_source is not None:
+                    verification_count += 1
+                    matched = bool(str(previous_source.result_signature) == str(result_signature))
+                    if matched:
+                        success_count += 1
+                        last_status = "matched"
+                    else:
+                        failure_count += 1
+                        last_status = "mismatch"
                 validity_envelope = {
                     "boundary": str(boundary),
                     "patch_radius": int(self.multiscale_patch_radius),
@@ -395,6 +413,10 @@ class PatternMemoryRuntime:
                         "support": int(support),
                         "confidence": float(confidence),
                         "usage_count": int(usage_count),
+                        "verification_count": int(verification_count),
+                        "success_count": int(success_count),
+                        "failure_count": int(failure_count),
+                        "last_status": str(last_status),
                         "last_verified_tick": int(tick),
                     },
                     provenance={
@@ -407,6 +429,22 @@ class PatternMemoryRuntime:
                     db_refs={"source_store": "bridge_record_sources"},
                 )
                 next_sources[source_id] = source
+                verification_rows.append(
+                    {
+                        "source_id": str(source_id),
+                        "tick": int(tick),
+                        "trace_ref": str(trace_ref),
+                        "level": str(level),
+                        "window_signature": window_signature,
+                        "interface_signature": interface_signature,
+                        "result_signature": result_signature,
+                        "matched": matched,
+                        "status": str(last_status),
+                        "verification_count": int(verification_count),
+                        "success_count": int(success_count),
+                        "failure_count": int(failure_count),
+                    }
+                )
             bridge = BridgeRecord(
                 record_id=record_id,
                 level=str(level),
@@ -493,6 +531,7 @@ class PatternMemoryRuntime:
             "catalog_backend": self.multiscale_backend_info(),
             "candidates": candidate_rows,
             "sources": source_rows,
+            "verifications": verification_rows,
             "summary": {
                 "coarsen_candidate_count": int(len(candidate_rows)),
                 "refine_candidate_count": int(refine_candidates),

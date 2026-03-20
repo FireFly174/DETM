@@ -17,12 +17,14 @@ from detm_app.runtime.subscribers.watch.flow import resolve_policy_decision
 class MultiscaleCatalogWriter:
     candidates_path: Path
     sources_path: Path
+    verifications_path: Path
     scale_tension_path: Path
     hits_path: Path
     retention_window: int = 0
     compaction_budget: int = 0
     _fh_candidates: Any | None = None
     _fh_sources: Any | None = None
+    _fh_verifications: Any | None = None
     _fh_tension: Any | None = None
     _fh_hits: Any | None = None
     _unsub_step: Callable[[], None] | None = None
@@ -40,6 +42,7 @@ class MultiscaleCatalogWriter:
         writer = cls(
             candidates_path=out_dir / "multiscale_candidates.jsonl",
             sources_path=out_dir / "bridge_record_sources.jsonl",
+            verifications_path=out_dir / "bridge_verifications.jsonl",
             scale_tension_path=out_dir / "scale_tension.jsonl",
             hits_path=out_dir / "operator_catalog_hits.jsonl",
             retention_window=max(0, int(retention_window)),
@@ -56,6 +59,9 @@ class MultiscaleCatalogWriter:
         if self._fh_sources is None:
             self.sources_path.parent.mkdir(parents=True, exist_ok=True)
             self._fh_sources = self.sources_path.open("a", encoding="utf-8")
+        if self._fh_verifications is None:
+            self.verifications_path.parent.mkdir(parents=True, exist_ok=True)
+            self._fh_verifications = self.verifications_path.open("a", encoding="utf-8")
         if self._fh_tension is None:
             self.scale_tension_path.parent.mkdir(parents=True, exist_ok=True)
             self._fh_tension = self.scale_tension_path.open("a", encoding="utf-8")
@@ -101,6 +107,7 @@ class MultiscaleCatalogWriter:
         self._ensure()
         assert self._fh_candidates is not None
         assert self._fh_sources is not None
+        assert self._fh_verifications is not None
         assert self._fh_tension is not None
         assert self._fh_hits is not None
         self._fh_candidates.write(
@@ -131,6 +138,20 @@ class MultiscaleCatalogWriter:
             + "\n"
         )
         self._fh_sources.flush()
+        self._fh_verifications.write(
+            json.dumps(
+                {
+                    "tick": tick,
+                    "trace_ref": trace_ref,
+                    "mode": str(observed["mode"]),
+                    "catalog_backend": dict(observed["catalog_backend"]),
+                    "verifications": list(observed["verifications"]),
+                },
+                ensure_ascii=False,
+            )
+            + "\n"
+        )
+        self._fh_verifications.flush()
         self._fh_tension.write(
             json.dumps(
                 {
@@ -165,7 +186,7 @@ class MultiscaleCatalogWriter:
         self._tail_limit_all()
 
     def on_close(self, **_rest: Any) -> None:
-        for handle_name in ("_fh_candidates", "_fh_sources", "_fh_tension", "_fh_hits"):
+        for handle_name in ("_fh_candidates", "_fh_sources", "_fh_verifications", "_fh_tension", "_fh_hits"):
             handle = getattr(self, handle_name)
             if handle is not None:
                 handle.close()
@@ -182,6 +203,7 @@ class MultiscaleCatalogWriter:
             return
         _tail_limit(self.candidates_path, max_entries=limit)
         _tail_limit(self.sources_path, max_entries=limit)
+        _tail_limit(self.verifications_path, max_entries=limit)
         _tail_limit(self.scale_tension_path, max_entries=limit)
         _tail_limit(self.hits_path, max_entries=limit)
 
