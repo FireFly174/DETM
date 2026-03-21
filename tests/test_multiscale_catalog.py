@@ -218,21 +218,26 @@ def test_multiscale_observe_only_writes_artifacts_and_keeps_ring_buffer_bounded(
 
     candidates = _read_jsonl(run_dir / "multiscale_candidates.jsonl")
     sources = _read_jsonl(run_dir / "bridge_record_sources.jsonl")
+    bodies = _read_jsonl(run_dir / "trajectory_bodies.jsonl")
     verifications = _read_jsonl(run_dir / "bridge_verifications.jsonl")
     tensions = _read_jsonl(run_dir / "scale_tension.jsonl")
     hits = _read_jsonl(run_dir / "operator_catalog_hits.jsonl")
 
     assert len(candidates) == 3
     assert len(sources) == 3
+    assert len(bodies) == 3
     assert len(verifications) == 3
     assert len(tensions) == 3
     assert len(hits) == 3
     assert all(row["mode"] == "observe" for row in candidates)
     assert all(isinstance(row["sources"], list) for row in sources)
+    assert all(isinstance(row["bodies"], list) for row in bodies)
     assert all(isinstance(row["verifications"], list) for row in verifications)
     assert any(row["sources"] for row in sources)
+    assert any(row["bodies"] for row in bodies)
     assert candidates[-1]["candidates"][0]["source_id"]
     assert verifications[-1]["verifications"]
+    assert bodies[-1]["bodies"][0]["body_id"]
     assert verifications[-1]["verifications"][0]["source_id"]
     assert any(int(row["summary"]["coarsen_candidate_count"]) > 0 for row in tensions)
     assert int(hits[-1]["hit_count"]) >= 0
@@ -264,7 +269,35 @@ def test_multiscale_bridge_sources_persist_to_local_source_store(tmp_path):
     assert first["source_id"]
     assert first["forward_body"]["type"] == "forward_body_observe_placeholder"
     assert first["reverse_body"]["type"] == "reverse_refine_placeholder"
+    assert first["db_refs"]["forward_body_id"]
+    assert first["db_refs"]["reverse_body_id"]
     assert first["verification_summary"]["verification_count"] >= 0
+
+
+def test_multiscale_trajectory_bodies_persist_to_local_store(tmp_path):
+    session, runtime, store_path = _make_multiscale_runtime_with_store(tmp_path)
+    energy = np.zeros((5, 5), dtype=float)
+
+    runtime.observe_multiscale(
+        energy=energy,
+        tick=1,
+        boundary=str(session.state.lattice.boundary),
+        level="L0",
+        trace_ref="trace://tick/1",
+    )
+    session.close()
+
+    body_store_path = store_path.with_name("pattern_store.trajectory_bodies.json")
+    payload = json.loads(body_store_path.read_text(encoding="utf-8"))
+
+    assert body_store_path.exists()
+    assert payload
+    roles = {item["body_role"] for item in payload.values()}
+    assert roles == {"forward", "reverse"}
+    first = next(iter(payload.values()))
+    assert first["schema_version"] == "trajectory_body/v1"
+    assert first["body_id"]
+    assert first["source_id"]
 
 
 def test_multiscale_bridge_source_verification_summary_updates_on_reuse(tmp_path):
@@ -430,6 +463,7 @@ def test_analytics_ingest_indexes_multiscale_artifacts(tmp_path):
     summary = json.loads((run_dir / "analytics" / "run_summary.json").read_text(encoding="utf-8"))
     assert int(summary["artifact_inventory"]["multiscale_candidates_file_count"]) == 1
     assert int(summary["artifact_inventory"]["bridge_record_sources_file_count"]) == 1
+    assert int(summary["artifact_inventory"]["trajectory_bodies_file_count"]) == 1
     assert int(summary["artifact_inventory"]["bridge_verifications_file_count"]) == 1
     assert int(summary["artifact_inventory"]["scale_tension_file_count"]) == 1
     assert int(summary["artifact_inventory"]["operator_catalog_hits_file_count"]) == 1
@@ -451,7 +485,7 @@ def test_analytics_ingest_indexes_multiscale_artifacts(tmp_path):
                 """
                 SELECT artifact_kind, COUNT(*) AS n
                 FROM artifact_refs
-                WHERE artifact_kind IN ('multiscale_candidates', 'bridge_record_sources', 'bridge_verifications', 'scale_tension', 'operator_catalog_hits')
+                WHERE artifact_kind IN ('multiscale_candidates', 'bridge_record_sources', 'trajectory_bodies', 'bridge_verifications', 'scale_tension', 'operator_catalog_hits')
                 GROUP BY artifact_kind
                 """
             ).fetchall()
@@ -462,6 +496,7 @@ def test_analytics_ingest_indexes_multiscale_artifacts(tmp_path):
         "multiscale_candidates": 3,
         "operator_catalog_hits": 3,
         "scale_tension": 3,
+        "trajectory_bodies": 3,
     }
     with open_run_db(run_dir) as conn:
         verification_rows = conn.execute(

@@ -22,9 +22,14 @@ from detm.runtime.pattern_memory.flow import (
     runtime_key_from_config as _runtime_key_from_config_flow,
     scoped_key as _scoped_key_flow,
 )
-from detm.runtime.pattern_memory.record import BridgeRecord, BridgeRecordSource, PatternRecord, VerificationRun
+from detm.runtime.pattern_memory.record import BridgeRecord, BridgeRecordSource, PatternRecord, TrajectoryBody, VerificationRun
 from detm.runtime.pattern_memory.scope import normalize_reuse_scope
-from detm.runtime.pattern_memory.store import FileBridgeSourceStore, FilePatternStore, FileVerificationRunStore
+from detm.runtime.pattern_memory.store import (
+    FileBridgeSourceStore,
+    FilePatternStore,
+    FileTrajectoryBodyStore,
+    FileVerificationRunStore,
+)
 
 
 def _quantize_array(array: np.ndarray, *, quantization: float) -> np.ndarray:
@@ -76,6 +81,12 @@ def _bridge_verification_store_path(path: Path) -> Path:
     return path.with_name(f"{stem}.bridge_verification_runs{suffix}")
 
 
+def _trajectory_body_store_path(path: Path) -> Path:
+    stem = path.stem or path.name
+    suffix = path.suffix or ".json"
+    return path.with_name(f"{stem}.trajectory_bodies{suffix}")
+
+
 class PatternMemoryRuntime:
     def __init__(
         self,
@@ -110,9 +121,11 @@ class PatternMemoryRuntime:
             else FilePatternStore(Path(str(store_path).strip()))
         )
         self.bridge_source_store = None
+        self.trajectory_body_store = None
         self.verification_run_store = None
         if self.store is not None:
             self.bridge_source_store = FileBridgeSourceStore(_bridge_source_store_path(self.store.path))
+            self.trajectory_body_store = FileTrajectoryBodyStore(_trajectory_body_store_path(self.store.path))
             self.verification_run_store = FileVerificationRunStore(_bridge_verification_store_path(self.store.path))
         if self.store is not None:
             for record in self.store.load().values():
@@ -132,6 +145,9 @@ class PatternMemoryRuntime:
         self._bridge_records: dict[str, BridgeRecord] = {}
         self._bridge_sources: dict[str, BridgeRecordSource] = (
             {} if self.bridge_source_store is None else self.bridge_source_store.load()
+        )
+        self._trajectory_bodies: dict[str, TrajectoryBody] = (
+            {} if self.trajectory_body_store is None else self.trajectory_body_store.load()
         )
         self._verification_runs: dict[str, VerificationRun] = (
             {} if self.verification_run_store is None else self.verification_run_store.load()
@@ -273,6 +289,7 @@ class PatternMemoryRuntime:
                 "catalog_backend": self.multiscale_backend_info(),
                 "candidates": [],
                 "sources": [],
+                "bodies": [],
                 "summary": {
                     "coarsen_candidate_count": 0,
                     "refine_candidate_count": 0,
@@ -284,6 +301,7 @@ class PatternMemoryRuntime:
                 "miss_count": 0,
                 "record_count": int(len(self._bridge_records)),
                 "source_count": int(len(self._bridge_sources)),
+                "body_count": int(len(self._trajectory_bodies)),
                 "verification_run_count": int(len(self._verification_runs)),
             }
 
@@ -336,10 +354,12 @@ class PatternMemoryRuntime:
         previous_positions = dict(self._multiscale_last_positions)
         previous_records = dict(self._bridge_records)
         previous_sources = dict(self._bridge_sources)
+        next_trajectory_bodies = dict(self._trajectory_bodies)
         next_verification_runs = dict(self._verification_runs)
         current_positions: dict[tuple[int, int], tuple[str, str]] = {}
         next_records = dict(previous_records)
         next_sources = dict(previous_sources)
+        body_rows_by_id: dict[str, dict[str, Any]] = {}
         for window in windows:
             center_y, center_x = int(window["center"][0]), int(window["center"][1])
             position = (center_y, center_x)
@@ -395,6 +415,20 @@ class PatternMemoryRuntime:
                     "quantization": float(self.multiscale_quantization),
                     "jump_max_error": float(self.multiscale_jump_max_error),
                 }
+                forward_body_id = f"body:forward:{str(source_id)}"
+                reverse_body_id = f"body:reverse:{str(source_id)}"
+                forward_body = {
+                    "type": "forward_body_observe_placeholder",
+                    "result_signature": result_signature,
+                    "patch_mean": float(window["patch_mean"]),
+                    "patch_var": float(window["patch_var"]),
+                    "boundary_activity": float(window["boundary_activity"]),
+                }
+                reverse_body = {
+                    "type": "reverse_refine_placeholder",
+                    "mode": "canonical_reconstruction_placeholder",
+                    "available": False,
+                }
                 source = BridgeRecordSource(
                     source_id=source_id,
                     level_src=str(level),
@@ -414,18 +448,8 @@ class PatternMemoryRuntime:
                         "boundary",
                         "quantization",
                     ),
-                    forward_body={
-                        "type": "forward_body_observe_placeholder",
-                        "result_signature": result_signature,
-                        "patch_mean": float(window["patch_mean"]),
-                        "patch_var": float(window["patch_var"]),
-                        "boundary_activity": float(window["boundary_activity"]),
-                    },
-                    reverse_body={
-                        "type": "reverse_refine_placeholder",
-                        "mode": "canonical_reconstruction_placeholder",
-                        "available": False,
-                    },
+                    forward_body=forward_body,
+                    reverse_body=reverse_body,
                     validity_envelope=validity_envelope,
                     verification_summary={
                         "support": int(support),
@@ -444,9 +468,46 @@ class PatternMemoryRuntime:
                         "first_observed_tick": int(tick if previous_source is None else previous_source.provenance.get("first_observed_tick", tick)),
                     },
                     status=source_status,
-                    db_refs={"source_store": "bridge_record_sources"},
+                    db_refs={
+                        "source_store": "bridge_record_sources",
+                        "trajectory_body_store": "trajectory_bodies",
+                        "forward_body_id": str(forward_body_id),
+                        "reverse_body_id": str(reverse_body_id),
+                    },
                 )
                 next_sources[source_id] = source
+                for body_record in (
+                    TrajectoryBody(
+                        body_id=str(forward_body_id),
+                        source_id=str(source_id),
+                        body_role="forward",
+                        level_src=str(level),
+                        level_dst=f"{str(level)}+1",
+                        horizon_k=int(self.multiscale_horizons[0]),
+                        body=forward_body,
+                        provenance={
+                            "trace_ref": str(trace_ref),
+                            "tick": int(tick),
+                            "mode": str(self.multiscale_mode),
+                        },
+                    ),
+                    TrajectoryBody(
+                        body_id=str(reverse_body_id),
+                        source_id=str(source_id),
+                        body_role="reverse",
+                        level_src=str(level),
+                        level_dst=f"{str(level)}+1",
+                        horizon_k=int(self.multiscale_horizons[0]),
+                        body=reverse_body,
+                        provenance={
+                            "trace_ref": str(trace_ref),
+                            "tick": int(tick),
+                            "mode": str(self.multiscale_mode),
+                        },
+                    ),
+                ):
+                    next_trajectory_bodies[str(body_record.body_id)] = body_record
+                    body_rows_by_id[str(body_record.body_id)] = body_record.to_dict()
                 verification_rows.append(
                     {
                         "verification_id": (
@@ -513,8 +574,8 @@ class PatternMemoryRuntime:
                 },
                 db_refs={
                     "source_id": source_id,
-                    "forward": None,
-                    "reverse": None,
+                    "forward": None if source_id is None else f"body:forward:{str(source_id)}",
+                    "reverse": None if source_id is None else f"body:reverse:{str(source_id)}",
                 },
             )
             next_records[record_id] = bridge
@@ -540,6 +601,7 @@ class PatternMemoryRuntime:
         self._multiscale_last_positions = current_positions
         self._bridge_records = next_records
         self._bridge_sources = next_sources
+        self._trajectory_bodies = next_trajectory_bodies
         for verification in verification_rows:
             record = VerificationRun.from_dict(verification)
             next_verification_runs[str(record.verification_id)] = record
@@ -554,9 +616,12 @@ class PatternMemoryRuntime:
             }
         )
         source_rows = list(source_rows_by_id.values())
+        body_rows = list(body_rows_by_id.values())
         if self.bridge_source_store is not None:
             for source in source_rows:
                 self.bridge_source_store.upsert(BridgeRecordSource.from_dict(source))
+        if self.trajectory_body_store is not None:
+            self.trajectory_body_store.replace_all(next_trajectory_bodies)
         if self.verification_run_store is not None:
             self.verification_run_store.replace_all(next_verification_runs)
         unique_signature_count = len(signature_counts)
@@ -578,7 +643,9 @@ class PatternMemoryRuntime:
             "miss_count": int(max(0, len(windows) - repeated_hits)),
             "record_count": int(len(self._bridge_records)),
             "source_count": int(len(self._bridge_sources)),
+            "body_count": int(len(self._trajectory_bodies)),
             "verification_run_count": int(len(self._verification_runs)),
+            "bodies": body_rows,
         }
 
     def _is_reusable_record(self, record: PatternRecord) -> bool:

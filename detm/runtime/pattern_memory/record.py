@@ -226,4 +226,45 @@ class VerificationRun:
         )
 
 
-__all__ = ["BridgeRecord", "BridgeRecordSource", "PatternRecord", "VerificationRun"]
+@dataclass(frozen=True)
+class TrajectoryBody:
+    body_id: str
+    schema_version: str = "trajectory_body/v1"
+    source_id: str = ""
+    body_role: str = "forward"
+    level_src: str = "L0"
+    level_dst: str = "L0+1"
+    horizon_k: int = 1
+    body: Dict[str, Any] = field(default_factory=dict)
+    provenance: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "body_id": str(self.body_id),
+            "schema_version": str(self.schema_version),
+            "source_id": str(self.source_id),
+            "body_role": str(self.body_role),
+            "level_src": str(self.level_src),
+            "level_dst": str(self.level_dst),
+            "horizon_k": int(self.horizon_k),
+            "body": dict(self.body),
+            "provenance": dict(self.provenance),
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Dict[str, Any]) -> "TrajectoryBody":
+        data = dict(payload)
+        return cls(
+            body_id=str(data.get("body_id", "")),
+            schema_version=str(data.get("schema_version", "trajectory_body/v1")),
+            source_id=str(data.get("source_id", "")),
+            body_role=str(data.get("body_role", "forward")),
+            level_src=str(data.get("level_src", "L0")),
+            level_dst=str(data.get("level_dst", "L0+1")),
+            horizon_k=max(1, int(data.get("horizon_k", 1))),
+            body=dict(data.get("body", {})),
+            provenance=dict(data.get("provenance", {})),
+        )
+
+
+__all__ = ["BridgeRecord", "BridgeRecordSource", "PatternRecord", "VerificationRun", "TrajectoryBody"]

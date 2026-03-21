@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from detm.runtime.pattern_memory.record import BridgeRecordSource, PatternRecord, VerificationRun
+from detm.runtime.pattern_memory.record import BridgeRecordSource, PatternRecord, TrajectoryBody, VerificationRun
 
 
 class FilePatternStore:
@@ -129,4 +129,37 @@ class FileVerificationRunStore:
         self.path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-__all__ = ["FileBridgeSourceStore", "FilePatternStore", "FileVerificationRunStore"]
+class FileTrajectoryBodyStore:
+    """File-backed store for durable trajectory body records."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = Path(path)
+
+    def load(self) -> dict[str, TrajectoryBody]:
+        if not self.path.exists():
+            return {}
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+        if not isinstance(payload, dict):
+            return {}
+        out: dict[str, TrajectoryBody] = {}
+        for raw in payload.values():
+            if not isinstance(raw, dict):
+                continue
+            record = TrajectoryBody.from_dict(raw)
+            if record.body_id:
+                out[str(record.body_id)] = record
+        return out
+
+    def replace_all(self, records: dict[str, TrajectoryBody]) -> None:
+        self._write(records)
+
+    def _write(self, records: dict[str, TrajectoryBody]) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        serializable = {key: record.to_dict() for key, record in records.items()}
+        self.path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+__all__ = ["FileBridgeSourceStore", "FilePatternStore", "FileTrajectoryBodyStore", "FileVerificationRunStore"]
