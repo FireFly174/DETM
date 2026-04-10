@@ -38,7 +38,7 @@ visualization/
 #   comfyui_nodes/DETM/
 #     comfyui_nodes/DETM/README.md
 # docs/
-   docs/eng/
+#   docs/eng/
 #     docs/eng/00_overview/
 #       docs/eng/00_overview/architecture.md
 #       docs/eng/00_overview/README.md

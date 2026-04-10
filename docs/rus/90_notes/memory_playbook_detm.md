@@ -10,6 +10,7 @@ Operational runbook for docs ingestion, file-level code map sync, and cross-proj
 - Primary memory endpoint for DETM: `memdetm`.
 - Global bridge endpoint for cross-project links: `memglobal`.
 - Forbidden as source input: `aimemo/*.md` and any local generated summary markdown.
+- Docs-ops generated outputs live in `docs/source/generated/docs_ops/` and must not be written back into `docs/rus/90_notes/`.
 
 ## Hybrid Graph Topology (canonical)
 
@@ -38,12 +39,12 @@ Each entity must include:
 
 1. Generate docs inventory and cards:
 ```powershell
-python tools/build_docs_memory_index.py --date <YYYY-MM-DD>
+python tools/build_docs_memory_index.py --date <YYYY-MM-DD> --out-md docs/source/generated/docs_ops/docs_memory_index_run_<YYYY-MM-DD>.md --out-cards docs/source/generated/docs_ops/docs_memory_cards_<YYYY-MM-DD>.jsonl --out-non-md docs/source/generated/docs_ops/docs_non_md_inventory_<YYYY-MM-DD>.jsonl
 ```
 
 2. Refresh runtime hotspot triage (detector only):
 ```powershell
-python tools/runtime_hotspot_scan.py --repo-root . --roots detm detm_app --policy tools/oop_gatekeeper_policy.yaml --out-json docs/rus/90_notes/runtime_oop_hotspots_<YYYY-MM-DD>.json --out-md docs/rus/90_notes/runtime_oop_hotspots_<YYYY-MM-DD>.md
+python tools/runtime_hotspot_scan.py --repo-root . --roots detm detm_app --policy tools/oop_gatekeeper_policy.yaml --out-json docs/source/generated/docs_ops/runtime_oop_hotspots_<YYYY-MM-DD>.json --out-md docs/source/generated/docs_ops/runtime_oop_hotspots_<YYYY-MM-DD>.md
 ```
 
 3. Run link checks for canonical subset:
@@ -53,7 +54,7 @@ python tools/check_markdown_links.py docs/README.md docs/BRANCHING.md docs/integ
 
 4. Sync docs entities into `memdetm`:
 ```powershell
-python D:\01 Projects\_aimemo-control\scripts\memory_sync_docs.py --project detm --mode delta --endpoint memdetm --cards-jsonl docs/rus/90_notes/docs_memory_cards_<YYYY-MM-DD>.jsonl --inventory-jsonl docs/rus/90_notes/docs_non_md_inventory_<YYYY-MM-DD>.jsonl
+python D:\01 Projects\_aimemo-control\scripts\memory_sync_docs.py --project detm --mode delta --endpoint memdetm --cards-jsonl docs/source/generated/docs_ops/docs_memory_cards_<YYYY-MM-DD>.jsonl --inventory-jsonl docs/source/generated/docs_ops/docs_non_md_inventory_<YYYY-MM-DD>.jsonl
 ```
 
 5. Sync file-level code map into `memdetm`:

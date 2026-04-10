@@ -210,17 +210,17 @@ def main() -> int:
     parser.add_argument(
         "--out-md",
         default=None,
-        help="Output markdown summary path (defaults to docs/rus/90_notes/docs_memory_index_run_<date>.md)",
+        help="Output markdown summary path (defaults to docs/source/generated/docs_ops/docs_memory_index_run_<date>.md)",
     )
     parser.add_argument(
         "--out-cards",
         default=None,
-        help="Output JSONL with markdown cards (defaults to docs/rus/90_notes/docs_memory_cards_<date>.jsonl)",
+        help="Output JSONL with markdown cards (defaults to docs/source/generated/docs_ops/docs_memory_cards_<date>.jsonl)",
     )
     parser.add_argument(
         "--out-non-md",
         default=None,
-        help="Output JSONL with non-markdown inventory (defaults to docs/rus/90_notes/docs_non_md_inventory_<date>.jsonl)",
+        help="Output JSONL with non-markdown inventory (defaults to docs/source/generated/docs_ops/docs_non_md_inventory_<date>.jsonl)",
     )
     parser.add_argument(
         "--pointer-entity",
@@ -234,9 +234,9 @@ def main() -> int:
         raise SystemExit(f"docs root not found: {docs_root}")
 
     date_tag = args.date
-    out_md = Path(args.out_md) if args.out_md else Path(f"docs/rus/90_notes/docs_memory_index_run_{date_tag}.md")
-    out_cards = Path(args.out_cards) if args.out_cards else Path(f"docs/rus/90_notes/docs_memory_cards_{date_tag}.jsonl")
-    out_non_md = Path(args.out_non_md) if args.out_non_md else Path(f"docs/rus/90_notes/docs_non_md_inventory_{date_tag}.jsonl")
+    out_md = Path(args.out_md) if args.out_md else Path(f"docs/source/generated/docs_ops/docs_memory_index_run_{date_tag}.md")
+    out_cards = Path(args.out_cards) if args.out_cards else Path(f"docs/source/generated/docs_ops/docs_memory_cards_{date_tag}.jsonl")
+    out_non_md = Path(args.out_non_md) if args.out_non_md else Path(f"docs/source/generated/docs_ops/docs_non_md_inventory_{date_tag}.jsonl")
 
     md_paths = sorted([p for p in docs_root.rglob("*.md") if p.is_file()])
     all_files = sorted([p for p in docs_root.rglob("*") if p.is_file()])

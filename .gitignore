@@ -86,4 +86,8 @@ _archive/
 _mcp_launchers/
 .continue/
 *cache/
-docs/rus/90_notes/docs*
+docs/rus/90_notes/docs_memory_*
+docs/rus/90_notes/docs_memory_index_run_*
+docs/rus/90_notes/docs_non_md_inventory_*
+docs/rus/90_notes/runtime_oop_hotspots_*
+docs/rus/note*.md

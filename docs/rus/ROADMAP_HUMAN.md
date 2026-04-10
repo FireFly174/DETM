@@ -1,6 +1,6 @@
 ﻿# ROADMAP (human)
 
-Обновлено: 2026-03-20
+Обновлено: 2026-04-10
 
 > Этот файл — человеческая версия roadmap в старом формате (как в `D:\github\game\ROADMAP.md`).
 > Детальная инженерная спецификация с PM-полями: `docs/rus/ROADMAP.md`.
@@ -29,7 +29,7 @@
 - [x] Есть epoch/watermark + pre-consensus MVP + quorum/reporting
 - [x] Архитектурные docs/cards синхронизированы с текущим layout (`detm_app/runtime/*`, launcher `main.py`, `detm/runtime/fabric/*`)
 - [x] Добавлен local-first analytics read-model: post-run ingest в `analytics.sqlite` + structured exports в `analytics/*`
-- [x] Тестовый snapshot зелёный: `pytest -q -> 425 passed`
+- [x] Тестовый snapshot зелёный: `pytest -q -> 439 passed`
 - [x] Веточная политика зафиксирована: разработка через `dev/main`, релизы через `main` (`docs/BRANCHING.md`)
 
 ## Зафиксированные архитектурные решения

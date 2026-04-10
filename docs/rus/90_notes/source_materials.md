@@ -1,9 +1,13 @@
-﻿# Исходные материалы и покрытие документацией
+# Исходные материалы и покрытие документацией
 
 Изначально большая часть идей и формулировок велась как «поток заметок» (Markdown + Obsidian `.canvas`).
-Эти исходники рассматриваются как **локальное сырьё** и **не трекаются git** (их можно хранить рядом с репозиторием или в локальной папке `docs/source/`, которая игнорируется).
+Сейчас этот поток разделён на три слоя:
 
-Цель этого файла — зафиксировать, где находится канон, и какие темы из исходников уже перенесены в структуру `docs/rus/` (и переведены в `docs/eng/`).
+- `docs/rus/**` — каноническая tracked-документация;
+- `docs/rus/90_notes/**` — curated support/governance layer;
+- `docs/source/**` — локальный raw/archive/generated layer, который не трекается git.
+
+Цель этого файла — зафиксировать, где находится канон, какие notes оставлены в curated-слое, а какие материалы считаются historical archive или docs-ops generated outputs.
 
 ---
 
@@ -12,7 +16,9 @@
 - `docs/rus/` — каноническая документация (на неё опираются код и эксперименты).
 - `docs/eng/` — перевод (может быть неполным/упрощённым).
 - `docs/book/ru/` — «книга» / внешняя рамка (не канон, публицистика/обобщение идей поверх проекта).
-- исходные заметки и выгрузки из `.canvas` — вспомогательный материал и не являются частью канона.
+- `docs/rus/90_notes/` — только актуальные supporting/governance notes.
+- `docs/source/archive/90_notes/` — локальный historical archive для snapshot/backlog/audit/chat-like материалов.
+- `docs/source/generated/docs_ops/` — локальные служебные выгрузки docs-ops.
 
 Если нужно локально «распаковать» текстовые узлы `.canvas` в карточки, используйте `tools/extract_canvas_cards.py` (выходные файлы считаются локальными и не коммитятся).
 
@@ -37,7 +43,7 @@
 
 ---
 
-## 3) Карточки‑расширения (выжимка из canvas)
+## 3) Карточки-расширения (выжимка из canvas)
 
 Следующие темы из исходных `.canvas` перенесены как отдельные карточки/протоколы:
 
@@ -50,9 +56,9 @@
 
 ---
 
-## 4) Что явно вне канона L0 (но важно не потерять)
+## 4) Curated support notes в `90_notes`
 
-Темы про уровни выше L0 и/или оркестрацию (ACGS) хранятся в `90_notes`:
+Темы про уровни выше L0 и/или оркестрацию (ACGS), которые пока оставлены в curated support layer:
 
 - fallback/subworld: `docs/rus/90_notes/fallback_subworld.md`
 - форматы хранения нейронов/subworld и ресурсные критерии: `docs/rus/90_notes/storage_neurons_subworld.md`
@@ -62,18 +68,42 @@
 - «два раза — и меняем измерение» (memory layers): `docs/rus/90_notes/two_strikes_change_dimension.md`
 - «архитектурно нечестное» (эксплойт интерпретатора/метрик): `docs/rus/90_notes/architecturally_unfair_interactions.md`
 - межкомпанийнный пул задач и синхронизация уровней: `docs/rus/90_notes/intercompany_level_sync_task_pool.md`
-- anti‑capture: защита системы от захвата и вырождения: `docs/rus/90_notes/anti_capture_and_degeneracy.md`
+- anti-capture: защита системы от захвата и вырождения: `docs/rus/90_notes/anti_capture_and_degeneracy.md`
 - инженерный паспорт решения (шаблон): `docs/rus/90_notes/solution_passport.md`
 - инженерный паспорт DETM (заполненный черновик): `docs/rus/90_notes/DETM_solution_passport_filled.md`
 - вариационная/гамильтонова интерпретация DETM: `docs/rus/90_notes/variational_interpretation.md`
 - набросок системной архитектуры (термины): `docs/rus/90_notes/system_architecture_sketch.md`
-- статус-снимок и план извлечения из книги (2026-02-09): `docs/rus/90_notes/status_recovery_2026-02-09.md`
-- спецификация кодовой базы (snapshot 2026-02-09): `docs/rus/90_notes/codebase_spec_2026-02-09.md`
 - единый источник концепций книги для DETM: `docs/rus/90_notes/book_concepts_single_source.md`
 - модель обучения DETM (удержание инварианта): `docs/rus/90_notes/learning_model_detm.md`
 - протокол readout/anti-Goodhart: `docs/rus/90_notes/readout_protocol_and_antigoodhart.md`
 - контекст как состояние + метрика времени исследуемости: `docs/rus/90_notes/context_graph_exploration_horizon_2026-02-21.md`
 - сохранение и адаптация agent workspace в DETM: `docs/rus/90_notes/agent_workspace_preservation.md`
-- архив двух архитектурных вариантов (L0-подписчики vs Node/Fabric): `docs/rus/90_notes/architecture_variants_l0_and_fabric_2026-02-09.md`
 
 Эти темы не должны требоваться для работы канонического L0 API (`detm/runtime/api/*`).
+
+---
+
+## 5) Historical archive (local, non-tracked)
+
+Следующие материалы вынесены из `90_notes` в `docs/source/archive/90_notes/` как historical archive:
+
+- status/recovery snapshots;
+- docs audit и rewrite checklists;
+- translation backlog snapshots;
+- старые architecture-variant и codebase-spec snapshots;
+- архивные исследовательские сводки, не являющиеся текущим source-of-truth.
+
+На эти материалы можно ссылаться только как на archival/historical reference, но не как на каноническую опору текущей архитектуры.
+
+---
+
+## 6) Docs-ops generated artifacts (local, non-tracked)
+
+Следующие семейства артефактов больше не должны появляться в `docs/rus/90_notes/`:
+
+- `docs_memory_cards_*`
+- `docs_memory_index_run_*`
+- `docs_non_md_inventory_*`
+- `runtime_oop_hotspots_*`
+
+Их рабочее место: `docs/source/generated/docs_ops/`.

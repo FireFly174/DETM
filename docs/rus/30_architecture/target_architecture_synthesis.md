@@ -133,4 +133,3 @@
 - `docs/rus/30_architecture/OuterFields_and_Subscriptions.md`
 - `docs/rus/30_architecture/commit_protocol.md`
 - `docs/rus/30_architecture/Level_policy_schema.md`
-- `docs/rus/90_notes/codebase_spec_2026-02-09.md`

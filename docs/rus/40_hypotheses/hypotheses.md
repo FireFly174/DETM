@@ -152,6 +152,7 @@ H17. e-шаг масштаба как естественная координа�
 
 Эти страницы дополняют список гипотез операциональными определениями и набросками экспериментов:
 - аттракторы как «объекты»: `docs/rus/40_hypotheses/attractors_as_objects.md`
+- объект, граница и перенос: `docs/rus/40_hypotheses/object_boundary_transfer.md`
 - граница как интерфейс и «голографичность»: `docs/rus/40_hypotheses/boundary_interface_holography.md`
 - инерция/«масса» из локальности: `docs/rus/40_hypotheses/inertia_mass_locality.md`
 - вихри как квазичастицы: `docs/rus/40_hypotheses/vortices_quasiparticles.md`

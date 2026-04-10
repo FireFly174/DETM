@@ -13,6 +13,16 @@ DETM — исследовательская дискретная модель д
 
 ---
 
+## Снимок состояния (2026-04-10)
+
+- Проверенный локальный snapshot: `python main.py --help`, `pytest -q -> 439 passed in 16.51s`
+- Каноническая граница слоёв: `detm/*` — library-core и runtime-контракты, `detm_app/*` — orchestration/UI/transport/subscribers
+- Закрытые baseline-треки: fabric production baseline (`G-FAB-01..05`), phase-F code contour (`F-01..F-03`), bounded N-D migration (`G-ND-01..03`)
+- Текущий открытый фокус: `G-RND-01`, follow-up multiscale contract step `MSC-02`, public packaging (`PUB-01..03`), residual P1 structural debt
+- Source-of-truth по статусам и зависимостям: `docs/rus/ROADMAP.md`, краткая человеческая версия: `docs/rus/ROADMAP_HUMAN.md`
+
+---
+
 ## Quickstart (5 минут)
 
 ```bash
@@ -103,6 +113,8 @@ DETM:
 ## Структура проекта
 
 - `docs/` — каноническая документация проекта  
+  - `docs/README.md` — корневой индекс документации
+  - `docs/rus/README.md` — канонический RU entrypoint
   - `10_model` — формальная спецификация модели  
   - `20_mechanisms` — механизмы эмерджентной динамики  
   - `40_hypotheses` (RU) / `30_hypotheses` (EN) — проверяемые гипотезы  
@@ -162,6 +174,7 @@ DETM:
 - воспроизводимые эксперименты,
 - проверку гипотез,
 - уточнение границ применимости.
+- приоритетное закрытие bounded runtime/documentation workstreams без фиксации transition-слоёв как финальной архитектуры
 
 ---
 

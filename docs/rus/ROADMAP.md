@@ -1,6 +1,6 @@
 ﻿# ROADMAP V2 — DETM
 
-Обновлено: 2026-03-20
+Обновлено: 2026-04-10
 
 Короткая версия для чтения: `docs/rus/ROADMAP_HUMAN.md`.
 Source-of-truth по статусам и зависимостям задач: `docs/rus/ROADMAP.md`.
@@ -74,8 +74,8 @@ Source-of-truth по статусам и зависимостям задач: `d
 
 ### Тестовый срез
 
-- Локальный snapshot (2026-03-20): `pytest -q -> 425 passed`.
-- Fabric-focused срез в roadmap и status snapshots уже зафиксирован (`docs/rus/90_notes/status_snapshot_2026-02-12_fabric_and_napari.md`, `docs/rus/90_notes/status_snapshot_2026-02-13_napari_phase_profiler.md`).
+- Локальный snapshot (2026-04-10): `pytest -q -> 439 passed`.
+- Fabric-focused статусные snapshots уже зафиксированы как локальный historical archive в `docs/source/archive/90_notes/`; они информативны, но не являются текущим source-of-truth.
 
 ## Workstreams
 
