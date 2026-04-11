@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
   "numpy>=1.26",
-  "msgpack>=1.0",
+  "msgpack>=1.1.2",
 ]
 
 [project.urls]
