@@ -1,0 +1,30 @@
+{
+  "sizes": [24],
+  "seeds": [12345, 54321],
+  "boundary": "periodic",
+  "initial": {
+    "equilibrium_energies": [0.45, 0.5, 0.55],
+    "noise_levels": [0.08],
+    "marker_radius": 0
+  },
+  "dynamics": {
+    "beta": [0.3, 1.0],
+    "gamma": [0.1, 0.3],
+    "kappa": [0.08, 0.15],
+    "alpha": [0.2, 0.3],
+    "lambda_t": [0.2, 0.5],
+    "activation_threshold": 4.0,
+    "energy_bounds": [0.0, 1.0]
+  },
+  "crystallization": {
+    "window": 96,
+    "min_steps": 256,
+    "max_steps": 1200,
+    "snapshot_steps": [150, 300, 600, 900, 1200],
+    "delta_mean_threshold": 0.0012,
+    "energy_var_std_threshold": 0.00025,
+    "structure_std_threshold": 0.0008,
+    "min_structure_score": 0.015
+  },
+  "out": "runs/01_crystallization"
+}

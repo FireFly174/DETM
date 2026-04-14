@@ -1,0 +1,30 @@
+{
+  "sizes": [24],
+  "seeds": [12345, 54321],
+  "boundary": "periodic",
+  "initial": {
+    "equilibrium_energies": [0.999999],
+    "noise_levels": [0.1],
+    "marker_radius": 0
+  },
+  "dynamics": {
+    "beta": [0.8],
+    "gamma": [0.1],
+    "kappa": [0.1],
+    "alpha": [0.3],
+    "lambda_t": [1.5],
+    "activation_threshold": 2.0,
+    "energy_bounds": [0.0, 1.0]
+  },
+  "crystallization": {
+    "window": 64,
+    "min_steps": 96,
+    "max_steps": 500,
+    "snapshot_steps": [25, 50, 75, 100, 150, 200, 300, 500],
+    "delta_mean_threshold": 0.0012,
+    "energy_var_std_threshold": 0.00025,
+    "structure_std_threshold": 0.0008,
+    "min_structure_score": 0.015
+  },
+  "out": "runs/02_ui_reference"
+}

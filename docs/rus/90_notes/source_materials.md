@@ -107,3 +107,23 @@
 - `runtime_oop_hotspots_*`
 
 Их рабочее место: `docs/source/generated/docs_ops/`.
+
+---
+
+## 7) Архивированные root notes и куда ушло их содержимое
+
+Root-файлы `docs/rus/note1.md`, `note2.md`, `Note3.md`, `Note4.md`, `note5.md`, `Note6.md`
+считаются source-layer заметками и после извлечения полезного содержания переносятся в
+`docs/source/archive/rus_notes/`.
+
+Ключевые переносы в канон:
+- bounded non-negative energy + signed deviations as readout:
+  `docs/rus/10_model/model_core.md`, `docs/rus/60_limits/limits.md`
+- lawful coarsening / aggregated energy / boundary summary:
+  `docs/rus/20_mechanisms/coarsening.md`
+- internal time as local readiness / trigger:
+  `docs/rus/20_mechanisms/internal_time.md`
+- object / boundary / transfer / causal memory window:
+  `docs/rus/40_hypotheses/object_boundary_transfer.md`
+
+После такого переноса сами `Note*.md` не должны использоваться как часть канонической навигации.

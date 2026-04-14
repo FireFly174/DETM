@@ -1,7 +1,7 @@
 {
   "size": 24,
-  "steps": 180,
-  "seeds": [7],
+  "steps": 2000,
+  "seeds": [11111],
   "boundary": "periodic",
   "noise": 0.08,
   "dynamics": {

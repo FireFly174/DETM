@@ -1,0 +1,31 @@
+{
+  "sizes": [24],
+  "seeds": [22222, 44444, 66666],
+  "boundary": "periodic",
+  "initial": {
+    "equilibrium_energies": [0.5, 0.7],
+    "noise_levels": [0.1],
+    "marker_radius": 0
+  },
+  "dynamics": {
+    "beta": [0.9],
+    "gamma": [0.1],
+    "kappa": [0.1, 0.11, 0.12, 0.13, 0.15, 0.2],
+    "alpha": [0.3],
+    "lambda_t": [1.5],
+    "activation_threshold": 2.0,
+    "energy_bounds": [0.0, 1.0]
+  },
+  "crystallization": {
+    "window": 96,
+    "min_steps": 256,
+    "max_steps": 2000,
+    "snapshot_steps": [150, 300, 600, 900, 1200, 1600, 2000],
+    "delta_mean_threshold": 0.0012,
+    "energy_var_std_threshold": 0.00025,
+    "structure_std_threshold": 0.0008,
+    "min_structure_score": 0.015
+  },
+  "out": "runs/07_kappa_viscosity"
+}
+
