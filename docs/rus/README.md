@@ -18,7 +18,7 @@ This page is an index-only entrypoint for canonical Russian documentation.
 - Проверенный локальный snapshot (2026-04-10): `python main.py --help`, `pytest -q -> 439 passed in 16.51s`
 - Граница слоёв зафиксирована: `detm/*` — library-core и runtime-контракты, `detm_app/*` — orchestration/UI/transport/subscribers
 - Fabric production baseline, phase-F code contour и bounded N-D migration уже закрыты как baseline
-- Открытый фокус: `G-RND-01`, `MSC-02`, public packaging (`PUB-01..03`) и остаточный P1 structural debt
+- Открытый фокус: `G-RND-01`, `MSC-02`, analytics/outerfields retention follow-up и остаточный P1 structural debt
 - Важно: текущее runtime `coarsening` в `detm_app/runtime/coarsening.py` — это invariant/coarse-time stream layer, а не финальный объектный `L0 -> L1` coarsener
 - Analytics read-model и multiscale catalog остаются bounded transition layers; не трактовать как финальную архитектуру
 

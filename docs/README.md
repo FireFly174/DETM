@@ -28,7 +28,7 @@ When RU and EN differ, prefer RU canonical docs.
 - Verified local snapshot (2026-04-10): `python main.py --help`, `pytest -q -> 439 passed in 16.51s`
 - Architecture boundary is stable: `detm/*` = library-core/runtime contracts, `detm_app/*` = orchestration/UI/transport/subscribers
 - Closed baselines: fabric production baseline, phase-F code contour, bounded N-D migration
-- Current open focus: `G-RND-01`, `MSC-02`, public packaging (`PUB-01..03`) and residual P1 structural debt
+- Current open focus: `G-RND-01`, `MSC-02`, analytics/outerfields retention follow-up, and residual P1 structural debt
 - Treat analytics read-model and current multiscale catalog as bounded transition layers, not final architecture
 
 ## Foundation Docs

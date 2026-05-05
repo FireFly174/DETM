@@ -1,6 +1,6 @@
 ﻿# ROADMAP (human)
 
-Обновлено: 2026-04-10
+Обновлено: 2026-05-04
 
 > Этот файл — человеческая версия roadmap в старом формате (как в `D:\github\game\ROADMAP.md`).
 > Детальная инженерная спецификация с PM-полями: `docs/rus/ROADMAP.md`.
@@ -137,9 +137,9 @@
 
 ### Этап PUB (public packaging, non-blocking)
 
-- [ ] PUB-01: добавить 3-5 demo assets (`docs/media`) и встроить их в `README.md`
-- [ ] PUB-02: зафиксировать 2-3 каноничных визуальных пресета с командами воспроизведения
-- [ ] PUB-03: сделать one-page описание проекта (RU/EN)
+- [x] PUB-01: добавить 3-5 demo assets (`docs/media`) и встроить их в `README.md`
+- [x] PUB-02: зафиксировать 2-3 каноничных визуальных пресета с командами воспроизведения
+- [x] PUB-03: сделать one-page описание проекта (RU/EN)
 - [ ] QLT-01: усилить docstrings/type hints для ключевых runtime API
 - [ ] DAGM-01: оформить RFC по отдельному DAGM general-graph runtime треку (без срыва текущего фокуса)
 
@@ -148,8 +148,8 @@
 - [ ] 1. Описать `G-RND-01` как отдельный `local-first + validation-sync` R&D трек
 - [ ] 2. Закрыть RFC/contract step `MSC-02`: `BridgeRecordSource`, hot Redis projection и trajectory-store contract без premature jump semantics
 - [ ] 3. Спроектировать follow-up к `ANL-01`: sharded/deduplicated policy для raw `outerfields` и bounded retention для long runs
-- [ ] 4. Закрыть `PUB-01` (demo assets в `docs/media` и README)
-- [ ] 5. Закрыть `PUB-02` или `PUB-03` в зависимости от того, что сильнее помогает external readability текущего baseline
+- [ ] 4. Выбрать следующий public/quality шаг после `PUB-03` (`QLT-01` или `DAGM-01`)
+- [ ] 5. Вернуться к P1 structural debt после фиксации R&D/contract приоритетов
 
 ## Imported from game (кратко)
 

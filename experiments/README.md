@@ -65,3 +65,13 @@ Beta x kappa phase map:
 
 - config: `experiments/11_beta_kappa_phase_map/config.json`
 - how to run: `experiments/11_beta_kappa_phase_map/README.md`
+
+Public media readouts:
+
+- build from existing sweep outputs: `python -m experiments.pub01_media_assets`
+- outputs: `docs/media/png/beta_viscosity_readout.png`, `docs/media/png/kappa_viscosity_readout.png`
+
+Public visual presets:
+
+- configs/runbook: `experiments/12_public_visual_presets/README.md`
+- smoke command shape: `python -m experiments.marker_protocol --config experiments/12_public_visual_presets/<preset>.json`

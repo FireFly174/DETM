@@ -18,7 +18,7 @@ DETM — исследовательская дискретная модель д
 - Проверенный локальный snapshot: `python main.py --help`, `pytest -q -> 439 passed in 16.51s`
 - Каноническая граница слоёв: `detm/*` — library-core и runtime-контракты, `detm_app/*` — orchestration/UI/transport/subscribers
 - Закрытые baseline-треки: fabric production baseline (`G-FAB-01..05`), phase-F code contour (`F-01..F-03`), bounded N-D migration (`G-ND-01..03`)
-- Текущий открытый фокус: `G-RND-01`, follow-up multiscale contract step `MSC-02`, public packaging (`PUB-01..03`), residual P1 structural debt
+- Текущий открытый фокус: `G-RND-01`, follow-up multiscale contract step `MSC-02`, analytics/outerfields retention follow-up, residual P1 structural debt
 - Source-of-truth по статусам и зависимостям: `docs/rus/ROADMAP.md`, краткая человеческая версия: `docs/rus/ROADMAP_HUMAN.md`
 
 ---
@@ -46,13 +46,41 @@ python main.py headless --seed 7 --steps 64 --batch 1 --out runs/out/quickstart 
 python main.py napari --interactive
 ```
 
+One-page overview:
+
+- RU: `docs/rus/00_overview/one_pager.md`
+- EN: `docs/eng/00_overview/one_pager.md`
+
 ---
 
 ## Demo / preview
 
 Для публичного демо и артефактов запусков используется `docs/media/`.
 
-Рекомендуемый файл для README-превью: `docs/media/gif/video_001.gif`.
+Воспроизводимые readout-артефакты:
+
+![DETM beta x kappa phase map](docs/media/png/beta_kappa_phase_map.png)
+
+![DETM beta viscosity readout](docs/media/png/beta_viscosity_readout.png)
+
+![DETM kappa viscosity readout](docs/media/png/kappa_viscosity_readout.png)
+
+Команды воспроизведения:
+
+- `python -m experiments.11_beta_kappa_phase_map.analyze`
+- `python -m experiments.pub01_media_assets`
+
+Ручные GIF-записи в `docs/media/gif/` оставлены как дополнительные визуальные captures,
+но не являются каноничным воспроизводимым readout.
+
+Каноничные visual presets:
+
+- `experiments/12_public_visual_presets/classic_coarsing.json`
+- `experiments/12_public_visual_presets/stable_object.json`
+- `experiments/12_public_visual_presets/channel_tunnel.json`
+
+Каждый preset запускается через `python -m experiments.marker_protocol --config ...`
+и пишет `catalog.json`, `metrics.csv`, `summary.json`, `final_state.npz`.
 
 ---
 

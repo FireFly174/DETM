@@ -1,6 +1,6 @@
 ﻿# ROADMAP V2 — DETM
 
-Обновлено: 2026-04-10
+Обновлено: 2026-05-04
 
 Короткая версия для чтения: `docs/rus/ROADMAP_HUMAN.md`.
 Source-of-truth по статусам и зависимостям задач: `docs/rus/ROADMAP.md`.
@@ -638,7 +638,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 ### PUB-01 — Demo assets для README и docs
 
 - `id`: `PUB-01`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P0`
 - `owner_role`: `docs`
 - `target_date`: `2026-02-28`
@@ -651,11 +651,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: `docs/media/*`, `README.md`.
 - `risks`: визуализации не отражают каноничный режим (маркетинг вместо факта).
 - `dod`: минимум 3 воспроизводимых демо-артефакта с подписью параметров запуска и ссылкой на сценарий.
+- `readout` (2026-05-04): закрыт bounded public-media baseline без изменения runtime. В `docs/media/png/` добавлены воспроизводимые readout-артефакты: `beta_kappa_phase_map.png` из `experiments/11_beta_kappa_phase_map`, `beta_viscosity_readout.png` из `experiments/04_beta_viscosity`, `kappa_viscosity_readout.png` из `experiments/07_kappa_viscosity`. Команды регенерации зафиксированы в `README.md`, `docs/media/README.md`, `experiments/README.md`; ручные GIF в `docs/media/gif/` явно отмечены как supplementary captures, не как canonical reproducible readout.
 
 ### PUB-02 — Каноничный пакет визуальных пресетов
 
 - `id`: `PUB-02`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P0`
 - `owner_role`: `runtime`
 - `target_date`: `2026-03-03`
@@ -668,11 +669,12 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: `experiments/*`, `runs/*` exemplar paths, docs references.
 - `risks`: пресеты окажутся нестабильными между окружениями/backend.
 - `dod`: каждый пресет воспроизводится одной командой и даёт documented artifacts (`catalog/metrics/summary/final_state`).
+- `readout` (2026-05-04): закрыт config-level preset pack `experiments/12_public_visual_presets` без изменения runtime. Зафиксированы `classic_coarsing`, `stable_object`, `channel_tunnel` configs для `experiments.marker_protocol`; smoke-прогоны подтвердили expected artifacts в `runs/pub02_classic_coarsing`, `runs/pub02_stable_object`, `runs/pub02_channel_tunnel` (`catalog.json`, `seed_*/metrics.csv`, `seed_*/summary.json`, `seed_*/final_state.npz`). `channel_tunnel` явно ограничен как visual stress preset для локального perturbation readout, не новая channel-механика и не final tunnel architecture.
 
 ### PUB-03 — One-page overview (RU/EN)
 
 - `id`: `PUB-03`
-- `status`: `todo`
+- `status`: `done`
 - `priority`: `P1`
 - `owner_role`: `docs`
 - `target_date`: `2026-03-05`
@@ -685,6 +687,7 @@ Source-of-truth по статусам и зависимостям задач: `d
 - `readout_artifacts`: one-pager files + README/docs index updates.
 - `risks`: дублирование и рассинхрон с canonical документацией.
 - `dod`: one-pager синхронизирован с roadmap и launch-командами, ссылки валидны.
+- `readout` (2026-05-04): закрыт one-page overview baseline. `docs/rus/00_overview/one_pager.md` заменён читаемой RU версией, `docs/eng/00_overview/one_pager.md` синхронизирован как EN projection; оба файла фиксируют `что это`, `что это не`, слойность, quickstart, public readouts/presets и текущие открытые фокусы без объявления transition layers финальной архитектурой. Ссылки добавлены/синхронизированы в `README.md`, `docs/README.md`, RU/EN overview indexes и roadmap snapshot.
 
 ### QLT-01 — Code-level docstrings и type hints (runtime core)
 

@@ -35,6 +35,12 @@ Run:
 .\.venv\Scripts\python.exe -m experiments.crystallization_protocol --config experiments/11_beta_kappa_phase_map/config.json
 ```
 
+Analyze:
+
+```powershell
+.\.venv\Scripts\python.exe -m experiments.11_beta_kappa_phase_map.analyze
+```
+
 Outputs:
 
 - `runs/11_beta_kappa_phase_map/catalog.json`
@@ -44,6 +50,13 @@ Outputs:
   - `summary.json`
   - `state_snapshots.npz`
   - `quicklook.png`
+
+Analysis outputs:
+
+- `runs/11_beta_kappa_phase_map/analysis/phase_map_summary.csv`
+- `runs/11_beta_kappa_phase_map/analysis/beta_kappa_phase_map.png`
+- `runs/11_beta_kappa_phase_map/analysis/README.md`
+- `docs/media/png/beta_kappa_phase_map.png`
 
 Intended use:
 

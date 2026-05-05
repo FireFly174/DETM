@@ -1,0 +1,22 @@
+{
+  "size": 24,
+  "steps": 512,
+  "seeds": [31031],
+  "boundary": "periodic",
+  "noise": 0.1,
+  "dynamics": {
+    "equilibrium_energy": 0.65,
+    "beta": 0.3,
+    "gamma": 0.1,
+    "kappa": 0.1,
+    "alpha": 0.3,
+    "lambda_t": 1.5,
+    "activation_threshold": 2.0,
+    "energy_bounds": [0.0, 1.0]
+  },
+  "marker": {
+    "radius": 0,
+    "energy": 0.92
+  },
+  "out": "runs/pub02_classic_coarsing"
+}

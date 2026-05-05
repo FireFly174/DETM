@@ -2,48 +2,58 @@
 
 ## Что это
 
-DETM (Discrete Entropy-Time Model) — исследовательский runtime для дискретной динамики на решётке.
-Фокус проекта — устойчивые локальные структуры, коарсинг, асинхронность и внутреннее время, возникающие из локальных правил переноса и подавления.
+DETM (Discrete Entropy-Time Model) - исследовательский runtime для дискретной
+динамики на решетке. Проект изучает, при каких локальных правилах переноса и
+подавления возникают устойчивые локализованные структуры, коарсинг,
+асинхронность и внутреннее время.
+
+Практически это reproducible research workspace: код, сценарии запусков,
+артефакты и документация связаны так, чтобы результат можно было повторить и
+проверить по файлам, а не только по описанию.
 
 ## Что это не
 
 - не физическая теория;
-- не готовая AGI-система;
-- не доказательство универсальных законов.
+- не модель реальной Вселенной;
+- не AGI-система;
+- не доказательство универсальных законов;
+- не финальная архитектура многоуровневого coarsening.
 
-Это инженерная и исследовательская платформа для воспроизводимых экспериментов по самоорганизации и multilevel readout.
+Внешние аналогии допустимы только как интерпретации. Канон проекта - локальная
+динамика, артефакты запуска, trace/readout и явно зафиксированные ограничения.
 
-## Канонические слои
+## Как устроены слои
 
-- `detm/*`: library-core, L0 runtime и контракты API.
-- `detm_app/*`: orchestration, UI, transport, subscribers, analytics read-model.
-- `docs/rus/*`: каноническая документация и roadmap.
-- `docs/eng/*`: производная translation layer.
+- `detm/*` - library-core и runtime contracts.
+- `detm_app/*` - orchestration, UI, transport, subscribers, analytics read-model.
+- `experiments/*` - воспроизводимые сценарии и публичные preset/config пакеты.
+- `docs/rus/*` - canonical documentation и roadmap source-of-truth.
+- `docs/eng/*` - производная English translation layer.
+- `docs/media/*` - curated public preview/readout artifacts.
+
+Внешний доступ к состоянию остается artifact-first: `System Trace`, `Watch Trace`,
+`OuterFields`, `trace_ref`, summary/readout files. SQLite analytics read-model -
+производный слой поверх raw artifacts, не замена source-of-truth.
 
 ## Текущий статус
 
-- Проверенный локальный snapshot (2026-04-10): `python main.py --help`, `pytest -q -> 439 passed in 16.51s`
-- Закрыты baseline-треки: fabric production baseline, phase-F code contour, bounded N-D migration
-- Открытый фокус: `G-RND-01`, `MSC-02`, public packaging (`PUB-01..03`), residual P1 structural debt
-- Текущее runtime `coarsening` — это invariant/coarse-time stream layer; полноценный объектный `L0 -> L1` coarsener остаётся исследовательским треком
+- Verified baseline: `python main.py --help`, `pytest -> 439 passed`.
+- Закрыты: fabric production baseline, phase-F code contour, bounded N-D migration.
+- Закрыт public packaging baseline: `PUB-01` media readouts, `PUB-02` visual presets, `PUB-03` one-page overview.
+- Открытый фокус: `G-RND-01`, `MSC-02`, follow-up к analytics/outerfields retention, residual P1 structural debt.
+- Transition layers нельзя трактовать как final architecture: current multiscale catalog, analytics read-model, visual presets и `channel_tunnel` preset остаются bounded readout/packaging layers.
 
-## Минимальный запуск
+## Быстрый запуск
 
 ```powershell
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 pip install -e .
 python main.py headless --seed 7 --steps 64 --batch 1 --out runs/out/quickstart --no-viz
 ```
 
-UI-путь:
-
-```powershell
-python main.py napari --interactive
-```
-
-## Минимальные артефакты запуска
+Ожидаемые артефакты:
 
 - `runs/out/quickstart/catalog.json`
 - `runs/out/quickstart/seed_0000/config.json`
@@ -51,10 +61,45 @@ python main.py napari --interactive
 - `runs/out/quickstart/seed_0000/state.msgpack`
 - `runs/out/quickstart/seed_0000/trace.jsonl`
 
-## Куда читать дальше
+Интерактивный UI:
 
-1. `README.md`
-2. `docs/rus/00_overview/README.md`
-3. `docs/rus/10_model/model_core.md`
-4. `docs/rus/ROADMAP_HUMAN.md`
-5. `docs/rus/ROADMAP.md`
+```powershell
+python main.py napari --interactive
+```
+
+## Публичные readout и presets
+
+Curated media:
+
+- `docs/media/png/beta_kappa_phase_map.png`
+- `docs/media/png/beta_viscosity_readout.png`
+- `docs/media/png/kappa_viscosity_readout.png`
+
+Регенерация:
+
+```powershell
+python -m experiments.11_beta_kappa_phase_map.analyze
+python -m experiments.pub01_media_assets
+```
+
+Visual presets:
+
+- `experiments/12_public_visual_presets/classic_coarsing.json`
+- `experiments/12_public_visual_presets/stable_object.json`
+- `experiments/12_public_visual_presets/channel_tunnel.json`
+
+Пример запуска:
+
+```powershell
+python -m experiments.marker_protocol --config experiments/12_public_visual_presets/stable_object.json
+```
+
+## Куда смотреть дальше
+
+1. `README.md` - основной вход в репозиторий.
+2. `docs/rus/README.md` - canonical RU docs index.
+3. `docs/rus/ROADMAP_HUMAN.md` - краткая дорожная карта.
+4. `docs/rus/ROADMAP.md` - engineering source-of-truth по статусам и зависимостям.
+5. `experiments/README.md` - список воспроизводимых сценариев.
+6. `docs/media/README.md` - публичные preview/readout artifacts.
+

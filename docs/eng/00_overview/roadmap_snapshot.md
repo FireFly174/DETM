@@ -24,16 +24,16 @@ Canonical planning and statuses are maintained in:
 - Main open technical focus:
   - `G-RND-01`: formal `local-first + validation-sync` R&D track
   - `MSC-02`: BridgeRecordSource + hot transport / trajectory-store contract follow-up
-  - public packaging (`PUB-01..03`)
+  - analytics/outerfields retention follow-up
   - residual runtime/app structural debt (P1)
 
 ## Public packaging track (non-blocking)
 
 The following tasks are planned as public-facing quality improvements:
 
-- `PUB-01`: add 3-5 curated demo assets to `docs/media` and wire them into `README.md`
-- `PUB-02`: define 2-3 canonical visual presets with reproducible commands
-- `PUB-03`: create one-page project overview (RU/EN)
+- `PUB-01`: done; curated reproducible demo/readout assets are wired into `README.md` and `docs/media`
+- `PUB-02`: done; canonical visual presets live in `experiments/12_public_visual_presets`
+- `PUB-03`: done; RU/EN one-page project overview is synchronized with the current roadmap and launch commands
 - `QLT-01`: improve runtime code-level docstrings and type hints
 - `DAGM-01`: prepare RFC for a separate general-graph DAGM runtime track
 
